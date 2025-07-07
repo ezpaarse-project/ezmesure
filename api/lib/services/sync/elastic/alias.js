@@ -4,6 +4,14 @@ const { appLogger } = require('../../logger');
 const RepositoriesService = require('../../../entities/repositories.service');
 const RepositoryAliasesService = require('../../../entities/repository-aliases.service');
 const SpacesService = require('../../../entities/spaces.service');
+const MembershipsService = require('../../../entities/memberships.service');
+
+const {
+  MEMBER_ROLES: {
+    docContact: DOC_CONTACT,
+    techContact: TECH_CONTACT,
+  },
+} = require('../../../entities/memberships.dto');
 
 const { syncIndexPatterns } = require('../kibana');
 
@@ -84,6 +92,65 @@ const syncRepositoryAlias = async (alias) => {
     appLogger.verbose(`[elastic] Alias [${alias.pattern}] has been upserted`);
   } catch (error) {
     appLogger.error(`[elastic] Alias [${alias.pattern}] cannot be upserted:\n${error}`);
+  }
+
+  const membershipsService = new MembershipsService();
+
+  const contacts = await membershipsService.findMany({
+    where: {
+      roles: {
+        hasSome: [DOC_CONTACT, TECH_CONTACT],
+      },
+      institution: {
+        repositoryAliases: {
+          some: {
+            pattern: alias.pattern,
+          },
+        },
+      },
+    },
+    select: {
+      username: true,
+      institutionId: true,
+    },
+  });
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const contact of contacts) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await membershipsService.update({
+        where: {
+          username_institutionId: {
+            username: contact.username,
+            institutionId: contact.institutionId,
+          },
+        },
+        data: {
+          repositoryAliasPermissions: {
+            upsert: {
+              where: {
+                username_institutionId_aliasPattern: {
+                  aliasPattern: alias.pattern,
+                  institutionId: contact.institutionId,
+                  username: contact.username,
+                },
+              },
+              update: {
+                aliasPattern: alias.pattern,
+              },
+              create: {
+                aliasPattern: alias.pattern,
+              },
+            },
+          },
+        },
+      });
+    } catch (e) {
+      appLogger.error(`[elastic] Permissions for alias [${alias.pattern}] cannot be granted to [${contact.username}] in institution [${contact.institutionId}]:\n${e}`);
+    }
+
+    appLogger.verbose(`[elastic] Permissions for alias [${alias.pattern}] has been granted to [${contact.username}] in institution [${contact.institutionId}]`);
   }
 
   const spacesService = new SpacesService();
