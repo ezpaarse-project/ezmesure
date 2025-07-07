@@ -246,18 +246,18 @@ const formRef = useTemplateRef('formRef');
 
 const availablePackages = computedAsync(
   async () => {
-    const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+    const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
       query: {
         size: 0,
         distinct: 'packages',
       },
     });
 
-    // Map sushi items with array of packages as key
-    const itemsPerPackages = Map.groupBy(Object.values(sushiItems), (item) => item.packages);
-    // Merge all packages in one array then make unique
-    const packages = new Set(Array.from(itemsPerPackages.keys()).flat());
-    return Array.from(packages).sort();
+    // Merge all packages in one array them make unique
+    const packages = new Set(items.flatMap((item) => item.packages ?? []));
+
+    return Array.from(packages)
+      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
   },
   [],
   { lazy: true, evaluating: loadingPackages },

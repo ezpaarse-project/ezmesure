@@ -427,18 +427,18 @@ const formRef = useTemplateRef('formRef');
 
 const availableTags = computedAsync(
   async () => {
-    const endpointItems = await $fetch('/api/sushi-endpoints', {
+    const items = await $fetch('/api/sushi-endpoints', {
       query: {
         size: 0,
         distinct: 'tags',
       },
     });
 
-    // Map sushi items with array of tags as key
-    const itemsPerTags = Map.groupBy(Object.values(endpointItems), (item) => item.tags);
-    // Merge all tags in one array then make unique
-    const tags = new Set(Array.from(itemsPerTags.keys()).flat());
-    return Array.from(tags).sort();
+    // Merge all tags in one array them make unique
+    const tags = new Set(items.flatMap((item) => item.tags ?? []));
+
+    return Array.from(tags)
+      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
   },
   [],
   { lazy: true, evaluating: loadingTags },

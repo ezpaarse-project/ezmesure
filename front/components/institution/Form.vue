@@ -446,7 +446,7 @@ const LOGO_RATIO = { w: 3, h: 1 };
 const LOGO_ACCEPT = 'JPEG, PNG, SVG';
 const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2mb
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { data: user } = useAuthState();
 const snacks = useSnacksStore();
 const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
@@ -515,12 +515,11 @@ async function getAvailableTags() {
       },
     });
 
-    // Merge all tags in one array then make unique
+    // Merge all tags in one array them make unique
     const tags = new Set(items.flatMap((item) => item.tags ?? []));
 
-    availableTags.value = Array.from(tags).toSorted((a, b) => (
-      a.toLowerCase().localeCompare(b.toLowerCase())
-    ));
+    availableTags.value = Array.from(tags)
+      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   } finally {
