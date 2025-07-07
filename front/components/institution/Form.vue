@@ -167,7 +167,8 @@
                   :items="availableTags"
                   :loading="loadingTags && 'primary'"
                   :hide-no-data="!tagSearch"
-                  variant="solo"
+                  prepend-icon="mdi-tag"
+                  variant="underlined"
                   multiple
                   chips
                   closable-chips
@@ -175,7 +176,7 @@
                 >
                   <template #no-data>
                     <v-list-item>
-                      <v-list-item-title>
+                      <template #title>
                         <i18n-t keypath="noMatchFor">
                           <template #search>
                             <strong>{{ tagSearch }}</strong>
@@ -185,7 +186,7 @@
                             <kbd>{{ $t('enterKey') }}</kbd>
                           </template>
                         </i18n-t>
-                      </v-list-item-title>
+                      </template>
                     </v-list-item>
                   </template>
                 </v-combobox>
@@ -223,13 +224,13 @@
                     :label="$t('institutions.institution.propertyName')"
                     :items="availableCustomFields ?? []"
                     item-title="labelFr"
+                    variant="outlined"
+                    density="compact"
+                    class="flex-grow-1"
                     return-object
                     autofocus
                     hide-details
                     auto-select-first
-                    variant="outlined"
-                    density="compact"
-                    class="flex-grow-1"
                     @update:model-value="addCustomProp"
                   >
                     <template #item="{ props: itemProps, item }">
@@ -662,7 +663,7 @@ async function removeLogo() {
  * Init the form, if `institution` is provided, pre-populate the form and will
  * update it.
  */
-watch(props.modelValue, () => {
+watch(() => props.modelValue, () => {
   /**
    * @type {Object} [opts]
    * @property {boolean} [opts.addAsMember]
