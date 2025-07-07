@@ -148,6 +148,52 @@
             </v-card>
 
             <v-card
+              v-if="user?.isAdmin"
+              :title="$t('institutions.institution.tags')"
+              prepend-icon="mdi-tag-outline"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template #text>
+                <p class="mb-3">
+                  {{ $t('institutions.institution.tagsDescription') }}
+                </p>
+
+                <v-combobox
+                  v-model="institution.tags"
+                  v-model:search="tagSearch"
+                  v-model:focused="tagInputFocused"
+                  :label="$t('institutions.institution.tags')"
+                  :items="availableTags"
+                  :loading="loadingTags && 'primary'"
+                  :hide-no-data="!tagSearch"
+                  prepend-icon="mdi-tag"
+                  variant="underlined"
+                  multiple
+                  chips
+                  closable-chips
+                  hide-details
+                >
+                  <template #no-data>
+                    <v-list-item>
+                      <template #title>
+                        <i18n-t keypath="noMatchFor">
+                          <template #search>
+                            <strong>{{ tagSearch }}</strong>
+                          </template>
+
+                          <template #key>
+                            <kbd>{{ $t('enterKey') }}</kbd>
+                          </template>
+                        </i18n-t>
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-combobox>
+              </template>
+            </v-card>
+
+            <v-card
               :title="$t('institutions.institution.customProperties')"
               prepend-icon="mdi-tag-text-outline"
               variant="outlined"
@@ -178,13 +224,13 @@
                     :label="$t('institutions.institution.propertyName')"
                     :items="availableCustomFields ?? []"
                     item-title="labelFr"
+                    variant="outlined"
+                    density="compact"
+                    class="flex-grow-1"
                     return-object
                     autofocus
                     hide-details
                     auto-select-first
-                    variant="outlined"
-                    density="compact"
-                    class="flex-grow-1"
                     @update:model-value="addCustomProp"
                   >
                     <template #item="{ props: itemProps, item }">
@@ -428,6 +474,11 @@ const showCustomPropMenu = ref(false);
 const customField = ref(null);
 const customPropInputRefs = ref({});
 
+const loadingTags = ref(false);
+const availableTags = ref([]);
+const tagSearch = ref('');
+const tagInputFocused = ref(false);
+
 const {
   data: availableCustomFields,
   error: customFieldsError,
@@ -452,6 +503,32 @@ const logoSrc = computed(() => {
   if (institution.value.logoId) { return `/api/assets/logos/${institution.value.logoId}`; }
   return defaultLogo;
 });
+
+async function getAvailableTags() {
+  loadingTags.value = true;
+
+  try {
+    const items = await $fetch('/api/institutions', {
+      query: {
+        size: 0,
+        distinct: 'tags',
+      },
+    });
+
+    // Merge all tags in one array then make unique
+    const tags = new Set(items.flatMap((item) => item.tags ?? []));
+
+    availableTags.value = Array.from(tags).toSorted((a, b) => (
+      a.toLowerCase().localeCompare(b.toLowerCase())
+    ));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+  } finally {
+    loadingTags.value = false;
+  }
+}
+
+watch(tagInputFocused, getAvailableTags, { once: true });
 
 function removeCustomProp(fieldId) {
   institution.value.customProps = institution.value.customProps.filter(
@@ -586,7 +663,7 @@ async function removeLogo() {
  * Init the form, if `institution` is provided, pre-populate the form and will
  * update it.
  */
-watch(props.modelValue, () => {
+watch(() => props.modelValue, () => {
   /**
    * @type {Object} [opts]
    * @property {boolean} [opts.addAsMember]

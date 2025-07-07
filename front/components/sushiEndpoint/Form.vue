@@ -117,9 +117,11 @@
                   <v-col cols="12" sm="4">
                     <v-combobox
                       v-model="endpoint.counterVersions"
+                      v-model:search="versionSearch"
                       :label="$t('endpoints.counterVersion')"
                       :items="SUPPORTED_COUNTER_VERSIONS"
                       :rules="versionRules"
+                      :hide-no-data="!versionSearch"
                       :return-object="false"
                       prepend-icon="mdi-numeric"
                       variant="underlined"
@@ -135,6 +137,22 @@
                           variant="flat"
                           label
                         />
+                      </template>
+
+                      <template #no-data>
+                        <v-list-item>
+                          <template #title>
+                            <i18n-t keypath="noMatchFor">
+                              <template #search>
+                                <strong>{{ versionSearch }}</strong>
+                              </template>
+
+                              <template #key>
+                                <kbd>{{ $t('enterKey') }}</kbd>
+                              </template>
+                            </i18n-t>
+                          </template>
+                        </v-list-item>
                       </template>
                     </v-combobox>
                   </v-col>
@@ -166,15 +184,33 @@
                   <v-col cols="12">
                     <v-combobox
                       v-model="endpoint.tags"
+                      v-model:search="tagSearch"
                       :label="$t('endpoints.tags')"
                       :items="availableTags"
                       :loading="loadingTags && 'primary'"
+                      :hide-no-data="!tagSearch"
                       prepend-icon="mdi-tag"
                       variant="underlined"
                       multiple
                       chips
                       closable-chips
-                    />
+                    >
+                      <template #no-data>
+                        <v-list-item>
+                          <template #title>
+                            <i18n-t keypath="noMatchFor">
+                              <template #search>
+                                <strong>{{ tagSearch }}</strong>
+                              </template>
+
+                              <template #key>
+                                <kbd>{{ $t('enterKey') }}</kbd>
+                              </template>
+                            </i18n-t>
+                          </template>
+                        </v-list-item>
+                      </template>
+                    </v-combobox>
                   </v-col>
 
                   <v-col cols="12">
@@ -381,6 +417,8 @@ const saving = ref(false);
 const valid = ref(false);
 const isConnectionMenuOpen = ref(false);
 const loadingTags = ref(false);
+const versionSearch = ref('');
+const tagSearch = ref('');
 const registryEndpoint = ref();
 const endpoint = ref({ ...(props.modelValue ?? { counterVersions: ['5'] }) });
 
