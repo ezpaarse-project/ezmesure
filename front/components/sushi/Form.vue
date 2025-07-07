@@ -90,6 +90,7 @@
                   <v-col cols="12">
                     <v-combobox
                       v-model="sushi.packages"
+                      v-model:search="packageSearch"
                       :label="`${$t('institutions.sushi.packages')} *`"
                       :hint="$t('institutions.sushi.packagesDescription')"
                       :items="availablePackages"
@@ -98,13 +99,30 @@
                         (v) => (v?.length ?? 0) > 0 || $t('fieldIsRequired'),
                         (v) => (v?.length ?? 0) <= 1 || $t('institutions.sushi.onlyOnePackage'),
                       ]"
+                      :hide-no-data="!packageSearch"
                       prepend-icon="mdi-tag"
                       variant="underlined"
                       required
                       multiple
                       chips
                       closable-chips
-                    />
+                    >
+                      <template #no-data>
+                        <v-list-item>
+                          <template #title>
+                            <i18n-t keypath="noMatchFor">
+                              <template #search>
+                                <strong>{{ packageSearch }}</strong>
+                              </template>
+
+                              <template #key>
+                                <kbd>{{ $t('enterKey') }}</kbd>
+                              </template>
+                            </i18n-t>
+                          </template>
+                        </v-list-item>
+                      </template>
+                    </v-combobox>
                   </v-col>
 
                   <v-col cols="12">
@@ -220,6 +238,7 @@ const saving = ref(false);
 const valid = ref(false);
 const isAdvancedOpen = ref(false);
 const loadingPackages = ref(false);
+const packageSearch = ref('');
 const sushi = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */

@@ -4,6 +4,7 @@
     :model-value="modelValue?.toUpperCase() ?? ''"
     :items="supportedReports"
     :return-object="false"
+    :hide-no-data="!search"
     @update:model-value="$emit('update:modelValue', $event?.toLowerCase() ?? undefined)"
   >
     <template #prepend-item>
@@ -12,7 +13,7 @@
 
     <template #no-data>
       <v-list-item :title="$t('reports.supportedReportsUnavailable')">
-        <template v-if="search" #title>
+        <template #title>
           <i18n-t keypath="noMatchFor">
             <template #search>
               <strong>{{ search }}</strong>
