@@ -1,7 +1,16 @@
 // @ts-check
 const { registerHook } = require('../hookEmitter');
 
+const MembershipsService = require('../../entities/memberships.service');
+
 const { appLogger } = require('../../services/logger');
+
+const {
+  MEMBER_ROLES: {
+    docContact: DOC_CONTACT,
+    techContact: TECH_CONTACT,
+  },
+} = require('../../entities/memberships.dto');
 
 const {
   syncRepositoryAlias,
@@ -14,6 +23,67 @@ const {
  */
 
 /**
+ * Give permissions to the contacts of an institution that are connected to an alias
+ * @param {RepositoryAlias} alias
+ */
+const givePermissionsToContacts = async (alias, institutionId) => {
+  const membershipsService = new MembershipsService();
+
+  const contacts = await membershipsService.findMany({
+    where: {
+      roles: {
+        hasSome: [DOC_CONTACT, TECH_CONTACT],
+      },
+      institution: {
+        id: institutionId,
+      },
+    },
+    select: {
+      username: true,
+      institutionId: true,
+    },
+  });
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const contact of contacts) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await membershipsService.update({
+        where: {
+          username_institutionId: {
+            username: contact.username,
+            institutionId: contact.institutionId,
+          },
+        },
+        data: {
+          repositoryAliasPermissions: {
+            upsert: {
+              where: {
+                username_institutionId_aliasPattern: {
+                  aliasPattern: alias.pattern,
+                  institutionId: contact.institutionId,
+                  username: contact.username,
+                },
+              },
+              update: {
+                aliasPattern: alias.pattern,
+              },
+              create: {
+                aliasPattern: alias.pattern,
+              },
+            },
+          },
+        },
+      });
+    } catch (e) {
+      appLogger.error(`[elastic] Permissions for alias [${alias.pattern}] cannot be granted to [${contact.username}] in institution [${contact.institutionId}]:\n${e}`);
+    }
+
+    appLogger.verbose(`[elastic] Permissions for alias [${alias.pattern}] has been granted to [${contact.username}] in institution [${contact.institutionId}]`);
+  }
+};
+
+/**
  * @param {RepositoryAlias} repositoryAlias
  */
 const onRepositoryAliasUpsert = async (repositoryAlias) => {
@@ -22,6 +92,19 @@ const onRepositoryAliasUpsert = async (repositoryAlias) => {
   } catch (error) {
     appLogger.error(
       `[elastic][hooks] RepositoryAlias [${repositoryAlias?.pattern}] could not be synchronized:\n${error}`,
+    );
+  }
+};
+
+/**
+ * @param {{ alias: RepositoryAlias, institutionId: string }} opts
+ */
+const onRepositoryAliasConnected = async ({ alias, institutionId }) => {
+  try {
+    await givePermissionsToContacts(alias, institutionId);
+  } catch (error) {
+    appLogger.error(
+      `[elastic][hooks] Permissions for RepositoryAlias [${alias?.pattern}] could not be granted:\n${error}`,
     );
   }
 };
@@ -59,6 +142,8 @@ registerHook('repository_alias:create', onRepositoryAliasUpsert, hookOptions);
 registerHook('repository_alias:update', onRepositoryAliasUpsert, hookOptions);
 registerHook('repository_alias:upsert', onRepositoryAliasUpsert, hookOptions);
 registerHook('repository_alias:delete', onRepositoryAliasDelete, hookOptions);
+
+registerHook('repository_alias:connected', onRepositoryAliasConnected, hookOptions);
 
 // Sync of repository index template is debounced by target repository pattern
 // That way we avoid spamming template syncs when a lot of aliases are created or removed at once

@@ -20,6 +20,7 @@ const {
 /**
  * @typedef {import('@prisma/client').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
  * @typedef {import('@prisma/client').Prisma.RepositoryAliasGetPayload<{ include: { institutions: true } }>} RepoAliasWithInstitutions
+ * @typedef {import('@prisma/client').Prisma.RepositoryAliasGetPayload<{ select: { institutions: { select: { id: true } } } }>} RepoAliasWithOnlyInstitutionIds
  * @typedef {import('@prisma/client').RepositoryAliasTemplate} RepositoryAliasTemplate
  * @typedef {import('@prisma/client').Prisma.RepositoryAliasUncheckedCreateInput} RepositoryAliasUncheckedCreateInput
  * @typedef {import('@prisma/client').Prisma.RepositoryAliasTemplateCreateInput} RepositoryAliasTemplateCreateInput
@@ -58,6 +59,7 @@ const {
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { appLogger } = require('../../services/logger');
+const { triggerHooks } = require('../../hooks/hookEmitter');
 
 const standardQueryParams = prepareStandardQueryParams({
   ...repoAliasTemplateDto,
@@ -212,10 +214,15 @@ exports.applyOne = async (ctx) => {
       };
 
       try {
+        /** @type {RepoAliasWithOnlyInstitutionIds | null} */
+        // @ts-ignore
         // eslint-disable-next-line no-await-in-loop
         const existingAlias = await repositoryAliasesService.findUnique({
           where: { pattern: alias.pattern },
+          select: { institutions: { select: { id: true } } },
         });
+
+        const currentInstitutions = new Set(existingAlias?.institutions?.map((i) => i.id));
 
         if (existingAlias) {
           if (!dryRun) {
@@ -247,6 +254,12 @@ exports.applyOne = async (ctx) => {
 
           addResponseItem(alias, 'created', null);
         }
+
+        alias.institutions?.forEach((institution) => {
+          if (!currentInstitutions.has(institution.id)) {
+            triggerHooks('repository_alias:connected', { alias, institutionId: institution.id });
+          }
+        });
       } catch (e) {
         appLogger.error(`[alias-template] Failed to upsert alias [${alias.pattern}]:\n${e}`);
         addResponseItem(alias, 'error', e.message);
