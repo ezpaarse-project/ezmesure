@@ -91,6 +91,14 @@ const includableFields = [
   'customProps.field',
   'repositoryAliases',
   'repositoryAliases.repository',
+  'elasticRoles',
+  'elasticRoles.spacePermissions',
+  'elasticRoles.spacePermissions.space',
+  'elasticRoles.repositoryPermissions',
+  'elasticRoles.repositoryPermissions.repository',
+  'elasticRoles.repositoryAliasPermissions',
+  'elasticRoles.repositoryAliasPermissions.alias',
+  'elasticRoles.repositoryAliasPermissions.alias.repository',
 ];
 
 /**

@@ -9,7 +9,7 @@
  *
  * @param {object} filter The filter
  *
- * @returns  {QueryDslQueryContainer}
+ * @returns {QueryDslQueryContainer}
  */
 function filterToEs(filter) {
   if ('raw' in filter) {
@@ -20,18 +20,7 @@ function filterToEs(filter) {
     return { exists: { field: filter.field } };
   }
 
-  const value = Array.isArray(filter.value) ? filter.value : [filter.value];
-  if (value.length === 1) {
-    return { match_phrase: { [filter.field]: value[0] } };
-  }
-
-  return {
-    bool: {
-      should: value.map(
-        (v) => ({ match_phrase: { [filter.field]: v } }),
-      ),
-    },
-  };
+  return { terms: { [filter.field]: Array.isArray(filter.value) ? filter.value : [filter.value] } };
 }
 
 /**

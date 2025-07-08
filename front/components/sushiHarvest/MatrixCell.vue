@@ -41,7 +41,15 @@
           <v-col>
             <i18n-t v-for="item in counts" :key="item.path" :keypath="item.path">
               <template #count>
-                <strong>{{ item.value }}</strong>
+                <span class="font-weight-bold">{{ item.value }}</span>
+              </template>
+
+              <template #beignDate>
+                <span class="font-weight-bold">{{ modelValue.harvestedBy?.beginDate ?? '???' }}</span>
+              </template>
+
+              <template #endDate>
+                <span class="font-weight-bold">{{ modelValue.harvestedBy?.endDate ?? '???' }}</span>
               </template>
             </i18n-t>
           </v-col>

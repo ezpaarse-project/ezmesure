@@ -114,9 +114,11 @@ const {
 });
 
 // Allow parent component to refresh
-props.defineRefresh({
-  execute: refresh,
-  status,
+onMounted(() => {
+  props.defineRefresh({
+    execute: refresh,
+    status,
+  });
 });
 
 const headers = computed(() => [

@@ -12,11 +12,15 @@ const {
  */
 const schema = {
   id: Joi.string().trim(),
+  deletedAt: Joi.date(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
   active: Joi.boolean(),
   activeUpdatedAt: Joi.date(),
+
+  archivedUpdatedAt: Joi.date(),
+  archived: Joi.boolean(),
 
   customerId: Joi.string().trim().allow(''),
   requestorId: Joi.string().trim().allow(''),
@@ -40,6 +44,9 @@ const schema = {
 
   harvests: Joi.array().items(Joi.object()),
 
+  deletionTaskId: Joi.string().trim(),
+  deletionTask: Joi.object(),
+
   connection: Joi.object({
     date: Joi.date(),
     status: Joi.string(),
@@ -53,9 +60,14 @@ const schema = {
  */
 const immutableFields = [
   'id',
+  'deletedAt',
   'updatedAt',
+  'archivedUpdatedAt',
+  'activeUpdatedAt',
   'createdAt',
   'institution',
+  'deletionTaskId',
+  'deletionTask',
   'endpoint',
   'harvests',
   'connection',
@@ -70,6 +82,7 @@ const includableFields = [
   'institution.memberships',
   'institution.memberships.user',
   'harvests',
+  'deletionTask',
   'connection',
 ];
 

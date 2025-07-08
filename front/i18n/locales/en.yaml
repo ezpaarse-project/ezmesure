@@ -12,9 +12,13 @@ menu:
   administration: Administration
   myInstitution: My institution
   myInstitutions: My institutions
+  myForeignAccess: Shared with you
   institutions: Institutions
   sushiEndpoints: COUNTER endpoints
   activity: Activity
+  actions:
+    title: Actions
+    tooltip: New version of the activity, actions will being rolled out progressively
   profile: Profile
   members: Members
   users: Users
@@ -28,6 +32,7 @@ menu:
     group: Repository aliases
     aliases: Aliases
     templates: Templates
+    orphans: Orphans
   spaces: Spaces
   harvest:
     group: Harvest
@@ -454,6 +459,7 @@ institutions:
     createdAt: Creation date
     updatedAt: Last updated
     testedAt: Last tested
+    archivedAt: Archive date
     sushiUrl: Sushi URL
     enterUrl: Please enter an URL
     enterRequestorId: Please enter a Requestor Id.
@@ -538,7 +544,7 @@ tasks:
     error: Error
     cancelled: Cancelled
     delayed: Delayed
-    missing: Missing
+    missing: Empty report
     exceptions:
       network_error: Unreachable service
       unreadable_report: Unreadable report
@@ -601,8 +607,15 @@ tasks:
 sushi:
   filters:
     title: Filters credentials
-  credentials: Credentials
+  credentials: COUNTER Credentials
   credentialsCount: "{count} credentials"
+  tabs:
+    active:
+      title: Active credentials
+      description: This list contains the active credentials that will be used for harvesting.
+    archived:
+      title: Archived credentials
+      description: This list contains the archived credentials that will be NOT used for harvesting.
   auth: Authentication
   copyId: Copy ID
   showFiles: View files
@@ -613,6 +626,10 @@ sushi:
   unableToUpdate: Unable to update credentials
   unableToGetLockStatus: Failed to retrieve credentials lock status
   managementIsLocked: COUNTER credentials management is currently locked.
+  deleting: Deletion in progress
+  deletingWaiting: Waiting for deletion
+  deletingError: "Unable to delete credentials: {error}"
+  deletionTask: Deletion state
   nInstitutions: >
     1 institution use this endpoint
     |{count} institutions use this endpoint
@@ -626,7 +643,8 @@ sushi:
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
   problematicEndpoint: Problematic endpoint
-  deleteNbCredentials: You are about to delete {number} COUNTER credentials.
+  deleteNbCredentials: You are about to delete {number} COUNTER credentials. This will delete associated data in a few minutes. {cantDelete}
+  archiveNbCredentials: You are about to archive {number} COUNTER credentials. Associated data will be kept.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
@@ -637,10 +655,13 @@ sushi:
   checking: Checking connection with {vendor} for {name}
   report: Report
   openHelpPage: Open help page
-  insertedItems: "{count} report items have been inserted."
-  updatedItems: "{count} report items have been updated."
-  failedItems: "{count} report items could not be retrieved."
+  insertedItems: "{count} report items have been inserted for the period {beignDate} ~ {endDate}."
+  updatedItems: "{count} report items have been updated for the period {beignDate} ~ {endDate}."
+  failedItems: "{count} report items could not be retrieved for the period {beignDate} ~ {endDate}."
   messagesFromEndpoint: "Messages from the endpoint:"
+  cannotArchiveItems: Unable to archive the credentials.
+  itemsArchived: "{count} credential(s) archived."
+  itemsDeleted: "{count} credential(s) deleted, associated data will be deleted soon."
   checkBeforeSave: Check credentials before saving
   matrix:
     unsupported: Report not supported (editor declaration)
@@ -668,6 +689,12 @@ sushi:
       error: An error occurred while searching for harvested but unsupported reports
       empty: No unsupported reports have been harvested!
       deletePeriod: "You'll delete the harvested report \"{reportId}\" of the matrix from \"{institutionName}\" for the period \"{beginDate} - {endDate}\". This won't delete the data. This action is irreversible."
+  deleteReason: Reason for deletion
+  deleteReasonDescription: Please provide a reason for the deletion of theses credentials. You can choose an existing reason or type your own below.
+  deleteReasons:
+    mistake: I entered the identifiers by mistake
+    neverWorked: The access point has never worked for our institution
+    duplicate: This identifier is a duplicate of another one
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
@@ -814,6 +841,8 @@ repositories:
     title: Filter repositories
   givePermissions: Give permissions
   nPermissions: "{count} access"
+  ownedRepositories: Owned repositories
+  foreignRepositories: Shared repositories
 repositoryAliases:
   manageRepositoryAliases: >
     Manage aliases
@@ -828,6 +857,8 @@ repositoryAliases:
   deleteNbAliases: You are about to delete {number} aliases
   newAlias: New repository alias
   noInstitutions: No institutions is using this alias
+  ownedAliases: Owned aliases
+  foreignAliases: Shared aliases
   filters:
     title: Filter aliases
   filtersForm:
@@ -846,6 +877,11 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} is {valueText}"
       is:not: "{field} is not {valueText}"
+
+orphanAliases:
+  toolbarTitle: Orphan aliases ({count})
+  pageDescription: Aliases shown here are found in Elasticsearch but are not managed by ezMESURE.
+
 repoAliasTemplates:
   toolbarTitle: Alias templates ({count})
   manageTemplates: >
@@ -876,6 +912,8 @@ spaces:
   toolbarTitle: Spaces ({count})
   newSpace: New space
   editSpace: Edit space
+  ownedSpaces: Owned spaces
+  foreignSpaces: Shared spaces
   manageSpaces: >
     Manage spaces
     |Manage {count} spaces
@@ -953,6 +991,7 @@ elasticRoles:
     Manage roles
     |Manage {count} roles
   deleteNbRoles: You are about to delete {n} roles
+  grantedBy: Rights granted by a role
 sync:
   status:
     notSynced: Not yet synchronized
@@ -1080,6 +1119,8 @@ notEditable: Not editable
 maxLength: "Maximum length: {n} characters"
 open: Open
 send: Send
+archive: Archive
+unarchive: Unarchive
 "yes": "Yes"
 "no": "No"
 active: Active
@@ -1104,3 +1145,8 @@ applyToAll: Apply to all
 minValueError: "The value is too small. Minimum: {min}"
 maxValueError: "The value is too big. Maximum: {max}"
 synchronize: Synchronize
+archived: Archived
+archivedSince: Archived since {date}
+deleted: Deleted
+deletedSince: Deleted since {date}
+cantCancel: This operation cannot be undone.

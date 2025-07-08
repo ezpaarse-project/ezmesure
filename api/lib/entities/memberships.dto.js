@@ -73,7 +73,6 @@ const immutableFields = [
  */
 const includableFields = [
   'user',
-  'institution',
   'spacePermissions',
   'spacePermissions.space',
   'repositoryPermissions',
@@ -81,6 +80,17 @@ const includableFields = [
   'repositoryAliasPermissions',
   'repositoryAliasPermissions.alias',
   'repositoryAliasPermissions.alias.repository',
+  'institution',
+  'institution.customProps',
+  'institution.customProps.field',
+  'institution.elasticRoles',
+  'institution.elasticRoles.spacePermissions',
+  'institution.elasticRoles.spacePermissions.space',
+  'institution.elasticRoles.repositoryPermissions',
+  'institution.elasticRoles.repositoryPermissions.repository',
+  'institution.elasticRoles.repositoryAliasPermissions',
+  'institution.elasticRoles.repositoryAliasPermissions.alias',
+  'institution.elasticRoles.repositoryAliasPermissions.alias.repository',
 ];
 
 /**

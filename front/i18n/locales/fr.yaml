@@ -12,9 +12,13 @@ menu:
   administration: Administration
   myInstitution: Mon établissement
   myInstitutions: Mes établissements
+  myForeignAccess: Partagé avec vous
   institutions: Établissements
   sushiEndpoints: Points d'accès COUNTER
   activity: Activité
+  actions:
+    title: Actions
+    tooltip: Nouvelle version de l'activité, les actions seront mises en place progressivement
   profile: Profil
   members: Membres
   users: Utilisateurs
@@ -28,6 +32,7 @@ menu:
     group: Alias d'entrepôts
     aliases: Alias
     templates: Modèles
+    orphans: Orphelins
   spaces: Espaces
   harvest:
     group: Moissonnage
@@ -456,6 +461,7 @@ institutions:
     createdAt: Date de création
     updatedAt: Dernière mise à jour
     testedAt: Dernier test
+    archivedAt: Date d'archivage
     sushiUrl: URL Sushi
     enterUrl: Veuillez saisir une URL
     enterRequestorId: Veuillez saisir un Requestor Id.
@@ -542,7 +548,7 @@ tasks:
     error: Erreur
     cancelled: Annulé
     delayed: Reporté
-    missing: Manquant
+    missing: Rapport vide
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible
@@ -605,10 +611,17 @@ tasks:
 sushi:
   filters:
     title: Filtrer les identifiants
-  credentials: Identifiants
+  credentials: Identifiants COUNTER
   credentialsCount: >
     1 identifiant
     |{count} identifiants
+  tabs:
+    active:
+      title: Identifiants actifs
+      description: Cette liste contient les identifiants actifs qui seront utilisés pour le moissonnage.
+    archived:
+      title: Identifiants archivés
+      description: Cette liste contient les identifiants archivés qui ne seront PAS utilisés pour le moissonnage.
   auth: Authentification
   copyId: Copier l'ID
   showFiles: Voir les fichiers
@@ -619,6 +632,10 @@ sushi:
   unableToUpdate: Impossible de modifier l'identifiant
   unableToGetLockStatus: Impossible de récupérer l'état de verrouillage des identifiants
   managementIsLocked: La gestion des identifiants COUNTER est actuellement verrouillée.
+  deleting: Suppression en cours
+  deletingWaiting: En attente de suppression
+  deletingError: "Impossible de supprimer l'identifiant: {error}"
+  deletionTask: État de suppression
   nInstitutions: >
     1 établissement utilise cet endpoint
     |{count} établissements utilisent cet endpoint
@@ -638,8 +655,11 @@ sushi:
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
   deleteNbCredentials: >
-    Vous allez supprimer {count} identifiant COUNTER.
-    |Vous allez supprimer {count} identifiants COUNTER.
+    Vous allez supprimer {count} identifiant COUNTER. Cela supprimera les données d'usage liées à cet identifiant d'ici quelques minutes. {cantCancel}.
+    |Vous allez supprimer {count} identifiants COUNTER. Cela supprimera les données d'usage liées à cet identifiant d'ici quelques minutes. {cantCancel}.
+  archiveNbCredentials: >
+    Vous allez archiver {count} identifiant COUNTER. Les données d'usage liées à cet identifiant seront conservées.
+    |Vous allez archiver {count} identifiants COUNTER. Les données d'usage liées à cet identifiant seront conservées.
   problematicEndpoint: Point d'accès problématique
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
@@ -652,10 +672,13 @@ sushi:
   report: Rapport
   checkBeforeSave: Vérifier les identifiants avant de sauvegarder
   openHelpPage: Ouvrir page d'aide
-  insertedItems: "{count} éléments du rapport ont été insérés."
-  updatedItems: "{count} éléments du rapport ont été mis à jour."
-  failedItems: "{count} éléments du rapport n'ont pas pu être récupérés."
+  insertedItems: "{count} éléments du rapport ont été insérés pour la période {beignDate} ~ {endDate}."
+  updatedItems: "{count} éléments du rapport ont été mis à jour pour la période {beignDate} ~ {endDate}."
+  failedItems: "{count} éléments du rapport n'ont pas pu être récupérés pour la période {beignDate} ~ {endDate}."
   messagesFromEndpoint: 'Messages du point d''accès :'
+  cannotArchiveItems: Impossible d'archiver les identifiants.
+  itemsArchived: "{count} élement(s) archivé(s)"
+  itemsDeleted: "{count} élement(s) supprimé(s), les données liées aux identifiants seront supprimée prochainement."
   matrix:
     unsupported: Rapport non supporté (déclaration éditeur)
     ignored: Rapport non supporté (constat ezMESURE)
@@ -682,6 +705,12 @@ sushi:
       error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
       empty: Aucun rapport non supporté n'a été moissonné !
       deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
+  deleteReason: Raison de la suppression
+  deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
+  deleteReasons:
+    mistake: J'ai entré(e) ces identifiants par erreur
+    neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
+    duplicate: Cet identifiant est en doublon avec un autre
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
@@ -828,6 +857,8 @@ repositories:
     title: Filtrer les entrepôts
   givePermissions: Attribuer les permissions
   nPermissions: "{count} accès"
+  ownedRepositories: Entrepôts d'établissement
+  foreignRepositories: Entrepôts partagés
 repositoryAliases:
   manageRepositoryAliases: >
     Gérer les alias
@@ -842,6 +873,8 @@ repositoryAliases:
   deleteNbAliases: Vous allez supprimer {count} alias.
   newAlias: Nouvel alias d'entrepôt
   noInstitutions: Aucun établissement n'utilise cet alias
+  ownedAliases: Alias d'établissement
+  foreignAliases: Alias partagés
   filters:
     title: Filtrer les alias
   filtersForm:
@@ -860,6 +893,11 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} est {valueText}"
       is:not: "{field} n'est pas {valueText}"
+
+orphanAliases:
+  toolbarTitle: Alias orphelins ({count})
+  pageDescription: Les alias affichés ici sont présents dans Elasticsearch mais ne sont pas gérés par ezMESURE.
+
 repoAliasTemplates:
   toolbarTitle: Modèles d'alias ({count})
   manageTemplates: >
@@ -890,6 +928,8 @@ spaces:
   toolbarTitle: Espace ({count})
   newSpace: Nouvel espace
   editSpace: Mise à jour de l'espace
+  ownedSpaces: Espaces établissement
+  foreignSpaces: Espaces partagés
   manageSpaces: >
     Gérer les espaces
     |Gérer {count} espaces
@@ -970,6 +1010,7 @@ elasticRoles:
   deleteNbRoles: >
     Vous êtes sur le point de supprimer {n} rôle
     |Vous êtes sur le point de supprimer {n} rôles
+  grantedBy: Droits accordés par un rôle
 sync:
   status:
     notSynced: Pas encore synchronisé
@@ -1094,6 +1135,8 @@ notEditable: Non éditable
 maxLength: 'Longueur maximale : {n} caractères'
 open: Ouvrir
 send: Envoyer
+archive: Archiver
+unarchive: Désarchiver
 'yes': Oui
 'no': Non
 active: Actif
@@ -1118,3 +1161,8 @@ applyToAll: Appliquer à tous
 minValueError: "La valeur est trop petite. Minimum: {min}"
 maxValueError: "La valeur est trop grande. Maximum: {max}"
 synchronize: Synchroniser
+archived: Archivé
+archivedSince: Archivé depuis le {date}
+deleted: Supprimé
+deletedSince: Supprimé depuis le {date}
+cantCancel: Cette action est irreversible

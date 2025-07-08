@@ -42,8 +42,16 @@ async function listHarvestedButUnsupported() {
       status: {
         notIn: ['running', 'waiting', 'delayed'],
       },
+      credentials: {
+        deletedAt: null,
+      },
     },
-    include: {
+    select: {
+      reportId: true,
+      credentialsId: true,
+      status: true,
+      period: true,
+
       credentials: {
         include: {
           endpoint: true,

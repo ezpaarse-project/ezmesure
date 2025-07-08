@@ -6,6 +6,8 @@ const { requireJwt, requireUser, requireAdmin } = require('../../../services/aut
 const { schema } = require('../../../entities/elastic-roles.dto');
 
 const {
+  standardQueryParams,
+
   getAll,
   getOne,
   connectRole,
@@ -22,6 +24,7 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
     },
+    query: standardQueryParams.manyValidation,
   },
 });
 
@@ -34,6 +37,7 @@ router.route({
       institutionId: Joi.string().trim().required(),
       name: schema.name,
     },
+    query: standardQueryParams.oneValidation,
   },
 });
 

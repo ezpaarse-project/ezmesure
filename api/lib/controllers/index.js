@@ -33,6 +33,7 @@ const roles = require('./elastic-roles');
 const queues = require('./queues');
 const kibana = require('./kibana');
 const activity = require('./activity');
+const actions = require('./actions');
 const sync = require('./sync');
 
 const openapi = require('./openapi.json');
@@ -100,6 +101,7 @@ app.use(kibanaSpaces.prefix('/kibana-spaces').middleware());
 app.use(roles.prefix('/elastic-roles').middleware());
 app.use(queues.prefix('/queues').middleware());
 app.use(kibana.prefix('/kibana').middleware());
+app.use(actions.prefix('/actions').middleware());
 app.use(activity.prefix('/activity').middleware());
 app.use(sync.prefix('/sync').middleware());
 

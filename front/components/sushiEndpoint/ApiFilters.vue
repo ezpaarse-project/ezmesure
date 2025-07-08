@@ -56,7 +56,7 @@
         </v-col>
 
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.counterVersions"
             v-model:loose="filters['counterVersions:loose']"
             :items="SUPPORTED_COUNTER_VERSIONS"
@@ -74,7 +74,7 @@
                 label
               />
             </template>
-          </FiltersSelect>
+          </ApiFiltersSelect>
         </v-col>
       </v-row>
     </v-container>

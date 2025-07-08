@@ -90,13 +90,17 @@
                   <v-col cols="12">
                     <v-combobox
                       v-model="sushi.packages"
-                      :label="$t('institutions.sushi.packages')"
+                      :label="`${$t('institutions.sushi.packages')} *`"
                       :hint="$t('institutions.sushi.packagesDescription')"
                       :items="availablePackages"
                       :loading="loadingPackages && 'primary'"
-                      :rules="[(v) => v.length <= 1 || $t('institutions.sushi.onlyOnePackage')]"
+                      :rules="[
+                        (v) => (v?.length ?? 0) > 0 || $t('fieldIsRequired'),
+                        (v) => (v?.length ?? 0) <= 1 || $t('institutions.sushi.onlyOnePackage'),
+                      ]"
                       prepend-icon="mdi-tag"
                       variant="underlined"
+                      required
                       multiple
                       chips
                       closable-chips

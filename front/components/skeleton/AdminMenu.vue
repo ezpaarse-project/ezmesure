@@ -30,8 +30,14 @@
 
         <v-list-item
           :title="$t('menu.repositoryAliases.templates')"
-          to="/admin/repository-alias-templates"
+          to="/admin/repository-aliases/templates"
           prepend-icon="mdi-view-grid"
+        />
+
+        <v-list-item
+          :title="$t('menu.repositoryAliases.orphans')"
+          to="/admin/repository-aliases/orphans"
+          prepend-icon="mdi-bell-outline"
         />
       </v-list-group>
 
@@ -133,6 +139,17 @@
         to="/admin/sync"
         prepend-icon="mdi-sync"
       />
+
+      <v-list-item
+        v-tooltip="$t('menu.actions.tooltip')"
+        :title="$t('menu.actions.title')"
+        to="/admin/actions"
+        prepend-icon="mdi-history"
+      >
+        <template #append>
+          <v-badge content="BETA" color="primary" inline />
+        </template>
+      </v-list-item>
 
       <v-list-item
         :title="$t('menu.activity')"

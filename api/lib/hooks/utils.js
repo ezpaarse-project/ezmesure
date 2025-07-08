@@ -20,9 +20,8 @@ const generateRoleNameFromRepository = (repository, modifier) => `repository.${r
 
 /**
  * @param {RepositoryAlias} alias
- * @param {string} modifier
  */
-const generateRoleNameFromAlias = (alias, repository) => `alias.${alias.pattern}.${repository.type}`;
+const generateRoleNameFromAlias = (alias) => `alias.${alias.pattern}`;
 
 /**
  *
@@ -115,9 +114,11 @@ const generateUserRoles = async (username) => {
   const additionalRoles = user.elasticRoles.map((role) => role.name);
 
   const roles = new Set(user.memberships?.flatMap?.((membership) => {
-    const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
+    const repoRoles = membership?.repositoryPermissions?.map(
+      (perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all'),
+    ) || [];
     const aliasRoles = membership?.repositoryAliasPermissions?.map(
-      (perm) => generateRoleNameFromAlias(perm.alias, perm.alias.repository),
+      (perm) => generateRoleNameFromAlias(perm.alias),
     ) || [];
     const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
     const institutionRoles = membership?.institution?.elasticRoles.map((role) => role.name);

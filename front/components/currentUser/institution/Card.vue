@@ -105,6 +105,7 @@
             elevation="0"
             title=""
             prepend-icon=""
+            user-spaced
           />
         </v-tabs-window-item>
 
@@ -114,6 +115,7 @@
             elevation="0"
             title=""
             prepend-icon=""
+            user-spaced
           />
         </v-tabs-window-item>
 
@@ -129,6 +131,18 @@
             />
 
             <v-list-item
+              v-for="customProp in customProps"
+              :key="customProp.fieldId"
+              :title="customProp.value"
+              prepend-icon="mdi-tag-outline"
+              lines="two"
+            >
+              <template #subtitle>
+                <CustomFieldLabel :model-value="customProp.field" />
+              </template>
+            </v-list-item>
+
+            <v-list-item
               v-if="links.length > 0"
               :subtitle="$t('institutions.institution.links')"
               prepend-icon="mdi-link-variant"
@@ -138,7 +152,7 @@
                 <v-btn
                   v-for="link in links"
                   :key="link.icon"
-                  v-tooltip="link.title"
+                  v-tooltip:top="link.title"
                   :href="link.url"
                   :color="link.color"
                   :icon="link.icon"
@@ -177,7 +191,7 @@ const tab = ref(0);
 const institution = computed(() => props.membership.institution);
 
 const fullInstitution = computed(() => ({
-  ...props.institution,
+  ...institution.value,
   spaces: props.membership.spacePermissions.map(({ space }) => space),
   repositories: props.membership.repositoryPermissions.map(({ repository }) => repository),
 }));
@@ -228,6 +242,12 @@ const links = computed(() => [
     url: institution.value.social?.facebookUrl,
   },
 ].filter(({ url }) => !!url));
+
+const customProps = computed(() => {
+  if (!institution.value.customProps) { return []; }
+
+  return institution.value.customProps.filter((prop) => !!prop.value && prop.field?.visible);
+});
 
 const allowedActions = computed(() => {
   const perms = new Set(props.membership.permissions);

@@ -74,11 +74,21 @@ module.exports = class SushiCredentialsService extends BasePrismaService {
   }
 
   /**
+   * Mark credentials as deleted before cleaning up data in elastic and then delete
+   *
    * @param {SushiCredentialsDeleteArgs} params
    * @returns {Promise<SushiCredentials | null>}
    */
   delete(params) {
-    return sushiCredentialsPrisma.remove(params, this.prisma);
+    // Mark credentials as deleted
+    const credentials = sushiCredentialsPrisma.update({
+      ...params,
+      data: { deletedAt: new Date() },
+    }, this.prisma);
+
+    // A cron will regularly clean up deleted credentials
+
+    return credentials;
   }
 
   /**

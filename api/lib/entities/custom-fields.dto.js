@@ -48,6 +48,7 @@ const immutableFields = [
  */
 const includableFields = [
   'institutionProperties',
+  'institutionProperties.institution',
 ];
 
 /**
