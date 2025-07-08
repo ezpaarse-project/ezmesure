@@ -406,22 +406,39 @@ A SUSHI endpoint
 
 A set of SUSHI credentials, associated to a SUSHI endpoint
 
-| Property        | Type            | Description                                                                                              | Attributes | Default  |
-|-----------------|-----------------|----------------------------------------------------------------------------------------------------------|------------|----------|
-| id              | `String`        | ID of the SUSHI credentials                                                                              | Id         | `cuid()` |
-| createdAt       | `DateTime`      | Creation date                                                                                            |            | `now()`  |
-| updatedAt       | `DateTime`      | Latest update date                                                                                       |            |          |
-| customerId      | `String?`       | Value of the customer_id parameter                                                                       |            |          |
-| requestorId     | `String?`       | Value of the requestor_id parameter                                                                      |            |          |
-| apiKey          | `String?`       | Value of the api_key parameter                                                                           |            |          |
-| comment         | `String?`       | Abritrary comment about the credentials                                                                  |            |          |
-| active          | `Boolean`       | Whether the credentials are active and can be harvested                                                  |            | `true`   |
-| activeUpdatedAt | `DateTime`      | Date on which the active status was last modified                                                        |            | `now()`  |
-| packages        | `String[]`      | Packages (profiles, accounts, funds...) that include the credentials                                     |            |          |
-| tags            | `String[]`      | Abritrary tag list associated to the credentials                                                         |            |          |
-| params          | `Json[]`        | Additionnal parameters. Each param has a name, a value, and a scope.                                     |            |          |
-| institution     | `Institution`   | Institution that owns the credentials                                                                    |            |          |
-| endpoint        | `SushiEndpoint` | The SUSHI endpoint                                                                                       |            |          |
-| harvestJobs     | `HarvestJob[]`  | The harvest jobs associated to the credentials                                                           |            |          |
-| harvests        | `Harvest[]`     | The harvest states associated to the credentials                                                         |            |          |
-| connection      | `Json?`         | Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? } |            |          |
+| Property          | Type                            | Description                                                                                              | Attributes | Default  |
+|-------------------|---------------------------------|----------------------------------------------------------------------------------------------------------|------------|----------|
+| id                | `String`                        | ID of the SUSHI credentials                                                                              | Id         | `cuid()` |
+| createdAt         | `DateTime`                      | Creation date                                                                                            |            | `now()`  |
+| updatedAt         | `DateTime`                      | Latest update date                                                                                       |            |          |
+| deletedAt         | `DateTime?`                     | When item was marked for deletion                                                                        |            |          |
+| customerId        | `String?`                       | Value of the customer_id parameter                                                                       |            |          |
+| requestorId       | `String?`                       | Value of the requestor_id parameter                                                                      |            |          |
+| apiKey            | `String?`                       | Value of the api_key parameter                                                                           |            |          |
+| comment           | `String?`                       | Abritrary comment about the credentials                                                                  |            |          |
+| active            | `Boolean`                       | Whether the credentials are active and can be harvested                                                  |            | `true`   |
+| activeUpdatedAt   | `DateTime`                      | Date on which the active status was last modified                                                        |            | `now()`  |
+| archived          | `Boolean`                       | Whether the credentials are archived                                                                     |            | `false`  |
+| archivedUpdatedAt | `DateTime`                      | Date on which the archived status was last modified                                                      |            | `now()`  |
+| packages          | `String[]`                      | Packages (profiles, accounts, funds...) that include the credentials                                     |            |          |
+| tags              | `String[]`                      | Abritrary tag list associated to the credentials                                                         |            |          |
+| params            | `Json[]`                        | Additionnal parameters. Each param has a name, a value, and a scope.                                     |            |          |
+| institution       | `Institution`                   | Institution that owns the credentials                                                                    |            |          |
+| endpoint          | `SushiEndpoint`                 | The SUSHI endpoint                                                                                       |            |          |
+| harvestJobs       | `HarvestJob[]`                  | The harvest jobs associated to the credentials                                                           |            |          |
+| harvests          | `Harvest[]`                     | The harvest states associated to the credentials                                                         |            |          |
+| deletionTask      | `SushiCredentialsDeletionTask?` | The deletion task associated to the credentials                                                          |            |          |
+| connection        | `Json?`                         | Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? } |            |          |
+
+### SushiCredentialsDeletionTask
+
+| Property     | Type                 | Description                       | Attributes | Default |
+|--------------|----------------------|-----------------------------------|------------|---------|
+| id           | `String`             | ID of the Elastic task            | Id         |         |
+| progress     | `Int`                | Progress of the task              |            | `0`     |
+| indexPattern | `String`             | Index pattern related to the task |            |         |
+| canceled     | `Boolean`            | Is the task canceled              |            | `false` |
+| error        | `String?`            | Error encountered with the task   |            |         |
+| createdAt    | `DateTime`           | Creation date                     |            | `now()` |
+| updatedAt    | `DateTime`           | Latest update date                |            |         |
+| credentials  | `SushiCredentials[]` | Credentials related to task       |            |         |
