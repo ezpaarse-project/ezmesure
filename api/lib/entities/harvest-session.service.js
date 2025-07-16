@@ -418,7 +418,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const allowedVersions = new Set(session.allowedCounterVersions);
 
     // Create index cache
-    const institutionIndices = new Map();
+    const institutionIndexPrefixes = new Map();
 
     // Start harvests jobs
     const jobsPerCredential = await Promise.all(
@@ -440,9 +440,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           return [];
         }
 
-        // Get index for institution
-        let index = institutionIndices.get(institution.id) || '';
-        if (!index) {
+        // Get index prefix for institution
+        let indexPrefix = institutionIndexPrefixes.get(institution.id) || '';
+        if (!indexPrefix) {
           const repository = await repositoriesService.findFirst({
             where: {
               type: 'counter5',
@@ -456,8 +456,20 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
           }
 
-          index = repository.pattern.replace(/[*]/g, '');
-          institutionIndices.set(institution.id, index);
+          indexPrefix = repository.pattern.replace(/[*]/g, '');
+          institutionIndexPrefixes.set(institution.id, indexPrefix);
+        }
+
+        // Get index by COUNTER version
+        let index;
+        switch (counterVersion) {
+          case '5.1':
+            index = `${indexPrefix}-r51`;
+            break;
+
+          default:
+            index = indexPrefix;
+            break;
         }
 
         // [DEPRECATED] Use old way to get supported data

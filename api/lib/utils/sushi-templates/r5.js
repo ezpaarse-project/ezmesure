@@ -50,15 +50,6 @@ module.exports = {
       },
     ],
     properties: {
-      X_Package: { type: 'keyword' },
-      X_Tags: { type: 'keyword' },
-      X_Sushi_ID: { type: 'keyword' },
-      X_Institution_ID: { type: 'keyword' },
-      X_Endpoint_ID: { type: 'keyword' },
-      X_Endpoint_Tags: { type: 'keyword' },
-      X_Harvest_ID: { type: 'keyword' },
-      X_Date_Month: { type: 'date', format: 'yyyy-MM' },
-
       Metric_Type: { type: 'keyword' },
       Count: { type: 'integer' },
 
