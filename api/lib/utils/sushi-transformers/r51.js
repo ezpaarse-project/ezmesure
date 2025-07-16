@@ -2,6 +2,14 @@
 
 const { format } = require('date-fns');
 
+/**
+ * Check if value is an record
+ *
+ * @param {unknown} val The value to check
+ * @returns {val is Record<string, unknown>}
+ */
+const isRecord = (val) => !!val && typeof val === 'object' && !Array.isArray(val);
+
 module.exports = function prepareC51Transformer(report) {
   // Extract report header
   const reportHeader = {
@@ -39,31 +47,12 @@ module.exports = function prepareC51Transformer(report) {
           if (parent.Item_ID) {
             itemParent = {
               Item_ID: parent.Item_ID,
-              // Item_Dates was renamed into Publication_Date
-              // // Item_Dates: parent.Item_Dates,
               Publication_Date: parent.Publication_Date,
 
               Item: parent.Item,
-              // ? Item_Name was renamed into Item
-              // // Item_Name: parent.Item_Name,
               Data_Type: parent.Data_Type,
-              // Item_Contributors was renamed into Authors
-              // // Item_Contributors: parent.Item_Contributors,
               Authors: parent.Authors,
-              // Item_Attributes.Article_Version was renamed into Article_Version
-              // // Item_Attributes.Article_Version: parent.Item_Attributes.Article_Version,
               Article_Version: parent.Article_Version,
-
-              // Item_Attributes was deleted, and now is spread
-              // // Item_Attributes: parent.Item_Attributes,
-              // Item_Attributes.Article_Type was deleted
-              // // Item_Attributes.Article_Type: parent.Item_Attributes.Article_Type,
-              // Item_Attributes.Qualification_Name was deleted
-              // // Item_Attributes.Qualification_Name: parent.Item_Attributes.Qualification_Name,
-              // Item_Attributes.Qualification_Level was deleted
-              // // Item_Attributes.Qualification_Level: parent.Item_Attributes.Qualification_Level,
-              // Item_Attributes.Proprietary was deleted
-              // // Item_Attributes.Proprietary: parent.Item_Attributes.Proprietary,
             };
           }
         }
@@ -79,8 +68,6 @@ module.exports = function prepareC51Transformer(report) {
             Item_Parent: itemParent,
 
             Item_ID: reportItem.Item_ID,
-            // Item_Dates was renamed into Publication_Date
-            // // Item_Dates: reportItem.Item_Dates,
             Publication_Date: reportItem.Publication_Date,
             Publisher_ID: reportItem.Publisher_ID,
 
@@ -89,30 +76,15 @@ module.exports = function prepareC51Transformer(report) {
             Database: reportItem.Database,
             Platform: reportItem.Platform,
             Publisher: reportItem.Publisher,
-            // Item_Contributors was renamed into Authors
-            // // Item_Contributors: reportItem.Item_Contributors,
             Authors: reportItem.Authors,
-
-            // Item_Attributes.Article_Version was renamed into Article_Version
-            // // Item_Attributes.Article_Version: reportItem.Item_Attributes.Article_Version,
             Article_Version: reportItem.Article_Version,
-
-            // Item_Attributes was deleted, and now is spread
-            // // Item_Attributes: reportItem.Item_Attributes,
-            // Item_Attributes.Article_Type was deleted
-            // // Item_Attributes.Article_Type: reportItem.Item_Attributes.Article_Type,
-            // Item_Attributes.Qualification_Name was deleted
-            // // Item_Attributes.Qualification_Name: reportItem.Item_Attributes.Qualification_Name,
-            // Item_Attributes.Qualification_Level was deleted
-            // // Item_Attributes.Qualification_Level: reportItem.Item_Attributes.Qualification_Level,
-            // Item_Attributes.Proprietary was deleted
-            // // Item_Attributes.Proprietary: reportItem.Item_Attributes.Proprietary,
-            // Section_Type was deleted
-            // // Section_Type: reportItem.Section_Type,
           };
 
+          // eslint-disable-next-line no-continue
+          if (!isRecord(baseItem.Item_ID)) { continue; }
+
           // Extract item identifiers
-          const identifiers = Object.entries(baseItem.Item_ID ?? {})
+          const identifiers = Object.entries(baseItem.Item_ID)
             .map(([key, value]) => `${key}:${value}`)
             .sort();
 
@@ -134,15 +106,20 @@ module.exports = function prepareC51Transformer(report) {
               YOP: attr.YOP,
             };
 
-            // TODO: safe entries
-            const performances = Object.entries(attr.Performance ?? {});
+            // eslint-disable-next-line no-continue
+            if (!isRecord(attr.Performance)) { continue; }
+
+            const performances = Object.entries(attr.Performance);
+
             // eslint-disable-next-line no-restricted-syntax
             for (const [metricType, performance] of performances) {
               // eslint-disable-next-line no-continue
               if (!metricType) { continue; }
 
-              // TODO: safe entries
-              const instances = Object.entries(performance ?? {});
+              // eslint-disable-next-line no-continue
+              if (!isRecord(performance)) { continue; }
+
+              const instances = Object.entries(performance);
 
               // eslint-disable-next-line no-restricted-syntax
               for (const [instanceDate, instance] of instances) {
@@ -174,8 +151,6 @@ module.exports = function prepareC51Transformer(report) {
                       ...item,
                       Metric_Type: metricType,
                       Count: instance,
-                      // Period was deleted
-                      // // Period: period,
                     },
                   },
                 };
