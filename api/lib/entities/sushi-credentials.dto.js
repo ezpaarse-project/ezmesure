@@ -22,10 +22,10 @@ const schema = {
   archivedUpdatedAt: Joi.date(),
   archived: Joi.boolean(),
 
-  customerId: Joi.string().trim().allow(''),
-  requestorId: Joi.string().trim().allow(''),
-  apiKey: Joi.string().trim().allow(''),
-  comment: Joi.string().trim().allow(''),
+  customerId: Joi.string().trim().allow('', null),
+  requestorId: Joi.string().trim().allow('', null),
+  apiKey: Joi.string().trim().allow('', null),
+  comment: Joi.string().trim().allow('', null),
 
   packages: Joi.array().items(Joi.string()),
   tags: Joi.array().items(Joi.string()),
