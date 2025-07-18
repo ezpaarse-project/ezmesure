@@ -169,7 +169,7 @@
 </template>
 
 <script setup>
-import defaultLogo from '@/static/images/logo-etab.png';
+import defaultLogo from '@@/static/images/logo-etab.png';
 
 const LOGO_RATIO = [3, 1];
 

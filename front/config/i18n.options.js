@@ -1,4 +1,4 @@
-import locales from '../lib/locales';
+import locales from '../app/lib/locales';
 
 /**
  * @type {import('@nuxt/schema').NuxtConfig['i18n']}

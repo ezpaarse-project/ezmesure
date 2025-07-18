@@ -8,7 +8,6 @@ export default {
   vuetifyOptions: {
     ssr: true,
 
-    labComponents: ['VTreeview'],
     directives: true,
 
     theme: {

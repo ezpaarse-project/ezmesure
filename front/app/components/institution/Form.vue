@@ -419,8 +419,8 @@
 </template>
 
 <script setup>
+import defaultLogo from '@@/static/images/logo-etab.png';
 import { fileToBase64 } from '@/lib/base64';
-import defaultLogo from '@/static/images/logo-etab.png';
 
 const props = defineProps({
   modelValue: {

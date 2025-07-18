@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-import logo from '@/static/images/logo-ezMESURE-slogan.png';
+import logo from '@@/static/images/logo-ezMESURE-slogan.png';
 
 const { t } = useI18n();
 

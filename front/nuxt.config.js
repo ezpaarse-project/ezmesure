@@ -1,8 +1,8 @@
 import { defineNuxtConfig } from 'nuxt/config';
 
-import authOptions from './app/auth.options';
-import i18nOptions from './app/i18n.options';
-import vuetifyOptions from './app/vuetify.options';
+import authOptions from './config/auth.options';
+import i18nOptions from './config/i18n.options';
+import vuetifyOptions from './config/vuetify.options';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({

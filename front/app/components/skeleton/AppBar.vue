@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import logo from '@/static/images/logo.png';
+import logo from '@@/static/images/logo.png';
 
 const { public: config } = useRuntimeConfig();
 

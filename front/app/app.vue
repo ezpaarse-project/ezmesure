@@ -1,6 +1,5 @@
 <template>
   <v-app>
-
     <client-only>
       <NuxtLoadingIndicator color="#3B8070" />
 

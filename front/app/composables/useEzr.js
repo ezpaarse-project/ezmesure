@@ -11,7 +11,9 @@ export default async function useEzr() {
   const {
     data: ezrProfile,
     error,
-  } = await useFetch('/api/profile/reporting_token');
+  } = await useFetch('/api/profile/reporting_token', {
+    deep: true
+  });
 
   const itemsPerPageOptions = [10, 25, 50, 100, -1];
   const itemsPerPageStored = useLocalStorage('ezm.itemsPerPage', 10);
