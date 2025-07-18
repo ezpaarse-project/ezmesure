@@ -5,7 +5,6 @@ import locales from '../lib/locales';
  */
 export default {
   baseUrl: process.env.APPLI_APACHE_SERVERNAME,
-  lazy: true,
   strategy: 'no_prefix',
   defaultLocale: 'fr',
   langDir: 'locales',
