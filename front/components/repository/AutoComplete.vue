@@ -1,5 +1,6 @@
 <template>
   <v-combobox
+    v-model:search="search"
     :model-value="modelValue?.pattern"
     :label="`${$t('repositories.pattern')} *`"
     :items="availableRepositories ?? []"
@@ -10,6 +11,7 @@
     :loading="status === 'pending' && 'primary'"
     :error="!!error"
     :error-messages="error?.message"
+    :hide-no-data="!search"
     item-title="pattern"
     item-value="pattern"
     prepend-icon="mdi-form-textbox"
@@ -31,6 +33,22 @@
         </template>
       </v-list-item>
     </template>
+
+    <template #no-data>
+      <v-list-item>
+        <template #title>
+          <i18n-t keypath="noMatchFor">
+            <template #search>
+              <strong>{{ search }}</strong>
+            </template>
+
+            <template #key>
+              <kbd>{{ $t('enterKey') }}</kbd>
+            </template>
+          </i18n-t>
+        </template>
+      </v-list-item>
+    </template>
   </v-combobox>
 </template>
 
@@ -45,6 +63,8 @@ const props = defineProps({
 defineEmits({
   'update:modelValue': (repository) => !!repository,
 });
+
+const search = ref('');
 
 const pattern = computed(() => props.modelValue?.pattern);
 const debouncedPattern = useDebounce(pattern, 250);

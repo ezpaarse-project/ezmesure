@@ -53,6 +53,16 @@
       />
 
       <v-chip
+        v-if="modelValue.sendEndMail"
+        v-tooltip:top="$t('harvest.sessions.sendEndMail')"
+        size="small"
+        variant="outlined"
+        class="mr-2 mt-1"
+      >
+        <v-icon icon="mdi-email" />
+      </v-chip>
+
+      <v-chip
         v-if="status?.runningTime"
         v-tooltip:top="$t('harvest.sessions.startedAt', { date: dateFormat(modelValue?.startedAt, locale) })"
         :text="runningTime"
@@ -124,8 +134,8 @@ const runningTime = useTimeAgo(() => status.value?.runningTime ?? 0);
 async function copyId() {
   try {
     await copy(props.modelValue.id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

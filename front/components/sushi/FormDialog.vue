@@ -10,7 +10,7 @@
       :institution="institution"
       show-sushi
       @submit="onSave($event)"
-      @update:model-value="$emit('update:model-value', $event)"
+      @update:model-value="$emit('update:modelValue', $event)"
     >
       <template #actions="{ loading }">
         <v-btn
@@ -27,7 +27,7 @@
 <script setup>
 const emit = defineEmits({
   submit: (item) => !!item,
-  'update:model-value': (item) => !!item?.connection?.status,
+  'update:modelValue': (item) => !!item?.connection?.status,
 });
 
 const isOpen = ref(false);

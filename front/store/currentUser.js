@@ -7,25 +7,61 @@ import {
 
 export const useCurrentUserStore = defineStore('current-user', () => {
   const memberships = ref([]);
+  const elasticRoles = ref([]);
 
   const hasMemberships = computed(() => !!memberships.value?.length);
   const institutions = computed(() => memberships.value.map((m) => m.institution));
-  const spacesPermissions = computed(
-    () => memberships.value.map((m) => m.spacePermissions ?? []).flat(),
-  );
-  const reposPermissions = computed(
-    () => memberships.value.map((m) => m.repositoryPermissions ?? []).flat(),
-  );
+
+  const spacesPermissions = computed(() => {
+    const entries = memberships.value.flatMap((m) => {
+      const perms = m.spacePermissions ?? [];
+      return perms.map((p) => [p.spaceId, p]);
+    });
+    return Array.from(new Map(entries).values());
+  });
+
+  const reposPermissions = computed(() => {
+    const entries = memberships.value.flatMap((m) => {
+      const perms = m.repositoryPermissions ?? [];
+      return perms.map((p) => [p.repositoryPattern, p]);
+    });
+    return Array.from(new Map(entries).values());
+  });
+
+  const foreignSpacesPermissions = computed(() => {
+    const entries = elasticRoles.value.flatMap((elasticRole) => {
+      const perms = (elasticRole.spacePermissions ?? []);
+      return perms.map(({ space }) => [space.id, { space, elasticRole }]);
+    });
+    return Array.from(new Map(entries).values());
+  });
 
   async function fetchMemberships() {
-    const data = await $fetch('/api/profile/memberships', {
+    const mems = await $fetch('/api/profile/memberships', {
       query: {
-        include: ['institution', 'spacePermissions.space', 'repositoryPermissions.repository'],
+        include: [
+          'institution.customProps.field', // Used to show details in institution page
+          'spacePermissions.space', // Used to show spaces in menu & institution page
+          'repositoryPermissions.repository', // Used to show repositories in institution page
+          'institution.elasticRoles.spacePermissions.space', // Used to show spaces in menu & institution page
+          'institution.elasticRoles.repositoryPermissions.repository', // Used to show repositories in institution page
+        ],
         size: 0,
       },
     });
 
-    memberships.value = data ?? [];
+    const roles = await $fetch('/api/profile/elastic-roles', {
+      query: {
+        include: [
+          'spacePermissions.space', // Used to show spaces in menu
+        ],
+        size: 0,
+      },
+    });
+
+    memberships.value = mems ?? [];
+    elasticRoles.value = roles ?? [];
+
     return true;
   }
 
@@ -52,6 +88,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
     memberships,
     institutions,
     spacesPermissions,
+    foreignSpacesPermissions,
     reposPermissions,
     fetchMemberships,
     getMembership,

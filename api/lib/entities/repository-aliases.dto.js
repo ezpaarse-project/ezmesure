@@ -4,29 +4,24 @@ const {
   withModifiers,
   ignoreFields,
   requireFields,
+  filtersSchema,
 } = require('./schema.utils');
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
+  templateId: Joi.string().trim().allow(null),
+  template: Joi.object(),
+
   pattern: Joi.string().trim().min(1),
   target: Joi.string().trim().min(1),
 
-  filters: Joi.array().min(1).items(Joi.object({
-    name: Joi.string().trim().min(1).required(),
-    field: Joi.string().trim().min(1).required(),
-    isNot: Joi.boolean().default(false),
-    value: Joi.alternatives([
-      // Null values are allowed to check if empty
-      Joi.string().trim().min(1), // Exact match
-      Joi.array().items(Joi.string().trim().min(1)), // One of
-    ]).allow(null),
-  })).allow(null),
+  filters: Joi.array().min(1).items(filtersSchema).allow(null),
 
   institutions: Joi.array().items(Joi.object()),
   repository: Joi.object(),
@@ -41,6 +36,7 @@ const immutableFields = [
   'updatedAt',
   'createdAt',
   'institutions',
+  'template',
   'repository',
   'permissions',
   'elasticRolePermissions',

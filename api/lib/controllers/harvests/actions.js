@@ -47,3 +47,33 @@ exports.getHarvests = async (ctx) => {
   ctx.set('X-Total-Count', await harvestsService.count({ where: prismaQuery.where }));
   ctx.body = await harvestsService.findMany(prismaQuery);
 };
+
+exports.deleteHarvestsByQuery = async (ctx) => {
+  const {
+    credentialsId,
+    reportId,
+    period,
+    status,
+  } = ctx.request.body;
+
+  /** @type {HarvestFindManyArgs} */
+  const prismaQuery = {
+    where: {
+      credentialsId,
+      reportId,
+      period: {
+        gte: period.from,
+        lte: period.to,
+      },
+      status,
+    },
+  };
+
+  const harvestsService = new HarvestsService();
+
+  const deleted = await harvestsService.deleteMany(prismaQuery);
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = { deleted };
+};

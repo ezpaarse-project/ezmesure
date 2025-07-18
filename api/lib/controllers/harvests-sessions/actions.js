@@ -147,18 +147,24 @@ exports.upsertOne = async (ctx) => {
         throw new HTTPError(409, 'errors.harvest.updateSessionAfterStart', [harvestId]);
       }
 
+      const data = {
+        // Default values
+        timeout: 600,
+        allowFaulty: false,
+        downloadUnsupported: false,
+        forceDownload: false,
+        sendEndMail: true,
+        params: {},
+        // Provided values
+        ...body,
+        // Provided id
+        id: harvestId,
+      };
+
       return harvestSessionService.upsert({
         where: { id: harvestId },
-        create: {
-          ignoreValidation: null,
-          ...body,
-          id: harvestId,
-        },
-        update: {
-          ignoreValidation: null,
-          ...body,
-          id: harvestId,
-        },
+        create: data,
+        update: data,
         include: {
           _count: {
             select: {

@@ -202,14 +202,13 @@ function deleteRepositories(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/repositories/${item.pattern}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.pattern }));
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/repositories/${item.pattern}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.pattern }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {
@@ -237,8 +236,8 @@ async function copyRepositoryPattern({ pattern }) {
 
   try {
     await copy(pattern);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

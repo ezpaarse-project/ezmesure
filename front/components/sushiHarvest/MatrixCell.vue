@@ -41,7 +41,15 @@
           <v-col>
             <i18n-t v-for="item in counts" :key="item.path" :keypath="item.path">
               <template #count>
-                <strong>{{ item.value }}</strong>
+                <span class="font-weight-bold">{{ item.value }}</span>
+              </template>
+
+              <template #beignDate>
+                <span class="font-weight-bold">{{ modelValue.harvestedBy?.beginDate ?? '???' }}</span>
+              </template>
+
+              <template #endDate>
+                <span class="font-weight-bold">{{ modelValue.harvestedBy?.endDate ?? '???' }}</span>
               </template>
             </i18n-t>
           </v-col>
@@ -124,8 +132,8 @@ async function openTaskHistoryFromHarvest() {
 
     await nextTick(); // Wait for task.value to propagate, allowing ref to be resolved
     await historyRef.value?.open(task.value);
-  } catch {
-    snacks.error(t('tasks.failedToFetchTasks'));
+  } catch (err) {
+    snacks.error(t('tasks.failedToFetchTasks'), err);
   }
 }
 </script>

@@ -1,18 +1,19 @@
 <template>
   <v-app>
-    <ClientOnly>
+
+    <client-only>
       <NuxtLoadingIndicator color="#3B8070" />
 
       <SkeletonAppBar @model-value:menu="updateVisibleMenu()" />
       <SkeletonSnacks />
       <SkeletonConfirmDialog />
 
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
+      <nuxt-layout>
+        <nuxt-page />
+      </nuxt-layout>
 
       <SkeletonSushiQueueStatus />
-    </ClientOnly>
+    </client-only>
   </v-app>
 </template>
 

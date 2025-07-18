@@ -22,33 +22,63 @@ Possible statuses of a harvest job
 
 An institution
 
-| Property          | Type                 | Description                                                       | Attributes | Default  |
-|-------------------|----------------------|-------------------------------------------------------------------|------------|----------|
-| id                | `String`             | ID of the institution                                             | Id         | `cuid()` |
-| parentInstitution | `Institution?`       | The parent institution                                            |            |          |
-| createdAt         | `DateTime`           | Creation date                                                     |            | `now()`  |
-| updatedAt         | `DateTime`           | Latest update date                                                |            |          |
-| name              | `String`             | Institution name                                                  |            |          |
-| namespace         | `String?`            | Institution namespace (ex: b-bibcnrs)                             |            |          |
-| validated         | `Boolean`            | Whether the institution has been validated or not                 |            | `false`  |
-| hidePartner       | `Boolean`            | Whether the institution should appear in the partner list or not  |            | `false`  |
-| tags              | `String[]`           | A list of tags associated to the institution                      |            |          |
-| logoId            | `String?`            | ID of the institution logo                                        |            |          |
-| type              | `String?`            | Institution type (ex: university)                                 |            |          |
-| acronym           | `String?`            | Institution acronym                                               |            |          |
-| websiteUrl        | `String?`            | Institution website URL                                           |            |          |
-| city              | `String?`            | Institution city                                                  |            |          |
-| uai               | `String?`            | Institution UAI (Unité Administrative Immatriculée)               |            |          |
-| social            | `Json?`              | Social links of the institution                                   |            |          |
-| sushiReadySince   | `DateTime?`          | Date when SUSHI credentials have been marked as ready for harvest |            |          |
-| memberships       | `Membership[]`       | Institution members                                               |            |          |
-| elasticRoles      | `ElasticRole[]`      | Additional roles to give to each member                           |            |          |
-| spaces            | `Space[]`            | Institution spaces                                                |            |          |
-| actions           | `Action[]`           | Actions that were triggered in the scope of the institution       |            |          |
-| sushiCredentials  | `SushiCredentials[]` | Institution SUSHI credentials                                     |            |          |
-| childInstitutions | `Institution[]`      | Child institutions                                                |            |          |
-| repositories      | `Repository[]`       | Institution repositories                                          |            |          |
-| repositoryAliases | `RepositoryAlias[]`  | Institution aliases                                               |            |          |
+| Property          | Type                    | Description                                                       | Attributes | Default  |
+|-------------------|-------------------------|-------------------------------------------------------------------|------------|----------|
+| id                | `String`                | ID of the institution                                             | Id         | `cuid()` |
+| parentInstitution | `Institution?`          | The parent institution                                            |            |          |
+| createdAt         | `DateTime`              | Creation date                                                     |            | `now()`  |
+| updatedAt         | `DateTime`              | Latest update date                                                |            |          |
+| name              | `String`                | Institution name                                                  |            |          |
+| namespace         | `String?`               | Institution namespace (ex: b-bibcnrs)                             |            |          |
+| validated         | `Boolean`               | Whether the institution has been validated or not                 |            | `false`  |
+| hidePartner       | `Boolean`               | Whether the institution should appear in the partner list or not  |            | `false`  |
+| tags              | `String[]`              | A list of tags associated to the institution                      |            |          |
+| logoId            | `String?`               | ID of the institution logo                                        |            |          |
+| type              | `String?`               | Institution type (ex: university)                                 |            |          |
+| acronym           | `String?`               | Institution acronym                                               |            |          |
+| websiteUrl        | `String?`               | Institution website URL                                           |            |          |
+| city              | `String?`               | Institution city                                                  |            |          |
+| uai               | `String?`               | Institution UAI (Unité Administrative Immatriculée)               |            |          |
+| social            | `Json?`                 | Social links of the institution                                   |            |          |
+| sushiReadySince   | `DateTime?`             | Date when SUSHI credentials have been marked as ready for harvest |            |          |
+| memberships       | `Membership[]`          | Institution members                                               |            |          |
+| elasticRoles      | `ElasticRole[]`         | Additional roles to give to each member                           |            |          |
+| spaces            | `Space[]`               | Institution spaces                                                |            |          |
+| actions           | `Action[]`              | Actions that were triggered in the scope of the institution       |            |          |
+| sushiCredentials  | `SushiCredentials[]`    | Institution SUSHI credentials                                     |            |          |
+| childInstitutions | `Institution[]`         | Child institutions                                                |            |          |
+| repositories      | `Repository[]`          | Institution repositories                                          |            |          |
+| repositoryAliases | `RepositoryAlias[]`     | Institution aliases                                               |            |          |
+| customProps       | `InstitutionProperty[]` | Custom properties                                                 |            |          |
+
+### InstitutionProperty
+
+| Property    | Type          | Description                                | Attributes | Default |
+|-------------|---------------|--------------------------------------------|------------|---------|
+| field       | `CustomField` | The custom field                           |            |         |
+| institution | `Institution` | The institution                            |            |         |
+| createdAt   | `DateTime`    | Creation date                              |            | `now()` |
+| updatedAt   | `DateTime`    | Latest update date                         |            |         |
+| value       | `Json?`       | The value of the field for the institution |            |         |
+
+### CustomField
+
+| Property              | Type                    | Description                                                                                  | Attributes | Default |
+|-----------------------|-------------------------|----------------------------------------------------------------------------------------------|------------|---------|
+| id                    | `String`                | ID of the field                                                                              | Id         |         |
+| createdAt             | `DateTime`              | Creation date                                                                                |            | `now()` |
+| updatedAt             | `DateTime`              | Latest update date                                                                           |            |         |
+| multiple              | `Boolean`               | Whether the field should accept multiple values                                              |            | `false` |
+| editable              | `Boolean`               | Whether the values of this field can be edited by regular users                              |            | `false` |
+| visible               | `Boolean`               | Whether the field should be visible by regular users                                         |            | `false` |
+| labelFr               | `String?`               | Field label in French                                                                        |            |         |
+| labelEn               | `String?`               | Field label in English                                                                       |            |         |
+| descriptionFr         | `String?`               | Field description in French                                                                  |            |         |
+| descriptionEn         | `String?`               | Field description in English                                                                 |            |         |
+| helpUrl               | `String?`               | URL (if any) to a page containing explanations about that field                              |            |         |
+| itemUrl               | `String?`               | URL (if any) to the page dedicated to the institution (use {{id}} to insert the field value) |            |         |
+| autocomplete          | `Json?`                 | Source to be used to autocomplete values (format: { index: String, field: String })          |            |         |
+| institutionProperties | `InstitutionProperty[]` | Institution properties that reference the field                                              |            |         |
 
 ### User
 
@@ -127,6 +157,7 @@ A repository (a section of elasticsearch allocated to an institution)
 | permissions            | `RepositoryPermission[]`            | Member permissions associated to this repository |            |         |
 | aliases                | `RepositoryAlias[]`                 | Aliases associated to this repository            |            |         |
 | elasticRolePermissions | `ElasticRoleRepositoryPermission[]` | Permissions granted by role for this repository  |            |         |
+| aliasTemplates         | `RepositoryAliasTemplate[]`         | Alias templates that target this repository      |            |         |
 
 ### RepositoryPermission
 
@@ -145,6 +176,7 @@ A repository alias (alias for a section of elasticsearch)
 
 | Property               | Type                                     | Description                                                                 | Attributes | Default |
 |------------------------|------------------------------------------|-----------------------------------------------------------------------------|------------|---------|
+| template               | `RepositoryAliasTemplate?`               | The template of the alias                                                   |            |         |
 | institutions           | `Institution[]`                          | The institution this repository is associated to                            |            |         |
 | createdAt              | `DateTime`                               | Creation date                                                               |            | `now()` |
 | updatedAt              | `DateTime`                               | Latest update date                                                          |            |         |
@@ -153,6 +185,22 @@ A repository alias (alias for a section of elasticsearch)
 | filters                | `Json?`                                  | Filters linked to repository (format: [{ "field": "foo", "value": "bar" }]) |            |         |
 | permissions            | `RepositoryAliasPermission[]`            | Member permissions associated to this alias                                 |            |         |
 | elasticRolePermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions granted by role for this alias                                  |            |         |
+
+### RepositoryAliasTemplate
+
+A repository alias template (used to generate repository aliases)
+
+| Property   | Type                | Description                                                                        | Attributes | Default |
+|------------|---------------------|------------------------------------------------------------------------------------|------------|---------|
+| id         | `String`            | ID                                                                                 | Id         |         |
+| createdAt  | `DateTime`          | Creation date                                                                      |            | `now()` |
+| updatedAt  | `DateTime`          | Latest update date                                                                 |            |         |
+| pattern    | `String`            | The alias pattern (ex: x-alias-istex-{id}-ezpaarse)                                |            |         |
+| active     | `Boolean`           | Whether the template is active or not                                              |            | `true`  |
+| repository | `Repository`        | The repository                                                                     |            |         |
+| filters    | `Json[]`            | Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])        |            |         |
+| conditions | `Json[]`            | Conditions for creating a new alias (format: [{ "field": "foo", "value": "bar" }]) |            |         |
+| aliases    | `RepositoryAlias[]` | The aliases that were generated with this template                                 |            |         |
 
 ### RepositoryAliasPermission
 
@@ -168,16 +216,17 @@ A alias permission (access rights of a member for a specific alias)
 
 Custom role to give to users
 
-| Property                   | Type                                     | Description                                       | Attributes | Default |
-|----------------------------|------------------------------------------|---------------------------------------------------|------------|---------|
-| name                       | `String`                                 | Name of the role                                  | Id         |         |
-| users                      | `User[]`                                 | Users using this roles                            |            |         |
-| institutions               | `Institution[]`                          | Institutions using this roles                     |            |         |
-| createdAt                  | `DateTime`                               | Creation date                                     |            | `now()` |
-| updatedAt                  | `DateTime`                               | Latest update date                                |            |         |
-| repositoryPermissions      | `ElasticRoleRepositoryPermission[]`      | Permissions that role give to repositories        |            |         |
-| repositoryAliasPermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions that role gives to repository aliases |            |         |
-| spacePermissions           | `ElasticRoleSpacePermission[]`           | Permissions that role gives to spaces             |            |         |
+| Property                   | Type                                     | Description                                            | Attributes | Default |
+|----------------------------|------------------------------------------|--------------------------------------------------------|------------|---------|
+| name                       | `String`                                 | Name of the role                                       | Id         |         |
+| users                      | `User[]`                                 | Users using this roles                                 |            |         |
+| institutions               | `Institution[]`                          | Institutions using this roles                          |            |         |
+| createdAt                  | `DateTime`                               | Creation date                                          |            | `now()` |
+| updatedAt                  | `DateTime`                               | Latest update date                                     |            |         |
+| conditions                 | `Json[]`                                 | A list of conditions used to populate the institutions |            |         |
+| repositoryPermissions      | `ElasticRoleRepositoryPermission[]`      | Permissions that role give to repositories             |            |         |
+| repositoryAliasPermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions that role gives to repository aliases      |            |         |
+| spacePermissions           | `ElasticRoleSpacePermission[]`           | Permissions that role gives to spaces                  |            |         |
 
 ### ElasticRoleRepositoryPermission
 
@@ -237,6 +286,7 @@ Represent a harvest session
 | allowFaulty         | `Boolean`      | Whether the reports should be fetched even if credentials aren't verified or wrong  |            | `false`  |
 | downloadUnsupported | `Boolean`      | Whether the reports should be downloaded even if not supported by the endpoint      |            | `false`  |
 | forceDownload       | `Boolean`      | Whether the reports should be downloaded even if a local copy already exists        |            | `false`  |
+| sendEndMail         | `Boolean`      | Whether a mail should be sent when session ended                                    |            | `true`   |
 | ignoreValidation    | `Boolean?`     | Whether the reports should be inserted even if it does not pass the validation step |            |          |
 | params              | `Json?`        | Parameters to pass to jobs                                                          |            | `{}`     |
 | startedAt           | `DateTime?`    | Start date                                                                          |            |          |

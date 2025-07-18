@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="isOpen" color="grey-lighten-3">
+  <v-navigation-drawer v-model="isOpen" color="grey-lighten-3" width="300">
     <v-list density="compact" class="text-grey-darken-3 pa-0">
       <v-list-item
         :title="$t('menu.institutions')"
@@ -13,11 +13,33 @@
         prepend-icon="mdi-database"
       />
 
-      <v-list-item
-        :title="$t('menu.repositoryAliases')"
-        to="/admin/repository-aliases"
-        prepend-icon="mdi-database-eye"
-      />
+      <v-list-group value="aliases">
+        <template #activator="{ props }">
+          <v-list-item
+            :title="$t('menu.repositoryAliases.group')"
+            prepend-icon="mdi-database-eye"
+            v-bind="props"
+          />
+        </template>
+
+        <v-list-item
+          :title="$t('menu.repositoryAliases.aliases')"
+          to="/admin/repository-aliases"
+          prepend-icon="mdi-database-eye"
+        />
+
+        <v-list-item
+          :title="$t('menu.repositoryAliases.templates')"
+          to="/admin/repository-aliases/templates"
+          prepend-icon="mdi-view-grid"
+        />
+
+        <v-list-item
+          :title="$t('menu.repositoryAliases.orphans')"
+          to="/admin/repository-aliases/orphans"
+          prepend-icon="mdi-bell-outline"
+        />
+      </v-list-group>
 
       <v-list-item
         :title="$t('menu.spaces')"
@@ -48,11 +70,29 @@
         to="/admin/custom-fields"
         prepend-icon="mdi-tag-outline"
       />
-      <v-list-item
-        :title="$t('menu.harvest')"
-        to="/admin/harvests"
-        prepend-icon="mdi-tractor"
-      />
+
+      <v-list-group value="harvests">
+        <template #activator="{ props }">
+          <v-list-item
+            :title="$t('menu.harvest.group')"
+            prepend-icon="mdi-tractor"
+            v-bind="props"
+          />
+        </template>
+
+        <v-list-item
+          :title="$t('menu.harvest.sessions')"
+          to="/admin/harvests"
+          prepend-icon="mdi-file-tree"
+          exact
+        />
+
+        <v-list-item
+          :title="$t('menu.harvest.alerts')"
+          to="/admin/harvests/alerts"
+          prepend-icon="mdi-bell-outline"
+        />
+      </v-list-group>
 
       <v-list-group value="ezREEPORT">
         <template #activator="{ props }">
@@ -99,6 +139,17 @@
         to="/admin/sync"
         prepend-icon="mdi-sync"
       />
+
+      <v-list-item
+        v-tooltip="$t('menu.actions.tooltip')"
+        :title="$t('menu.actions.title')"
+        to="/admin/actions"
+        prepend-icon="mdi-history"
+      >
+        <template #append>
+          <v-badge content="BETA" color="primary" inline />
+        </template>
+      </v-list-item>
 
       <v-list-item
         :title="$t('menu.activity')"

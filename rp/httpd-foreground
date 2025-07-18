@@ -14,8 +14,21 @@ if [[ ! -v APPLI_APACHE_LOGLEVEL ]]; then
   exit 1
 fi
 
-# Allow shibboleth to write in a mounted volume
-chown -R _shibd:_shibd /var/cache/shibboleth
+if [[ $container == "podman" ]]; then
+  echo "==== podman does not support chown ===="
+  echo "To allow shibboleth to write in a mounted volume, please use:"
+  SHIBD_USERID=$(id -u _shibd)
+  SHIBD_GROUPID=$(id -g _shibd)
+  echo "- chown -R $SHIBD_USERID:$SHIBD_GROUPID <volume of /var/cache/shibboleth>"
+  echo "- chown -R $SHIBD_USERID:$SHIBD_GROUPID <volume of /var/log/shibboleth>"
+  echo ""
+  echo "Example with default configuration:"
+  echo "  chown -R $SHIBD_USERID:$SHIBD_GROUPID rp/sp-{cache,log}"
+  echo "========"
+else
+  # Allow shibboleth to write in a mounted volume
+  chown -R _shibd:_shibd /var/cache/shibboleth
+fi
 
 if [[ -z "$EZMESURE_DISABLE_SHIBBOLETH" ]]; then
   if [[ ! -v SHIBBOLETH_SP_URL ]]; then

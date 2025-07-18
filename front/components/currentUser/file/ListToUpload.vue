@@ -60,16 +60,12 @@ async function onRepositoryUpdate(upload, target) {
   try {
     indices = await $fetch(`/api/repositories/${target.repository}/_resolve`);
     indicesOfRepositories.value.set(target.repository, indices.map((i) => i.name));
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   if (indices.length === 0) {
     return { ...target, index: undefined };
-  }
-  if (indices.length === 1) {
-    // Auto select index if only one available
-    return { ...target, index: indices[0]?.name };
   }
   return target;
 }

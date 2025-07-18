@@ -90,17 +90,39 @@
                   <v-col cols="12">
                     <v-combobox
                       v-model="sushi.packages"
-                      :label="$t('institutions.sushi.packages')"
+                      v-model:search="packageSearch"
+                      :label="`${$t('institutions.sushi.packages')} *`"
                       :hint="$t('institutions.sushi.packagesDescription')"
                       :items="availablePackages"
                       :loading="loadingPackages && 'primary'"
-                      :rules="[(v) => v.length <= 1 || $t('institutions.sushi.onlyOnePackage')]"
+                      :rules="[
+                        (v) => (v?.length ?? 0) > 0 || $t('fieldIsRequired'),
+                        (v) => (v?.length ?? 0) <= 1 || $t('institutions.sushi.onlyOnePackage'),
+                      ]"
+                      :hide-no-data="!packageSearch"
                       prepend-icon="mdi-tag"
                       variant="underlined"
+                      required
                       multiple
                       chips
                       closable-chips
-                    />
+                    >
+                      <template #no-data>
+                        <v-list-item>
+                          <template #title>
+                            <i18n-t keypath="noMatchFor">
+                              <template #search>
+                                <strong>{{ packageSearch }}</strong>
+                              </template>
+
+                              <template #key>
+                                <kbd>{{ $t('enterKey') }}</kbd>
+                              </template>
+                            </i18n-t>
+                          </template>
+                        </v-list-item>
+                      </template>
+                    </v-combobox>
                   </v-col>
 
                   <v-col cols="12">
@@ -216,6 +238,7 @@ const saving = ref(false);
 const valid = ref(false);
 const isAdvancedOpen = ref(false);
 const loadingPackages = ref(false);
+const packageSearch = ref('');
 const sushi = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */
@@ -226,7 +249,7 @@ const availablePackages = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
-    const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+    const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
       signal: abortController.signal,
       query: {
         size: 0,
@@ -234,11 +257,11 @@ const availablePackages = computedAsync(
       },
     });
 
-    // Map sushi items with array of packages as key
-    const itemsPerPackages = Map.groupBy(Object.values(sushiItems), (item) => item.packages);
-    // Merge all packages in one array then make unique
-    const packages = new Set(Array.from(itemsPerPackages.keys()).flat());
-    return Array.from(packages).sort();
+    // Merge all packages in one array them make unique
+    const packages = new Set(items.flatMap((item) => item.packages ?? []));
+
+    return Array.from(packages)
+      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
   },
   [],
   { lazy: true, evaluating: loadingPackages },
@@ -320,8 +343,8 @@ async function checkConnection() {
     if (sushi.value.endpoint?.id === props.modelValue?.endpoint?.id) {
       emit('update:modelValue', sushi.value);
     }
-  } catch {
-    snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: sushi.value.endpoint?.vendor }));
+  } catch (err) {
+    snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: sushi.value.endpoint?.vendor }), err);
   }
 
   loading.value = false;
@@ -354,8 +377,8 @@ async function save() {
       });
     }
     emit('submit', newSushi);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   saving.value = false;

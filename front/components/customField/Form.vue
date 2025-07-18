@@ -177,8 +177,8 @@ async function save() {
       body: { ...customField.value },
     });
     emit('submit', newCustomField);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   saving.value = false;

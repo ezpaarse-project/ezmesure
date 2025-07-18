@@ -107,7 +107,7 @@ export default async function useServerSidePagination(params = {}) {
         // eslint-disable-next-line no-underscore-dangle
         return res._data;
       } catch (error) {
-        snacks.error(t('anErrorOccurred'));
+        snacks.error(t('anErrorOccurred'), error);
         throw error;
       }
     },

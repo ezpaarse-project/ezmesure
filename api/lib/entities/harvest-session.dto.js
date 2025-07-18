@@ -9,7 +9,7 @@ const {
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   id: Joi.string().trim(),
@@ -29,6 +29,7 @@ const schema = {
   allowFaulty: Joi.boolean(),
   downloadUnsupported: Joi.boolean(),
   forceDownload: Joi.boolean(),
+  sendEndMail: Joi.boolean(),
   ignoreValidation: Joi.boolean().allow(null),
   params: Joi.object().pattern(Joi.string(), Joi.any()),
 

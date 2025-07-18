@@ -1,7 +1,7 @@
 <template>
   <v-app-bar color="primary" app fixed clipped-left>
     <template #prepend>
-      <NuxtLink
+      <nuxt-link
         :title="$t('menu.homepage')"
         :aria-label="$t('menu.homepage')"
         to="/"
@@ -15,7 +15,7 @@
           height="38px"
           width="38px"
         />
-      </NuxtLink>
+      </nuxt-link>
     </template>
 
     <v-app-bar-title>

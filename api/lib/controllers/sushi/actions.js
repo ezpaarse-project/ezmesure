@@ -15,6 +15,7 @@ const { appLogger } = require('../../services/logger');
 
 const { SUSHI_CODES, ERROR_CODES } = sushiService;
 
+const ActionsService = require('../../entities/actions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
@@ -28,6 +29,7 @@ const { schema, includableFields } = require('../../entities/sushi-credentials.d
  */
 /* eslint-enable max-len */
 
+const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -153,7 +155,7 @@ exports.updateSushi = async (ctx) => {
     institutionName: institution.name,
   };
 
-  if (typeof body.active === 'boolean') {
+  if (typeof body.active === 'boolean' || typeof body.archived === 'boolean') {
     if (Object.keys(body).length === 1) {
       // If only the active state is toggled, no need to change update date
       data.updatedAt = sushi.updatedAt;
@@ -161,6 +163,9 @@ exports.updateSushi = async (ctx) => {
     }
     if (sushi.active !== body.active) {
       data.activeUpdatedAt = new Date();
+    }
+    if (sushi.archived !== body.archived) {
+      data.archivedUpdatedAt = new Date();
     }
   }
 
@@ -177,14 +182,61 @@ exports.updateSushi = async (ctx) => {
 exports.deleteOne = async (ctx) => {
   ctx.action = 'sushi/delete';
   const { sushi } = ctx.state;
+  const { reason } = ctx.request.body;
+
+  if (!sushi) {
+    ctx.status = 204;
+    return;
+  }
 
   ctx.metadata = {
-    sushiId: sushi?.id,
-    endpointVendor: sushi?.endpoint?.vendor,
+    sushiId: sushi.id,
+    endpointVendor: sushi.endpoint?.vendor,
   };
 
-  const sushiCredentialsService = new SushiCredentialsService();
-  await sushiCredentialsService.delete({ where: { id: sushi?.id } });
+  await SushiCredentialsService.$transaction(async (sushiCredentialsService) => {
+    const actionService = new ActionsService();
+
+    await sushiCredentialsService.delete({ where: { id: sushi.id } });
+    await actionService.create({
+      data: {
+        type: 'sushi/delete',
+        data: {
+          reason,
+          vendor: sushi.endpoint?.vendor,
+          oldState: {
+            ...sushi,
+            institution: undefined,
+            // Keep only relevant info about endpoint
+            endpoint: sushi.endpoint ? {
+              id: sushi.endpoint.id,
+              vendor: sushi.endpoint.vendor,
+              description: sushi.endpoint.description,
+              technicalProvider: sushi.endpoint.technicalProvider,
+              sushiUrl: sushi.endpoint.sushiUrl,
+              registryId: sushi.endpoint.registryId,
+              requireApiKey: sushi.endpoint.requireApiKey,
+              defaultApiKey: sushi.endpoint.defaultApiKey,
+              requireCustomerId: sushi.endpoint.requireCustomerId,
+              defaultCustomerId: sushi.endpoint.defaultCustomerId,
+              requireRequestorId: sushi.endpoint.requireRequestorId,
+              defaultRequestorId: sushi.endpoint.defaultRequestorId,
+              paramSeparator: sushi.endpoint.paramSeparator,
+              harvestDateFormat: sushi.endpoint.harvestDateFormat,
+            } : undefined,
+          },
+        },
+
+        institution: {
+          connect: { id: sushi.institutionId },
+        },
+
+        author: {
+          connect: { username: ctx.state.user.username },
+        },
+      },
+    });
+  });
 
   ctx.status = 204;
 };
@@ -199,6 +251,7 @@ exports.getHarvests = async (ctx) => {
     sort,
     order = 'asc',
     page = 1,
+    include,
   } = ctx.request.query;
 
   /** @type {HarvestFindManyArgs} */
@@ -210,6 +263,7 @@ exports.getHarvests = async (ctx) => {
       credentialsId: sushiId,
       reportId,
     },
+    include: propsToPrismaInclude(Array.isArray(include) ? include : [include]),
   };
 
   if (from || to) {

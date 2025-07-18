@@ -62,8 +62,8 @@ async function fetchEndpoint(id) {
   try {
     const endpoint = await $fetch(`/api/sushi-endpoints/_registry/${id}`);
     emit('update:endpoint', endpoint);
-  } catch {
-    snacks.error(t('errors.generic'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
   endpointLoading.value = false;
 }

@@ -17,60 +17,99 @@
     </template>
 
     <template #text>
-      <div v-if="aliases.length <= 0" class="text-center text-grey pt-5">
+      <div v-if="aliasCount <= 0" class="text-center text-grey pt-5">
         {{ $t('repositoryAliases.noAliases') }}
       </div>
 
-      <v-list v-else density="compact">
-        <v-list-item
-          v-for="alias in sortedAliases"
-          :key="alias.pattern"
-          lines="two"
-        >
-          <template #title>
-            {{ alias.pattern }}
+      <template v-else>
+        <v-list v-if="sortedAliases.length > 0" density="compact">
+          <v-list-subheader v-if="sortedForeignAliases.length > 0">
+            <v-icon icon="mdi-database-eye" start />
+            {{ $t('repositoryAliases.ownedAliases') }}
+          </v-list-subheader>
 
-            <v-icon v-if="!!alias.filters" icon="mdi-filter" size="small" start />
-          </template>
+          <v-list-item
+            v-for="alias in sortedAliases"
+            :key="alias.pattern"
+            lines="two"
+          >
+            <template #title>
+              {{ alias.pattern }}
 
-          <template v-if="alias.repository" #subtitle>
-            {{ alias.repository.pattern }}
+              <v-icon v-if="!!alias.filters" icon="mdi-filter" size="small" start />
+            </template>
 
-            <RepositoryTypeChip :model-value="alias.repository" />
-          </template>
+            <template v-if="alias.repository" #subtitle>
+              {{ alias.repository.pattern }}
 
-          <template v-if="user.isAdmin" #append>
-            <v-btn
-              v-if="filtersFormDialogRef"
-              v-tooltip="$t('repositoryAliases.filtersForm.editFilter')"
-              icon="mdi-filter"
-              variant="text"
-              size="small"
-              density="comfortable"
-              color="blue"
-              @click="openFiltersDialog(alias)"
-            />
+              <RepositoryTypeChip :model-value="alias.repository" />
+            </template>
 
-            <ConfirmPopover
-              :agree-text="$t('delete')"
-              :agree="() => removeAlias(alias)"
-              location="end"
-            >
-              <template #activator="{ props: confirm }">
-                <v-btn
-                  v-tooltip="$t('delete')"
-                  icon="mdi-delete"
-                  variant="text"
-                  size="small"
-                  density="comfortable"
-                  color="red"
-                  v-bind="confirm"
-                />
-              </template>
-            </ConfirmPopover>
-          </template>
-        </v-list-item>
-      </v-list>
+            <template v-if="user.isAdmin && !alias.templateId" #append>
+              <v-btn
+                v-if="filtersFormDialogRef"
+                v-tooltip="$t('repositoryAliases.filtersForm.editFilter')"
+                icon="mdi-filter"
+                variant="text"
+                size="small"
+                density="comfortable"
+                color="blue"
+                @click="openFiltersDialog(alias)"
+              />
+
+              <ConfirmPopover
+                :agree-text="$t('delete')"
+                :agree="() => removeAlias(alias)"
+                location="end"
+              >
+                <template #activator="{ props: confirm }">
+                  <v-btn
+                    v-tooltip="$t('delete')"
+                    icon="mdi-delete"
+                    variant="text"
+                    size="small"
+                    density="comfortable"
+                    color="red"
+                    v-bind="confirm"
+                  />
+                </template>
+              </ConfirmPopover>
+            </template>
+          </v-list-item>
+        </v-list>
+
+        <v-divider v-if="sortedForeignAliases.length > 0 && sortedAliases.length > 0" />
+
+        <v-list v-if="sortedForeignAliases.length > 0" density="compact">
+          <v-list-subheader>
+            <v-icon icon="mdi-database-plus" start />
+            {{ $t('repositoryAliases.foreignAliases') }}
+          </v-list-subheader>
+
+          <v-list-item
+            v-for="{ alias, elasticRole } in sortedForeignAliases"
+            :key="alias.pattern"
+            :title="alias.pattern"
+            lines="two"
+          >
+            <template #subtitle>
+              <RepositoryTypeChip :model-value="alias.repository" />
+            </template>
+
+            <template v-if="!userSpaced" #append>
+              <v-chip
+                v-tooltip:left="$t('elasticRoles.grantedBy')"
+                :text="elasticRole.name"
+                append-icon="mdi-account-tag"
+                color="secondary"
+                variant="outlined"
+                size="small"
+                label
+              />
+            </template>
+          </v-list-item>
+        </v-list>
+      </template>
     </template>
 
     <template v-if="$slots.actions" #actions>
@@ -113,6 +152,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  userSpaced: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits({
@@ -125,6 +168,8 @@ const snacks = useSnacksStore();
 
 /** @type {Ref<object[]>} */
 const aliases = ref(props.institution.repositoryAliases || []);
+/** @type {Ref<object[]>} */
+const elasticRoles = ref(props.institution.elasticRoles || []);
 /** @type {Ref<object|undefined>} */
 const updatedAlias = ref();
 
@@ -134,6 +179,18 @@ const filtersFormDialogRef = useTemplateRef('filtersFormDialogRef');
 const sortedAliases = computed(
   () => aliases.value.toSorted((a, b) => a.pattern.localeCompare(b.pattern)),
 );
+
+const sortedForeignAliases = computed(() => {
+  const entries = elasticRoles.value.flatMap((elasticRole) => {
+    const perms = elasticRole.repositoryAliasPermissions ?? [];
+    return perms.map(({ alias }) => [alias.pattern, { alias, elasticRole }]);
+  });
+
+  return Array.from(new Map(entries).values())
+    .toSorted((a, b) => a.alias.pattern.localeCompare(b.alias.pattern));
+});
+
+const aliasCount = computed(() => sortedAliases.value.length + sortedForeignAliases.value.length);
 
 function openFiltersDialog(alias) {
   updatedAlias.value = alias;
@@ -154,8 +211,8 @@ async function removeAlias(item) {
     aliases.value = aliases.value.filter((i) => i.pattern !== item.pattern);
 
     emit('update:modelValue', aliases.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 
@@ -175,8 +232,8 @@ async function onAliasUpdate(filters) {
     }
 
     emit('update:modelValue', aliases.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

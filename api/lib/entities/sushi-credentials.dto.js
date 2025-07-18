@@ -8,20 +8,24 @@ const {
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   id: Joi.string().trim(),
+  deletedAt: Joi.date(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
   active: Joi.boolean(),
   activeUpdatedAt: Joi.date(),
 
-  customerId: Joi.string().trim().allow(''),
-  requestorId: Joi.string().trim().allow(''),
-  apiKey: Joi.string().trim().allow(''),
-  comment: Joi.string().trim().allow(''),
+  archivedUpdatedAt: Joi.date(),
+  archived: Joi.boolean(),
+
+  customerId: Joi.string().trim().allow('', null),
+  requestorId: Joi.string().trim().allow('', null),
+  apiKey: Joi.string().trim().allow('', null),
+  comment: Joi.string().trim().allow('', null),
 
   packages: Joi.array().items(Joi.string()),
   tags: Joi.array().items(Joi.string()),
@@ -40,6 +44,9 @@ const schema = {
 
   harvests: Joi.array().items(Joi.object()),
 
+  deletionTaskId: Joi.string().trim(),
+  deletionTask: Joi.object(),
+
   connection: Joi.object({
     date: Joi.date(),
     status: Joi.string(),
@@ -53,9 +60,14 @@ const schema = {
  */
 const immutableFields = [
   'id',
+  'deletedAt',
   'updatedAt',
+  'archivedUpdatedAt',
+  'activeUpdatedAt',
   'createdAt',
   'institution',
+  'deletionTaskId',
+  'deletionTask',
   'endpoint',
   'harvests',
   'connection',
@@ -70,6 +82,7 @@ const includableFields = [
   'institution.memberships',
   'institution.memberships.user',
   'harvests',
+  'deletionTask',
   'connection',
 ];
 

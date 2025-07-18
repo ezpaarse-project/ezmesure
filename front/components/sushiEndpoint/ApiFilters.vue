@@ -56,7 +56,7 @@
         </v-col>
 
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.counterVersions"
             v-model:loose="filters['counterVersions:loose']"
             :items="SUPPORTED_COUNTER_VERSIONS"
@@ -74,7 +74,7 @@
                 label
               />
             </template>
-          </FiltersSelect>
+          </ApiFiltersSelect>
         </v-col>
       </v-row>
     </v-container>
@@ -109,7 +109,7 @@ const availableTags = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
-    const sushiItems = await $fetch('/api/sushi-endpoints', {
+    const items = await $fetch('/api/sushi-endpoints', {
       signal: abortController.signal,
       query: {
         size: 0,
@@ -117,11 +117,11 @@ const availableTags = computedAsync(
       },
     });
 
-    // Map sushi items with array of tags as key
-    const itemsPerTags = Map.groupBy(Object.values(sushiItems), (item) => item.tags);
-    // Merge all tags in one array then make unique
-    const tags = new Set(Array.from(itemsPerTags.keys()).flat());
-    return Array.from(tags).sort();
+    // Merge all tags in one array them make unique
+    const tags = new Set(items.flatMap((item) => item.tags ?? []));
+
+    return Array.from(tags)
+      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
   },
   [],
   { lazy: true, evaluating: loadingTags },

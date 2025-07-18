@@ -15,11 +15,12 @@
             <v-row v-if="errorMessage">
               <v-col>
                 <v-alert
-                  :text="errorMessage"
+                  :title="errorMessage.title"
+                  :text="errorMessage.text"
                   type="error"
                   density="compact"
                   closable
-                  @update:model-value="() => (errorMessage = '')"
+                  @update:model-value="() => (errorMessage = undefined)"
                 />
               </v-col>
             </v-row>
@@ -111,6 +112,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const { currentRoute } = useRouter();
 const { t } = useI18n();
 const { status: authStatus, getSession } = useAuth();
@@ -125,12 +128,12 @@ const password = ref('');
 const passwordRepeat = ref('');
 const accepted = ref(false);
 const showPassword = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref(undefined);
 
 async function activateProfile() {
-  errorMessage.value = '';
+  errorMessage.value = undefined;
   if (!accepted.value) {
-    errorMessage.value = t('account.acceptTerms');
+    errorMessage.value = { text: t('account.acceptTerms') };
     return;
   }
 
@@ -153,15 +156,13 @@ async function activateProfile() {
     await getSession({ force: true });
     await navigateTo('/myspace');
   } catch (err) {
-    if (!(err instanceof Error)) {
-      errorMessage.value = t('authenticate.failed');
-      return;
-    }
-
     if (err.statusCode >= 400 && err.statusCode < 500) {
-      errorMessage.value = t('authenticate.loginFailed');
+      errorMessage.value = { text: t('authenticate.loginFailed') };
     } else {
-      errorMessage.value = t('authenticate.failed');
+      errorMessage.value = {
+        title: t('authenticate.failed'),
+        text: getErrorMessage(err),
+      };
     }
   }
   loading.value = false;

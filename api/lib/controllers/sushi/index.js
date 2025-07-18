@@ -41,6 +41,7 @@ const {
 } = require('./actions');
 
 const { FEATURES } = require('../../entities/memberships.dto');
+const { stringOrArrayValidation } = require('../../services/std-query');
 
 let sushiLocked = false;
 let lockReason;
@@ -300,6 +301,7 @@ router.route({
       page: Joi.number().min(1),
       sort: Joi.string(),
       order: Joi.string().valid('asc', 'desc'),
+      include: stringOrArrayValidation,
     },
   },
 });
@@ -328,9 +330,13 @@ router.route({
     deleteOne,
   ],
   validate: {
+    type: 'json',
     params: {
       sushiId: Joi.string().trim().required(),
     },
+    body: Joi.object({
+      reason: Joi.string().trim(),
+    }),
   },
 });
 

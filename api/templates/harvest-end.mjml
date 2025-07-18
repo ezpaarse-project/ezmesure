@@ -24,7 +24,26 @@
     </mj-text>
 
     <mj-text>
-      Les données sont accessibles via vos tableaux de bords habituels, à condition d'en régler
+      Vous trouverez la liste des identifiants COUNTER moissonnés ci-dessous :
+    </mj-text>
+
+    <mj-table>
+      <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+        <th>Point d'accès</th>
+        <th style="padding: 0 8px;">Package</th>
+        <th></th>
+      </tr>
+      {% for c in credentials %}
+        <tr style="width: 100%;">
+          <td style="max-width: 0; width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.endpoint }}</td>
+          <td style="max-width: 0; width: 25%; padding: 0 8px;">{{ c.packages }}</td>
+          <td style="max-width: 0; width: 25%; color: orange;">{% if c.expired %}Ces identifiants sont périmés !{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </mj-table>
+
+    <mj-text>
+      Les données sont accessibles via vos tableaux de bord habituels, à condition d'en régler
       la temporalité à la période voulue.
     </mj-text>
 
@@ -49,11 +68,12 @@
     </mj-text>
 
     <mj-text>
-      Vous pouvez continuer à saisir de nouveaux identifiants dans le formulaire ezCOUNTER ou en
-      déclarer de nouveaux dans le formulaire ezCOUNTER. A l’issue de cette saisie, merci de
-      cliquer à nouveau sur le bouton “VALIDER DES IDENTIFIANTS” si vous souhaitez que les rapports
-      soient à nouveau moissonnés pour votre établissement : nous procéderons régulièrement à des
-      moissonnages réguliers, au moins une fois par mois.
+      Vous pouvez continuer à saisir de nouveaux identifiants dans
+      <a href="{{ credentialsURL }}">le formulaire ezCOUNTER</a> ou en déclarer de nouveaux dans
+      <a href="{{ credentialsURL }}">le formulaire ezCOUNTER</a>. A l’issue de cette saisie, merci
+      de cliquer à nouveau sur le bouton “VALIDER DES IDENTIFIANTS” si vous souhaitez que les
+      rapports soient à nouveau moissonnés pour votre établissement : nous procéderons régulièrement
+      à des moissonnages réguliers, au moins une fois par mois.
     </mj-text>
 
     <mj-text>

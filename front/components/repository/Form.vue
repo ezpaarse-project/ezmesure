@@ -169,8 +169,8 @@ async function save() {
     }
 
     emit('submit', newRepository);
-  } catch (e) {
-    snacks.error(e?.data?.error || t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   loading.value = false;

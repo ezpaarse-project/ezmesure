@@ -61,8 +61,8 @@ async function copyTokenToClipboard() {
 
   try {
     await copy(token.value);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

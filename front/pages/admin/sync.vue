@@ -215,8 +215,8 @@ async function startSync() {
 
   try {
     syncState.value.data = await $fetch('/api/sync/_start', { method: 'POST' });
-  } catch {
-    snacks.error('sync.unableToStart');
+  } catch (err) {
+    snacks.error(t('sync.unableToStart'), err);
   }
 }
 

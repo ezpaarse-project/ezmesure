@@ -15,6 +15,7 @@
           <InstitutionCard
             :institution="institution"
             :loading="status === 'pending'"
+            style="position: sticky; top: 80px;"
           >
             <template #actions>
               <v-switch
@@ -110,7 +111,16 @@ const {
   data: institution,
 } = await useFetch(`/api/institutions/${params.id}`, {
   query: {
-    include: ['parentInstitution', 'childInstitutions', 'repositories', 'repositoryAliases.repository', 'spaces'],
+    include: [
+      'parentInstitution',
+      'childInstitutions',
+      'repositories',
+      'repositoryAliases.repository',
+      'spaces',
+      'elasticRoles.spacePermissions.space',
+      'elasticRoles.repositoryPermissions.repository',
+      'elasticRoles.repositoryAliasPermissions.alias.repository',
+    ],
   },
 });
 
@@ -127,8 +137,8 @@ async function activateInstitution() {
       body: { value },
     });
     institution.value.validated = value;
-  } catch {
-    snacks.error(t('cannotUpdateItem', { id: institution.value.name || institution.value.id }));
+  } catch (err) {
+    snacks.error(t('cannotUpdateItem', { id: institution.value.name || institution.value.id }), err);
   }
   validatedLoading.value = false;
 }

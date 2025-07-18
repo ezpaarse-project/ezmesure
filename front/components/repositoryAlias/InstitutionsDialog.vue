@@ -131,8 +131,8 @@ async function unlinkInstitution(item) {
     institutions.value = institutions.value.filter((i) => i.id !== item.id);
 
     hasChanged.value = true;
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 
@@ -151,8 +151,8 @@ async function linkInstitution(item) {
     institutions.value.push(item);
 
     hasChanged.value = true;
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
   isLinkLoading.value = false;
 }

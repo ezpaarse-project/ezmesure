@@ -1,3 +1,5 @@
+const { startOfDay, endOfDay } = require('date-fns');
+
 const elastic = require('../../services/elastic');
 
 const activityIndex = '.ezmesure-metrics';
@@ -37,8 +39,8 @@ exports.search = async (ctx) => {
       range: {
         datetime: {
           format: 'date_optional_time',
-          gte: datetimeFrom,
-          lte: datetimeTo,
+          gte: datetimeFrom && startOfDay(datetimeFrom),
+          lte: datetimeTo && endOfDay(datetimeTo),
         },
       },
     });

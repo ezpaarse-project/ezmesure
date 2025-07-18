@@ -10,8 +10,8 @@ run: cleanup-docker config ## run ezMESURE using environment variables
 run-node: cleanup-docker config ## run ezMESURE elastic node(s) only (with ezmesure.local.env.sh)
 	. ./ezmesure.env.sh ; docker-compose up -d elastic
 
-run-debug: cleanup-docker config ## run ezMESURE debug mode
-	. ./ezmesure.env.sh ; docker-compose -f docker-compose.debug.yml up -d
+run-dev: cleanup-docker config ## run ezMESURE dev mode
+	. ./ezmesure.env.sh ; docker-compose -f docker-compose.dev.yml up -d
 
 stop: ## stop ezMESURE using environment variables
 	. ./ezmesure.env.sh ; docker-compose stop
@@ -22,4 +22,3 @@ cleanup-docker: ## remove docker image (needed for updating it)
 
 plugins: ## build plugin zip
 	./kibana/plugins/build.sh
-	

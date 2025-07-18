@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="title"
-    prepend-icon="mdi-filter"
+    :prepend-icon="prependIcon"
   >
     <template v-if="$slots.subtitle" #subtitle>
       <slot name="subtitle" />
@@ -42,7 +42,7 @@
           prepend-icon="mdi-filter-plus"
           variant="outlined"
         >
-          <template #append>
+          <template v-if="!disableAdvanced" #append>
             <v-btn
               v-tooltip="$t('repositoryAliases.filtersForm.advanced')"
               :color="isRawMode ? 'orange' : 'grey'"
@@ -144,8 +144,6 @@
     </template>
 
     <template v-if="$slots.actions" #actions>
-      <v-spacer />
-
       <slot name="actions" />
     </template>
   </v-card>
@@ -163,7 +161,11 @@ const props = defineProps({
   },
   prependIcon: {
     type: String,
-    default: undefined,
+    default: () => 'mdi-filter',
+  },
+  disableAdvanced: {
+    type: Boolean,
+    default: false,
   },
 });
 

@@ -88,8 +88,8 @@ async function addUser(item) {
     });
     users.value.push(updatedUser);
     emit('update:modelValue', users.value);
-  } catch {
-    snacks.error(t('institutions.members.cannotAddMember'));
+  } catch (err) {
+    snacks.error(t('institutions.members.cannotAddMember'), err);
   }
 }
 
@@ -102,8 +102,8 @@ async function removeUser(item) {
     users.value = users.value.filter((user) => user.username !== item.username);
 
     emit('update:modelValue', users.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

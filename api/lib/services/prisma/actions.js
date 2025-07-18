@@ -10,6 +10,7 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.ActionFindUniqueArgs} ActionFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.ActionFindManyArgs} ActionFindManyArgs
  * @typedef {import('@prisma/client').Prisma.ActionCreateArgs} ActionCreateArgs
+ * @typedef {import('@prisma/client').Prisma.ActionCountArgs} ActionCountArgs
  */
 /* eslint-enable max-len */
 
@@ -58,10 +59,20 @@ function upsert(params, tx = prisma) {
   return tx.action.upsert(params);
 }
 
+/**
+ * @param {ActionCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.action.count(params);
+}
+
 module.exports = {
   create,
   findMany,
   findUnique,
   update,
   upsert,
+  count,
 };

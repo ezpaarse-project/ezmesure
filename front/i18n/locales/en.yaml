@@ -12,9 +12,13 @@ menu:
   administration: Administration
   myInstitution: My institution
   myInstitutions: My institutions
+  myForeignAccess: Shared with you
   institutions: Institutions
   sushiEndpoints: COUNTER endpoints
   activity: Activity
+  actions:
+    title: Actions
+    tooltip: New version of the activity, actions will being rolled out progressively
   profile: Profile
   members: Members
   users: Users
@@ -24,9 +28,16 @@ menu:
   report: Reports
   adminReport: ezREEPORT
   repositories: Repositories
-  repositoryAliases: Repository aliases
+  repositoryAliases:
+    group: Repository aliases
+    aliases: Aliases
+    templates: Templates
+    orphans: Orphans
   spaces: Spaces
-  harvest: Harvest
+  harvest:
+    group: Harvest
+    sessions: Sessions
+    alerts: Alertes
   sync: Synchronisation
   customFields: Custom fields
 home:
@@ -325,7 +336,7 @@ institutions:
     domains: Domains
     general: General
     logo: Logo
-    logoHint: 'Ratio {ratioW}:{ratioH} - Formats: {accept}'
+    logoHint: "Ratio {ratioW}:{ratioH} - Formats: {accept}"
     links: Links
     localisation: Localisation
     automations: Automations
@@ -372,6 +383,8 @@ institutions:
     propertyName: Property name
     noCustomProps: No custom properties
     addNewCustomProp: Add a new one by clicking on the + in the top right corner
+    tags: Tags
+    tagsDescription: Tags allow you to organize institutions by associating them with keywords.
   members:
     noMembers: No members
     title: Members ({count})
@@ -422,6 +435,7 @@ institutions:
       institution: Institution card
       memberships: Members
       sushi: COUNTER credentials
+      reporting: ezREEPORT
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
@@ -447,6 +461,7 @@ institutions:
     createdAt: Creation date
     updatedAt: Last updated
     testedAt: Last tested
+    archivedAt: Archive date
     sushiUrl: Sushi URL
     enterUrl: Please enter an URL
     enterRequestorId: Please enter a Requestor Id.
@@ -531,7 +546,7 @@ tasks:
     error: Error
     cancelled: Cancelled
     delayed: Delayed
-    missing: Missing
+    missing: Empty report
     exceptions:
       network_error: Unreachable service
       unreadable_report: Unreadable report
@@ -594,8 +609,15 @@ tasks:
 sushi:
   filters:
     title: Filters credentials
-  credentials: Credentials
+  credentials: COUNTER Credentials
   credentialsCount: "{count} credentials"
+  tabs:
+    active:
+      title: Active credentials
+      description: This list contains the active credentials that will be used for harvesting.
+    archived:
+      title: Archived credentials
+      description: This list contains the archived credentials that will be NOT used for harvesting.
   auth: Authentication
   copyId: Copy ID
   showFiles: View files
@@ -606,6 +628,10 @@ sushi:
   unableToUpdate: Unable to update credentials
   unableToGetLockStatus: Failed to retrieve credentials lock status
   managementIsLocked: COUNTER credentials management is currently locked.
+  deleting: Deletion in progress
+  deletingWaiting: Waiting for deletion
+  deletingError: "Unable to delete credentials: {error}"
+  deletionTask: Deletion state
   nInstitutions: >
     1 institution use this endpoint
     |{count} institutions use this endpoint
@@ -619,7 +645,8 @@ sushi:
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
   problematicEndpoint: Problematic endpoint
-  deleteNbCredentials: You are about to delete {number} COUNTER credentials.
+  deleteNbCredentials: You are about to delete {number} COUNTER credentials. This will delete associated data in a few minutes. {cantDelete}
+  archiveNbCredentials: You are about to archive {number} COUNTER credentials. Associated data will be kept.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
@@ -630,10 +657,13 @@ sushi:
   checking: Checking connection with {vendor} for {name}
   report: Report
   openHelpPage: Open help page
-  insertedItems: "{count} report items have been inserted."
-  updatedItems: "{count} report items have been updated."
-  failedItems: "{count} report items could not be retrieved."
+  insertedItems: "{count} report items have been inserted for the period {beignDate} ~ {endDate}."
+  updatedItems: "{count} report items have been updated for the period {beignDate} ~ {endDate}."
+  failedItems: "{count} report items could not be retrieved for the period {beignDate} ~ {endDate}."
   messagesFromEndpoint: "Messages from the endpoint:"
+  cannotArchiveItems: Unable to archive the credentials.
+  itemsArchived: "{count} credential(s) archived."
+  itemsDeleted: "{count} credential(s) deleted, associated data will be deleted soon."
   checkBeforeSave: Check credentials before saving
   matrix:
     unsupported: Report not supported (editor declaration)
@@ -653,6 +683,20 @@ sushi:
     title: Available files
     noFilesAvailable: No files available
     nbFiles: 1 file|{count} files
+  alerts:
+    title: Alerts
+    unsupportedButHarvested:
+      title: Unsupported reports but still harvested
+      severity: Severity
+      error: An error occurred while searching for harvested but unsupported reports
+      empty: No unsupported reports have been harvested!
+      deletePeriod: "You'll delete the harvested report \"{reportId}\" of the matrix from \"{institutionName}\" for the period \"{beginDate} - {endDate}\". This won't delete the data. This action is irreversible."
+  deleteReason: Reason for deletion
+  deleteReasonDescription: Please provide a reason for the deletion of theses credentials. You can choose an existing reason or type your own below.
+  deleteReasons:
+    mistake: I entered the identifiers by mistake
+    neverWorked: The access point has never worked for our institution
+    duplicate: This identifier is a duplicate of another one
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
@@ -676,11 +720,13 @@ authenticate:
   impersonate: Impersonate
 password:
   forgot: Forgout your password ?
-  email: Email address *
   reset: Reset password
   save: Save password
   user: User
   password: Password
+  actualPassword: Actual Kibana password
+  newPassword: New Kibana password
+  repeatNewPassword: Repeat new Kibana password
   repeatPassword: Repeat password
   passwordIsRequired: Password required
   backToLogin: Back to login
@@ -797,12 +843,15 @@ repositories:
     title: Filter repositories
   givePermissions: Give permissions
   nPermissions: "{count} access"
+  ownedRepositories: Owned repositories
+  foreignRepositories: Shared repositories
 repositoryAliases:
   manageRepositoryAliases: >
     Manage aliases
     |Manage {count} aliases
   alias: Alias
   target: Target repository pattern
+  template: Template
   filtered: Filtered ?
   aliases: Repository aliases
   noAliases: No repository alias has been assigned yet
@@ -810,6 +859,8 @@ repositoryAliases:
   deleteNbAliases: You are about to delete {number} aliases
   newAlias: New repository alias
   noInstitutions: No institutions is using this alias
+  ownedAliases: Owned aliases
+  foreignAliases: Shared aliases
   filters:
     title: Filter aliases
   filtersForm:
@@ -828,15 +879,49 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} is {valueText}"
       is:not: "{field} is not {valueText}"
+
+orphanAliases:
+  toolbarTitle: Orphan aliases ({count})
+  pageDescription: Aliases shown here are found in Elasticsearch but are not managed by ezMESURE.
+
+repoAliasTemplates:
+  toolbarTitle: Alias templates ({count})
+  manageTemplates: >
+    Manage templates
+    |Manage {count} templates
+  target: Target repository
+  conditions: Conditions
+  conditionsDescription: What conditions must meet institutions ?
+  filters: Filters
+  filtersTitle: Filter templates
+  aliases: Repository aliases
+  aliasesPattern: Aliases pattern
+  noFilters: No filters
+  noConditions: No conditions
+  noTemplates: No template has been created yet
+  deleteNbTemplates: You are about to delete {number} alias templates.
+  newTemplate: New alias template
+  modifyTemplate: Modify an alias template
+  applyTemplate: Apply template [{id}]
+  applyTemplateDesc: This will trigger the creation of repository aliases for all institutions matching the conditions.
+  dryRun: Dry run
+  applyToSeeAliases: Apply the template to see the affected aliases
+  noAliasCreated: No alias has been created
+  applyHadNoEffect: The application of the template had no effect. No institution matched the conditions.
+
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
   newSpace: New space
   editSpace: Edit space
+  ownedSpaces: Owned spaces
+  foreignSpaces: Shared spaces
   manageSpaces: >
     Manage spaces
     |Manage {count} spaces
-  deleteNbRepositories: You are about to delete {number} spaces
+  deleteNbSpaces: >
+    Vous allez supprimer 1 espace.
+    |Vous allez supprimer {count} espaces.
   xSpaces: >
     1 space
     |{count} spaces
@@ -853,7 +938,7 @@ spaces:
   filters:
     title: Filter spaces
 harvest:
-  toolbarTitle: Harvests ({count})
+  toolbarTitle: Sessions ({count})
   sessions:
     pendingSession: Pending harvest...
     startedAt: Harvest started {date}
@@ -869,6 +954,7 @@ harvest:
       reportTypes: "{n} report type|{n} report types"
       credentials: "{n} credentials"
     credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
+    sendEndMail: A mail will be sent on harvest end
     notStarted: Not started
     unableToRetrive: Unable to retrieve harvests
   jobs:
@@ -907,6 +993,7 @@ elasticRoles:
     Manage roles
     |Manage {count} roles
   deleteNbRoles: You are about to delete {n} roles
+  grantedBy: Rights granted by a role
 sync:
   status:
     notSynced: Not yet synchronized
@@ -964,6 +1051,11 @@ customFields:
   descriptionFr: French description
   descriptionEn: English description
   manageCustomField: Manage custom field|Manage {count} custom fields
+statuses:
+  created: Created
+  updated: Updated
+  deleted: Deleted
+  error: Error
 anErrorOccurred: An error occurred
 url: URL
 type: Type
@@ -991,6 +1083,7 @@ close: Close
 confirm: Confirm
 cancel: Cancel
 canceled: Canceled
+clear: Clear
 error: Error
 reset: Reset
 copy: Copy
@@ -1028,8 +1121,13 @@ notEditable: Not editable
 maxLength: "Maximum length: {n} characters"
 open: Open
 send: Send
+archive: Archive
+unarchive: Unarchive
 "yes": "Yes"
 "no": "No"
+active: Active
+inactive: Inactive
+activeSwitch: Activate/Deactivate
 validate: Validate
 invalidate: Invalidate
 reason: "Reason: {reason}"
@@ -1048,3 +1146,9 @@ retry: Retry
 applyToAll: Apply to all
 minValueError: "The value is too small. Minimum: {min}"
 maxValueError: "The value is too big. Maximum: {max}"
+synchronize: Synchronize
+archived: Archived
+archivedSince: Archived since {date}
+deleted: Deleted
+deletedSince: Deleted since {date}
+cantCancel: This operation cannot be undone.

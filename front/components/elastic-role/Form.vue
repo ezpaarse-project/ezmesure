@@ -74,8 +74,8 @@ async function save() {
       },
     });
     emit('submit', newRole);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   loading.value = false;

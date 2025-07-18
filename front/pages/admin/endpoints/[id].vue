@@ -139,7 +139,7 @@
       :headers="headers"
       :group-by="[{ key: 'institution.id' }]"
       :loading="status === 'pending' && 'primary'"
-      :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
+      :row-props="({ item }) => ({ class: shouldGreyRow(item) && 'bg-grey-lighten-4 text-grey' })"
       items-per-page="0"
       density="comfortable"
       hide-default-footer
@@ -255,7 +255,7 @@
           :model-value="item.harvests"
           :endpoint="endpoint"
           :current-year="currentHarvestYear"
-          @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
+          @click:harvest="harvestMatrixRef?.open({ ...item, endpoint }, { period: $event.period })"
         />
       </template>
 
@@ -263,13 +263,8 @@
         <LocalDate :model-value="item.updatedAt" />
       </template>
 
-      <template #[`item.active`]="{ item }">
-        <span
-          v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
-          :class="[`text-${item.active ? 'green' : 'red-lighten-3'}`]"
-        >
-          {{ item.active ? $t('endpoints.active') : $t('endpoints.inactive') }}
-        </span>
+      <template #[`item.status`]="{ item }">
+        <SushiStateText :model-value="item" />
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -298,7 +293,7 @@
               v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
               prepend-icon="mdi-table-headers-eye"
-              @click="harvestMatrixRef?.open(item)"
+              @click="harvestMatrixRef?.open({ ...item, endpoint })"
             />
             <v-list-item
               v-if="reportsRef"
@@ -423,6 +418,7 @@ const {
     q: debouncedSearch,
     connection: computed(() => filters.value.connection),
     active: computed(() => filters.value.active),
+    archived: computed(() => filters.value.archived),
     include: ['harvests', 'institution.memberships.user'],
     sort: 'institution.name',
     order: 'asc',
@@ -455,7 +451,7 @@ const headers = computed(() => [
   },
   {
     title: t('status'),
-    value: 'active',
+    value: 'status',
     align: 'center',
     width: '130px',
   },
@@ -480,6 +476,10 @@ const institutionsSelectionStatus = computed(() => {
   }
   return 'partial';
 });
+
+function shouldGreyRow(item) {
+  return item.deletedAt || item.archived || !item.active;
+}
 
 function calcSushiMetrics() {
   if (!sushis.value) {
@@ -544,8 +544,8 @@ async function copySushiId({ id }) {
 
   try {
     await copy(id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));
@@ -564,8 +564,8 @@ async function toggleActiveStates() {
     });
 
     endpointRefresh();
-  } catch {
-    snacks.error(t('endpoints.unableToUpdate'));
+  } catch (err) {
+    snacks.error(t('endpoints.unableToUpdate'), err);
   }
   loading.value = false;
 }
@@ -590,8 +590,8 @@ async function copyMailListOfInstitutions(ids) {
 
   try {
     await copy(addresses.join('; '));
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('emailsCopied'));
@@ -647,14 +647,13 @@ async function resetConnections(items) {
     agreeIcon: 'mdi-restore',
     onAgree: async () => {
       await Promise.all(
-        toReset.map((item) => {
-          try {
-            return $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }));
-            return Promise.resolve(null);
-          }
-        }),
+        toReset.map(
+          (item) => $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       await refresh();
@@ -715,7 +714,18 @@ function toggleAllGroups(state) {
 
 watchOnce(
   sushis,
-  () => calcSushiMetrics(),
+  (v) => {
+    calcSushiMetrics();
+
+    const harvests = v
+      .flatMap((s) => s.harvests || [])
+      .sort((a, b) => a.period.localeCompare(b.period));
+
+    const lastYear = harvests.at(-1)?.period?.replace(/(-[0-9]{2})*$/, '');
+    if (lastYear) {
+      currentHarvestYear.value = Number.parseInt(lastYear, 10);
+    }
+  },
 );
 
 watchOnce(

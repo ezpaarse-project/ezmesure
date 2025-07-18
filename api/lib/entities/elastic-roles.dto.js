@@ -9,13 +9,15 @@ const roleNamePattern = /^[a-z0-9][a-z0-9_.-]*$/i;
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
   name: Joi.string().trim().min(1).regex(roleNamePattern),
+
+  conditions: Joi.array().items(Joi.object()),
 
   users: Joi.array().items(Joi.object()),
   institutions: Joi.array().items(Joi.object()),

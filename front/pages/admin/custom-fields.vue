@@ -58,6 +58,16 @@
         />
       </template>
 
+      <template #[`item._count.institutionProperties`]="{ value, item }">
+        <v-chip
+          :text="`${value}`"
+          :variant="!value ? 'outlined' : undefined"
+          prepend-icon="mdi-tag"
+          size="small"
+          @click="institutionsDialogRef?.open(item)"
+        />
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-btn
           v-tooltip:top="$t('modify')"
@@ -66,7 +76,7 @@
           variant="text"
           density="comfortable"
           color="blue"
-          @click="customFieldFormDialogRef.open(item)"
+          @click="customFieldFormDialogRef?.open(item)"
         />
         <v-btn
           v-tooltip:top="$t('delete')"
@@ -96,6 +106,11 @@
       ref="customFieldFormDialogRef"
       @submit="refresh()"
     />
+
+    <CustomFieldInstitutionsDialog
+      ref="institutionsDialogRef"
+      @update:model-value="refresh()"
+    />
   </div>
 </template>
 
@@ -112,6 +127,7 @@ const snacks = useSnacksStore();
 const selectedCustomField = ref([]);
 
 const customFieldFormDialogRef = useTemplateRef('customFieldFormDialogRef');
+const institutionsDialogRef = useTemplateRef('institutionsDialogRef');
 
 const {
   refresh,
@@ -121,6 +137,7 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/custom-fields',
+    query: { include: '_count.institutionProperties' },
   },
   data: {
     sortBy: [{ key: 'id', order: 'asc' }],
@@ -150,11 +167,20 @@ const headers = computed(() => [
     title: t('properties'),
     value: 'properties',
     sortable: false,
+    width: 130,
+  },
+  {
+    title: t('repositories.institutions'),
+    value: '_count.institutionProperties',
+    align: 'center',
+    sortable: false,
+    width: 130,
   },
   {
     title: t('actions'),
     value: 'actions',
     align: 'center',
+    width: 130,
   },
 ]);
 
@@ -194,14 +220,13 @@ function deleteCustomField(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/custom-fields/${item.id}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.id }));
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/custom-fields/${item.id}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {

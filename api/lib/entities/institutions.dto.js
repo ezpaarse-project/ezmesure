@@ -9,7 +9,7 @@ const {
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   id: Joi.string().trim(),
@@ -91,6 +91,14 @@ const includableFields = [
   'customProps.field',
   'repositoryAliases',
   'repositoryAliases.repository',
+  'elasticRoles',
+  'elasticRoles.spacePermissions',
+  'elasticRoles.spacePermissions.space',
+  'elasticRoles.repositoryPermissions',
+  'elasticRoles.repositoryPermissions.repository',
+  'elasticRoles.repositoryAliasPermissions',
+  'elasticRoles.repositoryAliasPermissions.alias',
+  'elasticRoles.repositoryAliasPermissions.alias.repository',
 ];
 
 /**
@@ -145,6 +153,7 @@ const adminImportSchema = withModifiers(
     repositories: () => schema.repositories,
     sushiCredentials: () => schema.sushiCredentials,
     memberships: () => schema.memberships,
+    customProps: () => schema.customProps,
     logo: () => Joi.string().base64(),
   },
 );

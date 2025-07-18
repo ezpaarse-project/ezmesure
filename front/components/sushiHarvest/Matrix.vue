@@ -93,9 +93,7 @@
 
                 <template v-if="report.supported">
                   <td v-for="month in periods" :key="`${reportId}-${month}`">
-                    <SushiHarvestMatrixCell
-                      :model-value="report.harvests.get(month)"
-                    />
+                    <SushiHarvestMatrixCell :model-value="report.harvests.get(month)" />
                   </td>
                 </template>
 
@@ -179,6 +177,7 @@ const {
   status,
 } = await useFetch(`/api/sushi/${props.sushi?.id}/harvests`, {
   params: {
+    include: ['harvestedBy'],
     from: computed(() => periods.value.at(0)),
     to: computed(() => periods.value.at(-1)),
     sort: 'period',

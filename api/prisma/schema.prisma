@@ -223,21 +223,23 @@ model SpacePermission {
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
   /// The institution this repository is associated to
-  institutions           Institution[]
+  institutions            Institution[]
   /// Creation date
-  createdAt              DateTime                          @default(now())
+  createdAt               DateTime                          @default(now())
   /// Latest update date
-  updatedAt              DateTime                          @updatedAt
+  updatedAt               DateTime                          @updatedAt
   /// The index pattern (ex: b-bibcnrs*)
-  pattern                String                            @id
+  pattern                 String                            @id
   /// The repository type (ezpaarse, counter5)
-  type                   String                            @db.VarChar(50)
+  type                    String                            @db.VarChar(50)
   /// Member permissions associated to this repository
-  permissions            RepositoryPermission[]
+  permissions             RepositoryPermission[]
   /// Aliases associated to this repository
-  aliases                RepositoryAlias[]
+  aliases                 RepositoryAlias[]
   /// Permissions granted by role for this repository
-  elasticRolePermissions ElasticRoleRepositoryPermission[]
+  elasticRolePermissions  ElasticRoleRepositoryPermission[]
+  /// Alias templates that target this repository
+  aliasTemplates RepositoryAliasTemplate[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -262,6 +264,10 @@ model RepositoryPermission {
 
 /// A repository alias (alias for a section of elasticsearch)
 model RepositoryAlias {
+  /// ID of the template
+  templateId             String?
+  /// The template of the alias
+  template               RepositoryAliasTemplate?               @relation(fields: [templateId], onUpdate: Cascade, onDelete: Cascade, references: [id])
   /// The institution this repository is associated to
   institutions           Institution[]
   /// Creation date
@@ -280,6 +286,30 @@ model RepositoryAlias {
   permissions            RepositoryAliasPermission[]
   /// Permissions granted by role for this alias
   elasticRolePermissions ElasticRoleRepositoryAliasPermission[]
+}
+
+/// A repository alias template (used to generate repository aliases)
+model RepositoryAliasTemplate {
+  /// ID
+  id         String            @id
+  /// Creation date
+  createdAt  DateTime          @default(now())
+  /// Latest update date
+  updatedAt  DateTime          @updatedAt
+  /// The alias pattern (ex: x-alias-istex-{id}-ezpaarse)
+  pattern    String
+  /// The repository's pattern targeted by alias
+  target     String
+  /// Whether the template is active or not
+  active     Boolean           @default(true)
+  /// The repository
+  repository Repository        @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
+  filters    Json[]
+  /// Conditions for creating a new alias (format: [{ "field": "foo", "value": "bar" }])
+  conditions Json[]
+  /// The aliases that were generated with this template
+  aliases    RepositoryAlias[]
 }
 
 /// A alias permission (access rights of a member for a specific alias)
@@ -312,6 +342,8 @@ model ElasticRole {
   createdAt                  DateTime                               @default(now())
   /// Latest update date
   updatedAt                  DateTime                               @updatedAt
+  /// A list of conditions used to populate the institutions
+  conditions                 Json[]
   /// Permissions that role give to repositories
   repositoryPermissions      ElasticRoleRepositoryPermission[]
   /// Permissions that role gives to repository aliases
@@ -408,6 +440,8 @@ model HarvestSession {
   downloadUnsupported Boolean      @default(false)
   /// Whether the reports should be downloaded even if a local copy already exists
   forceDownload       Boolean      @default(false)
+  /// Whether a mail should be sent when session ended
+  sendEndMail            Boolean      @default(true)
   /// Whether the reports should be inserted even if it does not pass the validation step
   ignoreValidation    Boolean?
   /// Parameters to pass to jobs
@@ -624,41 +658,70 @@ model SushiEndpoint {
 /// A set of SUSHI credentials, associated to a SUSHI endpoint
 model SushiCredentials {
   /// ID of the SUSHI credentials
-  id              String        @id @default(cuid())
+  id                String                        @id @default(cuid())
   /// Creation date
-  createdAt       DateTime      @default(now())
+  createdAt         DateTime                      @default(now())
   /// Latest update date
-  updatedAt       DateTime      @updatedAt
+  updatedAt         DateTime                      @updatedAt
+  /// When item was marked for deletion
+  deletedAt         DateTime?
   /// ID of the institution that owns the credentials
-  institutionId   String
+  institutionId     String
   /// ID of the SUSHI endpoint
-  endpointId      String
+  endpointId        String
+  /// ID of the deletion task
+  deletionTaskId    String?
   /// Value of the customer_id parameter
-  customerId      String?
+  customerId        String?
   /// Value of the requestor_id parameter
-  requestorId     String?
+  requestorId       String?
   /// Value of the api_key parameter
-  apiKey          String?
+  apiKey            String?
   /// Abritrary comment about the credentials
-  comment         String?
+  comment           String?
   /// Whether the credentials are active and can be harvested
-  active          Boolean       @default(true)
+  active            Boolean                       @default(true)
   /// Date on which the active status was last modified
-  activeUpdatedAt DateTime      @default(now())
+  activeUpdatedAt   DateTime                      @default(now())
+  /// Whether the credentials are archived
+  archived          Boolean                       @default(false)
+  /// Date on which the archived status was last modified
+  archivedUpdatedAt DateTime                      @default(now())
   /// Packages (profiles, accounts, funds...) that include the credentials
-  packages        String[]
+  packages          String[]
   /// Abritrary tag list associated to the credentials
-  tags            String[]
+  tags              String[]
   /// Additionnal parameters. Each param has a name, a value, and a scope.
-  params          Json[]
+  params            Json[]
   /// Institution that owns the credentials
-  institution     Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution       Institution                   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// The SUSHI endpoint
-  endpoint        SushiEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  endpoint          SushiEndpoint                 @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   /// The harvest jobs associated to the credentials
-  harvestJobs     HarvestJob[]
+  harvestJobs       HarvestJob[]
   /// The harvest states associated to the credentials
-  harvests        Harvest[]
+  harvests          Harvest[]
+  /// The deletion task associated to the credentials
+  deletionTask      SushiCredentialsDeletionTask? @relation(fields: [deletionTaskId], references: [id], onDelete: Cascade)
   /// Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? }
-  connection      Json?
+  connection        Json?
+}
+
+model SushiCredentialsDeletionTask {
+  /// ID of the Elastic task
+  id           String             @id
+  /// Progress of the task
+  progress     Int                @default(0)
+  /// Index pattern related to the task
+  indexPattern String
+  /// Is the task canceled
+  canceled     Boolean            @default(false)
+  /// Error encountered with the task
+  error        String?
+  /// Creation date
+  createdAt    DateTime           @default(now())
+  /// Latest update date
+  updatedAt    DateTime           @updatedAt
+  /// Credentials related to task
+  credentials  SushiCredentials[]
 }

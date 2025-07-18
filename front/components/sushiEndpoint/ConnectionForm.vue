@@ -170,8 +170,8 @@ async function checkConnection() {
         endpoint: props.endpoint,
       },
     });
-  } catch {
-    snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: endpoint.value?.vendor }));
+  } catch (err) {
+    snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: endpoint.value?.vendor }), err);
   }
 
   loading.value = false;

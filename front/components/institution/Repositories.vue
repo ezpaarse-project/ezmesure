@@ -4,7 +4,7 @@
     :subtitle="showInstitution ? institution.name : undefined"
     prepend-icon="mdi-database"
   >
-    <template #append>
+    <template v-if="!userSpaced" #append>
       <v-btn
         v-if="repositoryFormDialogRef"
         v-tooltip="$t('add')"
@@ -17,42 +17,82 @@
     </template>
 
     <template #text>
-      <div v-if="repositories.length <= 0" class="text-center text-grey pt-5">
+      <div v-if="repositoryCount <= 0" class="text-center text-grey pt-5">
         {{ $t('repositories.noRepository') }}
       </div>
 
-      <v-list v-else density="compact">
-        <v-list-item
-          v-for="repository in sortedRepositories"
-          :key="repository.pattern"
-          :title="repository.pattern"
-          lines="two"
-        >
-          <template #subtitle>
-            <RepositoryTypeChip :model-value="repository" />
-          </template>
+      <template v-else>
+        <v-list v-if="sortedRepositories.length > 0" density="compact">
+          <v-list-subheader v-if="sortedForeignRepositories.length > 0">
+            <v-icon icon="mdi-database" start />
+            {{ $t('repositories.ownedRepositories') }}
+          </v-list-subheader>
 
-          <template v-if="user.isAdmin" #append>
-            <ConfirmPopover
-              :agree-text="$t('delete')"
-              :agree="() => removeRepository(repository)"
-              location="end"
-            >
-              <template #activator="{ props: confirm }">
-                <v-btn
-                  v-tooltip="$t('delete')"
-                  icon="mdi-delete"
-                  variant="text"
-                  size="small"
-                  density="comfortable"
-                  color="red"
-                  v-bind="confirm"
-                />
-              </template>
-            </ConfirmPopover>
-          </template>
-        </v-list-item>
-      </v-list>
+          <v-list-item
+            v-for="repository in sortedRepositories"
+            :key="repository.pattern"
+            :title="repository.pattern"
+            lines="two"
+          >
+            <template #subtitle>
+              <RepositoryTypeChip :model-value="repository" />
+            </template>
+
+            <template v-if="!userSpaced" #append>
+              <ConfirmPopover
+                v-if="user.isAdmin"
+                :agree-text="$t('delete')"
+                :agree="() => removeRepository(repository)"
+                location="end"
+              >
+                <template #activator="{ props: confirm }">
+                  <v-btn
+                    v-tooltip="$t('delete')"
+                    icon="mdi-delete"
+                    variant="text"
+                    size="small"
+                    density="comfortable"
+                    color="red"
+                    v-bind="confirm"
+                  />
+                </template>
+              </ConfirmPopover>
+            </template>
+          </v-list-item>
+        </v-list>
+
+        <v-divider v-if="sortedRepositories.length > 0 && sortedForeignRepositories.length > 0" />
+
+        <v-list v-if="sortedForeignRepositories.length > 0" density="compact">
+          <v-list-subheader>
+            <v-icon icon="mdi-database-plus" start />
+            {{ $t('repositories.foreignRepositories') }}
+          </v-list-subheader>
+
+          <v-list-item
+            v-for="{ repository, elasticRole } in sortedForeignRepositories"
+            :key="repository.pattern"
+            :title="repository.pattern"
+            lines="two"
+          >
+            <template #subtitle>
+              <RepositoryTypeChip :model-value="repository" />
+            </template>
+
+            <template v-if="!userSpaced" #append>
+              <v-chip
+                v-tooltip:left="$t('elasticRoles.grantedBy')"
+                :text="elasticRole.name"
+                append-icon="mdi-account-tag"
+                color="secondary"
+                variant="outlined"
+                size="small"
+                label
+              />
+            </template>
+          </v-list-item>
+        </v-list>
+      </template>
     </template>
 
     <template v-if="$slots.actions" #actions>
@@ -80,6 +120,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  userSpaced: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits({
@@ -90,11 +134,27 @@ const { data: user } = useAuthState();
 
 /** @type {Ref<object[]>} */
 const repositories = ref(props.institution.repositories || []);
+/** @type {Ref<object[]>} */
+const elasticRoles = ref(props.institution.elasticRoles || []);
 
 const repositoryFormDialogRef = useTemplateRef('repositoryFormDialogRef');
 
 const sortedRepositories = computed(
   () => repositories.value.toSorted((a, b) => a.pattern.localeCompare(b.pattern)),
+);
+
+const sortedForeignRepositories = computed(() => {
+  const entries = elasticRoles.value.flatMap((elasticRole) => {
+    const perms = elasticRole.repositoryPermissions ?? [];
+    return perms.map(({ repository }) => [repository.pattern, { repository, elasticRole }]);
+  });
+
+  return Array.from(new Map(entries).values())
+    .toSorted((a, b) => a.repository.pattern.localeCompare(b.repository.pattern));
+});
+
+const repositoryCount = computed(
+  () => sortedRepositories.value.length + sortedForeignRepositories.value.length,
 );
 
 function onRepositoryAdded(item) {
@@ -111,8 +171,8 @@ async function removeRepository(item) {
     repositories.value = repositories.value.filter((i) => i.pattern !== item.pattern);
 
     emit('update:modelValue', repositories.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

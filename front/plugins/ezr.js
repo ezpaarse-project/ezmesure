@@ -14,8 +14,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
       },
       errorHandler: (message, err) => {
-        console.error(`[ezr-vue] ${message}`, err);
-        snacks.error(message);
+        snacks.error(message, err);
       },
     });
   });
