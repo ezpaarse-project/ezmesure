@@ -20,7 +20,8 @@ import {
  * @property {AsyncDataOptions} [async] Params to pass to underlying `useAsyncData`
  * @property {Record<string, string>} [sortMapping] Mapping from Vuetify columns' keys to
  * API sort keys
- * @property {Record<string, any>} [data] Initial query options
+ * @property {Record<string, any>} [data] Initial query options. Put dynamic params here,
+ * "static" params should go in `fetch.params` or `fetch.query`
  */
 
 /**
@@ -49,7 +50,7 @@ export default async function useServerSidePagination(params = {}) {
   });
 
   /**
-   * Query options for the table'institutions-list'
+   * Query options for the table
    */
   const query = ref({
     page: 1,
@@ -58,7 +59,7 @@ export default async function useServerSidePagination(params = {}) {
       order: 'asc',
     }],
     search: '',
-    ...(params.data ?? {}),
+    ...params.data,
   });
 
   /**
@@ -73,7 +74,7 @@ export default async function useServerSidePagination(params = {}) {
         const queryKey = fetchOpts.params ? 'params' : 'query';
 
         const {
-          search,
+          search: _search, // search parameter is q, and we're gonna use state one
           sortBy,
           ...queryParams
         } = query.value;
@@ -82,8 +83,8 @@ export default async function useServerSidePagination(params = {}) {
         const order = sortBy.map((v) => v.order);
         // transform query params
         fetchOpts[queryKey] = {
-          ...(fetchOpts?.[queryKey] ?? {}),
           ...queryParams,
+          ...fetchOpts?.[queryKey],
           page: query.value.page,
           size: Math.max(itemsPerPage.value, 0),
           q: query.value.search,
@@ -113,7 +114,7 @@ export default async function useServerSidePagination(params = {}) {
     },
     {
       lazy: true,
-      ...(params.async ?? {}),
+      ...params.async,
     },
   );
 

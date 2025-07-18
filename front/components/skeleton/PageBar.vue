@@ -121,25 +121,29 @@ const searchValue = computed({
   },
   set: (v) => {
     emit('update:search', v);
-    emit('update:modelValue', { ...(props.modelValue ?? {}), search: v });
+    emit('update:modelValue', { ...props.modelValue, search: v });
   },
 });
 
 const filtersValue = computed({
   get: () => ({
-    ...(props.filters ?? props.modelValue ?? {}),
+    ...(props.filters ?? props.modelValue),
+    // Ignore special fields
     page: undefined,
     sortBy: undefined,
-    include: undefined,
   }),
   set: (v) => {
+    const query = { ...v };
+    // Put back the special fields if present
+    if (props.modelValue?.page != null) {
+      query.page = props.modelValue.page;
+    }
+    if (props.modelValue?.sortBy != null) {
+      query.sortBy = props.modelValue.sortBy;
+    }
+
     emit('update:filters', v);
-    emit('update:modelValue', {
-      ...v,
-      page: props.modelValue?.page,
-      sortBy: props.modelValue?.sortBy,
-      include: props.modelValue?.include,
-    });
+    emit('update:modelValue', query);
   },
 });
 

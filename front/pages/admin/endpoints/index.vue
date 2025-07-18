@@ -179,6 +179,9 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/sushi-endpoints',
+    query: {
+      include: ['credentials'],
+    },
   },
   sortMapping: {
     institutions: 'institutions._count',
@@ -186,7 +189,6 @@ const {
   },
   data: {
     sortBy: [{ key: 'vendor', order: 'asc' }],
-    include: ['credentials'],
   },
 });
 

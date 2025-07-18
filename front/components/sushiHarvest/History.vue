@@ -80,12 +80,14 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/tasks',
+    query: {
+      credentialsId: props.sushi.id,
+      include: ['steps', 'logs', 'session'],
+    },
   },
   data: {
-    credentialsId: props.sushi.id,
     sortBy: [{ key: 'createdAt', order: 'desc' }],
-    include: ['steps', 'logs', 'session'],
-    search: undefined,
+    search: undefined, // q parameter is not allowed
   },
 });
 
