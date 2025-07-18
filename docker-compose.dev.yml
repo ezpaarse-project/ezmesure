@@ -63,7 +63,7 @@ services:
       - NUXT_PUBLIC_SUPPORT_MAIL
       - NUXT_PUBLIC_SHIBBOLETH_DISABLED
     tmpfs: /tmp
-    command: npm run dev
+    command: npm run dev -- --host 0.0.0.0
     restart: "no"
 
   maildev:
