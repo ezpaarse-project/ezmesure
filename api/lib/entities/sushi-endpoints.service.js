@@ -1,16 +1,41 @@
 // @ts-check
+const config = require('config');
+const {
+  subMonths,
+  isValid: isValidDate,
+  isBefore,
+} = require('date-fns');
+
 const sushiEndpointsPrisma = require('../services/prisma/sushi-endpoints');
 const BasePrismaService = require('./base-prisma.service');
 
+const { appLogger } = require('../services/logger');
+const sushiService = require('../services/sushi');
+
+const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
+const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) => r.toLowerCase());
+
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs */
+/**
+ * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
+ * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
+ */
+/**
+ * @template DataType
+ * @typedef {{ value: DataType, raw?: DataType, manual?: boolean }} SupportedDataEntry
+ */
+/**
+ *
+ * @typedef {{ supported?: SupportedDataEntry<boolean>, firstMonthAvailable?: SupportedDataEntry<string>, lastMonthAvailable?: SupportedDataEntry<string>  }} ReportSupportedData
+ * @typedef {{ [reportType: string]: ReportSupportedData | undefined }} EndpointSupportedData
+ */
 /* eslint-enable max-len */
 
 module.exports = class SushiEndpointsService extends BasePrismaService {
@@ -119,5 +144,160 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
       return transaction(this);
     }
     return SushiEndpointsService.$transaction(transaction);
+  }
+
+  /**
+    * Get supported data from COUNTER endpoint using credentials
+    *
+    * @param {SushiCredentials & { endpoint: SushiEndpoint }} credentials
+    * @param {string} [counterVersion=5] The related COUNTER version
+    * @param {EndpointSupportedData} [original={}] Existing supported data
+    *
+    * @returns {Promise<EndpointSupportedData>}
+    */
+  async updateSupportedData(credentials, counterVersion = '5', original = {}) {
+    const supportedData = { ...original };
+    appLogger.verbose(`Updating supported SUSHI reports of [${credentials.endpoint.vendor}]`);
+
+    const isValidReport = (report) => (report.Report_ID && report.Report_Name);
+
+    try {
+      const { data } = await sushiService.getAvailableReports(credentials, counterVersion);
+
+      if (!Array.isArray(data) || !data.every(isValidReport)) {
+        throw new Error('invalid response body');
+      }
+
+      const list = new Map(data.map((report) => [report.Report_ID.toLowerCase(), report]));
+
+      // Remove unsupported reports
+      defaultHarvestedReports.forEach((reportId) => {
+        const { supported, ...otherParams } = supportedData[reportId] ?? {};
+
+        const supportedRaw = list.has(reportId);
+
+        supportedData[reportId] = {
+          supported: {
+            raw: supportedRaw,
+            value: supported?.manual ? supported.value : supportedRaw,
+          },
+          ...otherParams,
+        };
+      });
+
+      // Update supported data
+      data.forEach((report) => {
+        const reportId = report.Report_ID.toLowerCase();
+
+        const {
+          supported,
+          firstMonthAvailable,
+          lastMonthAvailable,
+          ...otherParams
+        } = supportedData[reportId] ?? {};
+
+        supportedData[reportId] = {
+          supported: {
+            raw: true,
+            value: supported?.manual ? supported.value : true,
+          },
+          firstMonthAvailable: {
+            raw: report.First_Month_Available,
+            value: firstMonthAvailable?.manual
+              ? firstMonthAvailable.value
+              : report.First_Month_Available,
+          },
+          lastMonthAvailable: {
+            raw: report.Last_Month_Available,
+            value: lastMonthAvailable?.manual
+              ? lastMonthAvailable.value
+              : report.Last_Month_Available,
+          },
+          ...otherParams,
+        };
+      });
+    } catch (e) {
+      appLogger.warn(`Failed to update supported reports of [${credentials.endpoint.vendor}] (Reason: ${e.message})`);
+    }
+
+    await this.update({
+      where: { id: credentials.endpoint.id },
+      data: {
+        supportedData,
+        supportedDataUpdatedAt: new Date(),
+        // Remove deprecated fields to ease migration
+        supportedReports: [],
+        ignoredReports: [],
+        additionalReports: [],
+      },
+    });
+
+    return supportedData;
+  }
+
+  /**
+   * Get supported reports from the old way
+   *
+   * @deprecated Uses old way to get data
+   *
+   * @param {SushiEndpoint} endpoint
+   *
+   * @returns {EndpointSupportedData}
+   */
+  static #getSupportedReports({ supportedReports, ignoredReports, additionalReports }) {
+    /** @type {EndpointSupportedData} */
+    const supportedData = {};
+    supportedReports.forEach((rId) => {
+      const current = supportedData[rId] ?? {};
+      supportedData[rId] = { ...current, supported: { value: true, raw: true } };
+    });
+    additionalReports.forEach((rId) => {
+      const current = supportedData[rId] ?? {};
+      supportedData[rId] = { ...current, supported: { value: true, manual: true } };
+    });
+    ignoredReports.forEach((rId) => {
+      const current = supportedData[rId] ?? {};
+      supportedData[rId] = { ...current, supported: { value: false, manual: true } };
+    });
+    return supportedData;
+  }
+
+  /**
+   * Get supported data (reports and if data is present)
+   *
+   * @param {SushiEndpoint} endpoint
+   * @param {boolean} [forceRefreshSupported=false]
+   *
+   * @returns {{ expired: boolean, supported: EndpointSupportedData }}
+   */
+  static getSupportedData(endpoint, forceRefreshSupported = false) {
+    const { supportedDataUpdatedAt } = endpoint;
+
+    const oldSupportedData = SushiEndpointsService.#getSupportedReports(endpoint);
+    let supportedData = oldSupportedData;
+
+    // If new format is present, merge it with old one
+    if (
+      endpoint.supportedData
+      && typeof endpoint.supportedData === 'object'
+      && !Array.isArray(endpoint.supportedData)
+    ) {
+      const manualOldData = Object.fromEntries(
+        Object.entries(oldSupportedData).filter(([, params]) => params?.supported?.manual),
+      );
+      // @ts-expect-error
+      supportedData = { ...oldSupportedData, ...endpoint.supportedData, ...manualOldData };
+    }
+
+    const oneMonthAgo = subMonths(new Date(), 1);
+    const hasSupportedDataExpired = forceRefreshSupported
+      || !supportedDataUpdatedAt
+      || !isValidDate(supportedDataUpdatedAt)
+      || isBefore(supportedDataUpdatedAt, oneMonthAgo);
+
+    return {
+      expired: hasSupportedDataExpired,
+      supported: supportedData,
+    };
   }
 };
