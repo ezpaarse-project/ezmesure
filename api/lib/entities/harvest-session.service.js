@@ -5,11 +5,13 @@ const {
   isBefore,
   parse: parseDate,
   format: formatDate,
+  max,
 } = require('date-fns');
 const config = require('config');
 
 const { setTimeout } = require('node:timers/promises');
 
+const { HarvestJobStatus } = require('@prisma/client');
 const harvestSessionPrisma = require('../services/prisma/harvest-session');
 
 const BasePrismaService = require('./base-prisma.service');
@@ -20,6 +22,7 @@ const SushiCredentialsService = require('./sushi-credentials.service');
 const HTTPError = require('../models/HTTPError');
 
 const { queryToPrismaFilter } = require('../services/std-query/prisma-query');
+const { appLogger } = require('../services/logger');
 
 /* eslint-disable max-len */
 /**
@@ -94,35 +97,35 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   }
 
   /**
-   * Is given session is requesting data before the given limit.
+   * Is given period is requesting data before the given limit.
    *
-   * @param {HarvestSession} session - The session to check
+   * @param {HarvestPeriod} period - The period to check
    * @param {Date | number | string | undefined} limit - The limit
    *
    * @returns {boolean}
    */
-  static isSessionBeforeLimit(session, limit) {
+  static isBeginBeforeLimit(period, limit) {
     if (!limit) {
       return false;
     }
 
-    return isBefore(session.beginDate, limit);
+    return isBefore(period.beginDate, limit);
   }
 
   /**
-   * Is given session is requesting data after the given limit.
+   * Is given period is requesting data after the given limit.
    *
-   * @param {HarvestSession} session - The session to check
+   * @param {HarvestPeriod} period - The period to check
    * @param {Date | number | string | undefined} limit - The limit
    *
    * @returns {boolean}
    */
-  static isSessionAfterLimit(session, limit) {
+  static isEndAfterLimit(period, limit) {
     if (!limit) {
       return false;
     }
 
-    return isBefore(limit, session.endDate);
+    return isBefore(limit, period.endDate);
   }
 
   /**
@@ -403,7 +406,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     // Get all jobs of session
     /** @type {HarvestJobCredentials[]} */
     // @ts-expect-error
-    const sessionJobs = harvestJobsService.findMany({
+    const sessionJobs = await harvestJobsService.findMany({
       where: {
         sessionId: session.id,
       },
@@ -426,6 +429,8 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       // @ts-expect-error
       return harvestable;
     }
+
+    appLogger.verbose(`[harvest-start][${session.id}] Session already have [${sessionJobs.length}] jobs, restarting them (restartAll=${restartAll})`);
 
     // Get all credentials to harvest
     const credentialsToHarvest = sessionJobs.map((job) => job.credentials);
@@ -457,8 +462,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     // Get report types
     let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
     if (reportTypes.includes('all')) {
+      appLogger.verbose(`[harvest-start][${session.id}] Found [all] as reportType, using [${defaultHarvestedReports}]`);
       reportTypes = defaultHarvestedReports;
     }
+
+    appLogger.verbose(`[harvest-start][${session.id}] Found [${reportTypes.length}] reportTypes`);
 
     /** @type {{ reportType: string, params: HarvestPeriod }[]} */
     const harvestedReportTypes = reportTypes.map((reportType) => ({
@@ -483,20 +491,39 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         lastMonthAvailable,
       } = supportedData[reportType] ?? {};
 
+      // If report is not supported
       if (!params || supported?.value === false) {
+        appLogger.verbose(`[harvest-start][${session.id}] [${reportType}] is not supported for [${endpoint.id}]`);
         // eslint-disable-next-line no-continue
         continue;
       }
 
-      // TODO: what if request 2024-01 2024-12 but report is 2025-01 2025-03 ?
-
       let { beginDate, endDate } = params;
-      if (HarvestSessionService.isSessionBeforeLimit(session, firstMonthAvailable?.value)) {
-        beginDate = firstMonthAvailable?.value ?? '';
+
+      if (firstMonthAvailable?.value) {
+        // If session requests data before available data, skip the report
+        if (!HarvestSessionService.isEndAfterLimit(session, firstMonthAvailable.value)) {
+          appLogger.verbose(`[harvest-start][${session.id}] Period is not compatible with [${reportType}] of [${endpoint.id}] availability`);
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        if (HarvestSessionService.isBeginBeforeLimit(session, firstMonthAvailable.value)) {
+          appLogger.verbose(`[harvest-start][${session.id}] Restricting [${reportType}] of [${endpoint.id}] from [${firstMonthAvailable.value}]`);
+          beginDate = firstMonthAvailable.value;
+        }
       }
 
-      if (HarvestSessionService.isSessionAfterLimit(session, lastMonthAvailable?.value)) {
-        endDate = lastMonthAvailable?.value ?? '';
+      if (lastMonthAvailable?.value) {
+        // If session requests data after available data, skip the report
+        if (!HarvestSessionService.isBeginBeforeLimit(session, lastMonthAvailable.value)) {
+          appLogger.verbose(`[harvest-start][${session.id}] Period is not compatible with [${reportType}] of [${endpoint.id}] availability`);
+        }
+
+        if (HarvestSessionService.isEndAfterLimit(session, lastMonthAvailable.value)) {
+          appLogger.verbose(`[harvest-start][${session.id}] Restricting [${reportType}] of [${endpoint.id}] to [${lastMonthAvailable.value}]`);
+          endDate = lastMonthAvailable.value;
+        }
       }
 
       yield { reportType, params: { ...params, beginDate, endDate } };
@@ -509,16 +536,82 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    * @param {HarvestSession} session - The harvest session to check
    * @param {SushiEndpoint} endpoint - The endpoint to check
    *
-   * @return {string | null} The version, or null if no suitable version found
+   * @return {Generator<({ version: string } & HarvestPeriod)>} The versions with period of validity
    */
-  static #getCounterVersionForEndpoint(session, endpoint) {
+  static* #getCounterVersionForEndpoint(session, endpoint) {
     const allowedVersions = new Set(session.allowedCounterVersions);
 
-    const counterVersion = endpoint.counterVersions
-      .sort().reverse() // Sort from most recent to oldest
-      .find((v) => allowedVersions.has(v));
+    const counterVersions = endpoint.counterVersions
+      .filter((v) => allowedVersions.has(v))
+      // Sort from most recent to oldest (6 -> 5.2 -> 5.1 -> 5 -> ...)
+      .sort((a, b) => (b > a ? 1 : -1));
 
-    return counterVersion ?? null;
+    appLogger.verbose(`[harvest-start][${session.id}] Found following counter versions for [${endpoint.id}]: [${counterVersions}]`);
+
+    // If no version are found, skip credentials
+    if (counterVersions.length <= 0) {
+      return;
+    }
+
+    // If availability cannot be used, assume last version is correct
+    if (
+      !endpoint.counterVersionsAvailability
+      || typeof endpoint.counterVersionsAvailability !== 'object'
+      || Array.isArray(endpoint.counterVersionsAvailability)
+    ) {
+      appLogger.verbose(`[harvest-start][${session.id}] No availability set, defaulting to COUNTER [${counterVersions[0]}]`);
+      yield {
+        version: counterVersions[0],
+        beginDate: session.beginDate,
+        endDate: session.endDate,
+      };
+      return;
+    }
+
+    let remainingPeriod = {
+      beginDate: session.beginDate,
+      endDate: session.endDate,
+    };
+
+    // Split by availability period
+    // eslint-disable-next-line no-restricted-syntax
+    for (const version of counterVersions) {
+      // If period is invalid (can happen if whole session is processed), stop
+      if (isBefore(remainingPeriod.endDate, remainingPeriod.beginDate)) {
+        appLogger.verbose(`[harvest-start][${session.id}] All versions are processed`);
+        return;
+      }
+
+      const firstMonthAvailable = endpoint.counterVersionsAvailability[version];
+      // If no availability is provided, setup a job for the remaining period
+      if (!firstMonthAvailable || typeof firstMonthAvailable !== 'string') {
+        yield {
+          version,
+          beginDate: remainingPeriod.beginDate,
+          endDate: remainingPeriod.endDate,
+        };
+        appLogger.verbose(`[harvest-start][${session.id}] Preparing job for [${remainingPeriod.beginDate}] - [${remainingPeriod.endDate}] with COUNTER [${version}]. All versions are processed`);
+        return;
+      }
+
+      if (HarvestSessionService.isEndAfterLimit(remainingPeriod, firstMonthAvailable)) {
+        const beginDate = formatDate(max([firstMonthAvailable, remainingPeriod.beginDate]), 'yyyy-MM');
+
+        yield {
+          version,
+          beginDate,
+          endDate: remainingPeriod.endDate,
+        };
+        appLogger.verbose(`[harvest-start][${session.id}] Preparing job for [${beginDate}] - [${remainingPeriod.endDate}] with COUNTER [${version}]`);
+
+        remainingPeriod = {
+          beginDate: remainingPeriod.beginDate,
+          // We remove one month to avoid requesting 2 times the same months
+          // (endDate SHOULD be inclusive)
+          endDate: formatDate(subMonths(firstMonthAvailable, 1), 'yyyy-MM'),
+        };
+      }
+    }
   }
 
   /**
@@ -567,7 +660,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   }
 
   /**
-   * Get jobs to create for given SUSHI credentials
+   * Get jobs to create for given list of SUSHI credentials
    *
    * @param {HarvestSession} session - The session
    * @param {CredentialsToHarvest[]} credentialsList - The credentials to check
@@ -580,21 +673,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     for (const credentials of credentialsList) {
       const { endpoint, institution } = credentials;
 
-      const counterVersion = HarvestSessionService.#getCounterVersionForEndpoint(session, endpoint);
-      if (!counterVersion) {
-        return [];
-      }
-
-      // eslint-disable-next-line no-await-in-loop
-      const index = await this.#getIndexForInstitution(
-        institution,
-        counterVersion,
-        state.institutionIndexPrefixes,
-      );
-      if (!index) {
-        throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
-      }
-
       const endpointData = SushiEndpointsService.getSupportedData(
         endpoint,
         state.forceRefreshSupported,
@@ -606,29 +684,50 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         // eslint-disable-next-line no-await-in-loop
         endpointData.supported = await endpointService.updateSupportedData(
           credentials,
-          '5', // FIXME: Period provided in report list might collide with COUNTER versions !
+          '5', // FIXME: might collide between COUNTER versions
           endpointData.supported,
         );
       }
 
-      const harvestedReportTypes = HarvestSessionService.#getReportsToHarvestForEndpoint(
+      const counterVersions = HarvestSessionService.#getCounterVersionForEndpoint(
         session,
         endpoint,
-        endpointData.supported,
       );
 
       // eslint-disable-next-line no-restricted-syntax
-      for (const { reportType, params } of harvestedReportTypes) {
-        if (params) {
-          yield {
-            ...params,
-            status: 'waiting',
-            credentials: { id: credentials.id },
-            session: { id: session.id },
-            reportType,
-            index,
-            counterVersion,
-          };
+      for (const { version, beginDate, endDate } of counterVersions) {
+        // eslint-disable-next-line no-await-in-loop
+        const index = await this.#getIndexForInstitution(
+          institution,
+          version,
+          state.institutionIndexPrefixes,
+        );
+
+        if (!index) {
+          throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
+        }
+
+        appLogger.verbose(`[harvest-start][${session.id}] Found index [${index}] for [${institution.id}]`);
+
+        const harvestedReportTypes = HarvestSessionService.#getReportsToHarvestForEndpoint(
+          { ...session, beginDate, endDate },
+          endpoint,
+          endpointData.supported,
+        );
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { reportType, params } of harvestedReportTypes) {
+          if (params) {
+            yield {
+              ...params,
+              status: 'waiting',
+              credentials: { id: credentials.id },
+              session: { id: session.id },
+              reportType,
+              index,
+              counterVersion: version,
+            };
+          }
         }
       }
     }
@@ -651,22 +750,22 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
     }
 
-    // Get report types
-    let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
-    if (reportTypes.includes('all')) {
-      reportTypes = defaultHarvestedReports;
-    }
+    appLogger.verbose(`[harvest-start][${session.id}] Attempting to start session`);
 
     const credentialsToHarvest = await this.#getCredentialsToStart(session, options.restartAll);
+    appLogger.verbose(`[harvest-start][${session.id}] Found [${credentialsToHarvest.length}] credentials to harvest`);
 
     // Create index cache
     const institutionIndexPrefixes = new Map();
 
-    // Get harvests jobs
-    const jobList = this.#getJobsForCredentials(session, credentialsToHarvest, {
-      institutionIndexPrefixes,
-      forceRefreshSupported: options.forceRefreshSupported,
-    });
+    // Get harvests jobs, using Array.fromAsync to wait for the whole iterator before continuing
+    const jobList = await Array.fromAsync(
+      this.#getJobsForCredentials(session, credentialsToHarvest, {
+        institutionIndexPrefixes,
+        forceRefreshSupported: options.forceRefreshSupported,
+      }),
+    );
+    appLogger.verbose(`[harvest-start][${session.id}] Prepared [${jobList.length}] jobs to start`);
 
     /**
      * Create jobs in bulk
@@ -719,7 +818,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       ),
     );
 
-    if (!options.dryRun) {
+    if (options.dryRun) {
+      appLogger.verbose(`[harvest-start][${session.id}] Running in dry mode, no real updates are done`);
+    } else {
       await this.update({
         where: { id: session.id },
         data: { startedAt: new Date() },
@@ -728,7 +829,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
     let buffer = [];
     // eslint-disable-next-line no-restricted-syntax
-    for await (const jobToCreate of jobList) {
+    for (const jobToCreate of jobList) {
       buffer.push(jobToCreate);
       if (buffer.length < JOB_BATCH_SIZE) {
         // eslint-disable-next-line no-continue
@@ -737,6 +838,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       // eslint-disable-next-line no-await-in-loop
       const createdJobs = await createJobs(buffer);
+      appLogger.verbose(`[harvest-start][${session.id}] Created [${createdJobs.length}] jobs`);
       buffer = [];
       yield* createdJobs;
 
