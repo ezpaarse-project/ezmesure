@@ -25,7 +25,7 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
     sushiUrl: 'http://localhost',
     vendor: 'test vendor',
     description: 'test description',
-    counterVersion: '5.0.0',
+    counterVersions: ['5.0.0'],
     technicalProvider: 'test technicalProvider',
     requireCustomerId: true,
     requireRequestorId: true,
@@ -67,7 +67,7 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
         expect(sushiEndpointFromResponse).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpointFromResponse).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpointFromResponse).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpointFromResponse).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromResponse).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpointFromResponse).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpointFromResponse).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpointFromResponse).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
@@ -86,7 +86,7 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);

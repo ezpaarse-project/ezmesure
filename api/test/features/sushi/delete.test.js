@@ -54,7 +54,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
     sushiUrl: 'http://localhost',
     vendor: 'test vendor',
     description: 'test description',
-    counterVersion: '5.0.0',
+    counterVersions: ['5.0.0'],
     technicalProvider: 'test technicalProvider',
     requireCustomerId: true,
     requireRequestorId: true,
@@ -110,6 +110,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,
+            data: { reason: 'Some very pertinent reason' },
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -119,7 +120,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
 
           // Test service
           const sushiFromService = await sushiCredentialsPrisma.findMany();
-          expect(sushiFromService).toEqual([]);
+          expect(sushiFromService).toMatchObject([{ id: sushiId, deletedAt: expect.any(Date) }]);
         });
 
         afterAll(async () => {
@@ -154,6 +155,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,
+            data: { reason: 'Some very pertinent reason' },
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -164,7 +166,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
 
           // Test service
           const sushiFromService = await sushiCredentialsPrisma.findMany();
-          expect(sushiFromService).toEqual([]);
+          expect(sushiFromService).toMatchObject([{ id: sushiId, deletedAt: expect.any(Date) }]);
         });
 
         afterAll(async () => {
@@ -209,6 +211,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,
+            data: { reason: 'Some very pertinent reason' },
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
@@ -270,6 +273,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
+              data: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -279,7 +283,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
 
             // Test service
             const sushiFromService = await sushiCredentialsPrisma.findMany();
-            expect(sushiFromService).toEqual([]);
+            expect(sushiFromService).toMatchObject([{ id: sushiId, deletedAt: expect.any(Date) }]);
           });
 
           afterAll(async () => {
@@ -310,6 +314,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
+              data: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -387,6 +392,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
+              data: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -440,6 +446,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
+              data: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -505,6 +512,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,
+            data: { reason: 'Some very pertinent reason' },
           });
 
           // Test API

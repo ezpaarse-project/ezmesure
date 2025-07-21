@@ -24,7 +24,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
     sushiUrl: 'http://localhost',
     vendor: 'test vendor',
     description: 'test description',
-    counterVersion: '5.0.0',
+    counterVersions: ['5.0.0'],
     technicalProvider: 'test technicalProvider',
     requireCustomerId: true,
     requireRequestorId: true,
@@ -70,7 +70,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
         expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpoint).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpoint).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpoint).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpoint).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpoint).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpoint).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpoint).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
@@ -136,7 +136,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
         expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpoint).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpoint).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpoint).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpoint).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpoint).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpoint).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpoint).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
@@ -169,7 +169,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
         expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpoint).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpoint).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpoint).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpoint).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpoint).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpoint).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpoint).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
