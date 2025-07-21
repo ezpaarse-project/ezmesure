@@ -145,11 +145,13 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/tasks',
+    query: {
+      include: ['credentials.institution', 'credentials.endpoint', 'steps', 'logs'],
+      sessionId: props.modelValue.id,
+    },
   },
   data: {
     sortBy: [{ key: 'startedAt', order: 'desc' }],
-    include: ['credentials.institution', 'credentials.endpoint', 'steps', 'logs'],
-    sessionId: props.modelValue.id,
     search: undefined, // q parameter is not allowed
   },
 });

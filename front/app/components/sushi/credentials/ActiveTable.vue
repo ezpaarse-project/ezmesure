@@ -422,7 +422,7 @@ function checkConnections(items) {
   }
   // eslint-disable-next-line no-restricted-syntax
   for (const item of toCheck) {
-    addToCheck({ ...item, institution: institution.value }, {
+    addToCheck({ ...item, institution: props.institution }, {
       onComplete: (err, connection) => {
         if (connection) {
           item.connection = connection;

@@ -246,6 +246,18 @@ const {
   // Fetch options to pass to $fetch
   fetch: {
     url: '/api/institutions',
+    // If you want query parameters that must be present, you should put them here.
+    query: {
+      include: [
+        'repositories',
+        'repositoryAliases.repository',
+        'spaces',
+        'memberships',
+        'childInstitutions',
+        'sushiCredentials',
+        'customProps.field',
+      ],
+    },
   },
   // Mapping between the field in DataTable and the field in the API
   // used when sorting
@@ -257,19 +269,10 @@ const {
     spaces: 'spaces._count',
     sushiCredentials: 'sushiCredentials._count',
   },
-  // Initial data for the query, use only static here. If you want
+  // Initial data for the query, don't use refs here. If you want
   // reactivity please use `query.something = myReactiveThingy.value`
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
-    include: [
-      'repositories',
-      'repositoryAliases.repository',
-      'spaces',
-      'memberships',
-      'childInstitutions',
-      'sushiCredentials',
-      'customProps.field',
-    ],
   },
 });
 

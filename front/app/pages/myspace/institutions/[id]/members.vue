@@ -196,6 +196,14 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: `/api/institutions/${params.id}/memberships`,
+    query: {
+      include: [
+        'user',
+        'repositoryPermissions',
+        'repositoryAliasPermissions',
+        'spacePermissions',
+      ],
+    },
   },
   sortMapping: {
     repositoryPermissions: 'repositoryPermissions._count',
@@ -203,12 +211,6 @@ const {
   },
   data: {
     sortBy: [{ key: 'user.fullName', order: 'asc' }],
-    include: [
-      'user',
-      'repositoryPermissions',
-      'repositoryAliasPermissions',
-      'spacePermissions',
-    ],
   },
 });
 

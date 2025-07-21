@@ -223,18 +223,20 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/actions',
+    query: {
+      include: [
+        'institution',
+        'author.elasticRoles',
+        'author.memberships.repositoryPermissions',
+        'author.memberships.repositoryAliasPermissions',
+        'author.memberships.spacePermissions',
+      ],
+    },
   },
   data: {
     'date:from': format(DATE_NOW, DATE_FORMAT),
     'date:to': format(DATE_NOW, DATE_FORMAT),
     sortBy: [{ key: 'date', order: 'desc' }],
-    include: [
-      'institution',
-      'author.elasticRoles',
-      'author.memberships.repositoryPermissions',
-      'author.memberships.repositoryAliasPermissions',
-      'author.memberships.spacePermissions',
-    ],
     search: undefined, // q parameter is not allowed
   },
 });
