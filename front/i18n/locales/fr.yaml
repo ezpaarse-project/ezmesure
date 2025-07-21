@@ -251,9 +251,14 @@ endpoints:
   lastMonthAvailable: Dernier mois disponible
   undefinedAvailable: Indéfini
   addAdditionalReport: Ajouter un rapport additionnel
+  addAdditionalReportDesc: Vous pouvez ajouter un rapport qui ne se trouve pas dans la liste des rapports fournie par l'éditeur (ou celle par défaut dans ezMESURE). Cela permet de combler des trous côté éditeur ou de moissonner des rapports non standards.
   undoReport: Annuler les modifications
   manuallyEdited: Modification manuelles
   ignoreReportValidation: Ignorer la validation du rapport
+  supportedVersionsDesc: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ornare elit tellus, ut ultrices augue tempor iaculis. Maecenas posuere nulla quis magna congue mattis. Sed sit amet ligula pulvinar, pretium est ut, interdum tellus. Vous pouvez modifier cette liste à tout moment.
+  addCustomVersion: Ajouter une version
+  customVersion: Version COUNTER
+  customVersionDesc: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ornare elit tellus, ut ultrices augue tempor iaculis.
   description: Description
   paramSeparatorDesc: ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2} lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard {separator} pour ces champs multivalués, renseignez le séparateur ici.
   paramSeparator: Séparateur
@@ -1171,3 +1176,4 @@ archivedSince: Archivé depuis le {date}
 deleted: Supprimé
 deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
+version: Version

@@ -250,10 +250,15 @@ endpoints:
   firstMonthAvailable: First available month
   lastMonthAvailable: Last available month
   addAdditionalReport: Add an additional report
+  addAdditionalReportDesc: You can add a report that is not in the list of reports provided by the platform (or the default list in ezMESURE). This allows you to fill gaps on the editor side, or to harvest non-standard reports.
   undefinedAvailable: Undefined
   undoReport: Undo changes
   manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation
+  supportedVersionsDesc: ''
+  addCustomVersion: Add a version
+  customVersion: COUNTER version
+  customVersionDesc: ''
   description: Description
   paramSeparatorDesc: ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.
   paramSeparator: Separator
@@ -1154,3 +1159,4 @@ archivedSince: Archived since {date}
 deleted: Deleted
 deletedSince: Deleted since {date}
 cantCancel: This operation cannot be undone.
+version: Version

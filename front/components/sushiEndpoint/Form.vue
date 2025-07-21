@@ -104,7 +104,7 @@
             >
               <template #text>
                 <v-row>
-                  <v-col cols="12" sm="8">
+                  <v-col cols="12">
                     <v-text-field
                       v-model="endpoint.technicalProvider"
                       :label="$t('endpoints.technicalProvider')"
@@ -114,7 +114,7 @@
                     />
                   </v-col>
 
-                  <v-col cols="12" sm="4">
+                  <!-- <v-col cols="12" sm="4">
                     <v-combobox
                       v-model="endpoint.counterVersions"
                       v-model:search="versionSearch"
@@ -155,7 +155,7 @@
                         </v-list-item>
                       </template>
                     </v-combobox>
-                  </v-col>
+                  </v-col> -->
 
                   <v-col cols="12">
                     <v-text-field
@@ -220,6 +220,24 @@
                       prepend-icon="mdi-image-text"
                       variant="underlined"
                       hide-details="auto"
+                    />
+                  </v-col>
+                </v-row>
+              </template>
+            </v-card>
+
+            <v-card
+              :title="$t('endpoints.counterVersion')"
+              prepend-icon="mdi-numeric"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template #text>
+                <v-row>
+                  <v-col>
+                    <SushiEndpointSupportedVersions
+                      v-model="endpoint.counterVersionsAvailability"
+                      v-model:versions="endpoint.counterVersions"
                     />
                   </v-col>
                 </v-row>
@@ -391,8 +409,6 @@
 </template>
 
 <script setup>
-const SUPPORTED_COUNTER_VERSIONS = ['5', '5.1'];
-
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -417,7 +433,6 @@ const saving = ref(false);
 const valid = ref(false);
 const isConnectionMenuOpen = ref(false);
 const loadingTags = ref(false);
-const versionSearch = ref('');
 const tagSearch = ref('');
 const registryEndpoint = ref();
 const endpoint = ref({ ...(props.modelValue ?? { counterVersions: ['5'] }) });
@@ -458,17 +473,6 @@ const sushiUrlRules = computed(() => [
       return t('enterValidUrl');
     }
   },
-]);
-const versionRules = computed(() => [
-  (values) => values.length > 0 || t('fieldIsRequired'),
-  (values) => values.every((v) => {
-    const pattern = /^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/;
-
-    if (!v || pattern.test(v)) {
-      return true;
-    }
-    return t('fieldMustMatch', { pattern: pattern.toString() });
-  }),
 ]);
 
 async function changeSushiUrl(sushiUrl) {
