@@ -611,6 +611,8 @@ model SushiEndpoint {
   description               String?
   /// Counter versions of the SUSHI service
   counterVersions           String[]           @default(["5"])
+  /// Minimum period where a COUNTER version can be used. If not provided, version can be used for every period. Format: { [version: string]: string }
+  counterVersionsAvailability           Json           @default("{}")
   /// Technical provider of the endpoint (ex: Atypon)
   technicalProvider         String?
   /// Whether the endpoint is active and can be harvested

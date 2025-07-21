@@ -7,6 +7,8 @@ const {
   withDefaults,
 } = require('./schema.utils');
 
+const COUNTER_VERSION_VALIDATION = Joi.string().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/);
+
 /**
  * Base schema
  * @type {Record<string, import('joi').AnySchema>}
@@ -19,9 +21,11 @@ const schema = {
   sushiUrl: Joi.string().uri(),
   vendor: Joi.string().min(1),
   description: Joi.string().allow('').empty(null),
-  counterVersions: Joi.array().items(Joi.string().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/)).min(1),
   registryId: Joi.string().allow('').empty(null),
   technicalProvider: Joi.string().allow('').empty(null),
+
+  counterVersions: Joi.array().items(COUNTER_VERSION_VALIDATION).min(1),
+  counterVersionsAvailability: Joi.object().pattern(COUNTER_VERSION_VALIDATION, Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/)),
 
   active: Joi.boolean(),
   activeUpdatedAt: Joi.date(),
@@ -39,14 +43,28 @@ const schema = {
   testedReport: Joi.string().allow('').empty(null).lowercase(),
   tags: Joi.array().items(Joi.string()),
 
-  ignoredReports: Joi.array().items(Joi.string().lowercase()),
-  additionalReports: Joi.array().items(Joi.string().lowercase()),
-
   credentials: Joi.array().items(Joi.object()),
 
   disabledUntil: Joi.date().allow(null),
+
+  /**
+   * @deprecated use `supportedData` and look for
+   * (supported.value === false && supported.manual === true)
+   */
+  ignoredReports: Joi.array().items(Joi.string().lowercase()),
+  /**
+   * @deprecated use `supportedData` and look for
+   * (supported.value === true && supported.manual === true)
+   */
+  additionalReports: Joi.array().items(Joi.string().lowercase()),
+  /**
+   * @deprecated use `supportedData` and look for
+   * (supported.value === true && supported.manual === false)
+   */
   supportedReports: Joi.array().items(Joi.string().trim()),
+  /** @deprecated use `supportedDataUpdatedAt` */
   supportedReportsUpdatedAt: Joi.date().allow(null),
+
   supportedData: Joi.object().pattern(
     Joi.string(), // reportId
     Joi.object({
