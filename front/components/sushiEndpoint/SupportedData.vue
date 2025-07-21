@@ -156,9 +156,14 @@
                   ref="additionalReportForm"
                   @submit.prevent="addSupportedData()"
                 >
+                  <p>
+                    {{ $t('endpoints.addAdditionalReportDesc') }}
+                  </p>
+
                   <v-text-field
                     v-model="additionalReport"
                     :label="$t('harvest.jobs.reportType')"
+                    prepend-icon="mdi-file"
                     variant="underlined"
                     hide-details="auto"
                     autofocus
@@ -206,9 +211,7 @@ const { cloned: originalSupportedData } = useCloned(props.modelValue, { manual: 
 
 const rows = computed(() => {
   const entries = Object.entries(innerSupportedData.value);
-  return entries
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([reportId, data]) => [reportId, data]);
+  return entries.sort(([a], [b]) => a.localeCompare(b));
 });
 
 function patchSupportedData(reportId, params) {
@@ -232,8 +235,6 @@ function addSupportedData() {
   patchSupportedData(additionalReport.value.toLowerCase(), { supported: true });
   additionalReport.value = '';
   isAdditionalReportOpen.value = false;
-
-  emit('update:modelValue', innerSupportedData.value);
 }
 
 function resetForm() {
