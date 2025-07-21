@@ -58,7 +58,7 @@ describe('[sushi]: Test update sushi credential features', () => {
     sushiUrl: 'http://localhost',
     vendor: 'test vendor',
     description: 'test description',
-    counterVersion: '5.0.0',
+    counterVersions: ['5.0.0'],
     technicalProvider: 'test technicalProvider',
     requireCustomerId: true,
     requireRequestorId: true,

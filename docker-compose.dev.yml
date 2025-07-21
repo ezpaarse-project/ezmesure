@@ -2,7 +2,7 @@ include:
   - docker-compose.common.yml
 services:
   api:
-    image: node:18.18.2-alpine3.18
+    image: node:24.4.1-alpine3.22
     ports:
       - 3000:3000
       - 9229:9229 # Debug port
@@ -51,7 +51,7 @@ services:
     command: npm run dev
 
   front:
-    image: node:22.8.0-alpine3.20
+    image: node:24.4.1-alpine3.22
     ports:
       - 8080:8080
     volumes:
@@ -63,7 +63,7 @@ services:
       - NUXT_PUBLIC_SUPPORT_MAIL
       - NUXT_PUBLIC_SHIBBOLETH_DISABLED
     tmpfs: /tmp
-    command: npm run dev
+    command: npm run dev -- --host 0.0.0.0
     restart: "no"
 
   maildev:

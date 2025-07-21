@@ -25,7 +25,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
     sushiUrl: 'http://localhost',
     vendor: 'test vendor',
     description: 'test description',
-    counterVersion: '5.0.0',
+    counterVersions: ['5.0.0'],
     technicalProvider: 'test technicalProvider',
     requireCustomerId: true,
     requireRequestorId: true,
@@ -42,7 +42,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
     sushiUrl: 'http://localhost.updated',
     vendor: 'test vendor updated',
     description: 'test description updated',
-    counterVersion: '5.0.1',
+    counterVersions: ['5.0.1'],
     technicalProvider: 'test technicalProvider updated',
     requireCustomerId: true,
     requireRequestorId: true,
@@ -89,7 +89,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(sushiEndpointFromResponse).toHaveProperty('sushiUrl', sushiEndpointUpdateTest.sushiUrl);
         expect(sushiEndpointFromResponse).toHaveProperty('vendor', sushiEndpointUpdateTest.vendor);
         expect(sushiEndpointFromResponse).toHaveProperty('description', sushiEndpointUpdateTest.description);
-        expect(sushiEndpointFromResponse).toHaveProperty('counterVersion', sushiEndpointUpdateTest.counterVersion);
+        expect(sushiEndpointFromResponse).toHaveProperty('counterVersions', sushiEndpointUpdateTest.counterVersions);
         expect(sushiEndpointFromResponse).toHaveProperty('technicalProvider', sushiEndpointUpdateTest.technicalProvider);
         expect(sushiEndpointFromResponse).toHaveProperty('requireCustomerId', sushiEndpointUpdateTest.requireCustomerId);
         expect(sushiEndpointFromResponse).toHaveProperty('requireRequestorId', sushiEndpointUpdateTest.requireRequestorId);
@@ -108,7 +108,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointUpdateTest.sushiUrl);
         expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointUpdateTest.vendor);
         expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointUpdateTest.description);
-        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointUpdateTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersions', sushiEndpointUpdateTest.counterVersions);
         expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointUpdateTest.technicalProvider);
         expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointUpdateTest.requireCustomerId);
         expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointUpdateTest.requireRequestorId);
@@ -162,7 +162,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
@@ -212,7 +212,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
@@ -255,7 +255,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
         expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointTest.vendor);
         expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersions', sushiEndpointTest.counterVersions);
         expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
         expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
         expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
