@@ -77,6 +77,7 @@ exports.getMetrics = async (ctx) => {
         where: {
           connection,
           institutionId: ctx.state.institution.id,
+          archived: false,
         },
       }),
     ),

@@ -17,6 +17,34 @@
       class="text-grey-darken-3"
     />
 
+    <template v-if="foreignSpacesPermissions.length > 0">
+      <v-list-item
+        :title="$t('menu.myForeignAccess')"
+        prepend-icon="mdi-tab-plus"
+        class="text-grey-darken-3"
+      />
+
+      <v-list variant="flat" lines="two" density="compact" class="py-0">
+        <v-list-item
+          v-for="{ space } in foreignSpacesPermissions"
+          :key="space.id"
+          v-tooltip="space.name"
+          :title="space.name"
+          :href="`/kibana/s/${space.id}`"
+          append-icon="mdi-open-in-app"
+          @click.prevent="openInTab(`/kibana/s/${space.id}`, space.id)"
+        >
+          <template #subtitle>
+            <RepositoryTypeChip
+              :model-value="space"
+              size="small"
+              density="compact"
+            />
+          </template>
+        </v-list-item>
+      </v-list>
+    </template>
+
     <template v-if="user" #append>
       <v-divider />
 
@@ -58,6 +86,8 @@
 const { public: config } = useRuntimeConfig();
 const { data: user, signOut } = useAuth();
 const { isOpen } = storeToRefs(useDrawerStore());
+const { foreignSpacesPermissions } = storeToRefs(useCurrentUserStore());
+const { openInTab } = useSingleTabLinks('kibanaSpaces');
 
 async function logout() {
   if (!config.shibbolethDisabled) {

@@ -208,6 +208,9 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/elastic-roles',
+    query: {
+      include: ['institutions', 'users', 'repositoryPermissions.repository', 'repositoryAliasPermissions.alias.repository', 'spacePermissions.space'],
+    },
   },
   sortMapping: {
     institutions: 'institutions._count',
@@ -218,7 +221,6 @@ const {
   },
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
-    include: ['institutions', 'users', 'repositoryPermissions.repository', 'repositoryAliasPermissions.alias.repository', 'spacePermissions.space'],
   },
 });
 

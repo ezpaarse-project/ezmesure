@@ -129,13 +129,15 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/repositories',
+    query: {
+      include: ['institutions'],
+    },
   },
   sortMapping: {
     institutions: 'institutions._count',
   },
   data: {
     sortBy: [{ key: 'pattern', order: 'asc' }],
-    include: ['institutions'],
   },
 });
 

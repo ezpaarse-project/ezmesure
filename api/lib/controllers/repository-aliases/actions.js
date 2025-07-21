@@ -1,5 +1,6 @@
 const { Prisma } = require('@prisma/client');
 
+const elastic = require('../../services/elastic');
 const RepositoryAliasesService = require('../../entities/repository-aliases.service');
 const RepositoriesService = require('../../entities/repositories.service');
 
@@ -292,4 +293,42 @@ exports.importMany = async (ctx) => {
 
   ctx.type = 'json';
   ctx.body = response;
+};
+
+exports.getOrphans = async (ctx) => {
+  const repositoryAliasesService = new RepositoryAliasesService();
+
+  const { body } = await elastic.indices.getAlias({ name: '*,-.*' });
+
+  const allAliases = Object.entries(body).flatMap(([index, settings]) => (
+    Object
+      .entries(settings?.aliases ?? {})
+      .map(([alias, { filter } = {}]) => ({ index, alias, filter }))
+  ));
+
+  const orphanAliases = [];
+  const batchSize = 100;
+
+  for (let i = 0; i < allAliases.length; i += batchSize) {
+    const aliases = allAliases.slice(i, i + batchSize);
+
+    // eslint-disable-next-line no-await-in-loop
+    const repoAliases = await repositoryAliasesService.findMany({
+      where: {
+        pattern: {
+          in: aliases.map((alias) => alias.alias),
+        },
+      },
+      select: {
+        pattern: true,
+      },
+    });
+
+    const patterns = new Set(repoAliases.map((alias) => alias.pattern));
+    orphanAliases.push(...aliases.filter((alias) => !patterns.has(alias.alias)));
+  }
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = orphanAliases;
 };

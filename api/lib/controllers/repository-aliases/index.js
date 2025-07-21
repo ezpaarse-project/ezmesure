@@ -16,6 +16,7 @@ const {
   importMany,
   updateOne,
   deleteOne,
+  getOrphans,
 } = require('./actions');
 
 const {
@@ -49,6 +50,12 @@ router.route({
     },
     body: Joi.array(),
   },
+});
+
+router.route({
+  method: 'GET',
+  path: '/_orphans',
+  handler: getOrphans,
 });
 
 router.route({

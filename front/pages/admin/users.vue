@@ -145,13 +145,15 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/users',
+    query: {
+      include: ['memberships'],
+    },
   },
   sortMapping: {
     memberships: 'memberships._count',
   },
   data: {
     sortBy: [{ key: 'username', order: 'asc' }],
-    include: ['memberships'],
     source: '*',
   },
 });

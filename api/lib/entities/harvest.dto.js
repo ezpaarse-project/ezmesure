@@ -8,6 +8,7 @@ const schema = {
   harvestedAt: Joi.date(),
   credentialsId: Joi.string().trim(),
   reportId: Joi.string().trim(),
+  harvestedById: Joi.string().trim(),
   period: Joi.string().regex(/^\d{4}-\d{2}$/),
   status: Joi.string().trim(),
   errorCode: Joi.string().trim(),
@@ -22,6 +23,7 @@ const schema = {
   })),
 
   credentials: Joi.array().items(Joi.object()),
+  harvestedBy: Joi.object().allow(null),
 };
 
 /**
@@ -31,6 +33,7 @@ const includableFields = [
   'credentials',
   'credentials.institution',
   'credentials.endpoint',
+  'harvestedBy',
 ];
 
 module.exports = {

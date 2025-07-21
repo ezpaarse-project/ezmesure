@@ -67,10 +67,6 @@ async function onRepositoryUpdate(upload, target) {
   if (indices.length === 0) {
     return { ...target, index: undefined };
   }
-  if (indices.length === 1) {
-    // Auto select index if only one available
-    return { ...target, index: indices[0]?.name };
-  }
   return target;
 }
 

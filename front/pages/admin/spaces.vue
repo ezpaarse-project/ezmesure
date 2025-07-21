@@ -120,13 +120,15 @@ const {
 } = await useServerSidePagination({
   fetch: {
     url: '/api/kibana-spaces',
+    query: {
+      include: ['institution'],
+    },
   },
   sortMapping: {
     institutions: 'institutions._count',
   },
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
-    include: ['institution'],
   },
 });
 
