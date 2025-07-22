@@ -53,7 +53,6 @@
             >
               <td>
                 <v-chip
-                  v-tooltip:top="$t('endpoints.counterVersionTooltip')"
                   :text="version"
                   :color="counterVersionsColors.get(version) || 'secondary'"
                   density="comfortable"
@@ -124,15 +123,20 @@ const sushiUrls = computedAsync(async () => {
     const urls = await $fetch(`/api/sushi/${props.modelValue.id}/_sushiUrls`);
 
     return {
-      urls: new Map(Object.entries(urls).map(([version, { url: baseURL, firstMonthAvailable }]) => {
-        const url = new URL(baseURL);
-        // Delete standard optional attributes
-        url.searchParams.delete('attributes_to_show');
-        url.searchParams.delete('include_parent_details');
-        url.searchParams.delete('include_component_details');
+      urls: new Map(
+        Object.entries(urls)
+          // Sort from most recent to oldest (6 -> 5.2 -> 5.1 -> 5 -> ...)
+          .sort((a, b) => (b > a ? 1 : -1))
+          .map(([version, { url: baseURL, firstMonthAvailable }]) => {
+            const url = new URL(baseURL);
+            // Delete standard optional attributes
+            url.searchParams.delete('attributes_to_show');
+            url.searchParams.delete('include_parent_details');
+            url.searchParams.delete('include_component_details');
 
-        return [version, { url, firstMonthAvailable }];
-      })),
+            return [version, { url, firstMonthAvailable }];
+          }),
+      ),
     };
   } catch (err) {
     return { error: getErrorMessage(err) };
