@@ -751,6 +751,8 @@ exports.getSushiUrls = async (ctx) => {
   ctx.type = 'json';
   ctx.body = Object.fromEntries(
     endpoint.counterVersions.map((version) => {
+      const firstMonthAvailable = endpoint.counterVersionsAvailability?.[version] ?? '';
+
       const downloadConfig = sushiService.getReportDownloadConfig(
         endpoint,
         sushi,
@@ -763,7 +765,7 @@ exports.getSushiUrls = async (ctx) => {
 
       return [
         version,
-        url.href,
+        { url: url.href, firstMonthAvailable },
       ];
     }),
   );
