@@ -11,7 +11,6 @@ const config = require('config');
 
 const { setTimeout } = require('node:timers/promises');
 
-const { HarvestJobStatus } = require('@prisma/client');
 const harvestSessionPrisma = require('../services/prisma/harvest-session');
 
 const BasePrismaService = require('./base-prisma.service');
@@ -541,27 +540,27 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   static* #getCounterVersionForEndpoint(session, endpoint) {
     const allowedVersions = new Set(session.allowedCounterVersions);
 
-    const counterVersions = endpoint.counterVersions
+    const availableVersions = endpoint.counterVersions
       .filter((v) => allowedVersions.has(v))
       // Sort from most recent to oldest (6 -> 5.2 -> 5.1 -> 5 -> ...)
       .sort((a, b) => (b > a ? 1 : -1));
 
-    appLogger.verbose(`[harvest-start][${session.id}] Found following counter versions for [${endpoint.id}]: [${counterVersions}]`);
+    appLogger.verbose(`[harvest-start][${session.id}] Found following counter versions for [${endpoint.id}]: [${availableVersions}]`);
 
     // If no version are found, skip credentials
-    if (counterVersions.length <= 0) {
+    if (availableVersions.length <= 0) {
       return;
     }
 
-    // If availability cannot be used, assume last version is correct
-    if (
-      !endpoint.counterVersionsAvailability
-      || typeof endpoint.counterVersionsAvailability !== 'object'
-      || Array.isArray(endpoint.counterVersionsAvailability)
-    ) {
-      appLogger.verbose(`[harvest-start][${session.id}] No availability set, defaulting to COUNTER [${counterVersions[0]}]`);
+    const haveAvailability = !!endpoint.counterVersionsAvailability
+      && typeof endpoint.counterVersionsAvailability === 'object'
+      && !Array.isArray(endpoint.counterVersionsAvailability);
+
+    // If availability cannot be used, assume latest version is correct
+    if (!haveAvailability) {
+      appLogger.verbose(`[harvest-start][${session.id}] No availability set, defaulting to COUNTER [${availableVersions[0]}]`);
       yield {
-        version: counterVersions[0],
+        version: availableVersions[0],
         beginDate: session.beginDate,
         endDate: session.endDate,
       };
@@ -575,14 +574,14 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
     // Split by availability period
     // eslint-disable-next-line no-restricted-syntax
-    for (const version of counterVersions) {
+    for (const version of availableVersions) {
       // If period is invalid (can happen if whole session is processed), stop
       if (isBefore(remainingPeriod.endDate, remainingPeriod.beginDate)) {
         appLogger.verbose(`[harvest-start][${session.id}] All versions are processed`);
         return;
       }
 
-      const firstMonthAvailable = endpoint.counterVersionsAvailability[version];
+      const firstMonthAvailable = endpoint.counterVersionsAvailability?.[version] ?? '';
       // If no availability is provided, setup a job for the remaining period
       if (!firstMonthAvailable || typeof firstMonthAvailable !== 'string') {
         yield {
