@@ -68,8 +68,10 @@
               <tr>
                 <th>{{ $t('name') }}</th>
                 <th>{{ $t('identifier') }}</th>
-                <th v-if="currentVersion !== '5'">
-                  {{ $t('reports.availablePeriod') }}
+                <th>
+                  <div v-if="currentVersion !== '5'">
+                    {{ $t('reports.availablePeriod') }}
+                  </div>
                 </th>
               </tr>
             </thead>
