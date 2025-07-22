@@ -7,6 +7,7 @@
         :value="field.value"
         :label="field.label"
         :cols="field.cols"
+        style="word-wrap: anywhere;"
       />
 
       <DetailsField
@@ -44,36 +45,56 @@
           type="error"
         />
 
-        <template v-if="!!sushiUrls.urls">
-          <div
-            v-for="[version, url] in sushiUrls.urls"
-            :key="version"
-            class="d-flex  mb-1"
-          >
-            <v-chip
-              :text="version"
-              :color="counterVersionsColors.get(version) || 'secondary'"
-              size="small"
-              density="comfortable"
-              variant="flat"
-              label
-              class="mr-1"
-            />
-
-            <a
-              :href="url"
-              target="_blank"
-              rel="noreferrer noopener"
+        <v-table v-if="!!sushiUrls.urls" density="compact">
+          <tbody>
+            <tr
+              v-for="[version, { url, firstMonthAvailable }] in sushiUrls.urls"
+              :key="version"
             >
-              {{ url }}<v-icon
-                icon="mdi-open-in-new"
-                color="secondary"
-                size="small"
-                class="ml-1"
-              />
-            </a>
-          </div>
-        </template>
+              <td>
+                <v-chip
+                  v-tooltip:top="$t('endpoints.counterVersionTooltip')"
+                  :text="version"
+                  :color="counterVersionsColors.get(version) || 'secondary'"
+                  density="comfortable"
+                  variant="flat"
+                  label
+                  class="mr-1"
+                />
+              </td>
+
+              <td>
+                <v-chip
+                  v-if="firstMonthAvailable"
+                  v-tooltip:top="$t('endpoints.firstMonthAvailable')"
+                  :text="firstMonthAvailable"
+                  prepend-icon="mdi-calendar-start"
+                  color="info"
+                  density="comfortable"
+                  variant="flat"
+                  class="mr-1"
+                />
+              </td>
+
+              <td style="word-wrap: anywhere;">
+                <div style="overflow-y: auto; width: 100%;">
+                  <a
+                    :href="url"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {{ url }}<v-icon
+                      icon="mdi-open-in-new"
+                      color="secondary"
+                      size="small"
+                      class="ml-1"
+                    />
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
       </DetailsField>
 
       <DetailsField
@@ -103,14 +124,14 @@ const sushiUrls = computedAsync(async () => {
     const urls = await $fetch(`/api/sushi/${props.modelValue.id}/_sushiUrls`);
 
     return {
-      urls: new Map(Object.entries(urls).map(([version, baseURL]) => {
+      urls: new Map(Object.entries(urls).map(([version, { url: baseURL, firstMonthAvailable }]) => {
         const url = new URL(baseURL);
         // Delete standard optional attributes
         url.searchParams.delete('attributes_to_show');
         url.searchParams.delete('include_parent_details');
         url.searchParams.delete('include_component_details');
 
-        return [version, url];
+        return [version, { url, firstMonthAvailable }];
       })),
     };
   } catch (err) {

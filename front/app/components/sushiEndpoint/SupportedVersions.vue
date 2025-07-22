@@ -1,4 +1,3 @@
-/** eslint-disable quote-props */
 <template>
   <v-table style="max-height: 625px; overflow-y: auto;">
     <template v-if="rows.length > 0" #top>
