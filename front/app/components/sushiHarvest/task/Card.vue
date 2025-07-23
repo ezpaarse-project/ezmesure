@@ -3,16 +3,23 @@
     <template #text>
       <v-row>
         <DetailsField
-          :label="$t('harvest.jobs.runningTime')"
-          prepend-icon="mdi-timer-outline"
+          :label="$t('harvest.jobs.startedAt')"
+          :value="modelValue.startedAt"
+          prepend-icon="mdi-timer-play-outline"
         >
-          <v-chip
-            :text="runningTime"
-            variant="outlined"
-            size="small"
-          />
+          <LocalDate v-if="modelValue.startedAt" :model-value="modelValue.startedAt" format="PPPpp" />
         </DetailsField>
 
+        <DetailsField
+          :label="$t('harvest.jobs.updatedAt')"
+          :value="modelValue.updatedAt"
+          prepend-icon="mdi-update"
+        >
+          <LocalDate v-if="modelValue.updatedAt" :model-value="modelValue.updatedAt" format="PPPpp" />
+        </DetailsField>
+      </v-row>
+
+      <v-row>
         <DetailsField
           :label="$t('harvest.jobs.index')"
           :value="modelValue.index"
@@ -24,11 +31,19 @@
 
       <v-row>
         <DetailsField
-          :label="$t('harvest.jobs.period')"
-          :value="`${modelValue.beginDate} ~ ${modelValue.endDate}`"
-          prepend-icon="mdi-calendar-range"
-        />
+          v-if="modelValue.runningTime > 0"
+          :label="$t('harvest.jobs.runningTime')"
+          prepend-icon="mdi-timer-outline"
+        >
+          <v-chip
+            :text="runningTime"
+            variant="outlined"
+            size="small"
+          />
+        </DetailsField>
+      </v-row>
 
+      <v-row>
         <DetailsField
           v-if="modelValue.result"
           :label="$t('harvest.jobs.coveredPeriods')"
@@ -89,7 +104,7 @@
       </template>
 
       <template v-if="(modelValue.sushiExceptions?.length ?? 0) > 0">
-        <v-row>
+        <v-row v-if="modelValue.errorCode">
           <DetailsField :label="$t('reason', { reason: '' })">
             <div>{{ error.title || $t('indeterminate') }}</div>
             <div>{{ error.meaning }}</div>

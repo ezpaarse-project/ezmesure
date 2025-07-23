@@ -64,6 +64,10 @@
         />
       </template>
 
+      <template #[`item.period`]="{ item }">
+        {{ item.beginDate }} ~ {{ item.endDate }}
+      </template>
+
       <template #[`item.status`]="{ item }">
         <v-menu location="end center" width="400" open-on-hover>
           <template #activator="{ props: menu }">
@@ -223,19 +227,14 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('status'),
-    value: 'status',
+    title: t('harvest.jobs.period'),
+    value: 'period',
     align: 'center',
   },
   {
-    title: t('harvest.jobs.startedAt'),
-    value: 'startedAt',
-    sortable: true,
-  },
-  {
-    title: t('harvest.jobs.updatedAt'),
-    value: 'updatedAt',
-    sortable: true,
+    title: t('status'),
+    value: 'status',
+    align: 'center',
   },
   {
     title: t('actions'),
