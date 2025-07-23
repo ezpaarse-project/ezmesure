@@ -1,7 +1,6 @@
 <template>
   <v-card
     :title="modelValue.name"
-    :text="modelValue.description"
     variant="outlined"
     :style="{ borderColor: repoColors.get(modelValue.type), borderWidth: '2px' }"
   >
