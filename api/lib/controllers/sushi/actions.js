@@ -499,10 +499,6 @@ const checkConnection = async (sushi, params) => {
     counterVersion = '5';
   }
 
-  if (endpoint.counterVersions && !endpoint.counterVersions.includes(counterVersion)) {
-    throw new Error(`Counter version ${counterVersion} is not supported by endpoint ${endpoint.vendor}`);
-  }
-
   const sushiData = {
     ...period,
     sushi,
