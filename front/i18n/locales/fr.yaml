@@ -1081,7 +1081,7 @@ statuses:
 images:
   dropImageHere: Déposez votre image ici
   invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : {accept}'
-  imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : 2mb'
+  imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : {size}'
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
