@@ -4,6 +4,7 @@ const {
   subMonths,
   isValid: isValidDate,
   isBefore,
+  formatDate,
 } = require('date-fns');
 
 const sushiEndpointsPrisma = require('../services/prisma/sushi-endpoints');
@@ -207,22 +208,21 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
           ...otherParams
         } = supportedData[reportId] ?? {};
 
+        const reportFirstMonth = report.First_Month_Available && formatDate(report.First_Month_Available, 'yyyy-MM');
+        const reportLastMonth = report.Last_Month_Available && formatDate(report.Last_Month_Available, 'yyyy-MM');
+
         supportedData[reportId] = {
           supported: {
             raw: true,
             value: supported?.manual ? supported.value : true,
           },
           firstMonthAvailable: {
-            raw: report.First_Month_Available,
-            value: firstMonthAvailable?.manual
-              ? firstMonthAvailable.value
-              : report.First_Month_Available,
+            raw: reportFirstMonth,
+            value: firstMonthAvailable?.manual ? firstMonthAvailable.value : reportFirstMonth,
           },
           lastMonthAvailable: {
-            raw: report.Last_Month_Available,
-            value: lastMonthAvailable?.manual
-              ? lastMonthAvailable.value
-              : report.Last_Month_Available,
+            raw: reportLastMonth,
+            value: lastMonthAvailable?.manual ? lastMonthAvailable.value : reportLastMonth,
           },
           ...otherParams,
         };
