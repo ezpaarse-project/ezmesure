@@ -90,7 +90,7 @@ const supportedReports = computed(() => {
     return undefined;
   }
 
-  const versions = props.endpoint?.counterVersions ?? Object.keys(SUPPORTED_COUNTER_VERSIONS);
+  const versions = props.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS;
   const entries = versions.flatMap(
     // We don't need first/last month available, so we can merge all versions
     (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {})

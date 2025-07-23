@@ -52,7 +52,7 @@ const search = ref('');
 const supportedReports = computed(() => {
   const legacy = (props.endpoint?.supportedReports ?? []).map((r) => r);
 
-  const versions = props.endpoint?.counterVersions ?? Object.keys(SUPPORTED_COUNTER_VERSIONS);
+  const versions = props.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS;
   const supported = versions.map(
     // We don't need first/last month available, so we can merge all versions
     (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {})

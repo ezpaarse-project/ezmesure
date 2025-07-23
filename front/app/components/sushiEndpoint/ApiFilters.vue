@@ -59,7 +59,7 @@
           <ApiFiltersSelect
             v-model="filters.counterVersions"
             v-model:loose="filters['counterVersions:loose']"
-            :items="Object.keys(SUPPORTED_COUNTER_VERSIONS)"
+            :items="SUPPORTED_COUNTER_VERSIONS"
             :label="$t('endpoints.counterVersion')"
             :return-object="false"
             multiple

@@ -39,7 +39,7 @@
         </td>
         <td width="50%">
           <MonthPickerField
-            v-if="version in SUPPORTED_COUNTER_VERSIONS"
+            v-if="SUPPORTED_COUNTER_VERSIONS.includes(version)"
             :model-value="firstMonthAvailable"
             :title="$t('endpoints.firstMonthAvailable')"
             :placeholder="$t('endpoints.undefinedAvailable')"
@@ -144,11 +144,11 @@ const additionalVersionForm = useTemplateRef('additionalVersionForm');
 const rows = computed(() => {
   const entries = Object.entries({
     // Shows supported by default
-    ...SUPPORTED_COUNTER_VERSIONS,
+    ...SUPPORTED_COUNTER_VERSIONS.map((v) => ([v, undefined])),
     // Shows additional versions (unsupported but support might be added lated)
     ...Object.fromEntries(
       props.versions
-        .filter((v) => !(v in SUPPORTED_COUNTER_VERSIONS))
+        .filter((v) => !SUPPORTED_COUNTER_VERSIONS.includes(version))
         .map((v) => [v, undefined]),
     ),
     // Fill with current data

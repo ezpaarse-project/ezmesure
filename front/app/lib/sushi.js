@@ -9,12 +9,4 @@ export const DEFAULT_REPORTS_IDS = [
   'TR_J1',
 ];
 
-/* eslint-disable quote-props */
-/**
- * Default values for supported versions, key is the version, value the first month available
- */
-export const SUPPORTED_COUNTER_VERSIONS = {
-  '5': undefined,
-  '5.1': '2025-04',
-};
-/* eslint-enable quote-props */
+export const SUPPORTED_COUNTER_VERSIONS = ['5', '5.1'];

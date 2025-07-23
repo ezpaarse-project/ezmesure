@@ -177,7 +177,7 @@ const {
 });
 
 const endpointVersions = computed(
-  () => props.sushi?.endpoint?.counterVersions ?? Object.keys(SUPPORTED_COUNTER_VERSIONS),
+  () => props.sushi?.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS,
 );
 
 const supportedReports = computed(() => {
