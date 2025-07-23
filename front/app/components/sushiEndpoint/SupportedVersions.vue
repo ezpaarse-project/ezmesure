@@ -144,8 +144,8 @@ const additionalVersionForm = useTemplateRef('additionalVersionForm');
 const rows = computed(() => {
   const entries = Object.entries({
     // Shows supported by default
-    ...SUPPORTED_COUNTER_VERSIONS.map((v) => ([v, undefined])),
-    // Shows additional versions (unsupported but support might be added lated)
+    ...Object.fromEntries(SUPPORTED_COUNTER_VERSIONS.map((v) => ([v, undefined]))),
+    // Shows additional versions (unsupported but support might be added later)
     ...Object.fromEntries(
       props.versions
         .filter((v) => !SUPPORTED_COUNTER_VERSIONS.includes(v))
@@ -154,6 +154,8 @@ const rows = computed(() => {
     // Fill with current data
     ...props.modelValue,
   });
+
+  console.log(entries);
 
   // Sort from most oldest to recent (5 -> 5.1 -> 5.2 -> 6 -> ...)
   return entries.sort(([a], [b]) => (a > b ? 1 : -1));

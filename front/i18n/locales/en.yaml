@@ -255,10 +255,10 @@ endpoints:
   undoReport: Undo changes
   manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation
-  supportedVersionsDesc: ''
+  supportedVersionsDesc: The COUNTER Code of Practice is extended and upgraded as necessary based on input from the community it serves. Each new version is made available as a numbered release on the COUNTER website. The table below tells ezMESURE which versions are supported by the endpoint, and when the first month of each version is available. This date will be used to define which version to use when harvesting.
   addCustomVersion: Add a version
   customVersion: COUNTER version
-  customVersionDesc: ''
+  customVersionDesc: You can add a version that is not yet supported by ezMESURE. It will not be used for harvesting, but allows you to define certain parameters for future integration.
   description: Description
   paramSeparatorDesc: ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.
   paramSeparator: Separator
