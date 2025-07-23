@@ -217,7 +217,7 @@ const props = defineProps({
   },
   versions: {
     type: Array,
-    default: () => ([5]),
+    default: () => (['5']),
   },
 });
 
