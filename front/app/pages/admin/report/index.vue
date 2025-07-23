@@ -39,7 +39,7 @@
           </v-card>
         </v-dialog>
 
-        <v-dialog width="50%">
+        <v-dialog width="1200px">
           <template #activator="{ props: dialog }">
             <v-btn
               :text="$t('report.health')"
@@ -74,7 +74,7 @@
           <v-col>
             <v-card>
               <template #text>
-                <ezr-queue-list
+                <ezr-generation-table
                   v-model:items-per-page="itemsPerPage"
                   :items-per-page-options="itemsPerPageOptions"
                 />

@@ -12,7 +12,7 @@ export default async function useEzr() {
     data: ezrProfile,
     error,
   } = await useFetch('/api/profile/reporting_token', {
-    deep: true
+    deep: true,
   });
 
   const itemsPerPageOptions = [10, 25, 50, 100, -1];
@@ -33,7 +33,7 @@ export default async function useEzr() {
 
   if (!error.value) {
     prepareClient(
-      '/report/api', // ezREEPORT API url
+      new URL('/report/api', window.location.origin), // ezREEPORT API url
       { token: ezrProfile.value.token },
     );
   }
