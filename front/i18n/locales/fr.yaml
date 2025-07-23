@@ -212,7 +212,7 @@ endpoints:
   endpoint: Point d'accès
   toolbarTitle: Point d'accès COUNTER ({count})
   pageDescription: Gérez ici la liste des points d'accès COUNTER disponibles.
-  pageDescription2: Seule les version 5 et 5.1 du protocole COUNTER est supportée.
+  pageDescription2: Seules les versions 5 et 5.1 du protocole COUNTER sont supportées.
   manageEndpoints: >
     Gérer le point d'accès
     |Gérer {count} points d'accès
@@ -255,10 +255,10 @@ endpoints:
   undoReport: Annuler les modifications
   manuallyEdited: Modification manuelles
   ignoreReportValidation: Ignorer la validation du rapport
-  supportedVersionsDesc: Le Code de pratique COUNTER est complété et mis à jour si nécessaire en fonction des contributions de la communauté qu'il sert. Chaque nouvelle version est disponible en tant que version numérotée sur le site web COUNTER. Le tableau ci dessous permet d'indiquer à ezMESURE quelles versions sont supportées par le point d'accès, et quel et le premier mois disponible pour chaque version. Cette date sera utilisée pour définir quelle version utiliser lors du moissonnage.
+  supportedVersionsDesc: Le code de pratique COUNTER est complété et mis à jour si nécessaire en fonction des contributions de la communauté qu'il sert. Chaque nouvelle version est disponible en tant que version numérotée sur le site web COUNTER. Le tableau ci-dessous permet d'indiquer à ezMESURE quelles versions sont supportées par le point d'accès, et quel est le premier mois disponible pour chaque version. Cette date sera utilisée pour définir quelle version utiliser lors du moissonnage.
   addCustomVersion: Ajouter une version
   customVersion: Version COUNTER
-  customVersionDesc: Vous pouvez ajouter une version qui n'est pas encore supportée par ezMESURE, elle ne sera pas utilisée pour le moissonnage, mais permet de définir certains paramètres en vue d'une intégration prochaine.
+  customVersionDesc: Vous pouvez ajouter une version qui n'est pas encore supportée par ezMESURE. Elle ne sera pas utilisée pour le moissonnage, mais permet de définir certains paramètres en vue d'une intégration prochaine.
   description: Description
   paramSeparatorDesc: ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2} lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard {separator} pour ces champs multivalués, renseignez le séparateur ici.
   paramSeparator: Séparateur
@@ -446,7 +446,7 @@ institutions:
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
-    pageDescription2: Seule la version 5 et 5.1 du protocole COUNTER est supportée.
+    pageDescription2: Seules les versions 5 et 5.1 du protocole COUNTER sont supportées.
     addCredentials: Ajouter des identifiants
     updateCredentials: Mettre à jour des identifiants
     unabletToRetriveSushiInformations: Impossible de récupérer les informations des plateformes sushi

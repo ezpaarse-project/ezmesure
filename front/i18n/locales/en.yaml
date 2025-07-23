@@ -212,7 +212,7 @@ endpoints:
   endpoint: Endpoint
   toolbarTitle: COUNTER endpoints ({count})
   pageDescription: Here you can manage the list of the available COUNTER endpoints.
-  pageDescription2: Only version 5 and 5.1 of the COUNTER protocol is supported.
+  pageDescription2: Only versions 5 and 5.1 of the COUNTER protocol are supported.
   manageEndpoints: >
     Manage endpoint
     |Manage {count} endpoints
@@ -444,7 +444,7 @@ institutions:
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
-    pageDescription2: Only version 5 and 5.1 of the COUNTER protocol is supported.
+    pageDescription2: Only versions 5 and 5.1 of the COUNTER protocol are supported.
     addCredentials: Add credentials
     updateCredentials: Update credentials
     unabletToRetriveSushiInformations: Unable to retrieve information from sushi platforms
