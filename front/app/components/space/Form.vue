@@ -167,6 +167,7 @@
 </template>
 
 <script setup>
+import prettySize from 'pretty-bytes';
 import { fileToBase64 } from '@/lib/base64';
 
 const props = defineProps({
