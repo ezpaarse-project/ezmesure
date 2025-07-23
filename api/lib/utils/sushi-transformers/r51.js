@@ -80,13 +80,13 @@ module.exports = function prepareC51Transformer(report) {
             Article_Version: reportItem.Article_Version,
           };
 
-          // eslint-disable-next-line no-continue
-          if (!isRecord(baseItem.Item_ID)) { continue; }
-
-          // Extract item identifiers
-          const identifiers = Object.entries(baseItem.Item_ID)
-            .map(([key, value]) => `${key}:${value}`)
-            .sort();
+          let identifiers = [];
+          if (isRecord(baseItem.Item_ID)) {
+            // Extract item identifiers
+            identifiers = Object.entries(baseItem.Item_ID)
+              .map(([key, value]) => `${key}:${value}`)
+              .sort();
+          }
 
           const attributes = Array.isArray(reportItem?.Attribute_Performance)
             ? reportItem.Attribute_Performance
