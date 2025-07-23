@@ -11,6 +11,8 @@ const {
   Prisma: { PrismaClientKnownRequestError },
 } = require('../../services/prisma');
 
+const { toDataUrl } = require('../../services/images');
+
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.SpaceCreateInput} SpaceCreateInput
@@ -25,6 +27,11 @@ const standardQueryParams = prepareStandardQueryParams({
   queryFields: ['id', 'name'],
 });
 exports.standardQueryParams = standardQueryParams;
+
+const spaceLogoOptions = {
+  resize: { width: 64, height: 64, fit: 'inside' },
+  format: 'png',
+};
 
 exports.getMany = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
@@ -96,6 +103,7 @@ exports.createOne = async (ctx) => {
     space = await spacesService.create({
       data: {
         ...body,
+        imageUrl: body.imageUrl ? await toDataUrl(body.imageUrl, spaceLogoOptions) : undefined,
         institution: { connect: { id: body?.institutionId } },
         institutionId: undefined,
       },
@@ -126,11 +134,19 @@ exports.updateOne = async (ctx) => {
   const spacesService = new SpacesService();
 
   let updatedSushiCredentials;
+  let imageUrl;
+
+  if ('imageUrl' in body && body.imageUrl !== space.imageUrl) {
+    imageUrl = body.imageUrl ? await toDataUrl(body.imageUrl, spaceLogoOptions) : null;
+  }
 
   try {
     updatedSushiCredentials = await spacesService.update({
       where: { id: space.id },
-      data: body,
+      data: {
+        ...body,
+        imageUrl,
+      },
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {

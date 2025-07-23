@@ -23,6 +23,31 @@ module.exports = class ImagesService {
   }
 
   /**
+   * Take a base64 image, resize it, and return a base64 data URL
+   *
+   * @param {String} base64image - The base64 image to resize
+   * @param {Object} [options]
+   * @param {import('sharp').ResizeOptions} [options.resize] - The resize options
+   * @param {import('sharp').FormatEnum} [options.format] - The output format
+   * @returns {Promise<string>}
+   */
+  static async toDataUrl(base64image, options = {}) {
+    const imageContent = Buffer.from(base64image, 'base64');
+
+    const buffer = await sharp(imageContent)
+      .resize({
+        width: 64,
+        height: 64,
+        fit: sharp.fit.inside,
+        ...options.resize ?? {},
+      })
+      .toFormat(options.format ?? 'png')
+      .toBuffer();
+
+    return `data:image/png;base64,${buffer.toString('base64')}`;
+  }
+
+  /**
    * Take a Base64 image, resize it and store it
    *
    * @param {String} base64logo
