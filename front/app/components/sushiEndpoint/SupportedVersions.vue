@@ -148,7 +148,7 @@ const rows = computed(() => {
     // Shows additional versions (unsupported but support might be added lated)
     ...Object.fromEntries(
       props.versions
-        .filter((v) => !SUPPORTED_COUNTER_VERSIONS.includes(version))
+        .filter((v) => !SUPPORTED_COUNTER_VERSIONS.includes(v))
         .map((v) => [v, undefined]),
     ),
     // Fill with current data
