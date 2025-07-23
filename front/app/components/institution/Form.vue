@@ -346,7 +346,7 @@
                 class="drop-files-here"
                 contained
               >
-                {{ $t('institutions.institution.dropImageHere') }}
+                {{ $t('images.dropImageHere') }}
               </v-overlay>
             </v-card>
 
@@ -419,6 +419,8 @@
 </template>
 
 <script setup>
+import prettySize from 'pretty-bytes';
+
 import defaultLogo from '@@/static/images/logo-etab.png';
 import { fileToBase64 } from '@/lib/base64';
 
@@ -601,7 +603,7 @@ async function save() {
     }
   } catch (err) {
     if (err.statusCode === 413) {
-      snacks.error(t('institutions.institution.imageTooLarge'));
+      snacks.error(t('images.imageTooLarge'));
     } else {
       snacks.error(t('institutions.institution.unableToUpate'), err);
     }
@@ -622,12 +624,12 @@ async function save() {
  */
 async function updateLogo(file) {
   if (!/\.(jpe?g|png|svg)$/.exec(file.name)) {
-    logoError.value = t('institutions.institution.invalidImageFile', { accept: LOGO_ACCEPT });
+    logoError.value = t('images.invalidImageFile', { accept: LOGO_ACCEPT });
     return;
   }
 
   if (file.size > LOGO_MAX_SIZE) {
-    logoError.value = t('institutions.institution.imageTooLarge');
+    logoError.value = t('images.imageTooLarge', { size: prettySize(LOGO_MAX_SIZE) });
     return;
   }
 

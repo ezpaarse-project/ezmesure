@@ -348,9 +348,6 @@ institutions:
     localisation: Localisation
     automations: Automatisations
     monitor: Contrôle
-    dropImageHere: Déposez votre image ici
-    invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : {accept}'
-    imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : 2mb'
     noDataFound: Les informations de votre établissement n'ont pas pu être récupérées.
     dataSent: Informations d'établissement transmises
     updated: Établissement mis à jour
@@ -949,6 +946,7 @@ spaces:
   noSpace: Aucun espace n'est encore attribué
   id: Identifiant
   type: Type
+  logo: Logo
   types:
     ezpaarse: ezPAARSE
     counter5: COUNTER
@@ -1080,6 +1078,10 @@ statuses:
   updated: Mis à jour
   deleted: Supprimé
   error: Erreur
+images:
+  dropImageHere: Déposez votre image ici
+  invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : {accept}'
+  imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : 2mb'
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
