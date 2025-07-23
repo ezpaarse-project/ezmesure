@@ -1,6 +1,17 @@
 const r5Template = require('./r5');
 const r51Template = require('./r51');
 
+const mergeMapping = (base, additionalProps) => ({
+  ...base,
+  mappings: {
+    ...base.mappings,
+    properties: {
+      ...base.mappings.properties,
+      ...additionalProps,
+    },
+  },
+});
+
 // Custom properties are prefixed with X_ and added at the insert step, not
 // in transformers
 const customProperties = {
@@ -17,6 +28,6 @@ const customProperties = {
 };
 
 module.exports = new Map([
-  ['5', { ...r5Template, ...customProperties }],
-  ['5.1', { ...r51Template, ...customProperties }],
+  ['5', mergeMapping(r5Template, customProperties)],
+  ['5.1', mergeMapping(r51Template, customProperties)],
 ]);
