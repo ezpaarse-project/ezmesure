@@ -114,49 +114,6 @@
                     />
                   </v-col>
 
-                  <!-- <v-col cols="12" sm="4">
-                    <v-combobox
-                      v-model="endpoint.counterVersions"
-                      v-model:search="versionSearch"
-                      :label="$t('endpoints.counterVersion')"
-                      :items="SUPPORTED_COUNTER_VERSIONS"
-                      :rules="versionRules"
-                      :hide-no-data="!versionSearch"
-                      :return-object="false"
-                      prepend-icon="mdi-numeric"
-                      variant="underlined"
-                      hide-details="auto"
-                      multiple
-                      required
-                    >
-                      <template #selection="{ item: { raw: version } }">
-                        <v-chip
-                          :text="version"
-                          :color="counterVersionsColors.get(version) || 'secondary'"
-                          density="comfortable"
-                          variant="flat"
-                          label
-                        />
-                      </template>
-
-                      <template #no-data>
-                        <v-list-item>
-                          <template #title>
-                            <i18n-t keypath="noMatchFor">
-                              <template #search>
-                                <strong>{{ versionSearch }}</strong>
-                              </template>
-
-                              <template #key>
-                                <kbd>{{ $t('enterKey') }}</kbd>
-                              </template>
-                            </i18n-t>
-                          </template>
-                        </v-list-item>
-                      </template>
-                    </v-combobox>
-                  </v-col> -->
-
                   <v-col cols="12">
                     <v-text-field
                       v-model="endpoint.registryId"
@@ -253,7 +210,10 @@
               <template #text>
                 <v-row>
                   <v-col>
-                    <SushiEndpointSupportedData v-model="endpoint.supportedData" />
+                    <SushiEndpointSupportedData
+                      v-model="endpoint.supportedData"
+                      :versions="endpoint.counterVersions"
+                    />
                   </v-col>
                 </v-row>
 

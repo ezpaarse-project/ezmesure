@@ -1,9 +1,26 @@
 <template>
   <v-table style="max-height: 625px; overflow-y: auto;">
-    <template v-if="rows.length > 0" #top>
-      <p class="pb-4">
-        {{ $t('endpoints.supportedDataDesc') }}
-      </p>
+    <template #top>
+      <div>
+        <v-tabs v-model="currentVersion">
+          <v-tab
+            v-for="version in tabs"
+            :key="version"
+            :value="version"
+          >
+            COUNTER
+            <v-badge
+              :content="version"
+              :color="counterVersionsColors.get(version) || 'secondary'"
+              inline
+            />
+          </v-tab>
+        </v-tabs>
+
+        <p v-if="rows.length > 0" class="py-4">
+          {{ $t('endpoints.supportedDataDesc') }}
+        </p>
+      </div>
     </template>
 
     <v-empty-state
@@ -198,10 +215,15 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  versions: {
+    type: Array,
+    default: () => ([5]),
+  },
 });
 
 const emit = defineEmits(['update:modelValue']);
 
+const currentVersion = ref('5.1');
 const isAdditionalReportOpen = ref(false);
 const additionalReport = ref('');
 const additionalReportForm = useTemplateRef('additionalReportForm');
@@ -209,13 +231,18 @@ const additionalReportForm = useTemplateRef('additionalReportForm');
 const { cloned: innerSupportedData } = useCloned(props.modelValue);
 const { cloned: originalSupportedData } = useCloned(props.modelValue, { manual: true });
 
+const tabs = computed(
+  // Sort from most recent to oldest (6 -> 5.2 -> 5.1 -> 5 -> ...)
+  () => props.versions.toSorted((a, b) => (b > a ? 1 : -1)),
+);
+
 const rows = computed(() => {
-  const entries = Object.entries(innerSupportedData.value);
+  const entries = Object.entries(innerSupportedData.value[currentVersion.value] ?? {});
   return entries.sort(([a], [b]) => a.localeCompare(b));
 });
 
 function patchSupportedData(reportId, params) {
-  const data = { ...(innerSupportedData.value[reportId] ?? {}) };
+  const data = { ...innerSupportedData.value[currentVersion.value]?.[reportId] };
   if ('supported' in params) {
     data.supported = { value: params.supported, manual: true };
   }
@@ -226,7 +253,10 @@ function patchSupportedData(reportId, params) {
     data.lastMonthAvailable = { value: params.lastMonthAvailable, manual: true };
   }
 
-  innerSupportedData.value[reportId] = data;
+  innerSupportedData.value[currentVersion.value] = {
+    ...innerSupportedData.value[currentVersion.value],
+    [reportId]: data,
+  };
 
   emit('update:modelValue', innerSupportedData.value);
 }
@@ -242,11 +272,11 @@ function resetForm() {
 }
 
 function undoSupportedData(reportId, field) {
-  const original = originalSupportedData.value[reportId];
-  const data = { ...(innerSupportedData.value[reportId] ?? {}) };
+  const original = originalSupportedData.value[currentVersion.value]?.[reportId];
+  const data = { ...innerSupportedData.value[currentVersion.value]?.[reportId] };
 
   if (field === 'supported' && original?.[field]?.raw == null) {
-    delete innerSupportedData.value[reportId];
+    delete innerSupportedData.value[currentVersion.value]?.[reportId];
 
     emit('update:modelValue', innerSupportedData.value);
     return;
@@ -254,7 +284,10 @@ function undoSupportedData(reportId, field) {
 
   const value = original?.[field]?.raw;
   data[field] = value != null ? { raw: value, value, manual: false } : undefined;
-  innerSupportedData.value[reportId] = data;
+  innerSupportedData.value[currentVersion.value] = {
+    ...innerSupportedData.value[currentVersion.value],
+    [reportId]: data,
+  };
 
   emit('update:modelValue', innerSupportedData.value);
 }

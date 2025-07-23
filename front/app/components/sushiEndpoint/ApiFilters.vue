@@ -59,7 +59,7 @@
           <ApiFiltersSelect
             v-model="filters.counterVersions"
             v-model:loose="filters['counterVersions:loose']"
-            :items="SUPPORTED_COUNTER_VERSIONS"
+            :items="Object.keys(SUPPORTED_COUNTER_VERSIONS)"
             :label="$t('endpoints.counterVersion')"
             :return-object="false"
             multiple
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-const SUPPORTED_COUNTER_VERSIONS = ['5', '5.1'];
+import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
 
 const props = defineProps({
   modelValue: {
