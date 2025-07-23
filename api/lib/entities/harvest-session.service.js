@@ -711,7 +711,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         const harvestedReportTypes = HarvestSessionService.#getReportsToHarvestForEndpoint(
           { ...session, beginDate, endDate },
           endpoint,
-          endpointData.supported[version],
+          endpointData.supported[version] ?? {},
         );
 
         // eslint-disable-next-line no-restricted-syntax
