@@ -155,8 +155,6 @@ const rows = computed(() => {
     ...props.modelValue,
   });
 
-  console.log(entries);
-
   // Sort from most oldest to recent (5 -> 5.1 -> 5.2 -> 6 -> ...)
   return entries.sort(([a], [b]) => (a > b ? 1 : -1));
 });

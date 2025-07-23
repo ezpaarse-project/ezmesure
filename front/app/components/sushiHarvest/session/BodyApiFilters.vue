@@ -53,7 +53,7 @@
         <v-col cols="6">
           <ApiFiltersSelect
             v-model="filters.counterVersion"
-            :items="['5.1', '5']"
+            :items="SUPPORTED_COUNTER_VERSIONS"
             :label="$t('endpoints.counterVersion')"
             prepend-icon="mdi-numeric"
             chips
@@ -104,6 +104,8 @@
 </template>
 
 <script setup>
+import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
+
 const props = defineProps({
   modelValue: {
     type: Object,
