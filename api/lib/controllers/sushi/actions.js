@@ -779,7 +779,7 @@ exports.getSushiUrls = async (ctx) => {
   const threeMonthAgo = subMonths(new Date(), 3);
 
   const options = {
-    reportType: endpoint.testedReport || undefined,
+    reportType: endpoint.testedReport ?? 'pr',
     beginDate: format(threeMonthAgo, 'yyyy-MM'),
     endDate: format(threeMonthAgo, 'yyyy-MM'),
   };
