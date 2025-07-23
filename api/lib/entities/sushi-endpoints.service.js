@@ -9,6 +9,8 @@ const {
 const sushiEndpointsPrisma = require('../services/prisma/sushi-endpoints');
 const BasePrismaService = require('./base-prisma.service');
 
+const isObject = require('../utils/isObject');
+
 const { appLogger } = require('../services/logger');
 const sushiService = require('../services/sushi');
 
@@ -34,9 +36,18 @@ const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) =>
 /**
  *
  * @typedef {{ supported?: SupportedDataEntry<boolean>, firstMonthAvailable?: SupportedDataEntry<string>, lastMonthAvailable?: SupportedDataEntry<string>  }} ReportSupportedData
- * @typedef {{ [reportType: string]: ReportSupportedData | undefined }} EndpointSupportedData
+ * @typedef {{ [reportType: string]: ReportSupportedData | undefined }} VersionSupportedData
+ * @typedef {{ [version: string]: VersionSupportedData }} EndpointSupportedData
  */
 /* eslint-enable max-len */
+
+/**
+ * @param {Record<string, unknown>} data - The data from endpoint
+ * @returns {data is VersionSupportedData}
+ */
+const isVersionSupportedData = (data) => Object.values(data).some(
+  (value) => isObject(value) && ['supported', 'firstMonthAvailable', 'lastMonthAvailable'].some((key) => key in value),
+);
 
 module.exports = class SushiEndpointsService extends BasePrismaService {
   /** @type {BasePrismaService.TransactionFnc<SushiEndpointsService>} */
@@ -156,7 +167,7 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
     * @returns {Promise<EndpointSupportedData>}
     */
   async updateSupportedData(credentials, counterVersion = '5', original = {}) {
-    const supportedData = { ...original };
+    const supportedData = { ...original[counterVersion] };
     appLogger.verbose(`Updating supported SUSHI reports of [${credentials.endpoint.vendor}]`);
 
     const isValidReport = (report) => (report.Report_ID && report.Report_Name);
@@ -223,7 +234,10 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
     await this.update({
       where: { id: credentials.endpoint.id },
       data: {
-        supportedData,
+        supportedData: {
+          ...original,
+          [counterVersion]: supportedData,
+        },
         supportedDataUpdatedAt: new Date(),
         // Remove deprecated fields to ease migration
         supportedReports: [],
@@ -232,7 +246,10 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
       },
     });
 
-    return supportedData;
+    return {
+      ...original,
+      [counterVersion]: supportedData,
+    };
   }
 
   /**
@@ -242,10 +259,10 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
    *
    * @param {SushiEndpoint} endpoint
    *
-   * @returns {EndpointSupportedData}
+   * @returns {VersionSupportedData}
    */
   static #getSupportedReports({ supportedReports, ignoredReports, additionalReports }) {
-    /** @type {EndpointSupportedData} */
+    /** @type {VersionSupportedData} */
     const supportedData = {};
     supportedReports.forEach((rId) => {
       const current = supportedData[rId] ?? {};
@@ -273,20 +290,40 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
   static getSupportedData(endpoint, forceRefreshSupported = false) {
     const { supportedDataUpdatedAt } = endpoint;
 
+    // If new format is present, merge it with old one, should be dropped once everything moved on
     const oldSupportedData = SushiEndpointsService.#getSupportedReports(endpoint);
-    let supportedData = oldSupportedData;
+    // eslint-disable-next-line quote-props
+    let supportedData = { '5': oldSupportedData };
 
-    // If new format is present, merge it with old one
-    if (
-      endpoint.supportedData
-      && typeof endpoint.supportedData === 'object'
-      && !Array.isArray(endpoint.supportedData)
-    ) {
+    if (isObject(endpoint.supportedData)) {
       const manualOldData = Object.fromEntries(
         Object.entries(oldSupportedData).filter(([, params]) => params?.supported?.manual),
       );
+
+      /** @type {EndpointSupportedData} */
       // @ts-expect-error
-      supportedData = { ...oldSupportedData, ...endpoint.supportedData, ...manualOldData };
+      let endpointData = endpoint.supportedData;
+      if (isVersionSupportedData(endpointData)) {
+        const {
+          // Extract supported versions, might drop later once everything moved on
+          // eslint-disable-next-line quote-props
+          '5': r5, '5.1': r51,
+          ...reports
+        } = endpointData;
+
+        endpointData = {
+          /* eslint-disable quote-props */
+          '5': { ...reports, ...r5 },
+          '5.1': r51,
+          /* eslint-enable quote-props */
+        };
+      }
+
+      supportedData = {
+        ...endpointData,
+        // eslint-disable-next-line quote-props
+        '5': { ...oldSupportedData, ...endpointData['5'], ...manualOldData },
+      };
     }
 
     const oneMonthAgo = subMonths(new Date(), 1);

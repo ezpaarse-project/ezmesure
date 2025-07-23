@@ -9,6 +9,27 @@ const {
 
 const COUNTER_VERSION_VALIDATION = Joi.string().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/);
 
+const supportedDataValidation = Joi.object().pattern(
+  Joi.string(), // reportId
+  Joi.object({
+    supported: Joi.object({
+      value: Joi.boolean(),
+      raw: Joi.boolean().optional(),
+      manual: Joi.boolean().optional(),
+    }),
+    firstMonthAvailable: Joi.object({
+      value: Joi.string().regex(/^\d{4}-\d{2}$/),
+      raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      manual: Joi.boolean().optional(),
+    }).optional(),
+    lastMonthAvailable: Joi.object({
+      value: Joi.string().regex(/^\d{4}-\d{2}$/),
+      raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      manual: Joi.boolean().optional(),
+    }).optional(),
+  }),
+);
+
 /**
  * Base schema
  * @type {Record<string, import('joi').AnySchema>}
@@ -65,25 +86,12 @@ const schema = {
   /** @deprecated use `supportedDataUpdatedAt` */
   supportedReportsUpdatedAt: Joi.date().allow(null),
 
-  supportedData: Joi.object().pattern(
-    Joi.string(), // reportId
-    Joi.object({
-      supported: Joi.object({
-        value: Joi.boolean(),
-        raw: Joi.boolean().optional(),
-        manual: Joi.boolean().optional(),
-      }),
-      firstMonthAvailable: Joi.object({
-        value: Joi.string().regex(/^\d{4}-\d{2}$/),
-        raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
-        manual: Joi.boolean().optional(),
-      }).optional(),
-      lastMonthAvailable: Joi.object({
-        value: Joi.string().regex(/^\d{4}-\d{2}$/),
-        raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
-        manual: Joi.boolean().optional(),
-      }).optional(),
-    }),
+  supportedData: Joi.alternatives(
+    supportedDataValidation, // Old way, will be dropped once harvested
+    Joi.object().pattern(
+      Joi.string(), // version
+      supportedDataValidation,
+    ),
   ),
   supportedDataUpdatedAt: Joi.date().allow(null),
 

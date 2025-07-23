@@ -508,7 +508,7 @@ const checkConnection = async (sushi, params) => {
     sushi,
     institution: sushi.institution,
     endpoint,
-    reportType: endpoint.testedReport,
+    reportType: endpoint.testedReport ?? 'pr',
     counterVersion,
   };
 

@@ -44,7 +44,7 @@ const { appLogger } = require('../services/logger');
  * @typedef {import('@prisma/client').HarvestJob} HarvestJob
  * @typedef {{ credentials: { include: { endpoint: true, institution: true } } }} HarvestJobCredentialsInclude
  * @typedef {import('@prisma/client').Prisma.HarvestJobGetPayload<{ include: HarvestJobCredentialsInclude }>} HarvestJobCredentials
- * @typedef {import('./sushi-endpoints.service').EndpointSupportedData} EndpointSupportedData
+ * @typedef {import('./sushi-endpoints.service').VersionSupportedData} VersionSupportedData
  *
  * @typedef {Record<'beginDate' | 'endDate', string>} HarvestPeriod
  */
@@ -452,7 +452,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    *
    * @param {HarvestSession} session -
    * @param {SushiEndpoint} endpoint - The endpoint to check
-   * @param {EndpointSupportedData} supportedData - Supported data of endpoint
+   * @param {VersionSupportedData} supportedData - Supported data of endpoint
    *
    * @returns {Generator<{ reportType: string, params: HarvestPeriod }>} The reports to
    * harvest with specific params
@@ -677,17 +677,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         state.forceRefreshSupported,
       );
 
-      if (endpointData.expired) {
-        const endpointService = new SushiEndpointsService(this);
-
-        // eslint-disable-next-line no-await-in-loop
-        endpointData.supported = await endpointService.updateSupportedData(
-          credentials,
-          '5', // FIXME: might collide between COUNTER versions
-          endpointData.supported,
-        );
-      }
-
       const counterVersions = HarvestSessionService.#getCounterVersionForEndpoint(
         session,
         endpoint,
@@ -708,10 +697,21 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
         appLogger.verbose(`[harvest-start][${session.id}] Found index [${index}] for [${institution.id}]`);
 
+        if (endpointData.expired) {
+          const endpointService = new SushiEndpointsService(this);
+
+          // eslint-disable-next-line no-await-in-loop
+          endpointData.supported = await endpointService.updateSupportedData(
+            credentials,
+            version,
+            endpointData.supported,
+          );
+        }
+
         const harvestedReportTypes = HarvestSessionService.#getReportsToHarvestForEndpoint(
           { ...session, beginDate, endDate },
           endpoint,
-          endpointData.supported,
+          endpointData.supported[version],
         );
 
         // eslint-disable-next-line no-restricted-syntax
