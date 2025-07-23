@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-const SUPPORTED_COUNTER_VERSIONS = ['5', '5.1'];
+import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
 
 const props = defineProps({
   modelValue: {

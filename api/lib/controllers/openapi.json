@@ -124,11 +124,7 @@
     "schemas": {
       "MemberRole": {
         "type": "string",
-        "enum": [
-          "doc_contact",
-          "tech_contact",
-          "guest"
-        ]
+        "enum": ["doc_contact", "tech_contact", "guest"]
       },
       "MemberPermissions": {
         "type": "array",
@@ -178,10 +174,7 @@
       },
       "Institution": {
         "type": "object",
-        "required": [
-          "id",
-          "name"
-        ],
+        "required": ["id", "name"],
         "properties": {
           "id": {
             "$ref": "#/components/schemas/ItemID"
@@ -229,64 +222,43 @@
             "description": "Identifier of the institution logo image",
             "example": "32a1c269738c43463312f09821b22323.png",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "type": {
             "description": "Institution type",
             "example": "Enseignement supérieur",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "acronym": {
             "description": "Institution acronym",
             "example": "UFO",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "websiteUrl": {
             "description": "URL of the institution website",
             "example": "http://univ-foobar.fr",
             "format": "uri",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "city": {
             "description": "City of the institution",
             "example": "Paris",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "uai": {
             "example": "0362917P",
             "description": "UAI (Unité Administrative Immatriculée) of the institution",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "social": {
             "description": "Social links of the institution",
             "type": "string",
-            "enum": [
-              "object",
-              "null"
-            ],
+            "enum": ["object", "null"],
             "properties": {
               "twitterUrl": {
                 "type": "string"
@@ -304,10 +276,7 @@
           },
           "sushiReadySince": {
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ],
+            "enum": ["string", "null"],
             "description": "Date since which SUSHI credentials are ready",
             "format": "date-time"
           },
@@ -397,11 +366,7 @@
       },
       "User": {
         "type": "object",
-        "required": [
-          "username",
-          "fullName",
-          "email"
-        ],
+        "required": ["username", "fullName", "email"],
         "properties": {
           "username": {
             "description": "Username",
@@ -749,10 +714,7 @@
           "permissions": {
             "description": "User permissions for the repository",
             "type": "string",
-            "enum": [
-              "read",
-              "read_write"
-            ]
+            "enum": ["read", "read_write"]
           },
           "locked": {
             "description": "Whether the permission can be modified by admins only",
@@ -845,10 +807,7 @@
           "permissions": {
             "description": "User permissions for the repository",
             "type": "string",
-            "enum": [
-              "read",
-              "read_write"
-            ]
+            "enum": ["read", "read_write"]
           },
           "locked": {
             "description": "Whether the permission can be modified by admins only",
@@ -1010,14 +969,7 @@
             "description": "Result of the job",
             "readOnly": true,
             "type": "string",
-            "enum": [
-              "number",
-              "string",
-              "boolean",
-              "object",
-              "array",
-              "null"
-            ]
+            "enum": ["number", "string", "boolean", "object", "array", "null"]
           },
           "logs": {
             "description": "Job logs",
@@ -1248,11 +1200,7 @@
                 "severity": {
                   "description": "The exception severity",
                   "type": "string",
-                  "enum": [
-                    "info",
-                    "warning",
-                    "error"
-                  ]
+                  "enum": ["info", "warning", "error"]
                 },
                 "message": {
                   "description": "The exception message",
@@ -1317,13 +1265,7 @@
           "level": {
             "description": "The message level",
             "type": "string",
-            "enum": [
-              "error",
-              "warn",
-              "info",
-              "verbose",
-              "debug"
-            ]
+            "enum": ["error", "warn", "info", "verbose", "debug"]
           },
           "message": {
             "description": "The content of the message",
@@ -1360,12 +1302,7 @@
           "status": {
             "description": "Step status",
             "type": "string",
-            "enum": [
-              "pending",
-              "running",
-              "finished",
-              "failed"
-            ]
+            "enum": ["pending", "running", "finished", "failed"]
           },
           "runningTime": {
             "description": "Running time of the step in milliseconds",
@@ -1374,14 +1311,7 @@
           "data": {
             "description": "Arbitrary data associated to the step",
             "type": "string",
-            "enum": [
-              "number",
-              "string",
-              "boolean",
-              "object",
-              "array",
-              "null"
-            ]
+            "enum": ["number", "string", "boolean", "object", "array", "null"]
           }
         }
       },
@@ -1411,10 +1341,7 @@
           "description": {
             "description": "Description of the SUSHI endpoint",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "counterVersions": {
             "description": "The COUNTER version supported by the endpoint",
@@ -1428,10 +1355,7 @@
           "technicalProvider": {
             "description": "The technical provider that operates the SUSHI endpoint",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "ignoreReportValidation": {
             "description": "Whether to ignore the validation of the harvested reports",
@@ -1456,42 +1380,27 @@
           "defaultCustomerId": {
             "description": "Default customer ID to use",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "defaultRequestorId": {
             "description": "Default requestor ID to use",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "defaultApiKey": {
             "description": "Default API key to use",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "paramSeparator": {
             "description": "Separator to be use for multivaluated SUSHI parameters (defaults to '|')",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "testedReport": {
             "description": "Report used when testing endpoint",
             "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ]
+            "enum": ["string", "null"]
           },
           "tags": {
             "description": "Tags associated with the endpoint",
@@ -1631,6 +1540,11 @@
                 "description": "The error code, if an exception was encountered",
                 "type": "string",
                 "readOnly": true
+              },
+              "counterVersion": {
+                "description": "The version of COUNTER used",
+                "type": "string",
+                "readOnly": true
               }
             }
           },
@@ -1691,7 +1605,7 @@
           },
           "status": {
             "description": "Status of the synchonization process",
-            "type":"string",
+            "type": "string",
             "enum": ["idle", "synchronizing", "completed"]
           },
           "hasErrors": {
@@ -2123,9 +2037,7 @@
                 "description": "Value of the query parameter"
               }
             },
-            "required": [
-              "name"
-            ]
+            "required": ["name"]
           }
         },
         "required": [
@@ -2202,9 +2114,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "title"
-        ]
+        "required": ["title"]
       },
       "KibanaSavedObject": {
         "title": "KibanaSavedObject",
@@ -2270,11 +2180,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "name",
-          "type"
-        ]
+        "required": ["id", "name", "type"]
       },
       "KibanaSavedObjectError": {
         "title": "KibanaSavedObjectError",
@@ -2306,9 +2212,7 @@
             }
           }
         },
-        "required": [
-          "objects"
-        ]
+        "required": ["objects"]
       },
       "KibanaDashboardExportResponse": {
         "type": "object",
@@ -2321,10 +2225,7 @@
             "$ref": "#/components/schemas/KibanaSavedObject"
           }
         },
-        "required": [
-          "version",
-          "objects"
-        ]
+        "required": ["version", "objects"]
       },
       "ElasticsearchIndex": {
         "title": "ElasticsearchIndex",
@@ -2410,11 +2311,7 @@
             }
           }
         },
-        "required": [
-          "id",
-          "paused",
-          "jobCounts"
-        ]
+        "required": ["id", "paused", "jobCounts"]
       },
       "File": {
         "title": "File",
@@ -2429,10 +2326,7 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "directory",
-              "file"
-            ],
+            "enum": ["directory", "file"],
             "description": "File type"
           },
           "size": {
@@ -2452,12 +2346,7 @@
             "description": "Link to the file"
           }
         },
-        "required": [
-          "name",
-          "type",
-          "size",
-          "mtime"
-        ],
+        "required": ["name", "type", "size", "mtime"],
         "x-examples": {
           "example-1": {
             "name": "string",
@@ -2479,11 +2368,7 @@
       "Filter": {
         "title": "Filter",
         "type": "object",
-        "required": [
-          "name",
-          "field",
-          "isNot"
-        ],
+        "required": ["name", "field", "isNot"],
         "properties": {
           "name": { "type": "string" },
           "field": { "type": "string" },
@@ -2499,11 +2384,7 @@
       "SushiAlert": {
         "title": "Sushi Alert",
         "type": "object",
-        "required": [
-          "type",
-          "severity",
-          "data"
-        ],
+        "required": ["type", "severity", "data"],
         "properties": {
           "type": { "type": "string" },
           "severity": { "type": "string" },
@@ -2592,9 +2473,7 @@
           }
         },
         "operationId": "ping",
-        "tags": [
-          "Basics"
-        ],
+        "tags": ["Basics"],
         "security": []
       }
     },
@@ -2608,10 +2487,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "Actions"
-        ],
+        "tags": ["Administration", "Actions"],
         "parameters": [
           {
             "$ref": "#/components/parameters/size"
@@ -2742,10 +2618,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "Actions"
-        ],
+        "tags": ["Administration", "Actions"],
         "responses": {
           "200": {
             "description": "200 response",
@@ -2770,10 +2643,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "CustomFields"
-        ],
+        "tags": ["Administration", "CustomFields"],
         "parameters": [
           {
             "$ref": "#/components/parameters/size"
@@ -2798,9 +2668,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "institutionProperties"
-                ]
+                "enum": ["institutionProperties"]
               }
             }
           },
@@ -2951,10 +2819,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "CustomFields"
-        ],
+        "tags": ["Administration", "CustomFields"],
         "parameters": [
           {
             "name": "include",
@@ -2964,9 +2829,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "institutionProperties"
-                ]
+                "enum": ["institutionProperties"]
               }
             }
           }
@@ -3025,10 +2888,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Administration",
-          "CustomFields"
-        ],
+        "tags": ["Administration", "CustomFields"],
         "security": [
           {
             "bearerAuth": []
@@ -3064,19 +2924,13 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "CustomFields"
-        ]
+        "tags": ["Administration", "CustomFields"]
       }
     },
     "/dashboards": {
       "get": {
         "summary": "List dashboards",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "responses": {
           "200": {
             "description": "OK",
@@ -3120,10 +2974,7 @@
     "/dashboards/_copy": {
       "post": {
         "summary": "Copy a dashboard from one space to another",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "responses": {
           "200": {
             "description": "OK",
@@ -3180,9 +3031,7 @@
                         }
                       }
                     },
-                    "required": [
-                      "dashboard"
-                    ]
+                    "required": ["dashboard"]
                   },
                   "target": {
                     "type": "object",
@@ -3217,10 +3066,7 @@
     "/dashboards/_export": {
       "get": {
         "summary": "Export a dashboard",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "responses": {
           "200": {
             "description": "OK",
@@ -3279,10 +3125,7 @@
     "/dashboards/_import": {
       "post": {
         "summary": "Import a dashboard",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "responses": {
           "200": {
             "description": "OK",
@@ -3363,9 +3206,7 @@
         "operationId": "post-elastic-roles-name-_sync",
         "summary": "Sync an Elastic Role",
         "description": "Sync an Elastic Role by populating institutions depending on condititons",
-        "tags": [
-          "Elastic Roles"
-        ],
+        "tags": ["Elastic Roles"],
         "security": [
           {
             "bearerAuth": []
@@ -3451,9 +3292,7 @@
     },
     "/files": {
       "get": {
-        "tags": [
-          "Files"
-        ],
+        "tags": ["Files"],
         "summary": "List your hosted files",
         "description": "List your hosted files.",
         "security": [
@@ -3481,9 +3320,7 @@
     },
     "/files/{filename}": {
       "delete": {
-        "tags": [
-          "Files"
-        ],
+        "tags": ["Files"],
         "summary": "Remove one file from your hosted files",
         "description": "Remove one file from your hosted files.",
         "security": [
@@ -3516,9 +3353,7 @@
     },
     "/files/delete_batch": {
       "post": {
-        "tags": [
-          "Files"
-        ],
+        "tags": ["Files"],
         "summary": "Remove a list of files from your hosted files",
         "description": "Remove a list of files from your hosted files.",
         "security": [
@@ -3589,11 +3424,7 @@
                       "minLength": 1
                     }
                   },
-                  "required": [
-                    "acknowledged",
-                    "shards_acknowledged",
-                    "index"
-                  ],
+                  "required": ["acknowledged", "shards_acknowledged", "index"],
                   "x-examples": {
                     "example-1": {
                       "acknowledged": true,
@@ -3634,9 +3465,7 @@
           }
         },
         "description": "Initialize an index with a predefined mapping, either for access events or publisher data.",
-        "tags": [
-          "Administration"
-        ],
+        "tags": ["Administration"],
         "security": [
           {
             "bearerAuth": []
@@ -3646,10 +3475,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "ezpaarse",
-                "publisher"
-              ],
+              "enum": ["ezpaarse", "publisher"],
               "default": "ezpaarse"
             },
             "in": "query",
@@ -3689,9 +3515,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Administration"
-        ],
+        "tags": ["Administration"],
         "description": "Get information about an index",
         "security": [
           {
@@ -3722,18 +3546,13 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "Indices"
-        ]
+        "tags": ["Administration", "Indices"]
       }
     },
     "/institutions": {
       "get": {
         "summary": "Get institutions",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "parameters": [
           {
             "$ref": "#/components/parameters/size"
@@ -4007,9 +3826,7 @@
             }
           }
         },
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "security": [
           {
             "bearerAuth": []
@@ -4071,16 +3888,12 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "value"
-                ]
+                "required": ["value"]
               }
             }
           }
         },
-        "tags": [
-          "Institutions"
-        ]
+        "tags": ["Institutions"]
       }
     },
     "/institutions/{id}/sushiReadySince": {
@@ -4129,17 +3942,12 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "value"
-                ]
+                "required": ["value"]
               }
             }
           }
         },
-        "tags": [
-          "Institutions",
-          "Sushi"
-        ]
+        "tags": ["Institutions", "Sushi"]
       }
     },
     "/institutions/{id}": {
@@ -4175,9 +3983,7 @@
       ],
       "get": {
         "summary": "Get an institution",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4227,9 +4033,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Institutions"
-        ]
+        "tags": ["Institutions"]
       },
       "put": {
         "summary": "Update an institution",
@@ -4265,9 +4069,7 @@
             }
           }
         },
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "security": [
           {
             "bearerAuth": []
@@ -4288,10 +4090,7 @@
       ],
       "get": {
         "summary": "Get SUSHI credentials of an institution",
-        "tags": [
-          "Institutions",
-          "Sushi"
-        ],
+        "tags": ["Institutions", "Sushi"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4327,13 +4126,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "success",
-                "working",
-                "failed",
-                "faulty",
-                "untested"
-              ]
+              "enum": ["success", "working", "failed", "faulty", "untested"]
             },
             "in": "query",
             "name": "connection",
@@ -4355,9 +4148,7 @@
       ],
       "get": {
         "summary": "Get metrics about sushi credentials of an institution",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4410,9 +4201,7 @@
     "/institutions/{id}/memberships": {
       "get": {
         "summary": "Get institution memberships",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4478,9 +4267,7 @@
       ],
       "get": {
         "summary": "Get the contacts of an institution",
-        "tags": [
-          "Administration"
-        ],
+        "tags": ["Administration"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4534,9 +4321,7 @@
       ],
       "get": {
         "summary": "Get the membership of a user for an institution",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "parameters": [
           {
             "schema": {
@@ -4586,9 +4371,7 @@
       },
       "put": {
         "summary": "Create or a update a user membership for an institution",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4634,9 +4417,7 @@
       },
       "delete": {
         "summary": "Remove a membership",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4675,9 +4456,7 @@
     "/institutions/{id}/subinstitutions": {
       "get": {
         "summary": "Get institution sub-institutions",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "security": [
           {
             "bearerAuth": []
@@ -4753,9 +4532,7 @@
       ],
       "put": {
         "summary": "Add a sub-institution to an institution",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4787,9 +4564,7 @@
       },
       "delete": {
         "summary": "Remove a sub-institution",
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4823,10 +4598,7 @@
     "/institutions/{id}/repositories": {
       "get": {
         "summary": "Get institution repositories",
-        "tags": [
-          "Institutions",
-          "Repositories"
-        ],
+        "tags": ["Institutions", "Repositories"],
         "responses": {
           "200": {
             "description": "OK",
@@ -4901,10 +4673,7 @@
       "delete": {
         "summary": "Unlink a repository from an institution",
         "operationId": "delete-institutions-id-repositories-pattern",
-        "tags": [
-          "Institutions",
-          "Repositories"
-        ],
+        "tags": ["Institutions", "Repositories"],
         "security": [
           {
             "bearerAuth": []
@@ -4925,10 +4694,7 @@
       "put": {
         "summary": "Link a repository to an institution",
         "operationId": "put-institutions-id-repositories-pattern",
-        "tags": [
-          "Institutions",
-          "Repositories"
-        ],
+        "tags": ["Institutions", "Repositories"],
         "security": [
           {
             "bearerAuth": []
@@ -4990,10 +4756,7 @@
       "put": {
         "summary": "Set repository permissions",
         "operationId": "put-institutions-id-repositories-pattern-permissions",
-        "tags": [
-          "Institutions",
-          "Repositories"
-        ],
+        "tags": ["Institutions", "Repositories"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -5075,10 +4838,7 @@
       "delete": {
         "summary": "Remove repository permission",
         "operationId": "delete-institutions-id-repositories-pattern-permissions-username",
-        "tags": [
-          "Institutions",
-          "Repositories"
-        ],
+        "tags": ["Institutions", "Repositories"],
         "security": [
           {
             "bearerAuth": []
@@ -5099,10 +4859,7 @@
       "put": {
         "summary": "Update repository permission",
         "operationId": "put-institutions-id-repositories-pattern-permissions-username",
-        "tags": [
-          "Institutions",
-          "Repositories"
-        ],
+        "tags": ["Institutions", "Repositories"],
         "security": [
           {
             "bearerAuth": []
@@ -5131,10 +4888,7 @@
     "/institutions/{id}/repository-aliases": {
       "get": {
         "summary": "Get institution repository aliases",
-        "tags": [
-          "Institutions",
-          "Repository Aliases"
-        ],
+        "tags": ["Institutions", "Repository Aliases"],
         "responses": {
           "200": {
             "description": "OK",
@@ -5209,10 +4963,7 @@
       "delete": {
         "summary": "Unlink a repository from an institution",
         "operationId": "delete-institutions-id-repository-aliases-pattern",
-        "tags": [
-          "Institutions",
-          "Repository Aliases"
-        ],
+        "tags": ["Institutions", "Repository Aliases"],
         "security": [
           {
             "bearerAuth": []
@@ -5233,10 +4984,7 @@
       "put": {
         "summary": "Link a repository to an institution",
         "operationId": "put-institutions-id-repository-aliases-pattern",
-        "tags": [
-          "Institutions",
-          "Repository Aliases"
-        ],
+        "tags": ["Institutions", "Repository Aliases"],
         "security": [
           {
             "bearerAuth": []
@@ -5298,10 +5046,7 @@
       "put": {
         "summary": "Set repository permissions",
         "operationId": "put-institutions-id-repository-aliases-pattern-permissions",
-        "tags": [
-          "Institutions",
-          "Repository Aliases"
-        ],
+        "tags": ["Institutions", "Repository Aliases"],
         "security": [
           {
             "bearerAuth": []
@@ -5383,10 +5128,7 @@
       "delete": {
         "summary": "Remove repository alias permission",
         "operationId": "delete-institutions-id-repository-aliases-pattern-permissions-username",
-        "tags": [
-          "Institutions",
-          "Repository Aliases"
-        ],
+        "tags": ["Institutions", "Repository Aliases"],
         "security": [
           {
             "bearerAuth": []
@@ -5407,10 +5149,7 @@
       "put": {
         "summary": "Update repository alias permission",
         "operationId": "put-institutions-id-repository-aliases-pattern-permissions-username",
-        "tags": [
-          "Institutions",
-          "Repository Aliases"
-        ],
+        "tags": ["Institutions", "Repository Aliases"],
         "security": [
           {
             "bearerAuth": []
@@ -5438,9 +5177,7 @@
     },
     "/logs": {
       "get": {
-        "tags": [
-          "Indices"
-        ],
+        "tags": ["Indices"],
         "summary": "List existing indices",
         "description": "List the existing indices you are allowed to see.",
         "security": [
@@ -5468,9 +5205,7 @@
     },
     "/logs/{index}": {
       "post": {
-        "tags": [
-          "Indices"
-        ],
+        "tags": ["Indices"],
         "summary": "Insert data into an index",
         "description": "Insert access events into an index.",
         "security": [
@@ -5613,9 +5348,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "acknowledge"
-                  ]
+                  "required": ["acknowledge"]
                 }
               }
             }
@@ -5633,9 +5366,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Indices"
-        ]
+        "tags": ["Indices"]
       },
       "parameters": [
         {
@@ -5651,9 +5382,7 @@
     },
     "/logs/{index}/events": {
       "delete": {
-        "tags": [
-          "Indices"
-        ],
+        "tags": ["Indices"],
         "summary": "Remove data from an index",
         "description": "Remove access events from an index. Defaults to everything if no condition provided.",
         "security": [
@@ -5714,9 +5443,7 @@
     },
     "/logs/{index}/tops": {
       "get": {
-        "tags": [
-          "Indices"
-        ],
+        "tags": ["Indices"],
         "summary": "Get top metrics for an index",
         "description": "Get top metrics for an index.",
         "security": [
@@ -5788,9 +5515,7 @@
     },
     "/logs/{index}/search": {
       "post": {
-        "tags": [
-          "Indices"
-        ],
+        "tags": ["Indices"],
         "summary": "Search in indices",
         "description": "Perform search in indices using Elasticsearch Search API.",
         "security": [
@@ -5854,9 +5579,7 @@
     },
     "/logs/{index}/aggregation.{extension}": {
       "get": {
-        "tags": [
-          "Indices"
-        ],
+        "tags": ["Indices"],
         "summary": "Export all aggregated combinations of the given fields",
         "description": "Export all aggregated combinations of the given fields",
         "security": [
@@ -5880,10 +5603,7 @@
             "name": "extension",
             "schema": {
               "type": "string",
-              "enum": [
-                "csv",
-                "ndjson"
-              ]
+              "enum": ["csv", "ndjson"]
             },
             "description": "The export format",
             "required": true
@@ -5995,9 +5715,7 @@
     },
     "/logs/{index}/counterize": {
       "post": {
-        "tags": [
-          "Indices"
-        ],
+        "tags": ["Indices"],
         "summary": "Export aggregated COUNTER metrics into another index",
         "description": "Export aggregated COUNTER metrics into another index",
         "security": [
@@ -6023,9 +5741,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "destination"
-                ],
+                "required": ["destination"],
                 "properties": {
                   "destination": {
                     "type": "string",
@@ -6078,9 +5794,7 @@
     },
     "/metrics": {
       "get": {
-        "tags": [
-          "Metrics"
-        ],
+        "tags": ["Metrics"],
         "summary": "Get general metrics",
         "description": "Get general metrics about the data hosted on ezMESURE.",
         "responses": {
@@ -6108,9 +5822,7 @@
     },
     "/partners": {
       "get": {
-        "tags": [
-          "Institutions"
-        ],
+        "tags": ["Institutions"],
         "summary": "Get partners",
         "description": "Get the list of validated institutions.",
         "responses": {
@@ -6198,21 +5910,15 @@
                         "contacts": [
                           {
                             "fullName": "Tom SUBLET",
-                            "roles": [
-                              "contact:tech"
-                            ]
+                            "roles": ["contact:tech"]
                           },
                           {
                             "fullName": "ezMESURE Administrator",
-                            "roles": [
-                              "contact:doc"
-                            ]
+                            "roles": ["contact:doc"]
                           },
                           {
                             "fullName": "Yannick SCHURTER",
-                            "roles": [
-                              "contact:tech"
-                            ]
+                            "roles": ["contact:tech"]
                           }
                         ]
                       }
@@ -6233,9 +5939,7 @@
     },
     "/profile": {
       "get": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Fetch profile",
         "description": "Get the profile associated with the JWT token.",
         "security": [
@@ -6263,9 +5967,7 @@
     },
     "/profile/memberships": {
       "get": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Fetch memberships for profile",
         "description": "Get the memberships associated with current user.",
         "security": [
@@ -6336,9 +6038,7 @@
     },
     "/profile/elastic-role": {
       "get": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Fetch elastic roles for profile",
         "description": "Get the elastic roles associated with current user.",
         "security": [
@@ -6412,9 +6112,7 @@
     },
     "/profile/token": {
       "get": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Get an authorization token",
         "description": "Actually requires a JWT token (typically stored in cookies). This route provides you with a token from the user space.",
         "security": [
@@ -6443,9 +6141,7 @@
     },
     "/profile/terms/accept": {
       "post": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Accept terms of service",
         "description": "Accept terms of service. You should read them first!",
         "security": [
@@ -6466,9 +6162,7 @@
     },
     "/profile/password/reset": {
       "post": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Reset Kibana password",
         "description": "Reset Kibana password of the authenticated user.",
         "security": [
@@ -6490,9 +6184,7 @@
     "/queues": {
       "get": {
         "summary": "Get status of all job queues",
-        "tags": [
-          "Jobs"
-        ],
+        "tags": ["Jobs"],
         "operationId": "get-jobs",
         "description": "Get queue status for all job types",
         "security": [
@@ -6539,9 +6231,7 @@
       ],
       "get": {
         "summary": "Get status of a job queue",
-        "tags": [
-          "Jobs"
-        ],
+        "tags": ["Jobs"],
         "responses": {
           "200": {
             "description": "OK",
@@ -6587,9 +6277,7 @@
       ],
       "post": {
         "summary": "Pause a job queue",
-        "tags": [
-          "Jobs"
-        ],
+        "tags": ["Jobs"],
         "responses": {
           "200": {
             "description": "OK",
@@ -6675,9 +6363,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Jobs"
-        ]
+        "tags": ["Jobs"]
       }
     },
     "/repositories": {
@@ -6685,9 +6371,7 @@
         "operationId": "get-repositories",
         "summary": "Get all repositories",
         "description": "Get all data repositories",
-        "tags": [
-          "Repositories"
-        ],
+        "tags": ["Repositories"],
         "responses": {
           "200": {
             "description": "OK",
@@ -6738,10 +6422,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "permissions",
-                  "institutions"
-                ]
+                "enum": ["permissions", "institutions"]
               }
             }
           },
@@ -6804,9 +6485,7 @@
         "summary": "Create a repository endpoint",
         "description": "Create a new data repository",
         "operationId": "post-repositories",
-        "tags": [
-          "Repositories"
-        ],
+        "tags": ["Repositories"],
         "responses": {
           "201": {
             "description": "Created",
@@ -6888,11 +6567,7 @@
                           "status": {
                             "type": "string",
                             "description": "import status of the item",
-                            "enum": [
-                              "error",
-                              "conflict",
-                              "created"
-                            ]
+                            "enum": ["error", "conflict", "created"]
                           },
                           "message": {
                             "type": "string",
@@ -6902,19 +6577,11 @@
                             "$ref": "#/components/schemas/Repository"
                           }
                         },
-                        "required": [
-                          "status",
-                          "data"
-                        ]
+                        "required": ["status", "data"]
                       }
                     }
                   },
-                  "required": [
-                    "errors",
-                    "conflicts",
-                    "created",
-                    "items"
-                  ]
+                  "required": ["errors", "conflicts", "created", "items"]
                 }
               }
             }
@@ -6929,9 +6596,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Repositories"
-        ],
+        "tags": ["Repositories"],
         "description": "Import a list of repositories items",
         "security": [
           {
@@ -6982,10 +6647,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "permissions",
-                "institutions"
-              ]
+              "enum": ["permissions", "institutions"]
             }
           }
         }
@@ -7018,9 +6680,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Repositories"
-        ],
+        "tags": ["Repositories"],
         "security": [
           {
             "bearerAuth": []
@@ -7063,9 +6723,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Repositories"
-        ]
+        "tags": ["Repositories"]
       },
       "delete": {
         "summary": "Delete a repository",
@@ -7090,18 +6748,14 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Repositories"
-        ]
+        "tags": ["Repositories"]
       }
     },
     "/repositories/{id}/_resolve": {
       "get": {
         "summary": "Resolve aliases and indices for a repository",
         "operationId": "get-repositories-id-_resolve",
-        "tags": [
-          "Repositories"
-        ],
+        "tags": ["Repositories"],
         "parameters": [
           {
             "name": "id",
@@ -7156,9 +6810,7 @@
         "operationId": "get-repository-alias-template",
         "summary": "Get all repository alias templates",
         "description": "Get all repository alias templates",
-        "tags": [
-          "Repository alias templates"
-        ],
+        "tags": ["Repository alias templates"],
         "security": [
           {
             "bearerAuth": []
@@ -7191,10 +6843,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "repository",
-                  "aliases"
-                ]
+                "enum": ["repository", "aliases"]
               }
             }
           },
@@ -7296,9 +6945,7 @@
         "summary": "Upsert a repository alias template",
         "description": "Upsert a repository alias template",
         "operationId": "put-repository-alias-template",
-        "tags": [
-          "Repository alias templates"
-        ],
+        "tags": ["Repository alias templates"],
         "security": [
           {
             "bearerAuth": []
@@ -7353,9 +7000,7 @@
         "summary": "Get a repository alias template",
         "description": "Get a repository alias template",
         "operationId": "get-repository-alias-template-id",
-        "tags": [
-          "Repository alias templates"
-        ],
+        "tags": ["Repository alias templates"],
         "security": [
           {
             "bearerAuth": []
@@ -7384,9 +7029,7 @@
         "summary": "Delete a repository alias template",
         "description": "Delete a repository alias template",
         "operationId": "delete-repository-alias-template-id",
-        "tags": [
-          "Repository alias templates"
-        ],
+        "tags": ["Repository alias templates"],
         "security": [
           {
             "bearerAuth": []
@@ -7413,9 +7056,7 @@
         "summary": "Apply a repository alias template",
         "description": "Apply a repository alias template, generating repository aliases",
         "operationId": "post-repository-alias-templates-id-_apply",
-        "tags": [
-          "Repository alias templates"
-        ],
+        "tags": ["Repository alias templates"],
         "security": [
           {
             "bearerAuth": []
@@ -7513,9 +7154,7 @@
         "operationId": "get-repository-aliases",
         "summary": "Get all repository aliases",
         "description": "Get all data repository aliases",
-        "tags": [
-          "Repository Aliases"
-        ],
+        "tags": ["Repository Aliases"],
         "responses": {
           "200": {
             "description": "OK",
@@ -7566,11 +7205,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "permissions",
-                  "repository",
-                  "institutions"
-                ]
+                "enum": ["permissions", "repository", "institutions"]
               }
             }
           },
@@ -7653,9 +7288,7 @@
         "summary": "Create a repository alias",
         "description": "Create a new data alias",
         "operationId": "post-repository-aliases",
-        "tags": [
-          "Repository Aliases"
-        ],
+        "tags": ["Repository Aliases"],
         "responses": {
           "201": {
             "description": "Created",
@@ -7737,11 +7370,7 @@
                           "status": {
                             "type": "string",
                             "description": "import status of the item",
-                            "enum": [
-                              "error",
-                              "conflict",
-                              "created"
-                            ]
+                            "enum": ["error", "conflict", "created"]
                           },
                           "message": {
                             "type": "string",
@@ -7751,19 +7380,11 @@
                             "$ref": "#/components/schemas/RepositoryAlias"
                           }
                         },
-                        "required": [
-                          "status",
-                          "data"
-                        ]
+                        "required": ["status", "data"]
                       }
                     }
                   },
-                  "required": [
-                    "errors",
-                    "conflicts",
-                    "created",
-                    "items"
-                  ]
+                  "required": ["errors", "conflicts", "created", "items"]
                 }
               }
             }
@@ -7778,9 +7399,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Repository Aliases"
-        ],
+        "tags": ["Repository Aliases"],
         "description": "Import a list of alias items",
         "security": [
           {
@@ -7817,9 +7436,7 @@
         "summary": "Get orphan ES aliases",
         "description": "Get aliases that are found in Elasticsearch but not the database",
         "operationId": "get-repository-aliases-_orphans",
-        "tags": [
-          "Repository Aliases"
-        ],
+        "tags": ["Repository Aliases"],
         "security": [
           {
             "bearerAuth": []
@@ -7835,10 +7452,7 @@
                   "items": {
                     "type": "object",
                     "description": "an orphan alias",
-                    "required": [
-                      "alias",
-                      "index"
-                    ],
+                    "required": ["alias", "index"],
                     "properties": {
                       "alias": {
                         "type": "string",
@@ -7886,10 +7500,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "permissions",
-                "institutions"
-              ]
+              "enum": ["permissions", "institutions"]
             }
           }
         }
@@ -7922,9 +7533,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Repository Aliases"
-        ],
+        "tags": ["Repository Aliases"],
         "security": [
           {
             "bearerAuth": []
@@ -7967,9 +7576,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Repository Aliases"
-        ]
+        "tags": ["Repository Aliases"]
       },
       "delete": {
         "summary": "Delete a repository alias",
@@ -7994,18 +7601,13 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Repository Aliases"
-        ]
+        "tags": ["Repository Aliases"]
       }
     },
     "/kibana-spaces": {
       "get": {
         "summary": "List affected Kibana spaces",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "parameters": [
           {
             "$ref": "#/components/parameters/size"
@@ -8030,10 +7632,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "membership",
-                  "space"
-                ]
+                "enum": ["membership", "space"]
               }
             }
           },
@@ -8204,10 +7803,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "description": "Create and assign a new Kibana space",
         "security": [
           {
@@ -8258,11 +7854,7 @@
                           "status": {
                             "type": "string",
                             "description": "import status of the item",
-                            "enum": [
-                              "error",
-                              "conflict",
-                              "created"
-                            ]
+                            "enum": ["error", "conflict", "created"]
                           },
                           "message": {
                             "type": "string",
@@ -8272,19 +7864,11 @@
                             "$ref": "#/components/schemas/Space"
                           }
                         },
-                        "required": [
-                          "status",
-                          "data"
-                        ]
+                        "required": ["status", "data"]
                       }
                     }
                   },
-                  "required": [
-                    "errors",
-                    "conflicts",
-                    "created",
-                    "items"
-                  ]
+                  "required": ["errors", "conflicts", "created", "items"]
                 }
               }
             }
@@ -8299,9 +7883,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Kibana"
-        ],
+        "tags": ["Kibana"],
         "description": "Import a list of Kibana spaces",
         "security": [
           {
@@ -8346,10 +7928,7 @@
       ],
       "get": {
         "summary": "Get a Kibana space",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "parameters": [
           {
             "name": "include",
@@ -8359,10 +7938,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "membership",
-                  "space"
-                ]
+                "enum": ["membership", "space"]
               }
             }
           }
@@ -8423,10 +7999,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "description": "Update a Kibana space",
         "requestBody": {
           "content": {
@@ -8466,10 +8039,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "Kibana"
-        ]
+        "tags": ["Administration", "Kibana"]
       }
     },
     "/kibana-spaces/{id}/permissions": {
@@ -8510,10 +8080,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "membership",
-                  "space"
-                ]
+                "enum": ["membership", "space"]
               }
             }
           },
@@ -8584,10 +8151,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "description": "Get space permissions",
         "security": [
           {
@@ -8642,10 +8206,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "description": "Get space permissions",
         "security": [
           {
@@ -8703,9 +8264,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Kibana"
-        ],
+        "tags": ["Kibana"],
         "security": [
           {
             "bearerAuth": []
@@ -8751,18 +8310,13 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Kibana"
-        ]
+        "tags": ["Kibana"]
       }
     },
     "/spaces": {
       "get": {
         "summary": "List spaces",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "responses": {
           "200": {
             "description": "OK",
@@ -8826,10 +8380,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "description": "Create a Kibana space",
         "security": [
           {
@@ -8860,10 +8411,7 @@
       ],
       "get": {
         "summary": "Get a space",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "responses": {
           "200": {
             "description": "OK",
@@ -8920,10 +8468,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "description": "Update a Kibana space",
         "requestBody": {
           "content": {
@@ -8963,10 +8508,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "Kibana"
-        ]
+        "tags": ["Administration", "Kibana"]
       }
     },
     "/spaces/{id}/index-patterns": {
@@ -8982,10 +8524,7 @@
       ],
       "get": {
         "summary": "List index patterns in a space",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "responses": {
           "200": {
             "description": "OK",
@@ -9049,10 +8588,7 @@
           }
         },
         "description": "Create an index pattern in a given space",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
+        "tags": ["Administration", "Kibana"],
         "security": [
           {
             "bearerAuth": []
@@ -9073,9 +8609,7 @@
       "parameters": [],
       "get": {
         "summary": "Get harvests",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "parameters": [
           {
             "$ref": "#/components/parameters/size"
@@ -9283,9 +8817,7 @@
       "parameters": [],
       "get": {
         "summary": "Get harvest sessions",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "parameters": [
           {
             "$ref": "#/components/parameters/size"
@@ -9493,9 +9025,7 @@
       },
       "post": {
         "summary": "Create a new harvest session",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "requestBody": {
           "required": true,
           "content": {
@@ -9630,9 +9160,7 @@
       ],
       "get": {
         "summary": "Get status of a harvests sessions",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "responses": {
           "200": {
             "description": "OK",
@@ -9693,9 +9221,7 @@
       ],
       "put": {
         "summary": "Upsert a new harvest session",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "requestBody": {
           "required": true,
           "content": {
@@ -9808,9 +9334,7 @@
       },
       "delete": {
         "summary": "Delete an harvest session and stop jobs under it",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "parameters": [],
         "responses": {
           "204": {
@@ -9845,9 +9369,7 @@
       ],
       "post": {
         "summary": "Start a harvest session",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -9911,9 +9433,7 @@
       ],
       "post": {
         "summary": "Stop a harvest session and cancel jobs under it",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "responses": {
           "204": {
             "description": "OK"
@@ -9947,9 +9467,7 @@
       ],
       "get": {
         "summary": "Get credentials concerned by an harvest session",
-        "tags": [
-          "Harvests"
-        ],
+        "tags": ["Harvests"],
         "responses": {
           "200": {
             "description": "OK",
@@ -9983,9 +9501,7 @@
     "/sushi": {
       "get": {
         "summary": "Get all Sushi items",
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "responses": {
           "200": {
             "description": "OK",
@@ -10018,11 +9534,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "working",
-                "faulty",
-                "untested"
-              ]
+              "enum": ["working", "faulty", "untested"]
             },
             "in": "query",
             "name": "connection",
@@ -10221,9 +9733,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -10268,11 +9778,7 @@
                           "status": {
                             "type": "string",
                             "description": "import status of the item",
-                            "enum": [
-                              "error",
-                              "conflict",
-                              "created"
-                            ]
+                            "enum": ["error", "conflict", "created"]
                           },
                           "message": {
                             "type": "string",
@@ -10282,19 +9788,11 @@
                             "$ref": "#/components/schemas/Sushi"
                           }
                         },
-                        "required": [
-                          "status",
-                          "data"
-                        ]
+                        "required": ["status", "data"]
                       }
                     }
                   },
-                  "required": [
-                    "errors",
-                    "conflicts",
-                    "created",
-                    "items"
-                  ]
+                  "required": ["errors", "conflicts", "created", "items"]
                 }
               }
             }
@@ -10309,9 +9807,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "description": "Import a list of Sushi items",
         "security": [
           {
@@ -10369,9 +9865,7 @@
                       "description": "Whether the management is locked or not"
                     }
                   },
-                  "required": [
-                    "locked"
-                  ]
+                  "required": ["locked"]
                 }
               }
             }
@@ -10386,10 +9880,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Sushi",
-          "Administration"
-        ],
+        "tags": ["Sushi", "Administration"],
         "description": "Lock SUSHI identifiers management",
         "x-internal": false,
         "security": [
@@ -10412,9 +9903,7 @@
                     "description": "The reason of the lock"
                   }
                 },
-                "required": [
-                  "locked"
-                ]
+                "required": ["locked"]
               }
             }
           }
@@ -10440,9 +9929,7 @@
                       "description": "The reason of the lock"
                     }
                   },
-                  "required": [
-                    "locked"
-                  ]
+                  "required": ["locked"]
                 }
               }
             }
@@ -10454,9 +9941,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "description": "Get the current lock status of SUSHI management.",
         "security": [
           {
@@ -10490,7 +9975,10 @@
                     "properties": {
                       "id": { "type": "string", "nullable": true },
                       "sushiUrl": { "type": "string" },
-                      "harvestDateFormat": { "type": "string", "nullable": true },
+                      "harvestDateFormat": {
+                        "type": "string",
+                        "nullable": true
+                      },
                       "testedReport": { "type": "string", "nullable": true },
                       "paramSeparator": { "type": "string", "nullable": true },
                       "params": {
@@ -10508,9 +9996,7 @@
                               "description": "Value of the query parameter"
                             }
                           },
-                          "required": [
-                            "name"
-                          ]
+                          "required": ["name"]
                         }
                       }
                     }
@@ -10527,7 +10013,7 @@
                   "apiKey": { "type": "string", "nullable": true },
                   "params": {
                     "type": "array",
-                    "items":  {
+                    "items": {
                       "type": "object",
                       "description": "Parameters that should be added in the query string",
                       "properties": {
@@ -10540,9 +10026,7 @@
                           "description": "Value of the query parameter"
                         }
                       },
-                      "required": [
-                        "name"
-                      ]
+                      "required": ["name"]
                     }
                   }
                 }
@@ -10637,9 +10121,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "description": "Update a Sushi item",
         "security": [
           {
@@ -10704,9 +10186,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Sushi"
-        ]
+        "tags": ["Sushi"]
       },
       "delete": {
         "summary": "Delete a SUSHI item",
@@ -10744,9 +10224,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Sushi"
-        ]
+        "tags": ["Sushi"]
       }
     },
     "/sushi/{id}/_check_connection": {
@@ -10761,9 +10239,7 @@
         }
       ],
       "post": {
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "summary": "Check SUSHI connection",
         "operationId": "post-sushi-id-check-connection",
         "description": "Check the connection to the SUSHI endpoint and update the connection state of the SUSHI credentials",
@@ -10804,9 +10280,7 @@
         }
       ],
       "delete": {
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "summary": "Reset SUSHI crendentials connection",
         "operationId": "delete-sushi-id-connection",
         "description": "Reset the connection state of the SUSHI credentials",
@@ -10841,9 +10315,7 @@
       ],
       "get": {
         "summary": "List files in the directory of a SUSHI item",
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "responses": {
           "200": {
             "description": "OK",
@@ -10884,9 +10356,7 @@
       ],
       "get": {
         "summary": "Get harvests of a SUSHI item",
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "parameters": [
           {
             "name": "from",
@@ -10947,10 +10417,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
+              "enum": ["asc", "desc"],
               "default": "asc"
             }
           }
@@ -10998,9 +10465,7 @@
       ],
       "get": {
         "summary": "Download a COUNTER report",
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "responses": {
           "200": {
             "description": "The COUNTER report is returned in the body.",
@@ -11087,9 +10552,7 @@
       ],
       "get": {
         "summary": "Get tasks of a Sushi item",
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "responses": {
           "200": {
             "description": "OK",
@@ -11123,9 +10586,7 @@
     "/sushi-endpoints": {
       "get": {
         "summary": "Get all SUSHI endpoints",
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "responses": {
           "200": {
             "description": "OK",
@@ -11458,9 +10919,7 @@
             }
           }
         },
-        "tags": [
-          "Sushi"
-        ]
+        "tags": ["Sushi"]
       }
     },
     "/sushi-endpoints/_import": {
@@ -11496,11 +10955,7 @@
                           "status": {
                             "type": "string",
                             "description": "import status of the item",
-                            "enum": [
-                              "error",
-                              "conflict",
-                              "created"
-                            ]
+                            "enum": ["error", "conflict", "created"]
                           },
                           "message": {
                             "type": "string",
@@ -11510,19 +10965,11 @@
                             "$ref": "#/components/schemas/SushiEndpoint"
                           }
                         },
-                        "required": [
-                          "status",
-                          "data"
-                        ]
+                        "required": ["status", "data"]
                       }
                     }
                   },
-                  "required": [
-                    "errors",
-                    "conflicts",
-                    "created",
-                    "items"
-                  ]
+                  "required": ["errors", "conflicts", "created", "items"]
                 }
               }
             }
@@ -11537,9 +10984,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "description": "Import a list of SUSHI endpoints",
         "security": [
           {
@@ -11611,9 +11056,7 @@
             "description": "Not Found"
           }
         },
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "description": "Update a SUSHI endpoint",
         "security": [
           {
@@ -11677,9 +11120,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Sushi"
-        ]
+        "tags": ["Sushi"]
       },
       "delete": {
         "summary": "Delete a SUSHI endpoint",
@@ -11704,17 +11145,13 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Sushi"
-        ]
+        "tags": ["Sushi"]
       }
     },
     "/sushi-alerts": {
       "get": {
         "summary": "Get all SUSHI alerts",
-        "tags": [
-          "Sushi"
-        ],
+        "tags": ["Sushi"],
         "responses": {
           "200": {
             "description": "OK",
@@ -11750,9 +11187,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "harvestedButUnsupported"
-              ]
+              "enum": ["harvestedButUnsupported"]
             }
           }
         ]
@@ -11782,9 +11217,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Administration"
-        ],
+        "tags": ["Administration"],
         "security": [
           {
             "bearerAuth": []
@@ -11838,9 +11271,7 @@
             "description": "Forbidden"
           }
         },
-        "tags": [
-          "Administration"
-        ],
+        "tags": ["Administration"],
         "security": [
           {
             "bearerAuth": []
@@ -11851,9 +11282,7 @@
     "/tasks": {
       "get": {
         "summary": "Get all tasks",
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "responses": {
           "200": {
             "description": "OK",
@@ -12130,9 +11559,7 @@
             }
           }
         ],
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "responses": {
           "200": {
             "description": "OK",
@@ -12179,9 +11606,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Tasks"
-        ]
+        "tags": ["Tasks"]
       }
     },
     "/tasks/{id}/_cancel": {
@@ -12225,9 +11650,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Tasks"
-        ]
+        "tags": ["Tasks"]
       }
     },
     "/task-logs": {
@@ -12255,13 +11678,7 @@
                       "level": {
                         "description": "The message level",
                         "type": "string",
-                        "enum": [
-                          "error",
-                          "warn",
-                          "info",
-                          "verbose",
-                          "debug"
-                        ]
+                        "enum": ["error", "warn", "info", "verbose", "debug"]
                       },
                       "message": {
                         "description": "The content of the message",
@@ -12377,9 +11794,7 @@
             }
           }
         ],
-        "tags": [
-          "Logs"
-        ]
+        "tags": ["Logs"]
       }
     },
     "/users": {
@@ -12523,9 +11938,7 @@
             "description": "a query to retrieve more information, the fields are separated by a comma"
           }
         ],
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/users/_import": {
@@ -12571,11 +11984,7 @@
                           "status": {
                             "type": "string",
                             "description": "import status of the item",
-                            "enum": [
-                              "error",
-                              "conflict",
-                              "created"
-                            ]
+                            "enum": ["error", "conflict", "created"]
                           },
                           "message": {
                             "type": "string",
@@ -12585,19 +11994,11 @@
                             "$ref": "#/components/schemas/User"
                           }
                         },
-                        "required": [
-                          "status",
-                          "data"
-                        ]
+                        "required": ["status", "data"]
                       }
                     }
                   },
-                  "required": [
-                    "errors",
-                    "conflicts",
-                    "created",
-                    "items"
-                  ]
+                  "required": ["errors", "conflicts", "created", "items"]
                 }
               }
             }
@@ -12623,10 +12024,7 @@
           }
         },
         "description": "Import a list of users",
-        "tags": [
-          "Users",
-          "Administration"
-        ],
+        "tags": ["Users", "Administration"],
         "security": [
           {
             "bearerAuth": []
@@ -12722,9 +12120,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       },
       "put": {
         "summary": "Create or replace a user",
@@ -12761,10 +12157,7 @@
           }
         },
         "description": "Create or replace a user",
-        "tags": [
-          "Users",
-          "Administration"
-        ],
+        "tags": ["Users", "Administration"],
         "security": [
           {
             "bearerAuth": []
@@ -12805,10 +12198,7 @@
           }
         },
         "description": "Partially update a user",
-        "tags": [
-          "Users",
-          "Administration"
-        ],
+        "tags": ["Users", "Administration"],
         "security": [
           {
             "bearerAuth": []
@@ -12857,10 +12247,7 @@
             "bearerAuth": []
           }
         ],
-        "tags": [
-          "Administration",
-          "Users"
-        ]
+        "tags": ["Administration", "Users"]
       }
     },
     "/users/{username}/institution": {
@@ -12876,9 +12263,7 @@
       ],
       "get": {
         "summary": "Get the institution of a user",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "responses": {
           "200": {
             "description": "OK",
@@ -12921,9 +12306,7 @@
         }
       ],
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get memberships of user",
         "description": "Get the memberships associated with specified user.",
         "security": [
@@ -13005,9 +12388,7 @@
       "post": {
         "summary": "Impersonate a user",
         "description": "Login on behalf of a given user. Requires admin privileges.",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "responses": {
           "200": {
             "description": "OK",

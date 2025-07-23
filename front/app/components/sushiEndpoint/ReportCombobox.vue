@@ -30,6 +30,8 @@
 </template>
 
 <script setup>
+import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
+
 const props = defineProps({
   modelValue: {
     type: [String, Array],
@@ -49,9 +51,13 @@ const search = ref('');
 
 const supportedReports = computed(() => {
   const legacy = (props.endpoint?.supportedReports ?? []).map((r) => r);
-  const supported = Object.entries(props.endpoint?.supportedData ?? {}).flatMap(
-    ([r, data]) => (data?.supported?.value ? [r] : []),
-  );
+
+  const versions = props.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS;
+  const supported = versions.map(
+    // We don't need first/last month available, so we can merge all versions
+    (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {})
+      .map(([r, data]) => (data?.supported?.value ? [r] : [])),
+  ).flat(2);
 
   const reports = Array.from(new Set([...legacy, ...supported]));
   return reports.map((value) => ({

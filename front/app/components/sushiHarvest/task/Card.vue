@@ -3,16 +3,23 @@
     <template #text>
       <v-row>
         <DetailsField
-          :label="$t('harvest.jobs.runningTime')"
-          prepend-icon="mdi-timer-outline"
+          :label="$t('harvest.jobs.startedAt')"
+          :value="modelValue.startedAt"
+          prepend-icon="mdi-timer-play-outline"
         >
-          <v-chip
-            :text="runningTime"
-            variant="outlined"
-            size="small"
-          />
+          <LocalDate v-if="modelValue.startedAt" :model-value="modelValue.startedAt" format="PPPpp" />
         </DetailsField>
 
+        <DetailsField
+          :label="$t('harvest.jobs.updatedAt')"
+          :value="modelValue.updatedAt"
+          prepend-icon="mdi-update"
+        >
+          <LocalDate v-if="modelValue.updatedAt" :model-value="modelValue.updatedAt" format="PPPpp" />
+        </DetailsField>
+      </v-row>
+
+      <v-row>
         <DetailsField
           :label="$t('harvest.jobs.index')"
           :value="modelValue.index"
@@ -24,11 +31,19 @@
 
       <v-row>
         <DetailsField
-          :label="$t('harvest.jobs.period')"
-          :value="`${modelValue.beginDate} ~ ${modelValue.endDate}`"
-          prepend-icon="mdi-calendar-range"
-        />
+          v-if="modelValue.runningTime > 0"
+          :label="$t('harvest.jobs.runningTime')"
+          prepend-icon="mdi-timer-outline"
+        >
+          <v-chip
+            :text="runningTime"
+            variant="outlined"
+            size="small"
+          />
+        </DetailsField>
+      </v-row>
 
+      <v-row>
         <DetailsField
           v-if="modelValue.result"
           :label="$t('harvest.jobs.coveredPeriods')"
@@ -46,45 +61,50 @@
         </DetailsField>
       </v-row>
 
-      <template v-if="modelValue.result">
+      <template v-if="result">
         <v-divider class="my-4" />
 
         <v-row>
-          <v-col cols="4">
+          <v-col v-if="result.inserted > 0" cols="4">
             <v-chip
-              v-if="modelValue.result.inserted > 0"
               v-tooltip:top="$t('harvest.jobs.inserted')"
-              :text="`${modelValue.result.inserted}`"
+              :text="`${result.inserted}`"
               prepend-icon="mdi-file-download"
               color="success"
               variant="outlined"
             />
           </v-col>
-          <v-col cols="4">
+          <v-col v-if="result.updated > 0" cols="4">
             <v-chip
-              v-if="modelValue.result.updated > 0"
               v-tooltip:top="$t('harvest.jobs.updated')"
-              :text="`${modelValue.result.updated}`"
+              :text="`${result.updated}`"
               prepend-icon="mdi-file-replace"
               color="info"
               variant="outlined"
             />
           </v-col>
-          <v-col cols="4">
+          <v-col v-if="result.failed > 0" cols="4">
             <v-chip
-              v-if="modelValue.result.failed > 0"
               v-tooltip:top="$t('harvest.jobs.failed')"
-              :text="`${modelValue.result.failed}`"
+              :text="`${result.failed}`"
               prepend-icon="mdi-file-alert"
               color="error"
               variant="outlined"
+            />
+          </v-col>
+
+          <v-col v-if="result.total <= 0" cols="12">
+            <v-empty-state
+              :title="$t('harvest.jobs.noData')"
+              icon="mdi-file-hidden"
+              size="x-large"
             />
           </v-col>
         </v-row>
       </template>
 
       <template v-if="(modelValue.sushiExceptions?.length ?? 0) > 0">
-        <v-row>
+        <v-row v-if="modelValue.errorCode">
           <DetailsField :label="$t('reason', { reason: '' })">
             <div>{{ error.title || $t('indeterminate') }}</div>
             <div>{{ error.meaning }}</div>
@@ -112,6 +132,20 @@ const props = defineProps({
 const { t, te } = useI18n();
 
 const runningTime = useTimeAgo(() => props.modelValue.runningTime);
+
+const result = computed(() => {
+  const res = props.modelValue.result;
+  if (!res) {
+    return undefined;
+  }
+
+  return {
+    inserted: res.inserted,
+    updated: res.updated,
+    failed: res.failed,
+    total: res.inserted + res.updated + res.failed,
+  };
+});
 
 const error = computed(() => {
   const { errorCode } = props.modelValue;

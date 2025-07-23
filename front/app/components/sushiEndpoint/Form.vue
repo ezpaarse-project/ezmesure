@@ -104,7 +104,7 @@
             >
               <template #text>
                 <v-row>
-                  <v-col cols="12" sm="8">
+                  <v-col cols="12">
                     <v-text-field
                       v-model="endpoint.technicalProvider"
                       :label="$t('endpoints.technicalProvider')"
@@ -112,49 +112,6 @@
                       variant="underlined"
                       hide-details
                     />
-                  </v-col>
-
-                  <v-col cols="12" sm="4">
-                    <v-combobox
-                      v-model="endpoint.counterVersions"
-                      v-model:search="versionSearch"
-                      :label="$t('endpoints.counterVersion')"
-                      :items="SUPPORTED_COUNTER_VERSIONS"
-                      :rules="versionRules"
-                      :hide-no-data="!versionSearch"
-                      :return-object="false"
-                      prepend-icon="mdi-numeric"
-                      variant="underlined"
-                      hide-details="auto"
-                      multiple
-                      required
-                    >
-                      <template #selection="{ item: { raw: version } }">
-                        <v-chip
-                          :text="version"
-                          :color="counterVersionsColors.get(version) || 'secondary'"
-                          density="comfortable"
-                          variant="flat"
-                          label
-                        />
-                      </template>
-
-                      <template #no-data>
-                        <v-list-item>
-                          <template #title>
-                            <i18n-t keypath="noMatchFor">
-                              <template #search>
-                                <strong>{{ versionSearch }}</strong>
-                              </template>
-
-                              <template #key>
-                                <kbd>{{ $t('enterKey') }}</kbd>
-                              </template>
-                            </i18n-t>
-                          </template>
-                        </v-list-item>
-                      </template>
-                    </v-combobox>
                   </v-col>
 
                   <v-col cols="12">
@@ -227,6 +184,24 @@
             </v-card>
 
             <v-card
+              :title="$t('endpoints.counterVersion')"
+              prepend-icon="mdi-numeric"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template #text>
+                <v-row>
+                  <v-col>
+                    <SushiEndpointSupportedVersions
+                      v-model="endpoint.counterVersionsAvailability"
+                      v-model:versions="endpoint.counterVersions"
+                    />
+                  </v-col>
+                </v-row>
+              </template>
+            </v-card>
+
+            <v-card
               :title="$t('endpoints.harvestedReports')"
               prepend-icon="mdi-file"
               variant="outlined"
@@ -235,7 +210,10 @@
               <template #text>
                 <v-row>
                   <v-col>
-                    <SushiEndpointSupportedData v-model="endpoint.supportedData" />
+                    <SushiEndpointSupportedData
+                      v-model="endpoint.supportedData"
+                      :versions="endpoint.counterVersions"
+                    />
                   </v-col>
                 </v-row>
 
@@ -391,8 +369,6 @@
 </template>
 
 <script setup>
-const SUPPORTED_COUNTER_VERSIONS = ['5', '5.1'];
-
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -417,7 +393,6 @@ const saving = ref(false);
 const valid = ref(false);
 const isConnectionMenuOpen = ref(false);
 const loadingTags = ref(false);
-const versionSearch = ref('');
 const tagSearch = ref('');
 const registryEndpoint = ref();
 const endpoint = ref({ ...(props.modelValue ?? { counterVersions: ['5'] }) });
@@ -462,17 +437,6 @@ const sushiUrlRules = computed(() => [
       return t('enterValidUrl');
     }
   },
-]);
-const versionRules = computed(() => [
-  (values) => values.length > 0 || t('fieldIsRequired'),
-  (values) => values.every((v) => {
-    const pattern = /^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/;
-
-    if (!v || pattern.test(v)) {
-      return true;
-    }
-    return t('fieldMustMatch', { pattern: pattern.toString() });
-  }),
 ]);
 
 async function changeSushiUrl(sushiUrl) {

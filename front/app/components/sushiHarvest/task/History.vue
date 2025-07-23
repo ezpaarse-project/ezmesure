@@ -25,6 +25,17 @@
           {{ runningTime }}
         </template>
 
+        <template #[`item.counterVersion`]>
+          <v-chip
+            v-tooltip:top="$t('harvest.jobs.counterVersionTooltip', { version: task.counterVersion })"
+            :text="task.counterVersion"
+            :color="counterVersionsColors.get(task.counterVersion) || 'secondary'"
+            variant="flat"
+            size="small"
+            label
+          />
+        </template>
+
         <template #[`item.status`]>
           <SushiHarvestTaskChip :model-value="task" />
         </template>
@@ -78,6 +89,11 @@ const headers = computed(() => [
     title: t('duration'),
     value: 'runningTime',
     align: 'start',
+  },
+  {
+    title: t('endpoints.counterVersion'),
+    value: 'counterVersion',
+    align: 'center',
   },
   {
     title: t('type'),

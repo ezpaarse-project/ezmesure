@@ -1,13 +1,10 @@
 <template>
-  <v-list-item
-    :title="modelValue.id"
-    style="width: 98%;"
-  >
+  <v-list-item :title="modelValue.id" style="width: 98%;">
     <v-list-item-subtitle style="opacity: 1;">
       <v-menu
         v-model="isCredentialsMenuOpen"
         :close-on-content-click="false"
-        width="75vw"
+        width="1200px"
       >
         <template #activator="{ props: menu }">
           <v-chip
@@ -35,22 +32,35 @@
         </SushiHarvestSessionCredentials>
       </v-menu>
 
-      <v-chip
-        :text="`${props.modelValue.beginDate} ~ ${props.modelValue.endDate}`"
-        prepend-icon="mdi-calendar-range"
-        size="small"
-        variant="outlined"
-        class="mr-2 mt-1"
-      />
+      <v-menu
+        v-model="isReportsMenuOpen"
+        :close-on-content-click="false"
+        width="500px"
+      >
+        <template #activator="{ props: menu }">
+          <v-chip
+            :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
+            :color="props.modelValue.reportTypes.length > 0 ? 'accent' : 'error'"
+            prepend-icon="mdi-file"
+            size="small"
+            variant="flat"
+            class="mr-2 mt-1"
+            v-bind="menu"
+          />
+        </template>
 
-      <v-chip
-        v-tooltip:top="props.modelValue.reportTypes.join(', ').toUpperCase()"
-        :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
-        prepend-icon="mdi-file"
-        size="small"
-        variant="outlined"
-        class="mr-2 mt-1"
-      />
+        <SushiHarvestSessionReports :session="modelValue" :status="status">
+          <template #append>
+            <v-btn
+              icon="mdi-close"
+              color="secondary"
+              variant="text"
+              density="comfortable"
+              @click="isReportsMenuOpen = false"
+            />
+          </template>
+        </SushiHarvestSessionReports>
+      </v-menu>
 
       <v-chip
         v-if="modelValue.sendEndMail"
@@ -123,6 +133,7 @@ const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 
 const isCredentialsMenuOpen = ref(false);
+const isReportsMenuOpen = ref(false);
 
 // eslint-disable-next-line no-underscore-dangle
 const status = computed(() => props.modelValue._status);

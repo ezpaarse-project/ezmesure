@@ -1,0 +1,57 @@
+module.exports.DEFAULT_REPORT_TYPE = 'tr';
+
+module.exports.REPORT_IDS = [
+  'dr',
+  'dr_d1',
+  'dr_d2',
+  'ir',
+  'ir_a1',
+  'ir_m1',
+  'pr',
+  'pr_p1',
+  'tr',
+  'tr_b1',
+  'tr_b2',
+  'tr_b3',
+  'tr_j1',
+  'tr_j2',
+  'tr_j3',
+  'tr_j4',
+];
+
+module.exports.ERROR_CODES = {
+  networkError: 'network_error',
+  unreadableReport: 'unreadable_report',
+  invalidJson: 'invalid_json',
+  maxDeferralsExceeded: 'max_defferals_exceeded',
+  unreachableService: 'unreachable_service',
+  unauthorized: 'unauthorized',
+  invalidReport: 'invalid_report',
+};
+
+module.exports.SUSHI_CODES = {
+  infoOrDebug: 0,
+  serviceUnavailable: 1000,
+  serviceBusy: 1010,
+  queuedForProcessing: 1011,
+  tooManyRequests: 1020,
+  insufficientInformation: 1030,
+  unauthorizedRequestor: 2000,
+  unauthorizedRequestorAlt: 2010,
+  globalReportsNotSupported: 2011,
+  invalidAPIKey: 2020,
+  unauthorizedIPAddress: 2030,
+  unsupportedReport: 3000,
+  unsupportedReportVersion: 3010,
+  invalidDates: 3020,
+  unavailablePeriod: 3030,
+  usageNotReadyForRequestedDates: 3031,
+  usageNotAvailable: 3032,
+  partialData: 3040,
+  paramNotRecognizedInContext: 3050,
+  invalidReportFilterValue: 3060,
+  incongruousReportFilterValue: 3061,
+  unsupportedReportAttributeValues: 3062,
+  componentDetailsNotSupported: 3063,
+  requiredFilterMissing: 3070,
+};

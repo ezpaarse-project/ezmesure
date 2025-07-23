@@ -62,6 +62,8 @@
 <script setup>
 import { parseISO } from 'date-fns';
 
+import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
+
 const props = defineProps({
   modelValue: {
     type: Array,
@@ -69,7 +71,7 @@ const props = defineProps({
   },
   endpoint: {
     type: Object,
-    default: undefined,
+    default: () => undefined,
   },
   currentYear: {
     type: Number,
@@ -88,8 +90,12 @@ const supportedReports = computed(() => {
     return undefined;
   }
 
-  const entries = Object.entries(props.endpoint.supportedData)
-    .filter(([, data]) => !!data?.supported?.value);
+  const versions = props.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS;
+  const entries = versions.flatMap(
+    // We don't need first/last month available, so we can merge all versions
+    (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {})
+      .filter(([, reportData]) => !!reportData?.supported?.value),
+  );
 
   // Legacy way to handle supported reports
   if (props.endpoint?.supportedReports?.length > 0) {

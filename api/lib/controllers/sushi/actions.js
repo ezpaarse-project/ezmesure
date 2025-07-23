@@ -19,6 +19,7 @@ const ActionsService = require('../../entities/actions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
+const HarvestSessionService = require('../../entities/harvest-session.service');
 
 const { schema, includableFields } = require('../../entities/sushi-credentials.dto');
 
@@ -452,18 +453,59 @@ exports.downloadFile = async (ctx) => {
   });
 };
 
+const getCounterVersionForCheck = (endpoint, period) => {
+  // Sort from most recent to oldest (6 -> 5.2 -> 5.1 -> 5 -> ...)
+  const availableVersions = endpoint.counterVersions.sort((a, b) => (b > a ? 1 : -1));
+
+  // If no version are found, return to default
+  if (availableVersions <= 0) {
+    return undefined;
+  }
+
+  const haveAvailability = !!endpoint.counterVersionsAvailability
+    && typeof endpoint.counterVersionsAvailability === 'object'
+    && !Array.isArray(endpoint.counterVersionsAvailability);
+
+  // If availability cannot be used, assume latest version is correct
+  if (!haveAvailability) {
+    return availableVersions[0];
+  }
+
+  // Find suitable availability period
+  return availableVersions.find((version) => {
+    const firstMonthAvailable = endpoint.counterVersionsAvailability?.[version] ?? '';
+    return !firstMonthAvailable
+      || typeof firstMonthAvailable !== 'string'
+      || HarvestSessionService.isEndAfterLimit(period, firstMonthAvailable);
+  }) || availableVersions[0];
+};
+
 const checkConnection = async (sushi, params) => {
   const { endpoint } = sushi;
 
   const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
+  const period = {
+    beginDate: params.beginDate || params.endDate || threeMonthAgo,
+    endDate: params.endDate || params.beginDate || threeMonthAgo,
+  };
+
+  let { counterVersion } = params;
+  if (endpoint.counterVersions && !counterVersion) {
+    counterVersion = getCounterVersionForCheck(endpoint, period);
+  }
+
+  // Defaults to COUNTER 5
+  if (!counterVersion) {
+    counterVersion = '5';
+  }
 
   const sushiData = {
+    ...period,
     sushi,
     institution: sushi.institution,
     endpoint,
-    beginDate: params.beginDate || params.endDate || threeMonthAgo,
-    endDate: params.endDate || params.beginDate || threeMonthAgo,
-    reportType: endpoint.testedReport || 'pr',
+    reportType: endpoint.testedReport ?? 'pr',
+    counterVersion,
   };
 
   const reportPath = sushiService.getReportPath(sushiData);
@@ -484,7 +526,7 @@ const checkConnection = async (sushi, params) => {
       download.on('error', reject);
       download.on('finish', (res) => { resolve(res); });
     });
-  } catch (e) {
+  } catch {
     errorCode = ERROR_CODES.networkError;
   }
 
@@ -544,6 +586,7 @@ const checkConnection = async (sushi, params) => {
     status: status || 'failed',
     exceptions: exceptions || null,
     errorCode: errorCode || null,
+    counterVersion,
   };
 };
 
@@ -728,4 +771,38 @@ exports.importSushiItems = async (ctx) => {
 
   ctx.type = 'json';
   ctx.body = response;
+};
+
+exports.getSushiUrls = async (ctx) => {
+  const { endpoint, ...sushi } = ctx.state.sushi;
+
+  const threeMonthAgo = subMonths(new Date(), 3);
+
+  const options = {
+    reportType: endpoint.testedReport ?? 'pr',
+    beginDate: format(threeMonthAgo, 'yyyy-MM'),
+    endDate: format(threeMonthAgo, 'yyyy-MM'),
+  };
+
+  ctx.type = 'json';
+  ctx.body = Object.fromEntries(
+    endpoint.counterVersions.map((version) => {
+      const firstMonthAvailable = endpoint.counterVersionsAvailability?.[version] ?? '';
+
+      const downloadConfig = sushiService.getReportDownloadConfig(
+        endpoint,
+        sushi,
+        version,
+        options,
+      );
+
+      const url = new URL(downloadConfig.url);
+      url.search = new URLSearchParams(downloadConfig.params);
+
+      return [
+        version,
+        { url: url.href, firstMonthAvailable },
+      ];
+    }),
+  );
 };

@@ -20,17 +20,18 @@ const fs = require('fs-extra');
 const { stat: fsStats } = require('fs/promises');
 const EventEmitter = require('events');
 
-const Ajv = require('ajv').default;
-const addFormats = require('ajv-formats').default;
-const definitions = require('../utils/sushi-definitions-patched');
+const {
+  DEFAULT_REPORT_TYPE,
+  REPORT_IDS,
+  ERROR_CODES,
+  SUSHI_CODES,
+} = require('../utils/sushi-definitions/constants');
+const definitions = require('../utils/sushi-definitions');
 const { appLogger } = require('./logger');
 
 const cleanConfig = config.get('counter.clean');
 const storageDir = path.resolve(config.get('storage.path'), 'sushi');
 const tmpDir = path.resolve(os.tmpdir(), 'sushi');
-
-const ajv = new Ajv({ schemas: [definitions], strict: false });
-addFormats(ajv);
 
 /**
  * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
@@ -43,116 +44,7 @@ addFormats(ajv);
  * @property {string} Help_URL
  */
 
-const reportValidators = new Map([
-  ['pr', ajv.getSchema('#/definitions/COUNTER_platform_report')],
-  ['dr', ajv.getSchema('#/definitions/COUNTER_database_report')],
-  ['tr', ajv.getSchema('#/definitions/COUNTER_title_report')],
-  ['ir', ajv.getSchema('#/definitions/COUNTER_item_report')],
-]);
-
-const REPORT_IDS = [
-  'dr',
-  'dr_d1',
-  'dr_d2',
-  'ir',
-  'ir_a1',
-  'ir_m1',
-  'pr',
-  'pr_p1',
-  'tr',
-  'tr_b1',
-  'tr_b2',
-  'tr_b3',
-  'tr_j1',
-  'tr_j2',
-  'tr_j3',
-  'tr_j4',
-];
-
-const ERROR_CODES = {
-  networkError: 'network_error',
-  unreadableReport: 'unreadable_report',
-  invalidJson: 'invalid_json',
-  maxDeferralsExceeded: 'max_defferals_exceeded',
-  unreachableService: 'unreachable_service',
-  unauthorized: 'unauthorized',
-  invalidReport: 'invalid_report',
-};
-
-const SUSHI_CODES = {
-  infoOrDebug: 0,
-  serviceUnavailable: 1000,
-  serviceBusy: 1010,
-  queuedForProcessing: 1011,
-  tooManyRequests: 1020,
-  insufficientInformation: 1030,
-  unauthorizedRequestor: 2000,
-  unauthorizedRequestorAlt: 2010,
-  globalReportsNotSupported: 2011,
-  invalidAPIKey: 2020,
-  unauthorizedIPAddress: 2030,
-  unsupportedReport: 3000,
-  unsupportedReportVersion: 3010,
-  invalidDates: 3020,
-  unavailablePeriod: 3030,
-  usageNotReadyForRequestedDates: 3031,
-  usageNotAvailable: 3032,
-  partialData: 3040,
-  paramNotRecognizedInContext: 3050,
-  invalidReportFilterValue: 3060,
-  incongruousReportFilterValue: 3061,
-  unsupportedReportAttributeValues: 3062,
-  componentDetailsNotSupported: 3063,
-  requiredFilterMissing: 3070,
-};
-
-const defaultParameters = new Map([
-  [
-    'pr', {
-      attributes_to_show: [
-        'Data_Type',
-        'Access_Method',
-      ],
-    },
-  ],
-  [
-    'dr', {
-      attributes_to_show: [
-        'Data_Type',
-        'Access_Method',
-      ],
-    },
-  ],
-  [
-    'tr', {
-      attributes_to_show: [
-        'Data_Type',
-        'Section_Type',
-        'YOP',
-        'Access_Type',
-        'Access_Method',
-      ],
-    },
-  ],
-  [
-    'ir', {
-      include_parent_details: 'True',
-      include_component_details: 'True',
-      attributes_to_show: [
-        'Authors',
-        'Publication_Date',
-        'Article_Version',
-        'Data_Type',
-        'YOP',
-        'Access_Type',
-        'Access_Method',
-      ],
-    },
-  ],
-]);
-
 const downloads = new Map();
-const DEFAULT_REPORT_TYPE = 'tr';
 
 // https://app.swaggerhub.com/apis/COUNTER/counter-sushi_5_0_api/
 
@@ -245,12 +137,8 @@ async function getAvailableReports(sushi, version = '5') {
   return response;
 }
 
-function getReportDownloadConfig(endpoint, sushi, opts = {}) {
+function getReportDownloadConfig(endpoint, sushi, version, opts = {}) {
   const options = opts || {};
-
-  const {
-    sushiUrl,
-  } = endpoint;
 
   const paramSeparator = endpoint.paramSeparator || '|';
   const dateFormat = endpoint.harvestDateFormat || 'yyyy-MM';
@@ -262,11 +150,11 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
     stream,
   } = options;
 
-  if (!sushiUrl) {
+  if (!endpoint.sushiUrl) {
     throw new Error('endpoint is missing [sushiUrl]');
   }
 
-  const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
+  const { baseUrl } = getSushiURL(endpoint, version);
 
   const allowedScopes = [
     undefined,
@@ -275,11 +163,12 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
     `report_download_${reportType}`,
   ];
 
-  const params = getSushiParams(sushi, allowedScopes);
+  const params = getSushiParams({ endpoint, ...sushi }, allowedScopes);
   const paramNames = new Set(Object.keys(params).map((k) => k.toLowerCase()));
-  const defaultParams = defaultParameters.get(reportType) ?? {};
+  const { defaultParameters } = definitions.get(version) ?? {};
+  const paramsForReport = defaultParameters?.get(reportType) ?? {};
 
-  Object.entries(defaultParams).forEach(([key, value]) => {
+  Object.entries(paramsForReport).forEach(([key, value]) => {
     if (!paramNames.has(key)) {
       params[key] = Array.isArray(value) ? value.join(paramSeparator) : value;
     }
@@ -407,7 +296,7 @@ class DownloadEmitter extends EventEmitter {
 }
 
 function initiateDownload(options = {}) {
-  const { endpoint, sushi } = options;
+  const { endpoint, sushi, counterVersion } = options;
   const reportPath = getReportPath(options);
   const tmpPath = getReportTmpPath(options);
 
@@ -415,7 +304,13 @@ function initiateDownload(options = {}) {
     return downloads.get(reportPath);
   }
 
-  const requestConfig = getReportDownloadConfig(endpoint, sushi, { ...options, stream: true });
+  const requestConfig = getReportDownloadConfig(
+    endpoint,
+    sushi,
+    counterVersion,
+    { ...options, stream: true },
+  );
+
   const emitter = new DownloadEmitter(requestConfig);
   downloads.set(reportPath, emitter);
 
@@ -437,22 +332,53 @@ function initiateDownload(options = {}) {
 
 function validateReport(report) {
   const reportId = report?.Report_Header?.Report_ID;
+  const version = report?.Report_Header?.Release;
 
+  // Version must be present
+  if (typeof version !== 'string') {
+    return {
+      valid: false,
+    };
+  }
+
+  // Report ID must be present
   if (typeof reportId !== 'string') {
-    return { valid: false };
+    return {
+      valid: false,
+      version,
+    };
   }
 
-  const masterReportId = reportId.toLowerCase().split('_')[0];
-  const validate = reportValidators.get(masterReportId);
-
+  // Get the validator corresponding to report ID
+  const lowerReportId = reportId.toLowerCase();
+  const { reportValidators } = definitions.get(version) ?? {};
+  let validate = reportValidators?.get(lowerReportId);
+  // If no validator found, try to get the validator corresponding to the master report
   if (typeof validate !== 'function') {
-    return { valid: false, reportId, unsupported: true };
+    const masterReportId = lowerReportId.split('_')[0];
+    validate = reportValidators?.get(masterReportId);
   }
 
+  // If validator not found, report is unsupported
+  if (typeof validate !== 'function') {
+    return {
+      valid: false,
+      unsupported: true,
+      reportId,
+      version,
+    };
+  }
+
+  // Run the validator
   const valid = validate(report);
   const { errors } = validate;
 
-  return { valid, errors, reportId };
+  return {
+    valid,
+    errors,
+    reportId,
+    version,
+  };
 }
 
 /**
@@ -533,19 +459,23 @@ function normalizeException(obj) {
 function getExceptions(sushiResponse) {
   if (!sushiResponse) { return []; }
 
+  // Look if the response is a error object, then normalize it
   if (sushiResponse.Message || sushiResponse.message) {
     return [normalizeException(sushiResponse)];
   }
 
+  // Look if the response is an array of error objects, then normalize them
   if (
     Array.isArray(sushiResponse) && sushiResponse.some((item) => (item?.Message || item?.message))
   ) {
     return sushiResponse.map((item) => normalizeException(item));
   }
 
+  // Look if the response is a "proper" report, then extract the exceptions
   const header = sushiResponse.Report_Header || {};
   const exceptions = Array.isArray(header.Exceptions) ? header.Exceptions : [];
 
+  // Handle edge cases
   if (header.Exception) {
     exceptions.push(header.Exception);
   }
@@ -556,6 +486,7 @@ function getExceptions(sushiResponse) {
     exceptions.push(...sushiResponse.Exceptions);
   }
 
+  // Normalize the exceptions
   return exceptions.map((e) => normalizeException(e));
 }
 

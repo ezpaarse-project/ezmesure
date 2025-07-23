@@ -119,19 +119,10 @@
 <script setup>
 import { parse } from 'date-fns';
 
+import { DEFAULT_REPORTS_IDS, SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
+
 // eslint-disable-next-line vue/max-len
 /** * @typedef {{ supported: boolean, manual: boolean, harvests: Map<string, object[]> }} ReportDef */
-
-const DEFAULT_REPORTS_IDS = [
-  'DR',
-  'DR_D1',
-  'IR',
-  'PR',
-  'PR_P1',
-  'TR',
-  'TR_B1',
-  'TR_J1',
-];
 
 const props = defineProps({
   modelValue: {
@@ -185,6 +176,10 @@ const {
   },
 });
 
+const endpointVersions = computed(
+  () => props.sushi?.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS,
+);
+
 const supportedReports = computed(() => {
   const legacySupported = (props.sushi?.endpoint?.supportedReports ?? []).map((r) => [
     r.toUpperCase(),
@@ -202,19 +197,24 @@ const supportedReports = computed(() => {
     },
   ]);
 
-  const supported = Object.entries(props.sushi?.endpoint?.supportedData ?? {}).map(([r, data]) => {
-    if (!data?.supported?.value) {
-      return [];
-    }
+  // We don't need first/last month available, so we can merge all versions
+  const supported = endpointVersions.value.flatMap(
+    (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {}).map(
+      ([r, reportData]) => {
+        if (!reportData?.supported?.value) {
+          return [];
+        }
 
-    return [
-      r.toUpperCase(),
-      {
-        supported: data?.supported?.value,
-        manual: data?.supported?.manual,
+        return [
+          r.toUpperCase(),
+          {
+            supported: reportData?.supported?.value,
+            manual: reportData?.supported?.manual,
+          },
+        ];
       },
-    ];
-  });
+    ),
+  );
 
   return new Map([...legacySupported, ...legacyAdditional, ...supported]);
 });
@@ -228,19 +228,22 @@ const unsupportedReports = computed(() => {
     },
   ]);
 
-  const unsupported = Object.entries(props.sushi?.endpoint?.supportedData ?? {}).map(
-    ([r, data]) => {
-      if (data?.supported?.value === true) {
-        return [];
-      }
-      return [
-        r.toUpperCase(),
-        {
-          supported: data?.supported?.value,
-          manual: data?.supported?.manual,
-        },
-      ];
-    },
+  // We don't need first/last month available, so we can merge all versions
+  const unsupported = endpointVersions.value.flatMap(
+    (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {}).map(
+      ([r, reportData]) => {
+        if (reportData?.supported?.value === true) {
+          return [];
+        }
+        return [
+          r.toUpperCase(),
+          {
+            supported: reportData?.supported?.value,
+            manual: reportData?.supported?.manual,
+          },
+        ];
+      },
+    ),
   );
 
   return new Map([...legacy, ...unsupported]);

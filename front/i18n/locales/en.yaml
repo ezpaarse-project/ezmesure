@@ -212,7 +212,7 @@ endpoints:
   endpoint: Endpoint
   toolbarTitle: COUNTER endpoints ({count})
   pageDescription: Here you can manage the list of the available COUNTER endpoints.
-  pageDescription2: Only version 5 of the COUNTER protocol is supported.
+  pageDescription2: Only versions 5 and 5.1 of the COUNTER protocol are supported.
   manageEndpoints: >
     Manage endpoint
     |Manage {count} endpoints
@@ -250,10 +250,15 @@ endpoints:
   firstMonthAvailable: First available month
   lastMonthAvailable: Last available month
   addAdditionalReport: Add an additional report
+  addAdditionalReportDesc: You can add a report that is not in the list of reports provided by the platform (or the default list in ezMESURE). This allows you to fill gaps on the editor side, or to harvest non-standard reports.
   undefinedAvailable: Undefined
   undoReport: Undo changes
   manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation
+  supportedVersionsDesc: The COUNTER Code of Practice is extended and upgraded as necessary based on input from the community it serves. Each new version is made available as a numbered release on the COUNTER website. The table below tells ezMESURE which versions are supported by the endpoint, and when the first month of each version is available. This date will be used to define which version to use when harvesting.
+  addCustomVersion: Add a version
+  customVersion: COUNTER version
+  customVersionDesc: You can add a version that is not yet supported by ezMESURE. It will not be used for harvesting, but allows you to define certain parameters for future integration.
   description: Description
   paramSeparatorDesc: ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.
   paramSeparator: Separator
@@ -439,7 +444,7 @@ institutions:
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
-    pageDescription2: Only version 5 of the COUNTER protocol is supported.
+    pageDescription2: Only versions 5 and 5.1 of the COUNTER protocol are supported.
     addCredentials: Add credentials
     updateCredentials: Update credentials
     unabletToRetriveSushiInformations: Unable to retrieve information from sushi platforms
@@ -978,6 +983,8 @@ harvest:
     unableToRetriveMeta: Unable to retrieve information about harvesting tasks
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
+    counterVersionTooltip: Harvest a COUNTER {version} report
+    noData: No data in the harvested report
 elasticRoles:
   toolbarTitle: Elastic Roles ({count})
   newRole: New role
@@ -1152,3 +1159,4 @@ archivedSince: Archived since {date}
 deleted: Deleted
 deletedSince: Deleted since {date}
 cantCancel: This operation cannot be undone.
+version: Version

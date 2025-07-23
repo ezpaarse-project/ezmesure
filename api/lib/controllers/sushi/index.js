@@ -38,6 +38,7 @@ const {
   checkSushiConnection,
   validateReport,
   deleteSushiConnection,
+  getSushiUrls,
 } = require('./actions');
 
 const { FEATURES } = require('../../entities/memberships.dto');
@@ -158,6 +159,7 @@ router.route({
     query: {
       beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
       endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      counterVersion: Joi.string().trim().optional(),
     },
     body: Joi.object({
       id: Joi.string().trim().min(1).empty(null),
@@ -248,6 +250,7 @@ router.route({
     query: {
       beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
       endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      counterVersion: Joi.string().trim().optional(),
     },
   },
 });
@@ -388,6 +391,20 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
       filePath: Joi.string().trim().regex(/^[a-z0-9/_.-]+$/).required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId/_sushiUrls',
+  handler: [
+    fetchSushi({ include: { endpoint: true } }),
+    getSushiUrls,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
     },
   },
 });

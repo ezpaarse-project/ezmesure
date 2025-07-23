@@ -53,6 +53,21 @@
         />
       </template>
 
+      <template #[`item.counterVersion`]="{ value }">
+        <v-chip
+          v-tooltip:top="$t('harvest.jobs.counterVersionTooltip', { version: value })"
+          :text="value"
+          :color="counterVersionsColors.get(value) || 'secondary'"
+          variant="flat"
+          size="small"
+          label
+        />
+      </template>
+
+      <template #[`item.period`]="{ item }">
+        {{ item.beginDate }} ~ {{ item.endDate }}
+      </template>
+
       <template #[`item.status`]="{ item }">
         <v-menu location="end center" width="400" open-on-hover>
           <template #activator="{ props: menu }">
@@ -185,12 +200,12 @@ const headers = computed(() => [
   {
     title: t('endpoints.vendor'),
     value: 'credentials.endpoint.vendor',
-    sortable: 'true',
+    sortable: true,
   },
   {
     title: t('institutions.title'),
     value: 'credentials.institution.name',
-    sortable: 'true',
+    sortable: true,
   },
   {
     title: t('institutions.sushi.packages'),
@@ -200,25 +215,26 @@ const headers = computed(() => [
     title: t('harvest.jobs.reportType'),
     value: 'reportType',
     align: 'center',
-    sortable: 'true',
+    sortable: true,
     cellProps: {
       class: ['text-uppercase'],
     },
   },
   {
-    title: t('status'),
-    value: 'status',
+    title: t('endpoints.counterVersion'),
+    value: 'counterVersion',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('harvest.jobs.period'),
+    value: 'period',
     align: 'center',
   },
   {
-    title: t('harvest.jobs.startedAt'),
-    value: 'startedAt',
-    sortable: 'true',
-  },
-  {
-    title: t('harvest.jobs.updatedAt'),
-    value: 'updatedAt',
-    sortable: 'true',
+    title: t('status'),
+    value: 'status',
+    align: 'center',
   },
   {
     title: t('actions'),

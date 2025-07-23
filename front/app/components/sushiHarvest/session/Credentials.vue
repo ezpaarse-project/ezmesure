@@ -43,12 +43,19 @@
               v-for="item in endpoints"
               :key="item.id"
               :title="item.vendor"
-              :subtitle="item.acronym"
               :to="`/admin/endpoints/${item.id}`"
               append-icon="mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
-            />
+            >
+              <template #subtitle>
+                <SushiEndpointVersionsChip
+                  :model-value="item"
+                  size="small"
+                  density="compact"
+                />
+              </template>
+            </v-list-item>
           </v-list>
         </v-col>
       </v-row>

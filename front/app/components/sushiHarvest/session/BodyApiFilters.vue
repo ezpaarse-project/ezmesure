@@ -52,6 +52,18 @@
 
         <v-col cols="6">
           <ApiFiltersSelect
+            v-model="filters.counterVersion"
+            :items="SUPPORTED_COUNTER_VERSIONS"
+            :label="$t('endpoints.counterVersion')"
+            prepend-icon="mdi-numeric"
+            chips
+            closable-chips
+            multiple
+          />
+        </v-col>
+
+        <v-col cols="6">
+          <ApiFiltersSelect
             v-model="filters.reportType"
             :items="reportOptions"
             :label="$t('harvest.jobs.reportType')"
@@ -74,7 +86,7 @@
           />
         </v-col>
 
-        <v-col cols="12">
+        <v-col cols="6">
           <ApiFiltersSelect
             v-model="filters.errorCode"
             :empty-symbol="emptySymbol"
@@ -92,6 +104,8 @@
 </template>
 
 <script setup>
+import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
+
 const props = defineProps({
   modelValue: {
     type: Object,

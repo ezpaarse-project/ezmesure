@@ -129,6 +129,7 @@ errors:
   index:
     notFound: Index [%s] not found
     alreadyExists: Index [%s] already exists
+    noTemplateFound: No template found for version [%s] of a [%s] index
 
   indexPattern:
     notFound: Index pattern [%s] not found in space [%s]

@@ -68,8 +68,10 @@
               <tr>
                 <th>{{ $t('name') }}</th>
                 <th>{{ $t('identifier') }}</th>
-                <th v-if="currentVersion !== '5'">
-                  {{ $t('reports.availablePeriod') }}
+                <th>
+                  <div v-if="currentVersion !== '5'">
+                    {{ $t('reports.availablePeriod') }}
+                  </div>
                 </th>
               </tr>
             </thead>
@@ -133,7 +135,7 @@ const props = defineProps({
 });
 
 const showOnlyMaster = ref(true);
-const currentVersion = ref('5');
+const currentVersion = ref('5.1');
 
 const { t } = useI18n();
 
@@ -146,7 +148,11 @@ const {
   lazy: true,
 });
 
-const versions = computed(() => Object.keys(reportsPerVersion.value ?? {}));
+const versions = computed(
+  () => Object.keys(reportsPerVersion.value ?? {})
+    // Sort from most recent to oldest (6 -> 5.2 -> 5.1 -> 5 -> ...)
+    .sort((a, b) => (b > a ? 1 : -1)),
+);
 const reports = computed(() => reportsPerVersion.value?.[currentVersion.value]?.data ?? []);
 
 const exceptions = computed(() => {
@@ -191,4 +197,6 @@ const filteredReports = computed(() => {
     return !report?.Report_ID.includes('_');
   });
 });
+
+watchOnce(versions, (values) => { ([currentVersion.value] = values); });
 </script>
