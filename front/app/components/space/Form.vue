@@ -75,6 +75,68 @@
                   required
                 />
               </v-col>
+
+              <v-col cols="12">
+                <v-input
+                  :error-messages="logoErrorMessage"
+                  prepend-icon="mdi-image"
+                >
+                  <v-card
+                    variant="outlined"
+                    class="w-100"
+                    @dragover.prevent="isDraggingLogo = true"
+                    @dragleave.prevent="isDraggingLogo = false"
+                    @drop.prevent="onLogoDrop($event)"
+                  >
+                    <template #title>
+                      <div class="text-subtitle-1">
+                        {{ $t('spaces.logo') }}
+                      </div>
+                    </template>
+
+                    <div class="d-flex justify-center">
+                      <v-avatar
+                        rounded
+                        size="64"
+                      >
+                        <v-img v-if="logoSrc" :src="logoSrc" />
+                        <v-icon v-else size="64" icon="mdi-image-off-outline" />
+                      </v-avatar>
+                    </div>
+
+                    <template #actions>
+                      <v-spacer />
+                      <v-btn
+                        v-if="logoPreview || space.imageUrl"
+                        size="small"
+                        variant="tonal"
+                        color="red"
+                        prepend-icon="mdi-delete"
+                        :text="$t('delete')"
+                        @click="removeLogo()"
+                      />
+                      <v-btn
+                        size="small"
+                        variant="tonal"
+                        color="primary"
+                        prepend-icon="mdi-pencil"
+                        :text="$t('modify')"
+                        @click="openFileDialog()"
+                      />
+                      <v-spacer />
+                    </template>
+
+                    <v-overlay
+                      :model-value="isDraggingLogo"
+                      class="align-center justify-center"
+                      style="top: 0"
+                      contained
+                    >
+                      {{ $t('images.dropImageHere') }}
+                    </v-overlay>
+                  </v-card>
+                </v-input>
+              </v-col>
             </v-row>
           </v-form>
         </v-col>
@@ -105,6 +167,8 @@
 </template>
 
 <script setup>
+import { fileToBase64 } from '@/lib/base64';
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -127,9 +191,23 @@ const emit = defineEmits({
 const { t, te } = useI18n();
 const snacks = useSnacksStore();
 
+const LOGO_ACCEPT = 'JPEG, PNG, SVG';
+const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2mb
+
+const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
+  accept: 'image/png, image/jpeg, image/svg+xml',
+  reset: true,
+  multiple: false,
+});
+
 const loading = ref(false);
 const valid = ref(false);
 const space = ref({ ...(props.modelValue ?? {}) });
+
+const logoPreview = ref('');
+const logoErrorMessage = ref('');
+const isDraggingLogo = ref(false);
+const logoSrc = computed(() => logoPreview.value || space.value.imageUrl);
 
 const types = computed(() => {
   const keys = Array.from(repoColors.keys());
@@ -186,6 +264,7 @@ async function save() {
         name: space.value.name,
         description: space.value.description,
         institutionId: props.institution.id,
+        imageUrl: space.value.imageUrl,
       },
     });
 
@@ -205,6 +284,59 @@ async function save() {
 
   loading.value = false;
 }
+
+/**
+ * Update the institution's logo
+ *
+ * @param {File} file Logo's file
+ */
+async function updateLogo(file) {
+  if (!/\.(jpe?g|png|svg)$/.exec(file.name)) {
+    logoErrorMessage.value = t('images.invalidImageFile', { accept: LOGO_ACCEPT });
+    return;
+  }
+
+  if (file.size > LOGO_MAX_SIZE) {
+    logoErrorMessage.value = t('images.imageTooLarge', { size: prettySize(LOGO_MAX_SIZE) });
+    return;
+  }
+
+  logoErrorMessage.value = null;
+  space.value.imageUrl = await fileToBase64(file);
+  logoPreview.value = URL.createObjectURL(file);
+}
+
+/**
+ * Update the space logo on drop
+ *
+ * @param {DragEvent} event
+ */
+function onLogoDrop(event) {
+  const [file] = event?.dataTransfer?.files ?? [];
+  if (file) {
+    updateLogo(file);
+  }
+  isDraggingLogo.value = false;
+}
+
+/**
+ * Remove the space logo
+ */
+function removeLogo() {
+  logoErrorMessage.value = null;
+  logoPreview.value = null;
+  space.value.imageUrl = null;
+}
+
+/**
+ * Update the space logo on file dialog change
+ */
+onFilesChange((files) => {
+  const [file] = files ?? [];
+  if (file) {
+    updateLogo(file);
+  }
+});
 
 onMounted(() => {
   formRef.value?.validate();

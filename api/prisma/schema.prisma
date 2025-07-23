@@ -192,6 +192,8 @@ model Space {
   color                  String?
   /// Space type (ezpaarse, counter5)
   type                   String                       @db.VarChar(50)
+  /// Space logo as a base64 data URL
+  imageUrl               String?
   /// A list of index patterns that should be available in the space
   indexPatterns          Json[]
   /// Member permissions associated to this space

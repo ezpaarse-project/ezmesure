@@ -1,7 +1,6 @@
 <template>
   <v-card
     :title="modelValue.name"
-    :text="modelValue.description"
     variant="outlined"
     :style="{ borderColor: repoColors.get(modelValue.type), borderWidth: '2px' }"
   >
@@ -19,6 +18,20 @@
         size="small"
         density="comfortable"
       />
+    </template>
+
+    <template #text>
+      <slot name="text">
+        <div class="d-flex ga-4">
+          <v-avatar v-if="modelValue.imageUrl" size="32">
+            <v-img :src="modelValue.imageUrl" />
+          </v-avatar>
+
+          <div class="flex-grow-1">
+            {{ modelValue.description }}
+          </div>
+        </div>
+      </slot>
     </template>
 
     <template v-if="$slots.append" #append>

@@ -612,6 +612,11 @@
             "example": "#458df9",
             "type": "string"
           },
+          "imageUrl": {
+            "description": "Space logo as a base64 data URL",
+            "type": "string",
+            "format": "byte"
+          },
           "permissions": {
             "description": "List of permissions associated to this space",
             "type": "array",

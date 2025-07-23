@@ -34,6 +34,10 @@ const { syncSchedule, dateFormat } = config.get('kibana');
  * @returns {Promise<string | undefined>}
  */
 const getSpaceLogo = async (space) => {
+  if (space.imageUrl) {
+    return space.imageUrl;
+  }
+
   let data;
   switch (space.type) {
     case 'counter5':
