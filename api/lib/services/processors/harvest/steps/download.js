@@ -41,10 +41,10 @@ module.exports = async function process(params) {
 
   const {
     session: {
-      beginDate,
-      endDate,
       forceDownload,
     },
+    beginDate,
+    endDate,
     credentials,
     reportType = sushiService.DEFAULT_REPORT_TYPE,
     counterVersion,
