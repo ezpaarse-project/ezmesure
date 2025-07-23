@@ -1,0 +1,17 @@
+{
+  "vhosts": [
+    {
+      "name": "/ezreeport",
+      "description": "VHost for ezreeport inter-service communication"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "ezreeport",
+      "vhost": "/ezreeport",
+      "read": ".*",
+      "write": ".*",
+      "configure": ".*"
+    }
+  ]
+}
