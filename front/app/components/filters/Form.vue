@@ -87,20 +87,41 @@
 
                 <v-row>
                   <v-col>
-                    <v-combobox
+                    <MultiTextField
                       v-model="values"
                       :label="$t('repositoryAliases.filtersForm.value')"
-                      :return-object="false"
                       prepend-icon="mdi-cursor-text"
                       variant="underlined"
-                      chips
-                      closable-chips
-                      multiple
-                      required
                     />
                   </v-col>
                 </v-row>
               </template>
+
+              <v-row>
+                <v-col cols="8">
+                  <p class="text-medium-emphasis">
+                    {{ $t('$ezreeport.editor.filters.hints.type') }}
+
+                    <ul class="pl-3">
+                      <li>{{ $t('$ezreeport.editor.filters.hints.type:exists') }}</li>
+                      <li>{{ $t('$ezreeport.editor.filters.hints.type:is') }}</li>
+                      <li>{{ $t('$ezreeport.editor.filters.hints.type:in') }}</li>
+                    </ul>
+                  </p>
+                </v-col>
+
+                <v-col cols="4">
+                  <v-checkbox v-model="isNot" :label="$t('$ezreeport.editor.filters.isNot')" />
+
+                  <v-text-field
+                    :model-value="filterType"
+                    :label="$t('$ezreeport.editor.filters.type')"
+                    variant="plain"
+                    prepend-icon="mdi-format-list-bulleted"
+                    disabled
+                  />
+                </v-col>
+              </v-row>
 
               <v-row>
                 <v-col cols="8">
@@ -191,6 +212,20 @@ const rawFilterJSON = shallowRef('');
 
 const filterMap = ref(new Map(props.modelValue?.map((f) => [f.name, f])));
 
+/** Type of the filter */
+const filterType = computed(() => {
+  if (isRawMode.value) {
+    return '';
+  }
+  if (values.value == null || values.value?.length === 0) {
+    return t('$ezreeport.editor.filters.types.exists');
+  }
+  if (Array.isArray(values.value)) {
+    return t('$ezreeport.editor.filters.types.in');
+  }
+  return t('$ezreeport.editor.filters.types.is');
+});
+
 function updateFilters() {
   const vals = Array.from(filterMap.value.values());
   emit('update:modelValue', vals.length > 0 ? vals : undefined);
@@ -254,21 +289,26 @@ function generateFilterName() {
     return '';
   }
 
-  // Generate value text
-  const valueText = t('repositoryAliases.filtersForm.nameTemplate.values', values.value);
+  // Ensure values are an array
+  let vals = values.value ?? '';
+  if (!Array.isArray(vals)) {
+    vals = [vals];
+  }
 
+  // Generate value text
+  const valueText = t('$ezreeport.editor.filters.nameTemplate.values', vals, vals.length - 1);
   const data = { field: field.value, valueText };
 
   // Generate name
-  if (values.value.length <= 0) {
+  if (values.value == null) {
     if (isNot.value) {
-      return t('repositoryAliases.filtersForm.nameTemplate.exists:not', data);
+      return t('$ezreeport.editor.filters.nameTemplate.exists:not', data);
     }
-    return t('repositoryAliases.filtersForm.nameTemplate.exists', data);
+    return t('$ezreeport.editor.filters.nameTemplate.exists', data);
   } if (isNot.value) {
-    return t('repositoryAliases.filtersForm.nameTemplate.is:not', data);
+    return t('$ezreeport.editor.filters.nameTemplate.is:not', data);
   }
-  return t('repositoryAliases.filtersForm.nameTemplate.is', data);
+  return t('$ezreeport.editor.filters.nameTemplate.is', data);
 }
 
 /**

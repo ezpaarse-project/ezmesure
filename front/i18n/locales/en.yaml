@@ -875,12 +875,6 @@ repositoryAliases:
     field: Field
     isNot: Invert filter
     value: Value(s)
-    nameTemplate:
-      exists: "{field} exists"
-      exists:not: "{field} does not exist"
-      values: "{0}|{0} {1}, etc."
-      is: "{field} is {valueText}"
-      is:not: "{field} is not {valueText}"
 
 orphanAliases:
   toolbarTitle: Orphan aliases ({count})

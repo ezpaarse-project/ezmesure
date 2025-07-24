@@ -891,12 +891,6 @@ repositoryAliases:
     field: Champ
     isNot: Inverser le filtre
     value: Valeur(s)
-    nameTemplate:
-      exists: "{field} existe"
-      exists:not: "{field} n'existe pas"
-      values: "{0}|{0} {1}, etc."
-      is: "{field} est {valueText}"
-      is:not: "{field} n'est pas {valueText}"
 
 orphanAliases:
   toolbarTitle: Alias orphelins ({count})
