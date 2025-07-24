@@ -124,7 +124,7 @@
               </v-row>
 
               <v-row>
-                <v-col cols="8">
+                <v-col>
                   <v-text-field
                     v-model="name"
                     :label="$t('name')"
@@ -134,10 +134,6 @@
                     required
                     @update:model-value="hasNameChanged = true"
                   />
-                </v-col>
-
-                <v-col cols="4">
-                  <v-checkbox v-model="isNot" :label="$t('repositoryAliases.filtersForm.isNot')" />
                 </v-col>
               </v-row>
             </v-form>
@@ -238,9 +234,9 @@ function openForm(filter) {
   name.value = filter?.name || '';
   isNot.value = filter?.isNot || false;
 
-  const rawJSON = '';
+  let rawJSON = '';
   if (filter && 'raw' in filter) {
-    rawFilterJSON.value = JSON.stringify(filter.raw, 2);
+    rawJSON = JSON.stringify(filter.raw, undefined, 2);
   } else {
     const value = (Array.isArray(filter?.value) ? filter.value : [filter?.value])
       .filter((v) => !!v);
