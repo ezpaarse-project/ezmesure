@@ -19,10 +19,10 @@
     </template>
 
     <template #text>
-      <template v-if="filters.length > 0">
+      <template v-if="filterMap.size > 0">
         <v-chip
-          v-for="filter in filters"
-          :key="filter.name"
+          v-for="[key, filter] in filterMap"
+          :key="key"
           :text="filter.name"
           :color="filter.isNot ? 'red' : 'blue'"
           density="compact"
@@ -38,7 +38,7 @@
 
       <v-menu v-model="isFormOpen" :close-on-content-click="false" target="parent">
         <v-card
-          :title="isEditing ? $t('repositoryAliases.filtersForm.editFilter') : $t('repositoryAliases.filtersForm.newFilter')"
+          :title="editingFilter ? $t('repositoryAliases.filtersForm.editFilter') : $t('repositoryAliases.filtersForm.newFilter')"
           prepend-icon="mdi-filter-plus"
           variant="outlined"
         >
@@ -133,6 +133,7 @@
 
             <v-btn
               :text="$t('create')"
+              :disabled="!isValid"
               prepend-icon="mdi-content-save"
               variant="elevated"
               color="primary"
@@ -178,7 +179,8 @@ const { t } = useI18n();
 const isFormOpen = shallowRef(false);
 const isValid = shallowRef(false);
 const isRawMode = shallowRef(false);
-const isEditing = shallowRef(false);
+/** @type {Ref<object|null>} */
+const editingFilter = ref(null);
 const hasNameChanged = shallowRef(false);
 const field = shallowRef('');
 /** @type {Ref<string[]>} */
@@ -187,13 +189,15 @@ const name = shallowRef('');
 const isNot = shallowRef(false);
 const rawFilterJSON = shallowRef('');
 
-const filters = computed({
-  get: () => props.modelValue ?? [],
-  set: (v) => { emit('update:modelValue', v.length > 0 ? v : undefined); },
-});
+const filterMap = ref(new Map(props.modelValue?.map((f) => [f.name, f])));
+
+function updateFilters() {
+  const vals = Array.from(filterMap.value.values());
+  emit('update:modelValue', vals.length > 0 ? vals : undefined);
+}
 
 function openForm(filter) {
-  isEditing.value = !!filter;
+  editingFilter.value = filter && { ...filter };
 
   field.value = filter?.field || '';
   name.value = filter?.name || '';
@@ -227,16 +231,16 @@ function submitFilter() {
     filter.raw = JSON.parse(rawFilterJSON.value);
   }
 
-  const currFilters = [...filters.value];
-  const index = currFilters.findIndex((f) => f.name === filter.name);
-  currFilters.splice(index < 0 ? currFilters.length : index, 1, filter);
-  filters.value = currFilters;
+  filterMap.value.set(editingFilter.value?.name ?? filter.name, filter);
+  updateFilters();
 
   isFormOpen.value = false;
+  editingFilter.value = null;
 }
 
 function removeFilter(filter) {
-  filters.value = filters.value.filter((f) => f.name !== filter.name);
+  filterMap.value.delete(filter.name);
+  updateFilters();
 }
 
 function generateFilterName() {
@@ -271,7 +275,7 @@ function generateFilterName() {
  * Generate name when filter changes
  */
 watch(computed(() => [field.value, values.value, isNot.value]), () => {
-  if (isEditing.value || hasNameChanged.value) {
+  if (editingFilter.value || hasNameChanged.value) {
     return;
   }
 
