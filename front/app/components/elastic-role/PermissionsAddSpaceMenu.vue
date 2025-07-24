@@ -50,7 +50,7 @@ const emit = defineEmits({
   'update:modelValue': (space) => !!space,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object|undefined>} */
 const space = ref();
 

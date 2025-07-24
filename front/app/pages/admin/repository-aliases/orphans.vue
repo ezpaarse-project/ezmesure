@@ -81,7 +81,7 @@ const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
 
-const search = ref('');
+const search = shallowRef('');
 
 const {
   data: orphanAliases,

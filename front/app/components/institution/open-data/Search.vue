@@ -41,9 +41,9 @@ const emit = defineEmits({
   'update:modelValue': (value) => typeof value === 'object',
 });
 
-const search = ref('');
-const loading = ref(false);
-const hasError = ref(false);
+const search = shallowRef('');
+const loading = shallowRef(false);
+const hasError = shallowRef(false);
 const items = ref([]);
 
 const selected = computed({

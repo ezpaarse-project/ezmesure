@@ -82,13 +82,13 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 
-const isOpen = ref(false);
-const dryRun = ref(false);
+const isOpen = shallowRef(false);
+const dryRun = shallowRef(false);
 const templateId = ref(null);
 
 const result = ref(null);
-const loading = ref(false);
-const errorMessage = ref('');
+const loading = shallowRef(false);
+const errorMessage = shallowRef('');
 
 const createdAliases = computed(() => result.value?.items ?? []);
 

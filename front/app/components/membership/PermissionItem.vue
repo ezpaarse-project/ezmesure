@@ -34,7 +34,7 @@ const emit = defineEmits({
   'update:modelValue': (v) => v,
 });
 
-const success = ref(false);
+const success = shallowRef(false);
 
 const value = computed({
   get: () => props.modelValue.get(props.feature.scope) || 'none',

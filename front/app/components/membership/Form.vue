@@ -258,7 +258,7 @@ const { data: user } = useAuthState();
 const { hasPermission } = useCurrentUserStore();
 const snacks = useSnacksStore();
 
-const loading = ref(false);
+const loading = shallowRef(false);
 const comment = ref(props.modelValue?.comment ?? '');
 const locked = ref(props.modelValue?.locked ?? false);
 /** @type {Ref<Set<string>>} */

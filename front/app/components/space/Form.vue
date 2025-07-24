@@ -201,13 +201,13 @@ const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
   multiple: false,
 });
 
-const loading = ref(false);
-const valid = ref(false);
+const loading = shallowRef(false);
+const valid = shallowRef(false);
 const space = ref({ ...(props.modelValue ?? {}) });
 
-const logoPreview = ref('');
-const logoErrorMessage = ref('');
-const isDraggingLogo = ref(false);
+const logoPreview = shallowRef('');
+const logoErrorMessage = shallowRef('');
+const isDraggingLogo = shallowRef(false);
 const logoSrc = computed(() => logoPreview.value || space.value.imageUrl);
 
 const types = computed(() => {

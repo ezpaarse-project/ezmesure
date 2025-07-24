@@ -175,17 +175,17 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 
-const isFormOpen = ref(false);
-const isValid = ref(false);
-const isRawMode = ref(false);
-const isEditing = ref(false);
-const hasNameChanged = ref(false);
-const field = ref('');
+const isFormOpen = shallowRef(false);
+const isValid = shallowRef(false);
+const isRawMode = shallowRef(false);
+const isEditing = shallowRef(false);
+const hasNameChanged = shallowRef(false);
+const field = shallowRef('');
 /** @type {Ref<string[]>} */
 const values = ref([]);
-const name = ref('');
-const isNot = ref(false);
-const rawFilterJSON = ref('');
+const name = shallowRef('');
+const isNot = shallowRef(false);
+const rawFilterJSON = shallowRef('');
 
 const filters = computed({
   get: () => props.modelValue ?? [],

@@ -46,7 +46,7 @@ const emit = defineEmits({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const endpointLoading = ref(false);
+const endpointLoading = shallowRef(false);
 
 const {
   data: items,

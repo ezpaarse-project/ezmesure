@@ -66,8 +66,8 @@ defineEmits({
   'update:modelValue': (v) => !!v,
 });
 
-const ready = ref(false);
-const isPanelOpen = ref(false);
+const ready = shallowRef(false);
+const isPanelOpen = shallowRef(false);
 
 const filtersCount = computed(
   () => {

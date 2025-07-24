@@ -137,8 +137,8 @@ const emit = defineEmits(['update:modelValue', 'update:versions']);
 
 const { t } = useI18n();
 
-const customVersion = ref('');
-const isAdditionalVersionOpen = ref(false);
+const customVersion = shallowRef('');
+const isAdditionalVersionOpen = shallowRef(false);
 const additionalVersionForm = useTemplateRef('additionalVersionForm');
 
 const rows = computed(() => {

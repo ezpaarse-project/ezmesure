@@ -28,7 +28,7 @@ defineProps({
   },
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object | undefined>} */
 const task = ref(undefined);
 

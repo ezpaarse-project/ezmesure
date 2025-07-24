@@ -13,7 +13,7 @@ import locales from '@/lib/locales';
 
 const { t, locale } = useI18n();
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 
 const currentLang = computed(() => locales.find((lang) => lang.code === locale.value)?.name || t('language'));
 </script>

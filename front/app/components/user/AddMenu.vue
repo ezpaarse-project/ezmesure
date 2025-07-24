@@ -87,8 +87,8 @@ const emit = defineEmits({
   'update:model-value': (m) => !!m,
 });
 
-const isOpen = ref(false);
-const search = ref('');
+const isOpen = shallowRef(false);
+const search = shallowRef('');
 const debouncedSearch = refDebounced(search, 250);
 const loadingMap = ref(new Map());
 

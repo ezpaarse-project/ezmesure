@@ -146,9 +146,9 @@ const DATE_FORMAT_REGEX = new RegExp(`^(?<year>\\d{4})${props.separator}(?<month
 
 const { t, locale } = useI18n();
 
-const isOpen = ref(false);
-const viewYear = ref(0);
-const modelValueInput = ref('');
+const isOpen = shallowRef(false);
+const viewYear = shallowRef(0);
+const modelValueInput = shallowRef('');
 
 const formatYear = (y) => `${y}`.toString().padStart(4, '0');
 const formatMonth = (m) => `${m}`.toString().padStart(2, '0');

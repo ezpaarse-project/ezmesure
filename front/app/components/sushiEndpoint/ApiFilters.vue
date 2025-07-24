@@ -102,7 +102,7 @@ const {
   resetFilters,
 } = useFilters(() => props.modelValue, emit);
 
-const loadingTags = ref(false);
+const loadingTags = shallowRef(false);
 
 const availableTags = computedAsync(
   async (onCancel) => {

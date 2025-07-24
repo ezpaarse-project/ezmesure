@@ -58,13 +58,13 @@ import { getErrorMessage } from '@/lib/errors';
 
 const { t, locale } = useI18n();
 
-const isOpen = ref(false);
-const fieldId = ref(null);
+const isOpen = shallowRef(false);
+const fieldId = shallowRef(null);
 
 const fieldData = ref(null);
-const loading = ref(false);
-const errorMessage = ref('');
-const errorIcon = ref('');
+const loading = shallowRef(false);
+const errorMessage = shallowRef('');
+const errorIcon = shallowRef('');
 
 const fieldLabel = computed(() => (fieldData.value?.[locale.value === 'en' ? 'labelEn' : 'labelFr']));
 const institutionProperties = computed(() => fieldData.value?.institutionProperties ?? []);

@@ -134,7 +134,7 @@ const props = defineProps({
   },
 });
 
-const showOnlyMaster = ref(true);
+const showOnlyMaster = shallowRef(true);
 const currentVersion = ref('5.1');
 
 const { t } = useI18n();

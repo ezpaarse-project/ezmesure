@@ -126,12 +126,12 @@ if (!currentRoute.value.query?.token) {
   await navigateTo('/');
 }
 
-const valid = ref(false);
-const loading = ref(false);
-const success = ref(false);
-const password = ref('');
-const passwordRepeat = ref('');
-const showPassword = ref(false);
+const valid = shallowRef(false);
+const loading = shallowRef(false);
+const success = shallowRef(false);
+const password = shallowRef('');
+const passwordRepeat = shallowRef('');
+const showPassword = shallowRef(false);
 const errorMessage = ref(undefined);
 
 async function replacePassword() {

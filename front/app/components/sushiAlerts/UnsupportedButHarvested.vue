@@ -96,8 +96,8 @@ const { t } = useI18n();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
-const lockActions = ref(false);
-const matrixLoading = ref('');
+const lockActions = shallowRef(false);
+const matrixLoading = shallowRef('');
 
 const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
 

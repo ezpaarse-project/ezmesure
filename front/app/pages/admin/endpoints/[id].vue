@@ -386,10 +386,10 @@ const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
-const search = ref('');
+const search = shallowRef('');
 const filters = ref({});
 const sushiMetrics = ref(undefined);
-const loading = ref(false);
+const loading = shallowRef(false);
 const selectedInstitutions = ref([]);
 const currentHarvestYear = ref(maxHarvestYear);
 

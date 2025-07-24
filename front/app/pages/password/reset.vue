@@ -107,9 +107,9 @@ import { getErrorMessage } from '@/lib/errors';
 const { t } = useI18n();
 const { data: user } = useAuthState();
 
-const valid = ref(false);
-const loading = ref(false);
-const success = ref(false);
+const valid = shallowRef(false);
+const loading = shallowRef(false);
+const success = shallowRef(false);
 const errorMessage = ref(undefined);
 const username = ref(user.value?.username);
 

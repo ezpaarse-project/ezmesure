@@ -120,8 +120,8 @@ const emit = defineEmits({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const saving = ref(false);
-const valid = ref(false);
+const saving = shallowRef(false);
+const valid = shallowRef(false);
 const user = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */

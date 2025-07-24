@@ -27,7 +27,7 @@ const emit = defineEmits({
   submit: (item) => !!item,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object | undefined>} */
 const space = ref(undefined);
 /** @type {Ref<object | undefined>} */

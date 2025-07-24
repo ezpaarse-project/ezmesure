@@ -158,8 +158,8 @@ const idRules = [
   (v) => (!v || ID_PATTERN.test(v)) || t('fieldMustMatch', { pattern: ID_PATTERN.toString() }),
 ];
 
-const saving = ref(false);
-const valid = ref(false);
+const saving = shallowRef(false);
+const valid = shallowRef(false);
 const customField = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */

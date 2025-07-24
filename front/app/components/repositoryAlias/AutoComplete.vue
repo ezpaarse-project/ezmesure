@@ -47,7 +47,7 @@ defineEmits({
   'update:modelValue': (alias) => !!alias,
 });
 
-const pattern = ref(props.modelValue?.pattern);
+const pattern = shallowRef(props.modelValue?.pattern);
 const debouncedPattern = useDebounce(pattern, 250);
 
 const {

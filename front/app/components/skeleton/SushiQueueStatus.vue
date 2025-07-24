@@ -33,9 +33,9 @@
 <script setup>
 const { idsInQueue, currentlyTesting } = storeToRefs(useSushiCheckQueueStore());
 
-const total = ref(0);
-const last = ref(0);
-const progress = ref(0);
+const total = shallowRef(0);
+const last = shallowRef(0);
+const progress = shallowRef(0);
 
 const status = computed(() => sushiStatus.get(currentlyTesting.value?.status));
 

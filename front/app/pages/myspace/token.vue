@@ -52,7 +52,7 @@ const snacks = useSnacksStore();
 
 const { data: token } = await useFetch('/api/profile/token');
 
-const showToken = ref(false);
+const showToken = shallowRef(false);
 
 async function copyTokenToClipboard() {
   if (!token.value) {

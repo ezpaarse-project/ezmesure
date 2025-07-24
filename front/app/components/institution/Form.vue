@@ -461,25 +461,25 @@ const namespaceRules = [
   (v) => (!v || ID_PATTERN.test(v)) || t('fieldMustMatch', { pattern: ID_PATTERN.toString() }),
 ];
 
-const loading = ref(false);
-const valid = ref(false);
-const originalName = ref(undefined);
+const loading = shallowRef(false);
+const valid = shallowRef(false);
+const originalName = shallowRef(undefined);
 /** @type {Ref<Object>} */
 const institution = ref({ social: {} });
-const logoPreview = ref('');
-const logoError = ref('');
-const isDraggingLogo = ref(false);
+const logoPreview = shallowRef('');
+const logoError = shallowRef('');
+const isDraggingLogo = shallowRef(false);
 /** @type {Ref<Object | null>} */
 const openData = ref(null);
-const addAsMember = ref(false);
-const showCustomPropMenu = ref(false);
-const customField = ref(null);
+const addAsMember = shallowRef(false);
+const showCustomPropMenu = shallowRef(false);
+const customField = shallowRef(null);
 const customPropInputRefs = ref({});
 
-const loadingTags = ref(false);
+const loadingTags = shallowRef(false);
 const availableTags = ref([]);
-const tagSearch = ref('');
-const tagInputFocused = ref(false);
+const tagSearch = shallowRef('');
+const tagInputFocused = shallowRef(false);
 
 const {
   data: availableCustomFields,

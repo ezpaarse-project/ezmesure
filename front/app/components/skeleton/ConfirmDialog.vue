@@ -38,8 +38,8 @@
 <script setup>
 const dialogStore = useDialogStore();
 
-const disagreeLoading = ref(false);
-const agreeLoading = ref(false);
+const disagreeLoading = shallowRef(false);
+const agreeLoading = shallowRef(false);
 
 async function cancel() {
   disagreeLoading.value = true;

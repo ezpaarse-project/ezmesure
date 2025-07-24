@@ -136,8 +136,8 @@ const emit = defineEmits({
 /** @type {Ref<object[]>} */
 const institutions = ref(props.role.institutions || []);
 
-const loading = ref(false);
-const dryRun = ref(false);
+const loading = shallowRef(false);
+const dryRun = shallowRef(false);
 const conditions = ref([]);
 const hasConditions = computed(() => (conditions.value || []).length > 0);
 

@@ -100,7 +100,7 @@ const { params } = useRoute();
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const validatedLoading = ref(false);
+const validatedLoading = shallowRef(false);
 
 const institutionFormDialogRef = useTemplateRef('institutionFormDialogRef');
 

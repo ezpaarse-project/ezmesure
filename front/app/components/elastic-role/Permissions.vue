@@ -209,7 +209,7 @@ const emit = defineEmits({
   'update:modelValue': () => true,
 });
 
-const loading = ref(false);
+const loading = shallowRef(false);
 /** @type {Ref<object[]>} */
 const repositoryPermissions = ref(props.role.repositoryPermissions || []);
 /** @type {Ref<object[]>} */

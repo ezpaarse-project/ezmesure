@@ -64,7 +64,7 @@ defineEmits({
   'update:modelValue': (repository) => !!repository,
 });
 
-const search = ref('');
+const search = shallowRef('');
 
 const pattern = computed(() => props.modelValue?.pattern);
 const debouncedPattern = useDebounce(pattern, 250);

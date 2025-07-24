@@ -199,11 +199,11 @@ const { query } = useRoute();
 const { data: user } = useAuthState();
 const snacks = useSnacksStore();
 
-const loading = ref(false);
-const valid = ref(false);
-const email = ref('');
-const subject = ref('');
-const message = ref('');
+const loading = shallowRef(false);
+const valid = shallowRef(false);
+const email = shallowRef('');
+const subject = shallowRef('');
+const message = shallowRef('');
 const additionalData = ref({});
 
 /** @type {Ref<Object | null>} */

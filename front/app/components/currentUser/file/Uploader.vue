@@ -77,7 +77,7 @@ const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
   reset: true,
 });
 
-const isDraggingFile = ref(false);
+const isDraggingFile = shallowRef(false);
 const filesPending = ref([]);
 const filesLoading = ref([]);
 const filesFinished = ref([]);

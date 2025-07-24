@@ -50,7 +50,7 @@ defineEmits({
   'update:modelValue': (selection) => selection.length >= 0,
 });
 
-const open = ref(false);
+const open = shallowRef(false);
 const snacks = useSnacksStore();
 
 const hasSnackMessages = computed(() => snacks.messages.length > 0);

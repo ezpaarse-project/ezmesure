@@ -43,7 +43,7 @@
 <script setup>
 const { t } = useI18n();
 
-const search = ref('');
+const search = shallowRef('');
 
 const {
   status,

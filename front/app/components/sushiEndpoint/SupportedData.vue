@@ -224,8 +224,8 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const currentVersion = ref('5.1');
-const isAdditionalReportOpen = ref(false);
-const additionalReport = ref('');
+const isAdditionalReportOpen = shallowRef(false);
+const additionalReport = shallowRef('');
 const additionalReportForm = useTemplateRef('additionalReportForm');
 
 const { cloned: innerSupportedData } = useCloned(props.modelValue);

@@ -65,7 +65,7 @@ export default async function useServerSidePagination(params = {}) {
   /**
    * Fetch data
    */
-  const asyncData = await useAsyncData(
+  const asyncData = useAsyncData(
     `${params.fetch.url}.ssp`,
     async () => {
       try {

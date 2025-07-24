@@ -92,7 +92,7 @@ const emit = defineEmits({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const isLinkLoading = ref(false);
+const isLinkLoading = shallowRef(false);
 /** @type {Ref<object[]>} */
 const components = ref(props.institution.childInstitutions || []);
 

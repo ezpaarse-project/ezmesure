@@ -110,7 +110,7 @@ const emit = defineEmits({
 
 const { toggle } = useDrawerStore();
 
-const loading = ref(false);
+const loading = shallowRef(false);
 
 const searchValue = computed({
   get: () => {

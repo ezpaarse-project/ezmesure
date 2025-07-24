@@ -100,6 +100,9 @@ const {
     sortBy: [{ key: 'createdAt', order: 'desc' }],
     search: undefined, // q parameter is not allowed
   },
+  async: {
+    deep: true,
+  },
 });
 
 const headers = computed(() => [

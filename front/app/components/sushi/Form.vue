@@ -233,12 +233,12 @@ const emit = defineEmits({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const loading = ref(false);
-const saving = ref(false);
-const valid = ref(false);
-const isAdvancedOpen = ref(false);
-const loadingPackages = ref(false);
-const packageSearch = ref('');
+const loading = shallowRef(false);
+const saving = shallowRef(false);
+const valid = shallowRef(false);
+const isAdvancedOpen = shallowRef(false);
+const loadingPackages = shallowRef(false);
+const packageSearch = shallowRef('');
 const sushi = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */

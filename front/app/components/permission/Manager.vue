@@ -98,8 +98,8 @@ const emit = defineEmits({
   'update:modelValue': (permissions) => !!permissions,
 });
 
-const search = ref('');
-const allValue = ref('');
+const search = shallowRef('');
+const allValue = shallowRef('');
 
 const {
   status,

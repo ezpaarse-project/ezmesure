@@ -389,11 +389,11 @@ const { t } = useI18n();
 const snacks = useSnacksStore();
 const { openConfirm } = useDialogStore();
 
-const saving = ref(false);
-const valid = ref(false);
-const isConnectionMenuOpen = ref(false);
-const loadingTags = ref(false);
-const tagSearch = ref('');
+const saving = shallowRef(false);
+const valid = shallowRef(false);
+const isConnectionMenuOpen = shallowRef(false);
+const loadingTags = shallowRef(false);
+const tagSearch = shallowRef('');
 const registryEndpoint = ref();
 const endpoint = ref({ ...(props.modelValue ?? { counterVersions: ['5'] }) });
 

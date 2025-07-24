@@ -186,7 +186,7 @@ defineEmits({
 
 const { t } = useI18n();
 
-const tab = ref(0);
+const tab = shallowRef(0);
 
 const institution = computed(() => props.membership.institution);
 

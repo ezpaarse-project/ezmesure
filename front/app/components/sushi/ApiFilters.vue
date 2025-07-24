@@ -109,8 +109,8 @@ const {
   resetFilters,
 } = useFilters(() => props.modelValue, emit);
 
-const loadingEndpoints = ref(false);
-const loadingPackages = ref(false);
+const loadingEndpoints = shallowRef(false);
+const loadingPackages = shallowRef(false);
 
 const availableEndpoints = computedAsync(
   async (onCancel) => {
@@ -171,7 +171,7 @@ const availablePackages = computedAsync(
 
     const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
       query: {
-      signal: abortController.signal,
+        signal: abortController.signal,
         size: 0,
         distinct: 'packages',
       },

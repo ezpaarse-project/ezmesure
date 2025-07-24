@@ -46,7 +46,7 @@ const emit = defineEmits({
   submit: (values) => true,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object[] | undefined>} */
 const filters = ref(undefined);
 

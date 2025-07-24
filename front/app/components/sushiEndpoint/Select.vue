@@ -74,7 +74,7 @@ defineEmits({
   'update:modelValue': (repository) => !!repository,
 });
 
-const search = ref('');
+const search = shallowRef('');
 const q = debouncedRef(search, 250);
 
 const {

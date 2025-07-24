@@ -161,9 +161,9 @@ if (query?.provider === 'kibana') {
   provider = 0;
 }
 
-const valid = ref(false);
-const loading = ref(false);
-const showPassword = ref(false);
+const valid = shallowRef(false);
+const loading = shallowRef(false);
+const showPassword = shallowRef(false);
 const errorMessage = ref(undefined);
 const credentials = ref({
   username: '',

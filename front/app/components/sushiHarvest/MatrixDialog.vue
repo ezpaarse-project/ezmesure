@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object | undefined>} */
 const sushi = ref(undefined);
 /** @type {Ref<string | undefined>} */

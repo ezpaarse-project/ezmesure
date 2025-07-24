@@ -76,9 +76,9 @@ const props = defineProps({
   },
 });
 
-const show = ref(false);
-const confirmLoading = ref(false);
-const cancelLoading = ref(false);
+const show = shallowRef(false);
+const confirmLoading = shallowRef(false);
+const cancelLoading = shallowRef(false);
 
 const loading = computed(() => confirmLoading.value || cancelLoading.value);
 

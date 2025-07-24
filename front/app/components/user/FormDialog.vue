@@ -29,7 +29,7 @@ const emit = defineEmits({
   'update:model-value': (item) => !!item?.connection?.status,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object | undefined>} */
 const user = ref(undefined);
 

@@ -132,8 +132,8 @@ const props = defineProps({
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 
-const isCredentialsMenuOpen = ref(false);
-const isReportsMenuOpen = ref(false);
+const isCredentialsMenuOpen = shallowRef(false);
+const isReportsMenuOpen = shallowRef(false);
 
 // eslint-disable-next-line no-underscore-dangle
 const status = computed(() => props.modelValue._status);

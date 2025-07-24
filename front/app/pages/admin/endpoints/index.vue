@@ -190,6 +190,9 @@ const {
   data: {
     sortBy: [{ key: 'vendor', order: 'asc' }],
   },
+  async: {
+    deep: true,
+  },
 });
 
 /**

@@ -26,5 +26,5 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms'],
 });
 
-const tab = ref(0);
+const tab = shallowRef(0);
 </script>

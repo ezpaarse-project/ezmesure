@@ -56,7 +56,7 @@ defineEmits({
 
 const { t } = useI18n();
 
-const search = ref('');
+const search = shallowRef('');
 const debouncedSearch = refDebounced(search, 250);
 
 const {

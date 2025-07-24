@@ -126,8 +126,8 @@ const emit = defineEmits({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const loading = ref(false);
-const valid = ref(false);
+const loading = shallowRef(false);
+const valid = shallowRef(false);
 const template = ref({});
 const repository = ref({});
 

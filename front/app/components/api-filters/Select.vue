@@ -68,7 +68,7 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 
-const search = ref('');
+const search = shallowRef('');
 
 const looseEnabled = computed(() => {
   const { 'onUpdate:loose': looseListener } = getCurrentInstance()?.vnode.props ?? {};

@@ -93,8 +93,8 @@ const props = defineProps({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const loading = ref(false);
-const valid = ref(false);
+const loading = shallowRef(false);
+const valid = shallowRef(false);
 const connection = ref(undefined);
 const sushi = ref({
   requestorId: '',

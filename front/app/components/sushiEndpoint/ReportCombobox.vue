@@ -47,7 +47,7 @@ defineEmits({
   'update:modelValue': (v) => Array.isArray(v) || typeof v === 'string' || v === undefined,
 });
 
-const search = ref('');
+const search = shallowRef('');
 
 const supportedReports = computed(() => {
   const legacy = (props.endpoint?.supportedReports ?? []).map((r) => r);

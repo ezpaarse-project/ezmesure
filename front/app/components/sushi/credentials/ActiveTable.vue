@@ -324,6 +324,9 @@ const {
   data: {
     sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
   },
+  async: {
+    deep: true,
+  },
 });
 
 onMounted(() => {

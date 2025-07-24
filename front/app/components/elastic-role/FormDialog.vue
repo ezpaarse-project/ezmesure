@@ -21,8 +21,8 @@ const emit = defineEmits({
   submit: () => true,
 });
 
-const isOpen = ref(false);
-const hasChanged = ref(false);
+const isOpen = shallowRef(false);
+const hasChanged = shallowRef(false);
 
 function open() {
   hasChanged.value = false;

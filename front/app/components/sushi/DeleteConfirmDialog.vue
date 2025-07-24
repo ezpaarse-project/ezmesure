@@ -83,11 +83,11 @@ const { t } = useI18n();
 const snacks = useSnacksStore();
 
 let close;
-const disagreeLoading = ref(false);
-const agreeLoading = ref(false);
-const show = ref(false);
-const isValid = ref(false);
-const reason = ref('');
+const disagreeLoading = shallowRef(false);
+const agreeLoading = shallowRef(false);
+const show = shallowRef(false);
+const isValid = shallowRef(false);
+const reason = shallowRef('');
 /**
  * @type {Ref<DeleteSushiDialogData>}
  */

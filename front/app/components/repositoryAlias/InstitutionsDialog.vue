@@ -97,9 +97,9 @@ const emit = defineEmits({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const isOpen = ref(false);
-const isLinkLoading = ref(false);
-const hasChanged = ref(false);
+const isOpen = shallowRef(false);
+const isLinkLoading = shallowRef(false);
+const hasChanged = shallowRef(false);
 /** @type {Ref<object|null>} */
 const alias = ref(null);
 const institutions = ref([]);

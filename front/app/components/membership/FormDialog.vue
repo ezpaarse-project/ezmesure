@@ -27,7 +27,7 @@ const emit = defineEmits({
   'update:modelValue': (item) => !!item,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object | undefined>} */
 const membership = ref(undefined);
 /** @type {Ref<object | undefined>} */

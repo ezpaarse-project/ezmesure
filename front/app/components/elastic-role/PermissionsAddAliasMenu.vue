@@ -50,7 +50,7 @@ const emit = defineEmits({
   'update:modelValue': (alias) => !!alias,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object|undefined>} */
 const alias = ref();
 

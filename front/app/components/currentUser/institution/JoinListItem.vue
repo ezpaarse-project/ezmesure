@@ -73,8 +73,8 @@ const { t } = useI18n();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
-const isOpen = ref(false);
-const search = ref('');
+const isOpen = shallowRef(false);
+const search = shallowRef('');
 
 const debouncedSearch = debouncedRef(search);
 

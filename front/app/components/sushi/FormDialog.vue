@@ -30,7 +30,7 @@ const emit = defineEmits({
   'update:modelValue': (item) => !!item?.connection?.status,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object | undefined>} */
 const sushi = ref(undefined);
 /** @type {Ref<object | undefined>} */

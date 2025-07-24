@@ -13,17 +13,19 @@
 <script setup>
 import setupSwaggerUI from '@/lib/swaggerUI';
 
-const iframe = ref(null);
+const iframe = useTemplateRef('iframe');
 
 function setupIframe() {
   if (!iframe.value) {
     return;
   }
 
-  const doc = iframe.value.contentWindow.document;
-  doc.open();
-  doc.write(setupSwaggerUI());
-  doc.close();
+  const doc = iframe.value.contentWindow?.document;
+  if (doc) {
+    doc.open();
+    doc.write(setupSwaggerUI());
+    doc.close();
+  }
 }
 
 onMounted(() => {

@@ -29,7 +29,7 @@ useHead({
   ],
 });
 
-const visible = ref(false);
+const visible = shallowRef(false);
 
 const emit = defineEmits({
   updated: () => true,

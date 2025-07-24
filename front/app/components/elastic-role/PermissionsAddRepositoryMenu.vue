@@ -53,7 +53,7 @@ const emit = defineEmits({
   'update:modelValue': (repository) => !!repository,
 });
 
-const isOpen = ref(false);
+const isOpen = shallowRef(false);
 /** @type {Ref<object|undefined>} */
 const repository = ref({});
 

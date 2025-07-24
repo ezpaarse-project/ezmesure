@@ -217,7 +217,7 @@ const { hasPermission } = useCurrentUserStore();
 const snacks = useSnacksStore();
 
 const tabsData = ref(new Map());
-const currentTabId = ref('');
+const currentTabId = shallowRef('');
 
 const sushiFormRef = useTemplateRef('sushiFormRef');
 

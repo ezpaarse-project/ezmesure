@@ -57,14 +57,14 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 
-const isOpen = ref(false);
-const institutionId = ref(null);
+const isOpen = shallowRef(false);
+const institutionId = shallowRef(null);
 const formOptions = ref(null);
 
 const institutionData = ref(null);
-const loading = ref(false);
-const errorMessage = ref('');
-const errorIcon = ref('');
+const loading = shallowRef(false);
+const errorMessage = shallowRef('');
+const errorIcon = shallowRef('');
 const dialogMaxWidth = computed(() => {
   if (loading.value) { return 200; }
   if (errorMessage.value) { return 500; }
