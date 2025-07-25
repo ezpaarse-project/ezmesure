@@ -4,8 +4,21 @@
     :subtitle="showRole ? role.name : undefined"
     prepend-icon="mdi-domain"
   >
-    <template v-if="!hasConditions" #append>
+    <template #append>
+      <v-text-field
+        v-if="institutions.length > 0"
+        v-model="search"
+        :placeholder="$t('search')"
+        append-inner-icon="mdi-magnify"
+        variant="outlined"
+        density="compact"
+        width="200"
+        hide-details
+        class="mr-2"
+      />
+
       <InstitutionAddMenu
+        v-if="!hasConditions"
         :model-value="institutions"
         :title="$t('elasticRoles.addInstitution')"
         @institution-add="addInstitution($event)"
@@ -78,6 +91,7 @@
 
       <v-data-table
         v-else
+        :search="search"
         :items="institutions"
         :headers="headers"
         :sort-by="[{ key: 'institution.name', order: 'asc' }]"
@@ -136,6 +150,7 @@ const emit = defineEmits({
 /** @type {Ref<object[]>} */
 const institutions = ref(props.role.institutions || []);
 
+const search = shallowRef('');
 const loading = shallowRef(false);
 const dryRun = shallowRef(false);
 const conditions = ref([]);
