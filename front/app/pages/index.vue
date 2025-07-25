@@ -65,6 +65,23 @@
           {{ $t('home.discoverOurPartners') }}
         </v-btn>
       </v-row>
+
+      <v-row style="margin-top: 16px;">
+        <v-col>
+          <div class="d-flex justify-center text-center">
+            <!-- eslint-disable-next-line vuejs-accessibility/anchor-has-content-->
+            <a href="https://www.inist.fr/" title="INIST-CNRS">
+              <v-img
+                alt="Opéré par l'INIST-CNRS"
+                src="/images/by-inist.svg"
+                contain
+                height="120px"
+                width="120px"
+              />
+            </a>
+          </div>
+        </v-col>
+      </v-row>
     </v-container>
   </v-container>
 </template>
@@ -73,6 +90,24 @@
 import logo from '@@/static/images/logo-ezMESURE-slogan.png';
 
 const { t } = useI18n();
+
+const features = computed(() => [
+  {
+    src: '/images/pres_visualizations.svg',
+    title: t('home.dynamicOnlineVisualizations'),
+    text: t('home.dynamicOnlineVisualizationsText'),
+  },
+  {
+    src: '/images/pres_centralized.svg',
+    title: t('home.centralizedRepository'),
+    text: t('home.centralizedRepositoryText'),
+  },
+  {
+    src: '/images/pres_ezpaarse.svg',
+    title: t('home.dataProducedByEzPAARSE'),
+    text: t('home.dataProducedByEzPAARSEText'),
+  },
+]);
 
 const logos = ref([
   {
@@ -94,24 +129,6 @@ const logos = ref([
     name: 'BSN',
     src: '/images/logo-bsn.png',
     link: 'http://www.bibliothequescientifiquenumerique.fr/',
-  },
-]);
-
-const features = computed(() => [
-  {
-    src: '/images/pres_visualizations.svg',
-    title: t('home.dynamicOnlineVisualizations'),
-    text: t('home.dynamicOnlineVisualizationsText'),
-  },
-  {
-    src: '/images/pres_centralized.svg',
-    title: t('home.centralizedRepository'),
-    text: t('home.centralizedRepositoryText'),
-  },
-  {
-    src: '/images/pres_ezpaarse.svg',
-    title: t('home.dataProducedByEzPAARSE'),
-    text: t('home.dataProducedByEzPAARSEText'),
   },
 ]);
 </script>
