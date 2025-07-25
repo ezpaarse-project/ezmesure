@@ -7,8 +7,6 @@ const InstitutionsService = require('../../entities/institutions.service');
 
 const repoAliasTemplateDto = require('../../entities/repository-alias-templates.dto');
 
-const { getPrismaManyQuery } = require('../institutions/actions').standardQueryParams;
-
 const { interpolateString, interpolateObject } = require('../../services/utils');
 
 const {
@@ -134,10 +132,7 @@ exports.applyOne = async (ctx) => {
   } = aliasTemplate;
 
   const institutionService = new InstitutionsService();
-  const institutions = await institutionService.findManyByConditions(
-    conditions,
-    getPrismaManyQuery,
-  );
+  const institutions = await institutionService.findManyByConditions(conditions);
 
   /** @type {Map<string, Partial<RepoAliasWithInstitutions>>} */
   const aliases = new Map();
