@@ -11,44 +11,61 @@
       :title="$t('institutions.toolbarTitle', { count: institutionProperties.length })"
       :subtitle="fieldLabel"
     >
-      <v-empty-state
-        v-if="errorMessage"
-        :icon="errorIcon"
-        :title="errorMessage"
-      >
-        <template #actions>
-          <v-btn
-            :text="$t('close')"
-            variant="text"
-            @click="isOpen = false"
-          />
+      <template #append>
+        <v-text-field
+          v-if="institutionProperties.length > 0"
+          v-model="search"
+          :placeholder="$t('search')"
+          append-inner-icon="mdi-magnify"
+          variant="outlined"
+          density="compact"
+          width="200"
+          hide-details
+          class="mr-2"
+        />
+      </template>
 
-          <v-btn
-            :text="$t('retry')"
-            :loading="loading"
-            variant="elevated"
-            color="secondary"
-            @click="refreshForm"
-          />
-        </template>
-      </v-empty-state>
+      <template #text>
+        <v-empty-state
+          v-if="errorMessage"
+          :icon="errorIcon"
+          :title="errorMessage"
+        >
+          <template #actions>
+            <v-btn
+              :text="$t('close')"
+              variant="text"
+              @click="isOpen = false"
+            />
 
-      <v-data-table
-        v-else
-        :headers="headers"
-        :items="institutionProperties"
-        :loading="loading"
-        :sort-by="[{ key: 'institution.name', order: 'asc' }]"
-        density="comfortable"
-      >
-        <template #[`item.institution.name`]="{ item }">
-          <InstitutionAvatar :institution="item.institution" size="x-small" class="mr-2" />
+            <v-btn
+              :text="$t('retry')"
+              :loading="loading"
+              variant="elevated"
+              color="secondary"
+              @click="refreshForm"
+            />
+          </template>
+        </v-empty-state>
 
-          <nuxt-link :to="`/admin/institutions/${item.institution.id}`">
-            {{ item.institution.name }}
-          </nuxt-link>
-        </template>
-      </v-data-table>
+        <v-data-table
+          v-else
+          :headers="headers"
+          :search="search"
+          :items="institutionProperties"
+          :loading="loading"
+          :sort-by="[{ key: 'institution.name', order: 'asc' }]"
+          density="comfortable"
+        >
+          <template #[`item.institution.name`]="{ item }">
+            <InstitutionAvatar :institution="item.institution" size="x-small" class="mr-2" />
+
+            <nuxt-link :to="`/admin/institutions/${item.institution.id}`">
+              {{ item.institution.name }}
+            </nuxt-link>
+          </template>
+        </v-data-table>
+      </template>
     </v-card>
   </v-dialog>
 </template>
@@ -62,6 +79,7 @@ const isOpen = shallowRef(false);
 const fieldId = shallowRef(null);
 
 const fieldData = ref(null);
+const search = shallowRef('');
 const loading = shallowRef(false);
 const errorMessage = shallowRef('');
 const errorIcon = shallowRef('');
