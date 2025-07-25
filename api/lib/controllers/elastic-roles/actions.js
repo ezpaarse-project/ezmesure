@@ -4,8 +4,6 @@ const ElasticRoleRepositoryAliasPermissionService = require('../../entities/elas
 const ElasticRoleSpacePermissionService = require('../../entities/elastic-role-space-permissions.service');
 const InstitutionsService = require('../../entities/institutions.service');
 
-const { getPrismaManyQuery } = require('../institutions/actions').standardQueryParams;
-
 const { schema, includableFields, adminImportSchema } = require('../../entities/elastic-roles.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
@@ -304,10 +302,7 @@ exports.syncRole = async (ctx) => {
 
     const institutionsService = new InstitutionsService(elasticRoleService);
 
-    const institutions = await institutionsService.findManyByConditions(
-      role.conditions,
-      getPrismaManyQuery,
-    );
+    const institutions = await institutionsService.findManyByConditions(role.conditions);
 
     let institutionsList = institutions;
 
