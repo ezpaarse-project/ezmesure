@@ -4,8 +4,10 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 const { client } = require('../services/prisma');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient */
-/* eslint-enable max-len */
+/**
+ * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('@prisma/client').Prisma.PrismaPromise<unknown>} PrismaPromise
+ */
 
 /**
  * @typedef {Object} BasePrismaServiceOptions
@@ -15,13 +17,14 @@ const { client } = require('../services/prisma');
 
 /**
  * @template {BasePrismaService} S
- * @typedef {(service: S) => Promise<any>} Executor
+ * @typedef {((service: S) => Promise<any>)} Executor
  */
 
 /**
  * @template {BasePrismaService} S
- * @typedef {(executor: Executor<S>) => ReturnType<Executor<S>>} TransactionFnc
+ * @typedef {(executorOrOps: Executor<S> | PrismaPromise[]) => executorOrOps extends Array ? any[] : ReturnType<Executor<S>>} TransactionFnc
  */
+/* eslint-enable max-len */
 
 /** @abstract @class */
 class BasePrismaService {
@@ -59,21 +62,27 @@ class BasePrismaService {
   }
 
   /**
-   * Start a new interactive transaction
+   * Start a new transaction
    *
-   * @param {Function} executor The executor of the transaction, take a service as parameter
-   * @param {BasePrismaServiceOptions} [opts] Options to configure the current instance of the
+   * @param {Function | PrismaPromise[]} executorOrOperations -
+   *  If a function is provided : The executor of the transaction, take a service as parameter
+   *  If an array is provided : The list of operation to do sequentially
+   * @param {BasePrismaServiceOptions} [opts]  -Options to configure the current instance of the
    * service
    *
    * @returns {Promise<any>} The result of the transaction
    */
-  static $transaction(executor, opts = {}) {
+  static $transaction(executorOrOperations, opts = {}) {
+    if (Array.isArray(executorOrOperations)) {
+      return client.$transaction(executorOrOperations);
+    }
+
     const currentTransaction = client.$transaction(
       (tx) => {
         const service = new this(tx, opts);
         service.currentTransaction = currentTransaction;
 
-        return executor(service);
+        return executorOrOperations(service);
       },
     );
 
