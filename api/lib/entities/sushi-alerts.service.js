@@ -354,6 +354,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
                 severity: 'info',
                 context: {
                   message: status.Note,
+                  counterVersion: version,
                   collectedAt,
                   endpoint,
                 },
@@ -368,6 +369,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
                 severity: 'error',
                 context: {
                   message: 'Endpoint reported itself as inactive',
+                  counterVersion: version,
                   collectedAt,
                   endpoint,
                 },
@@ -385,6 +387,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
                     severity: al.Severity || 'warning',
                     context: {
                       message: al.Alert,
+                      counterVersion: version,
                       collectedAt,
                       endpoint,
                     },
