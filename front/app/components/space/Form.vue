@@ -80,20 +80,16 @@
                 <v-input
                   :error-messages="logoErrorMessage"
                   prepend-icon="mdi-image"
+                  hide-details="auto"
                 >
                   <v-card
+                    :title="$t('spaces.logo')"
                     variant="outlined"
                     class="w-100"
                     @dragover.prevent="isDraggingLogo = true"
                     @dragleave.prevent="isDraggingLogo = false"
                     @drop.prevent="onLogoDrop($event)"
                   >
-                    <template #title>
-                      <div class="text-subtitle-1">
-                        {{ $t('spaces.logo') }}
-                      </div>
-                    </template>
-
                     <div class="d-flex justify-center">
                       <v-avatar
                         rounded
@@ -134,6 +130,21 @@
                     >
                       {{ $t('images.dropImageHere') }}
                     </v-overlay>
+                  </v-card>
+                </v-input>
+              </v-col>
+
+              <v-col cols="12">
+                <v-input
+                  prepend-icon="mdi-shape"
+                  hide-details="auto"
+                >
+                  <v-card
+                    variant="outlined"
+                    class="w-100"
+                    :title="$t('spaces.disabledFeatures')"
+                  >
+                    <SpaceFeaturesSelector v-model="space.disabledFeatures" />
                   </v-card>
                 </v-input>
               </v-col>
@@ -264,6 +275,7 @@ async function save() {
         type: space.value.type,
         name: space.value.name,
         description: space.value.description,
+        disabledFeatures: space.value.disabledFeatures,
         institutionId: props.institution.id,
         imageUrl: logoPreview.value ? space.value.imageUrl : undefined,
       },
