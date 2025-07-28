@@ -1,29 +1,22 @@
 <template>
   <div>
-    <v-progress-linear
-      v-if="status === 'pending'"
-      color="primary"
-      indeterminate
-    />
-
     <v-alert
-      v-else-if="error"
+      v-if="error"
       :text="$t('sushi.alerts.unsupportedButHarvested.error', { error: error.message })"
       type="error"
     />
 
     <v-empty-state
-      v-else-if="alerts.length <= 0"
+      v-else-if="itemLength.total <= 0"
       :title="$t('sushi.alerts.unsupportedButHarvested.empty')"
       icon="mdi-check"
       color="green"
     />
 
-    <v-data-table
+    <v-data-table-server
       v-else
-      :items="alerts"
       :headers="headers"
-      :sort-by="[{ key: 'severity', order: 'desc' }]"
+      v-bind="vDataTableOptions"
     >
       <template #[`item.severity`]="{ value }">
         <v-icon v-if="value === 'info'" color="info" icon="mdi-information-outline" />
@@ -31,19 +24,19 @@
         <v-icon v-else color="error" icon="mdi-alert-outline" />
       </template>
 
-      <template #[`item.data.credentials.endpoint.vendor`]="{ item, value }">
-        <nuxt-link :to="`/admin/endpoints/${item.data.credentials.endpoint.id}`">
+      <template #[`item.context.credentials.endpoint.vendor`]="{ item, value }">
+        <nuxt-link :to="`/admin/endpoints/${item.context.credentials.endpoint.id}`">
           {{ value }}
         </nuxt-link>
       </template>
 
-      <template #[`item.data.credentials.institution.name`]="{ item, value }">
-        <nuxt-link :to="`/admin/institutions/${item.data.credentials.institution.id}/sushi`">
+      <template #[`item.context.credentials.institution.name`]="{ item, value }">
+        <nuxt-link :to="`/admin/institutions/${item.context.credentials.institution.id}/sushi`">
           {{ value }}
         </nuxt-link>
       </template>
 
-      <template #[`item.data.status`]="{ value }">
+      <template #[`item.context.status`]="{ value }">
         <v-chip
           :text="t(`tasks.status.${value}`)"
           :prepend-icon="harvestStatus.get(value)?.icon"
@@ -54,31 +47,33 @@
       </template>
 
       <template #[`item.period`]="{ item }">
-        {{ item.data.beginDate }} - {{ item.data.endDate }}
+        {{ item.context.beginDate }} ~ {{ item.context.endDate }}
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-btn
-          v-tooltip:top="$t('sushi.harvestState')"
-          :disabled="!!lockActions"
-          :loading="matrixLoading === `${item.data.reportId}:${item.data.status}:${item.data.credentialsId}`"
-          icon="mdi-table-headers-eye"
-          color="grey-darken-1"
-          variant="text"
-          density="comfortable"
-          @click="openHarvestMatrix(item)"
-        />
-        <v-btn
-          v-tooltip:top="$t('delete')"
-          :disabled="!!lockActions"
-          icon="mdi-delete"
-          color="red"
-          variant="text"
-          density="comfortable"
-          @click="deleteHarvestedPeriod(item)"
-        />
+        <div class="d-flex">
+          <v-btn
+            v-tooltip:top="$t('sushi.harvestState')"
+            :disabled="!!lockActions"
+            :loading="matrixLoading === `${item.context.reportId}:${item.context.status}:${item.context.credentialsId}`"
+            icon="mdi-table-headers-eye"
+            color="grey-darken-1"
+            variant="text"
+            density="comfortable"
+            @click="openHarvestMatrix(item)"
+          />
+          <v-btn
+            v-tooltip:top="$t('delete')"
+            :disabled="!!lockActions"
+            icon="mdi-delete"
+            color="red"
+            variant="text"
+            density="comfortable"
+            @click="deleteHarvestedPeriod(item)"
+          />
+        </div>
       </template>
-    </v-data-table>
+    </v-data-table-server>
 
     <SushiHarvestMatrixDialog ref="harvestMatrixRef" />
   </div>
@@ -103,13 +98,23 @@ const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
 
 const {
   status,
-  data: alerts,
   error,
   refresh,
-} = await useFetch('/api/sushi-alerts', {
-  lazy: true,
-  query: {
-    type: 'harvestedButUnsupported',
+  itemLength,
+  vDataTableOptions,
+} = await useServerSidePagination({
+  fetch: {
+    url: '/api/sushi-alerts',
+    query: {
+      type: 'HARVESTED_BUT_UNSUPPORTED',
+    },
+  },
+  data: {
+    sortBy: [{ key: 'severity', order: 'desc' }],
+    search: undefined,
+  },
+  async: {
+    lazy: true,
   },
 });
 
@@ -130,22 +135,22 @@ const headers = computed(() => [
   },
   {
     title: t('institutions.sushi.endpoint'),
-    value: 'data.credentials.endpoint.vendor',
+    value: 'context.credentials.endpoint.vendor',
     sortable: true,
   },
   {
     title: t('institutions.title'),
-    value: 'data.credentials.institution.name',
+    value: 'context.credentials.institution.name',
     sortable: true,
   },
   {
     title: t('harvest.jobs.period'),
-    value: 'data.period',
+    value: 'period',
     align: 'center',
   },
   {
     title: t('harvest.jobs.reportType'),
-    value: 'data.reportId',
+    value: 'context.reportId',
     align: 'center',
     sortable: true,
     cellProps: {
@@ -154,7 +159,7 @@ const headers = computed(() => [
   },
   {
     title: t('status'),
-    value: 'data.status',
+    value: 'context.status',
     align: 'center',
     sortable: true,
   },
@@ -169,14 +174,14 @@ async function openHarvestMatrix(item) {
     return;
   }
 
-  matrixLoading.value = `${item.data.reportId}:${item.data.status}:${item.data.credentialsId}`;
+  matrixLoading.value = `${item.context.reportId}:${item.context.status}:${item.context.credentialsId}`;
 
   try {
-    const sushiItem = await $fetch(`/api/sushi/${item.data.credentialsId}`, {
+    const sushiItem = await $fetch(`/api/sushi/${item.context.credentialsId}`, {
       include: ['endpoint', 'harvests'],
     });
 
-    harvestMatrixRef.value.open(sushiItem, { period: item.data.beginDate });
+    harvestMatrixRef.value.open(sushiItem, { period: item.context.beginDate });
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   }
@@ -187,10 +192,10 @@ async function openHarvestMatrix(item) {
 function deleteHarvestedPeriod(item) {
   openConfirm({
     text: t('sushi.alerts.unsupportedButHarvested.deletePeriod', {
-      reportId: item.data.reportId.toUpperCase(),
-      institutionName: item.data.institution.name,
-      beginDate: item.data.beginDate,
-      endDate: item.data.endDate,
+      reportId: item.context.reportId.toUpperCase(),
+      institutionName: item.context.credentials.institution.name,
+      beginDate: item.context.beginDate,
+      endDate: item.context.endDate,
     }),
     agreeText: t('delete'),
     agreeIcon: 'mdi-delete',
@@ -201,15 +206,20 @@ function deleteHarvestedPeriod(item) {
         await $fetch('/api/harvests/_by-query', {
           method: 'DELETE',
           body: {
-            credentialsId: item.data.credentialId,
-            reportId: item.data.reportId,
+            credentialsId: item.context.credentialsId,
+            reportId: item.context.reportId,
             period: {
-              from: item.data.beginDate,
-              to: item.data.endDate,
+              from: item.context.beginDate,
+              to: item.context.endDate,
             },
-            status: item.data.status,
+            status: item.context.status,
           },
         });
+
+        await $fetch(`/api/sushi-alerts/${item.id}`, {
+          method: 'DELETE',
+        });
+
         refresh();
       } catch (err) {
         snacks.error(t('anErrorOccurred'), err);
