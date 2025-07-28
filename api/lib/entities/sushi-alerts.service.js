@@ -382,7 +382,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
                   .map((al, i) => ({
                     id: `${endpoint.id}:${i}`,
                     // not standard, so must have a fallback
-                    severity: al.Severity,
+                    severity: al.Severity || 'warning',
                     context: {
                       message: al.Alert,
                       collectedAt,

@@ -151,7 +151,7 @@ async function getStatus(sushi, version = '5.1') {
 
   const response = await axios({
     method: 'get',
-    url: `${baseUrl}/alerts`,
+    url: `${baseUrl}/status`,
     responseType: 'json',
     params,
   });
