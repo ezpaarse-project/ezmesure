@@ -265,7 +265,7 @@ async function save() {
         name: space.value.name,
         description: space.value.description,
         institutionId: props.institution.id,
-        imageUrl: space.value.imageUrl,
+        imageUrl: logoPreview.value ? space.value.imageUrl : undefined,
       },
     });
 
