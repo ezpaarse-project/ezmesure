@@ -137,6 +137,38 @@ async function getAvailableReports(sushi, version = '5') {
   return response;
 }
 
+/**
+ * Get the status of a endpoint using a given SUSHI item
+ * @param {SushiCredentials} sushi - The SUSHI item
+ * @param {string} [version=5] - The COUNTER version
+ * @returns {Promise<any>} The endpoint response
+ */
+async function getStatus(sushi, version = '5.1') {
+  const { baseUrl } = getSushiURL(sushi?.endpoint || {}, version);
+
+  const allowedScopes = [undefined, 'all'];
+  const params = getSushiParams(sushi, allowedScopes);
+
+  const response = await axios({
+    method: 'get',
+    url: `${baseUrl}/alerts`,
+    responseType: 'json',
+    params,
+  });
+
+  if (!response) {
+    throw new Error('sushi endpoint didn\'t respond');
+  }
+  if (response.status !== 200) {
+    throw new Error(`sushi endpoint responded with status ${response.status}`);
+  }
+  if (!response.data) {
+    throw new Error('sushi endpoint didn\'t return any data');
+  }
+
+  return response;
+}
+
 function getReportDownloadConfig(endpoint, sushi, version, opts = {}) {
   const options = opts || {};
 
@@ -573,6 +605,7 @@ module.exports = {
   getReportPath,
   getReportTmpPath,
   getAvailableReports,
+  getStatus,
   downloadReport,
   getOngoingDownload,
   initiateDownload,
