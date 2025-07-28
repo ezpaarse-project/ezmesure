@@ -125,6 +125,7 @@ const syncSpace = async (space) => {
     initials: space.initials || undefined,
     color: space.color || undefined,
     imageUrl: await getSpaceLogo(space),
+    disabledFeatures: space.disabledFeatures,
   };
 
   const spaceExists = (await kibana.getSpace(space.id)).status !== 404;

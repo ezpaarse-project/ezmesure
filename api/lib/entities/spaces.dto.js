@@ -26,6 +26,8 @@ const schema = {
   color: Joi.string().trim().allow('').empty(null),
   imageUrl: Joi.string().trim().base64().allow(null),
 
+  disabledFeatures: Joi.array().items(Joi.string().trim().min(1)),
+
   indexPatterns: Joi.array().items(Joi.object({
     title: Joi.string().required().min(1),
     timeFieldName: Joi.string(),
