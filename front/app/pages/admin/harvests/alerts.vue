@@ -33,6 +33,33 @@
             />
           </template>
         </v-expansion-panel>
+
+        <v-expansion-panel>
+          <template #title>
+            <v-icon icon="mdi-api" start />
+
+            {{ $t('sushi.alerts.endpoint.title') }}
+
+            <v-spacer />
+
+            <v-btn
+              v-if="panelsRefresh.endpoint"
+              :loading="panelsRefresh.endpoint.status === 'pending'"
+              icon="mdi-reload"
+              variant="tonal"
+              color="primary"
+              density="comfortable"
+              class="mr-2"
+              @click.stop="() => panelsRefresh.endpoint.execute()"
+            />
+          </template>
+
+          <template #text>
+            <SushiAlertsEndpoint
+              :define-refresh="(def) => panelsRefresh.endpoint = def"
+            />
+          </template>
+        </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
   </div>

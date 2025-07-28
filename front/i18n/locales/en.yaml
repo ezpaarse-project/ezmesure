@@ -687,12 +687,15 @@ sushi:
     nbFiles: 1 file|{count} files
   alerts:
     title: Alerts
+    severity: Severity
     unsupportedButHarvested:
       title: Unsupported reports but still harvested
-      severity: Severity
       error: An error occurred while searching for harvested but unsupported reports
       empty: No unsupported reports have been harvested!
       deletePeriod: "You'll delete the harvested report \"{reportId}\" of the matrix from \"{institutionName}\" for the period \"{beginDate} - {endDate}\". This won't delete the data. This action is irreversible."
+    endpoint:
+      title: Alerts/Messages from COUNTER Endpoints
+      message: Message
   deleteReason: Reason for deletion
   deleteReasonDescription: Please provide a reason for the deletion of theses credentials. You can choose an existing reason or type your own below.
   deleteReasons:

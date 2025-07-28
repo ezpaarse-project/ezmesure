@@ -128,7 +128,7 @@ onMounted(() => {
 
 const headers = computed(() => [
   {
-    title: t('sushi.alerts.unsupportedButHarvested.severity'),
+    title: t('sushi.alerts.severity'),
     value: 'severity',
     align: 'center',
     sortable: true,
