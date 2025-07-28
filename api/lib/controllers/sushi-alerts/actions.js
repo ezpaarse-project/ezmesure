@@ -1,14 +1,15 @@
-const { addMinutes, isBefore } = require('date-fns');
+const SushiAlertsService = require('../../entities/sushi-alerts.service');
+const { schema } = require('../../entities/sushi-alerts.dto');
 
-const HarvestService = require('../../entities/harvest.service');
-const { appLogger } = require('../../services/logger');
+const { startUpdateEndpointAlerts, startUpdateHarvestButUnsupportedAlerts } = require('../../services/sushi-alerts');
 
-const cache = {
-  harvestedButUnsupported: {
-    value: undefined,
-    updatedAt: undefined,
-  },
-};
+const { prepareStandardQueryParams } = require('../../services/std-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  queryFields: [],
+});
+exports.standardQueryParams = standardQueryParams;
 
 /**
  * @typedef {object} Alert
@@ -17,107 +18,57 @@ const cache = {
  * @property {object} data
  */
 
-async function listHarvestedButUnsupported() {
-  const cacheExpires = addMinutes(cache.harvestedButUnsupported.updatedAt ?? 0, 15);
-  if (isBefore(new Date(), cacheExpires)) {
-    return cache.harvestedButUnsupported.value ?? [];
-  }
+exports.getAllAlerts = async (ctx) => {
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
-  appLogger.info('[sushi-alerts] Calculating harvestedButUnsupported alerts');
+  const service = new SushiAlertsService();
 
-  /** @type {Map<string, Alert>} */
-  const alertsMap = new Map();
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.set('X-Total-Count', await service.count({ where: prismaQuery.where }));
+  ctx.body = await service.findMany(prismaQuery);
+};
 
-  // Severity by harvest status
-  const SEVERITY_PER_STATUS = new Map([
-    ['finished', 'info'],
-    ['missing', 'warning'],
-    // will defaults to "error"
-  ]);
+exports.getOneAlert = async (ctx) => {
+  const { id } = ctx.params;
 
-  const harvestService = new HarvestService();
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id });
 
-  const scroller = harvestService.scroll({
-    where: {
-      status: {
-        notIn: ['running', 'waiting', 'delayed'],
-      },
-      credentials: {
-        deletedAt: null,
-      },
-    },
-    select: {
-      reportId: true,
-      credentialsId: true,
-      status: true,
-      period: true,
+  const service = new SushiAlertsService();
+  const alert = await service.findUnique(prismaQuery);
 
-      credentials: {
-        include: {
-          endpoint: true,
-          institution: true,
-        },
-      },
-    },
-  });
-
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const harvest of scroller) {
-    // Filter harvests with a reportId marked as "unsupported" in the endpoint
-    // or endpoints without supportedData
-    const { supportedData } = harvest.credentials.endpoint;
-    if (supportedData?.[harvest.reportId]?.supported?.value !== false) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    const key = `${harvest.credentialsId}:${harvest.reportId}:${harvest.status}`;
-    const alert = alertsMap.get(key) ?? {
-      type: 'harvestedButUnsupported',
-      severity: SEVERITY_PER_STATUS.get(harvest.status) ?? 'error',
-      data: {
-        reportId: harvest.reportId,
-        status: harvest.status,
-        credentialsId: harvest.credentialsId,
-
-        beginDate: harvest.period,
-        endDate: harvest.period,
-
-        credentials: harvest.credentials,
-      },
-    };
-
-    // TODO: what if missing one ?
-    if (alert.data.beginDate >= harvest.period) {
-      alert.data.beginDate = harvest.period;
-    }
-    if (alert.data.endDate <= harvest.period) {
-      alert.data.endDate = harvest.period;
-    }
-
-    alertsMap.set(key, alert);
-  }
-
-  const data = Array.from(alertsMap.values());
-  cache.harvestedButUnsupported.value = data;
-  cache.harvestedButUnsupported.updatedAt = new Date();
-
-  appLogger.info('[sushi-alerts] Caching harvestedButUnsupported alerts');
-
-  return data;
-}
-
-exports.list = async (ctx) => {
-  const {
-    type,
-  } = ctx.query;
-
-  const alerts = [];
-  if (!type || type === 'harvestedButUnsupported') {
-    alerts.push(...await listHarvestedButUnsupported());
+  if (!alert) {
+    ctx.throw(404, ctx.$t('errors.alert.notFound'));
+    return;
   }
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = alerts;
+  ctx.body = alert;
+};
+
+exports.deleteOneAlert = async (ctx) => {
+  const { id } = ctx.params;
+
+  const service = new SushiAlertsService();
+  const data = await service.delete({ where: { id } });
+
+  ctx.status = 200;
+  ctx.body = data;
+};
+
+exports.refreshUnsupportedButHarvestedUpdateAlerts = async (ctx) => {
+  await startUpdateHarvestButUnsupportedAlerts();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = { acknowledged: true };
+};
+
+exports.refreshEndpointAlerts = async (ctx) => {
+  await startUpdateEndpointAlerts();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = { acknowledged: true };
 };
