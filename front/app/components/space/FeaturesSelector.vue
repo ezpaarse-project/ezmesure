@@ -19,6 +19,9 @@
   <v-treeview
     :model-value="enabledFeatures"
     :items="availableFeatures"
+    density="compact"
+    expand-icon="mdi-chevron-right"
+    collapse-icon="mdi-chevron-down"
     item-value="id"
     item-title="name"
     select-strategy="classic"
