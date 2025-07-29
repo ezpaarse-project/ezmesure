@@ -283,7 +283,6 @@ module.exports = class SushiAlertsService extends BasePrismaService {
     }
 
     appLogger.verbose(`[sushi-alerts][HARVESTED_BUT_UNSUPPORTED] Completed ! Running [${operations.size}] operations (Analysed [${harvestCount}] harvests)`);
-    // TODO: do by bulk to avoid timeout issues
     await SushiAlertsService.$transaction(Array.from(operations.values()));
   }
 
@@ -423,8 +422,6 @@ module.exports = class SushiAlertsService extends BasePrismaService {
     }));
 
     appLogger.verbose(`[sushi-alerts][ENDPOINT] Completed ! Running [${operations.length}] operations (Checked [${endpointsToDo.length}] endpoints)`);
-
-    // TODO: do by bulk to avoid timeout issues
     await SushiAlertsService.$transaction(operations);
   }
 };

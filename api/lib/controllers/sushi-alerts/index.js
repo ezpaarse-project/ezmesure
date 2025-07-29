@@ -9,7 +9,9 @@ const {
   getAllAlerts,
   getOneAlert,
   deleteOneAlert,
+  getUnsupportedButHarvestedState,
   refreshUnsupportedButHarvestedUpdateAlerts,
+  getEndpointState,
   refreshEndpointAlerts,
 } = require('./actions');
 
@@ -48,14 +50,26 @@ router.route({
 });
 
 router.route({
-  method: 'POST',
-  path: '/_refresh/unsupported-but-harvested',
-  handler: refreshUnsupportedButHarvestedUpdateAlerts,
+  method: 'GET',
+  path: '/_refresh/HARVESTED_BUT_UNSUPPORTED',
+  handler: getUnsupportedButHarvestedState,
 });
 
 router.route({
   method: 'POST',
-  path: '/_refresh/endpoint',
+  path: '/_refresh/HARVESTED_BUT_UNSUPPORTED',
+  handler: refreshUnsupportedButHarvestedUpdateAlerts,
+});
+
+router.route({
+  method: 'GET',
+  path: '/_refresh/ENDPOINT',
+  handler: getEndpointState,
+});
+
+router.route({
+  method: 'POST',
+  path: '/_refresh/ENDPOINT',
   handler: refreshEndpointAlerts,
 });
 

@@ -1,7 +1,12 @@
 const SushiAlertsService = require('../../entities/sushi-alerts.service');
 const { schema } = require('../../entities/sushi-alerts.dto');
 
-const { startUpdateEndpointAlerts, startUpdateHarvestButUnsupportedAlerts } = require('../../services/sushi-alerts');
+const {
+  getUpdateEndpointAlerts,
+  startUpdateEndpointAlerts,
+  getUpdateHarvestButUnsupportedAlerts,
+  startUpdateHarvestButUnsupportedAlerts,
+} = require('../../services/sushi-alerts');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
@@ -57,18 +62,26 @@ exports.deleteOneAlert = async (ctx) => {
   ctx.body = data;
 };
 
-exports.refreshUnsupportedButHarvestedUpdateAlerts = async (ctx) => {
-  await startUpdateHarvestButUnsupportedAlerts();
-
+exports.getUnsupportedButHarvestedState = (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = { acknowledged: true };
+  ctx.body = getUpdateHarvestButUnsupportedAlerts();
+};
+
+exports.refreshUnsupportedButHarvestedUpdateAlerts = async (ctx) => {
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = await startUpdateHarvestButUnsupportedAlerts();
+};
+
+exports.getEndpointState = (ctx) => {
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = getUpdateEndpointAlerts();
 };
 
 exports.refreshEndpointAlerts = async (ctx) => {
-  await startUpdateEndpointAlerts();
-
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = { acknowledged: true };
+  ctx.body = await startUpdateEndpointAlerts();
 };

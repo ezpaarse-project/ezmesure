@@ -35,6 +35,7 @@ const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
 /**
  * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
+ * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
  *
  * @typedef {object} SushiException
  * @property {number} Code
@@ -139,7 +140,7 @@ async function getAvailableReports(sushi, version = '5') {
 
 /**
  * Get the status of a endpoint using a given SUSHI item
- * @param {SushiCredentials} sushi - The SUSHI item
+ * @param {SushiCredentials & { endpoint: SushiEndpoint }} sushi - The SUSHI item
  * @param {string} [version=5] - The COUNTER version
  * @returns {Promise<any>} The endpoint response
  */

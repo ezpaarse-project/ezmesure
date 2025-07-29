@@ -11,7 +11,10 @@ const {
 
 // #region HARVESTED_BUT_UNSUPPORTED
 
+let harvestedButUnsupportedJobIsRunning = false;
+
 async function updateHarvestedButUnsupported() {
+  harvestedButUnsupportedJobIsRunning = true;
   appLogger.verbose('[sushi-alerts] Starting updating HARVEST_BUT_UNSUPPORTED alerts');
 
   const service = new SushiAlertsService();
@@ -21,9 +24,8 @@ async function updateHarvestedButUnsupported() {
     appLogger.error(`[sushi-alerts] Couldn't update HARVEST_BUT_UNSUPPORTED alerts: ${err instanceof Error ? err.message : err}`);
   }
 
-  // TODO: send mail
-
   appLogger.verbose('[sushi-alerts] Update of HARVEST_BUT_UNSUPPORTED alerts ended');
+  harvestedButUnsupportedJobIsRunning = false;
 }
 
 const harvestButUnsupportedJob = CronJob.from({
@@ -31,6 +33,12 @@ const harvestButUnsupportedJob = CronJob.from({
   runOnInit: false,
   onTick: updateHarvestedButUnsupported,
 });
+
+async function getUpdateHarvestButUnsupportedAlerts() {
+  return {
+    running: harvestedButUnsupportedJobIsRunning,
+  };
+}
 
 async function startUpdateHarvestButUnsupportedAlerts() {
   if (harvestButUnsupportedJob.isCallbackRunning) {
@@ -41,13 +49,18 @@ async function startUpdateHarvestButUnsupportedAlerts() {
   // Don't await promise to avoid waiting for cron to finish
   updateHarvestedButUnsupported()
     .then(() => harvestButUnsupportedJob.start());
+
+  return getUpdateHarvestButUnsupportedAlerts();
 }
 
 // #endregion HARVESTED_BUT_UNSUPPORTED
 
 // #region ENDPOINT
 
+let endpointJobIsRunning = false;
+
 async function updateEndpointAlerts() {
+  endpointJobIsRunning = true;
   appLogger.verbose('[sushi-alerts] Starting updating ENDPOINT alerts');
 
   const service = new SushiAlertsService();
@@ -56,9 +69,9 @@ async function updateEndpointAlerts() {
   } catch (err) {
     appLogger.error(`[sushi-alerts] Couldn't update ENDPOINT alerts: ${err instanceof Error ? err.message : err}`);
   }
-  // TODO: send mail
 
   appLogger.verbose('[sushi-alerts] Update of ENDPOINT alerts ended');
+  endpointJobIsRunning = false;
 }
 
 const endpointJob = CronJob.from({
@@ -67,8 +80,14 @@ const endpointJob = CronJob.from({
   onTick: updateEndpointAlerts,
 });
 
+async function getUpdateEndpointAlerts() {
+  return {
+    running: endpointJobIsRunning,
+  };
+}
+
 async function startUpdateEndpointAlerts() {
-  if (endpointJob.isCallbackRunning) {
+  if (endpointJobIsRunning) {
     throw new Error('An update of ENDPOINT alerts is already running');
   }
 
@@ -76,6 +95,8 @@ async function startUpdateEndpointAlerts() {
   // Don't await promise to avoid waiting for cron to finish
   updateEndpointAlerts()
     .then(() => endpointJob.start());
+
+  return getUpdateEndpointAlerts();
 }
 
 // #endregion HARVESTED_BUT_UNSUPPORTED
@@ -86,7 +107,9 @@ async function startCron() {
 }
 
 module.exports = {
+  getUpdateHarvestButUnsupportedAlerts,
   startUpdateHarvestButUnsupportedAlerts,
+  getUpdateEndpointAlerts,
   startUpdateEndpointAlerts,
   startCron,
 };
