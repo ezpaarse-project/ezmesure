@@ -16,27 +16,53 @@
     />
   </div>
 
-  <v-treeview
-    :model-value="Array.from(enabledFeatures)"
-    :items="availableFeatures"
-    density="compact"
-    expand-icon="mdi-chevron-right"
-    collapse-icon="mdi-chevron-down"
-    item-value="id"
-    item-title="name"
-    select-strategy="classic"
-    selectable
-    @update:model-value="onSelectionChange($event)"
+  <v-alert
+    v-if="errorMessage && !loading"
+    :title="$t('anErrorOccurred')"
+    color="error"
+    variant="tonal"
+    class="ma-2"
   >
-    <template #append="{ item }">
-      <span v-if="item?.children" class="text-caption text-grey">
-        {{ nbActiveChildren.get(item.id) }} / {{ item.children.length }}
-      </span>
-    </template>
-  </v-treeview>
+    <div>{{ errorMessage }}</div>
+
+    <v-btn
+      block
+      size="small"
+      variant="outlined"
+      @click="refresh()"
+    >
+      {{ $t('retry') }}
+    </v-btn>
+  </v-alert>
+
+  <v-skeleton-loader
+    type="list-item-avatar, list-item-avatar, list-item-avatar"
+    :loading="loading"
+  >
+    <v-treeview
+      :model-value="Array.from(enabledFeatures)"
+      :items="availableFeatures"
+      density="compact"
+      expand-icon="mdi-chevron-right"
+      collapse-icon="mdi-chevron-down"
+      item-value="id"
+      item-title="name"
+      select-strategy="classic"
+      selectable
+      @update:model-value="onSelectionChange($event)"
+    >
+      <template #append="{ item }">
+        <span v-if="item?.children" class="text-caption text-grey">
+          {{ nbActiveChildren.get(item.id) }} / {{ item.children.length }}
+        </span>
+      </template>
+    </v-treeview>
+  </v-skeleton-loader>
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const { modelValue: disabledFeatures } = defineProps({
   modelValue: {
     type: Array,
@@ -50,29 +76,31 @@ const emit = defineEmits({
   'update:modelValue': (features) => Array.isArray(features) && features.every((f) => typeof f === 'string'),
 });
 
-const features = computedAsync(async () => {
-  try {
-    return { items: await $fetch('/api/kibana/api/features') };
-  } catch (err) {
-    return { error: getErrorMessage(err) };
-  }
-}, { loading: true });
+const {
+  data: features,
+  status,
+  error,
+  refresh,
+} = useAsyncData('features', () => $fetch('/api/kibana/api/features'));
+
+const loading = computed(() => status.value === 'pending');
+const errorMessage = computed(() => error.value && getErrorMessage(error.value));
 
 // Workaround because selection does not sync when items are loaded asynchronously
-watch(() => features.value.items, () => {
+watch(() => features.value, () => {
   nextTick(() => {
     emit('update:modelValue', [...disabledFeatures]);
   });
-});
+}, { once: true });
 
 const availableFeatures = computed(() => {
-  if (!Array.isArray(features.value?.items)) {
+  if (!Array.isArray(features.value)) {
     return [];
   }
 
   const categories = new Map();
 
-  return features.value.items
+  return features.value
     .toSorted(sortByOrder)
     .reduce((acc, feature) => {
       let category = categories.get(feature.category.id);
@@ -101,7 +129,7 @@ const availableFeatures = computed(() => {
     });
 });
 
-const featureIds = computed(() => (features.value?.items ?? []).map((f) => f.id));
+const featureIds = computed(() => (features.value ?? []).map((f) => f.id));
 
 const enabledFeatures = computed(() => {
   const disabled = new Set(disabledFeatures);
