@@ -9,7 +9,7 @@ const { appLogger } = require('../services/logger');
 const HarvestService = require('./harvest.service');
 const EndpointsService = require('./sushi-endpoints.service');
 
-const isObject = require('../utils/isObject');
+const { isObject, isFalse } = require('../utils/type-guards');
 
 /* eslint-disable max-len */
 /**
@@ -225,7 +225,6 @@ module.exports = class SushiAlertsService extends BasePrismaService {
         continue;
       }
 
-      // TODO: should use first/last month available
       // We don't need first/last month available, so we can merge all versions
       const supportedData = new Map(
         Object.values(harvest.credentials.endpoint.supportedData)
@@ -263,7 +262,6 @@ module.exports = class SushiAlertsService extends BasePrismaService {
       };
 
       if (isObject(payload.context)) {
-        // TODO: what if missing one ?
         if ((payload.context.beginDate ?? '') >= harvest.period) {
           payload.context.beginDate = harvest.period;
         }
@@ -360,8 +358,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
               });
             }
 
-            // TODO: handle few edge cases like "False", "false", "no", "off", etc.
-            if (status.Service_Active === false) {
+            if (isFalse(status.Service_Active)) {
               appLogger.verbose(`[sushi-alerts][ENDPOINT] Found that service is inactive for [${endpoint.id}]`);
               alerts.push({
                 id: `${endpoint.id}:inactive`,
