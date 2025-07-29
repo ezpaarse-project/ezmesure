@@ -17,7 +17,7 @@
   </div>
 
   <v-treeview
-    :model-value="enabledFeatures"
+    :model-value="Array.from(enabledFeatures)"
     :items="availableFeatures"
     density="compact"
     expand-icon="mdi-chevron-right"
@@ -27,7 +27,13 @@
     select-strategy="classic"
     selectable
     @update:model-value="onSelectionChange($event)"
-  />
+  >
+    <template #append="{ item }">
+      <span v-if="item?.children" class="text-caption text-grey">
+        {{ nbActiveChildren.get(item.id) }} / {{ item.children.length }}
+      </span>
+    </template>
+  </v-treeview>
 </template>
 
 <script setup>
@@ -99,8 +105,17 @@ const featureIds = computed(() => (features.value?.items ?? []).map((f) => f.id)
 
 const enabledFeatures = computed(() => {
   const disabled = new Set(disabledFeatures);
-  return featureIds.value.filter((f) => !disabled.has(f));
+  return new Set(featureIds.value.filter((f) => !disabled.has(f)));
 });
+
+const isEnabled = (feature) => enabledFeatures.value.has(feature.id);
+
+const nbActiveChildren = computed(() => new Map(
+  availableFeatures.value.map((category) => [
+    category.id,
+    (category.children ?? []).filter(isEnabled).length,
+  ]),
+));
 
 const disableAll = () => {
   emit('update:modelValue', availableFeatures.value.flatMap((category) => {
