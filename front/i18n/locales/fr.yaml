@@ -941,7 +941,7 @@ spaces:
   id: Identifiant
   type: Type
   logo: Logo
-  disabledFeatures: Fonctionnalités désactivées
+  featureVisibility: Fonctionnalités visibles
   types:
     ezpaarse: ezPAARSE
     counter5: COUNTER
@@ -1118,8 +1118,8 @@ fixIt: Corriger
 leaveIt: Laisser tel quel
 nSelected: "{count} sélectionné(s)"
 deselect: Désélectionner
-selectAll: Tout sélectionner
-deselectAll: Tout desélectionner
+enableAll: Tout activer
+disableAll: Tout désactiver
 show: Afficher
 requiredFields: "* champs obligatoires"
 formSendingFailed: L'envoi du formulaire a échoué

@@ -1,34 +1,34 @@
 <template>
-  <div class="d-flex justify-end ga-2">
+  <div class="d-flex justify-end ga-2 px-2">
     <v-btn
-      v-if="!allSelected"
-      :text="$t('selectAll')"
+      v-if="!allEnabled"
+      :text="$t('enableAll')"
       size="x-small"
       variant="tonal"
-      @click="selectAll"
+      @click="enableAll"
     />
     <v-btn
-      v-if="!noneSelected"
-      :text="$t('deselectAll')"
+      v-if="!allDisabled"
+      :text="$t('disableAll')"
       size="x-small"
       variant="tonal"
-      @click="deselectAll"
+      @click="disableAll"
     />
   </div>
 
   <v-treeview
-    :model-value="props.modelValue"
+    :model-value="enabledFeatures"
     :items="availableFeatures"
     item-value="id"
     item-title="name"
     select-strategy="classic"
     selectable
-    @update:model-value="$emit('update:modelValue', $event);"
+    @update:model-value="onSelectionChange($event)"
   />
 </template>
 
 <script setup>
-const props = defineProps({
+const { modelValue: disabledFeatures } = defineProps({
   modelValue: {
     type: Array,
     default: () => [],
@@ -52,7 +52,7 @@ const features = computedAsync(async () => {
 // Workaround because selection does not sync when items are loaded asynchronously
 watch(() => features.value.items, () => {
   nextTick(() => {
-    emit('update:modelValue', [...props.modelValue]);
+    emit('update:modelValue', [...disabledFeatures]);
   });
 });
 
@@ -92,7 +92,14 @@ const availableFeatures = computed(() => {
     });
 });
 
-const selectAll = () => {
+const featureIds = computed(() => (features.value?.items ?? []).map((f) => f.id));
+
+const enabledFeatures = computed(() => {
+  const disabled = new Set(disabledFeatures);
+  return featureIds.value.filter((f) => !disabled.has(f));
+});
+
+const disableAll = () => {
   emit('update:modelValue', availableFeatures.value.flatMap((category) => {
     if (category.children) {
       return category.children.map((feature) => feature.id);
@@ -101,10 +108,21 @@ const selectAll = () => {
   }));
 };
 
-const deselectAll = () => {
+const enableAll = () => {
   emit('update:modelValue', []);
 };
 
-const allSelected = computed(() => props.modelValue.length === availableFeatures.value.length);
-const noneSelected = computed(() => props.modelValue.length === 0);
+const onSelectionChange = (selected) => {
+  const enabled = new Set(selected);
+  emit('update:modelValue', featureIds.value.filter((f) => !enabled.has(f)));
+};
+
+const allDisabled = computed(() => disabledFeatures.length === featureIds.value.length);
+const allEnabled = computed(() => disabledFeatures.length === 0);
 </script>
+
+<style scoped>
+  .v-treeview::v-deep .v-list-item--active:not(:hover) .v-list-item__overlay {
+    background: none;
+  }
+</style>

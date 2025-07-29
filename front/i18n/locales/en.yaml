@@ -925,7 +925,7 @@ spaces:
   id: Identifier
   type: Type
   logo: Logo
-  disabledFeatures: Disabled features
+  featureVisibility: Feature visibility
   types:
     ezpaarse: ezPAARSE
     counter5: COUNTER
@@ -1101,8 +1101,8 @@ fixIt: Fix it
 leaveIt: Leave it as is
 nSelected: "{count} selected"
 deselect: Deselect
-selectAll: Select all
-deselectAll: Deselect all
+enableAll: Enable all
+disableAll: Disable all
 show: Show
 requiredFields: "* required fields"
 formSendingFailed: Sending the form failed
