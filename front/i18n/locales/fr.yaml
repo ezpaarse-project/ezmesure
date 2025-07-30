@@ -703,12 +703,17 @@ sushi:
     nbFiles: 1 fichier|{count} fichiers
   alerts:
     title: Alertes
+    severity: Sévérité
     unsupportedButHarvested:
       title: Rapports moissonnés mais non supportés
-      severity: Sévérité
       error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
       empty: Aucun rapport non supporté n'a été moissonné !
       deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
+    endpoint:
+      title: Alertes/Messages des points d'accès COUNTER
+      message: Message
+      error: Une erreur est survenue lors de la moisson des alertes des points d'accès
+      empty: Aucune alerte n'a été trouvée !
   deleteReason: Raison de la suppression
   deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
