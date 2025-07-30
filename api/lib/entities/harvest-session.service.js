@@ -739,6 +739,14 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
     }
 
+    // Changing status to starting as we'll resolve endpoints, versions, etc.
+    if (!options.dryRun) {
+      await this.update({
+        where: { id: session.id },
+        data: { status: 'starting' },
+      });
+    }
+
     appLogger.verbose(`[harvest-start][${session.id}] Attempting to start session`);
 
     const credentialsToHarvest = await this.#getCredentialsToStart(session, options.restartAll);
@@ -809,11 +817,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
     if (options.dryRun) {
       appLogger.verbose(`[harvest-start][${session.id}] Running in dry mode, no real updates are done`);
-    } else {
-      await this.update({
-        where: { id: session.id },
-        data: { startedAt: new Date() },
-      });
     }
 
     let buffer = [];
@@ -859,6 +862,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     if (!session) {
       throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
     }
+
+    await this.update({
+      where: { id: session.id },
+      data: { status: 'stopping' },
+    });
 
     // Get jobs to cancel
     const jobsToCancel = await harvestJobsService.findMany({
