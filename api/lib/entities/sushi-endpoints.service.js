@@ -10,7 +10,7 @@ const {
 const sushiEndpointsPrisma = require('../services/prisma/sushi-endpoints');
 const BasePrismaService = require('./base-prisma.service');
 
-const isObject = require('../utils/isObject');
+const { isObject } = require('../utils/type-guards');
 
 const { appLogger } = require('../services/logger');
 const sushiService = require('../services/sushi');
