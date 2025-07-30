@@ -227,23 +227,25 @@ model SpacePermission {
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
   /// The institution this repository is associated to
-  institutions            Institution[]
+  institutions           Institution[]
   /// Creation date
-  createdAt               DateTime                          @default(now())
+  createdAt              DateTime                          @default(now())
   /// Latest update date
-  updatedAt               DateTime                          @updatedAt
+  updatedAt              DateTime                          @updatedAt
   /// The index pattern (ex: b-bibcnrs*)
-  pattern                 String                            @id
+  pattern                String                            @id
   /// The repository type (ezpaarse, counter5)
-  type                    String                            @db.VarChar(50)
+  type                   String                            @db.VarChar(50)
   /// Member permissions associated to this repository
-  permissions             RepositoryPermission[]
+  permissions            RepositoryPermission[]
   /// Aliases associated to this repository
-  aliases                 RepositoryAlias[]
+  aliases                RepositoryAlias[]
   /// Permissions granted by role for this repository
-  elasticRolePermissions  ElasticRoleRepositoryPermission[]
+  elasticRolePermissions ElasticRoleRepositoryPermission[]
   /// Alias templates that target this repository
-  aliasTemplates RepositoryAliasTemplate[]
+  aliasTemplates         RepositoryAliasTemplate[]
+  /// Harvest jobs using this repository
+  harvestJobs            HarvestJob[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -481,47 +483,51 @@ enum HarvestJobStatus {
 /// Represent the execution of a harvest job
 model HarvestJob {
   /// ID of the job
-  id              String           @id @default(cuid())
+  id                String           @id @default(cuid())
   /// ID of the SUSHI credentials
-  credentialsId   String
+  credentialsId     String
   /// SUSHI credentials used to harvest
-  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  credentials       SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
   /// Creation date
-  createdAt       DateTime         @default(now())
+  createdAt         DateTime         @default(now())
   /// Latest update date
-  updatedAt       DateTime         @updatedAt
+  updatedAt         DateTime         @updatedAt
   /// Start date (when the job moved from waiting to running)
-  startedAt       DateTime?
+  startedAt         DateTime?
   /// Job status
-  status          HarvestJobStatus
+  status            HarvestJobStatus
   /// ID of the harvested report (ex: tr_j1)
-  reportType      String
+  reportType        String
   /// Version of COUNTER to harvest (ex: 5.1)
-  counterVersion         String
+  counterVersion    String
   /// ID of the harvest session
-  sessionId       String
+  sessionId         String
   /// Session that created the job
-  session         HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session           HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   /// Beginning of the requested period, may differ from session's cause of supported periods
-  beginDate       String
+  beginDate         String
   /// End of the requested period, may differ from session's cause of supported periods
-  endDate         String
+  endDate           String
   /// Index where the harvested data should be inserted
-  index           String
+  index             String
+  /// Repository pattern including the index
+  repositoryPattern String?
+  /// Repository including the index
+  repository        Repository?      @relation(fields: [repositoryPattern], references: [pattern], onDelete: SetNull)
   /// Job running time
-  runningTime     Int?
+  runningTime       Int?
   /// Job result
-  result          Json?
+  result            Json?
   /// Error code, if a fatal exception was encountered
-  errorCode       String?
+  errorCode         String?
   /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
-  sushiExceptions Json[]
+  sushiExceptions   Json[]
   /// Job logs
-  logs            Log[]
+  logs              Log[]
   /// Job steps
-  steps           Step[]
+  steps             Step[]
   /// States affected by current job
-  harvests        Harvest[]
+  harvests          Harvest[]
 }
 
 /// Harvest state of a SUSHI item, for a specific month and report ID

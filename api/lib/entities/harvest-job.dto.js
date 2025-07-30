@@ -15,6 +15,7 @@ const schema = {
   counterVersion: Joi.string().trim(),
   sessionId: Joi.string().trim(),
   index: Joi.string().trim(),
+  repositoryPattern: Joi.string().trim(),
   runningTime: Joi.number().integer(),
   result: Joi.object({
     errors: Joi.array(),
@@ -33,6 +34,7 @@ const schema = {
   beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
   endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
 
+  repository: Joi.object(),
   credentials: Joi.object(),
   session: Joi.object(),
   logs: Joi.array().items(Joi.object()),
@@ -49,6 +51,7 @@ const includableFields = [
   'session',
   'logs',
   'steps',
+  'repository',
 ];
 
 module.exports = {

@@ -23,6 +23,7 @@ const schema = {
   elasticRolePermissions: Joi.array().items(Joi.object()),
   aliases: Joi.array().items(Joi.object()),
   aliasTemplates: Joi.array().items(Joi.object()),
+  harvestJobs: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -36,6 +37,7 @@ const immutableFields = [
   'aliases',
   'aliasTemplates',
   'elasticRolePermissions',
+  'harvestJobs',
 ];
 
 /**
@@ -47,6 +49,7 @@ const includableFields = [
   'aliasTemplates',
   'institutions',
   'elasticRolePermissions',
+  'harvestJobs',
 ];
 
 /**
