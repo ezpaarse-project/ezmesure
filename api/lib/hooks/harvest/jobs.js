@@ -92,7 +92,7 @@ const onHarvestJobUpdate = async (harvestJob) => {
     );
 
     // Check if session is still active, if not: trigger hook as session ended
-    if (!(await harvestSessionService.isActive(session))) {
+    if (!HarvestSessionService.isActive(session)) {
       triggerHooks('harvest-session:end', session);
     }
   });

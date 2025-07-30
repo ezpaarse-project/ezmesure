@@ -211,7 +211,7 @@ exports.startOne = async (ctx) => {
     return;
   }
 
-  if (await harvestSessionService.isActive(session)) {
+  if (HarvestSessionService.isActive(session)) {
     ctx.throw(409, ctx.$t('errors.harvest.sessionAlreadyRunning', harvestId));
     return;
   }
@@ -276,7 +276,7 @@ exports.stopOne = async (ctx) => {
     return;
   }
 
-  if (!await harvestSessionService.isActive(session)) {
+  if (!HarvestSessionService.isActive(session)) {
     ctx.status = 204;
     return;
   }

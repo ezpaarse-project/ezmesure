@@ -366,21 +366,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   }
 
   /**
-   * Returns whether the session is terminated or not by checking its jobs' status
+   * Returns whether the session is terminated or not
    * @param {HarvestSession} session - The session to check
    */
-  async isActive(session) {
-    const harvestJobsService = new HarvestJobsService(this.prisma);
-    const activeJob = await harvestJobsService.findFirst({
-      where: {
-        sessionId: session.id,
-        status: {
-          notIn: HarvestJobsService.endStatuses,
-        },
-      },
-    });
-
-    return !!activeJob;
+  static isActive(session) {
+    return session.status === 'starting' || session.status === 'running';
   }
 
   /* eslint-disable max-len */
