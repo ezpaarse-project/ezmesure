@@ -1,5 +1,7 @@
 const { Joi } = require('koa-joi-router');
 
+const { enums } = require('../services/prisma');
+
 const {
   withModifiers,
   ignoreFields,
@@ -16,6 +18,8 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
   startedAt: Joi.date(),
+
+  status: Joi.string().allow(...Object.values(enums.HarvestSessionStatus)),
 
   credentialsQuery: Joi.object({
     sushiIds: Joi.array().items(Joi.string()),
