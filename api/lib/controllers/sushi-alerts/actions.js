@@ -56,10 +56,9 @@ exports.deleteOneAlert = async (ctx) => {
   const { id } = ctx.params;
 
   const service = new SushiAlertsService();
-  const data = await service.delete({ where: { id } });
+  await service.delete({ where: { id } });
 
-  ctx.status = 200;
-  ctx.body = data;
+  ctx.status = 204;
 };
 
 exports.getUnsupportedButHarvestedState = (ctx) => {
