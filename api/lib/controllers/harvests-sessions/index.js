@@ -19,8 +19,10 @@ const {
   getOne,
   getManyStatus,
   createOne,
+  getStartStatus,
   startOne,
   deleteOne,
+  getStopStatus,
   stopOne,
   getOneCredentials,
   upsertOne,
@@ -111,6 +113,19 @@ router.route({
 });
 
 router.route({
+  method: 'GET',
+  path: '/:harvestId/_start',
+  handler: [
+    getStartStatus,
+  ],
+  validate: {
+    params: {
+      harvestId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
   method: 'POST',
   path: '/:harvestId/_start',
   handler: [
@@ -126,6 +141,19 @@ router.route({
       forceRefreshSupported: Joi.boolean().default(false),
       dryRun: Joi.boolean().default(false),
     }),
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:harvestId/_stop',
+  handler: [
+    getStopStatus,
+  ],
+  validate: {
+    params: {
+      harvestId: Joi.string().trim().required(),
+    },
   },
 });
 
