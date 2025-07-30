@@ -713,7 +713,7 @@ sushi:
       title: Alertes/Messages des points d'accès COUNTER
       message: Message
       error: Une erreur est survenue lors de la moisson des alertes des points d'accès
-      empty: Aucune alerte n'a été trouvé !
+      empty: Aucune alerte n'a été trouvée !
   deleteReason: Raison de la suppression
   deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
