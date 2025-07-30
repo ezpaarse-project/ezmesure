@@ -111,7 +111,7 @@ module.exports = {
     },
     alerts: {
       harvestedButUnsupported: {
-        schedule: '0 0 * * 7',
+        schedule: '0 0 0 * * 0',
       },
       endpoint: {
         schedule: '0 0 0 * * *',
