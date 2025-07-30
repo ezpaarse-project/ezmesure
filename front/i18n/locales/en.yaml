@@ -696,6 +696,8 @@ sushi:
     endpoint:
       title: Alerts/Messages from COUNTER endpoints
       message: Message
+      error: An error occurred while harvesting for alerts from endpoints
+      empty: No alerts was found !
   deleteReason: Reason for deletion
   deleteReasonDescription: Please provide a reason for the deletion of theses credentials. You can choose an existing reason or type your own below.
   deleteReasons:

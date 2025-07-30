@@ -2,13 +2,13 @@
   <div>
     <v-alert
       v-if="error"
-      :text="$t('sushi.alerts.unsupportedButHarvested.error', { error: error.message })"
+      :text="$t('sushi.alerts.endpoint.error', { error: error.message })"
       type="error"
     />
 
     <v-empty-state
       v-else-if="itemLength.total <= 0"
-      :title="$t('sushi.alerts.unsupportedButHarvested.empty')"
+      :title="$t('sushi.alerts.endpoint.empty')"
       icon="mdi-check"
       color="green"
     />
@@ -41,8 +41,6 @@
         />
       </template>
     </v-data-table-server>
-
-    <SushiHarvestMatrixDialog ref="harvestMatrixRef" />
   </div>
 </template>
 
@@ -55,8 +53,6 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
-
-const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
 
 const {
   status,
