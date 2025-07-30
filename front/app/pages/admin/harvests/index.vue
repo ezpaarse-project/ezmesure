@@ -59,6 +59,7 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+const snacks = useSnacksStore();
 
 const {
   data: sessions,
@@ -88,12 +89,17 @@ const statuses = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
-    return $fetch('/api/harvests-sessions/status', {
-      signal: abortController.signal,
-      params: {
-        harvestIds: sessionsIds.value,
-      },
-    });
+    try {
+      return $fetch('/api/harvests-sessions/status', {
+        signal: abortController.signal,
+        params: {
+          harvestIds: sessionsIds.value,
+        },
+      });
+    } catch (err) {
+      snacks.error(t('anErrorOccurred'), err);
+      return undefined;
+    }
   },
   undefined,
   { lazy: true },

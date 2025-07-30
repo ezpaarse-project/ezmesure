@@ -124,7 +124,7 @@ token:
   copyFailed: La copie du token a échoué
   clipped: Token copié dans le presse papier
 partners:
-  correspondents: Correspondants
+  correspondents: Contacts
   ecs: Événements de consultation
   ecsLoaded: chargés
   technical: Technique
@@ -134,7 +134,7 @@ partners:
   filteredCount: Nos {count} (sur {total}) partenaires
   automated: Automatisé
   links: Liens
-  noContacts: Pas de correspondants
+  noContacts: Pas de contacts
   noAutomations: Pas de services automatisés
   noLinks: Pas de liens
   auto:
@@ -946,6 +946,7 @@ spaces:
   id: Identifiant
   type: Type
   logo: Logo
+  disabledFeatures: Fonctionnalités désactivées
   types:
     ezpaarse: ezPAARSE
     counter5: COUNTER
@@ -1122,6 +1123,8 @@ fixIt: Corriger
 leaveIt: Laisser tel quel
 nSelected: "{count} sélectionné(s)"
 deselect: Désélectionner
+selectAll: Tout sélectionner
+deselectAll: Tout desélectionner
 show: Afficher
 requiredFields: "* champs obligatoires"
 formSendingFailed: L'envoi du formulaire a échoué

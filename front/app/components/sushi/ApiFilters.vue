@@ -101,7 +101,8 @@ const emit = defineEmits({
   'update:show': (v) => typeof v === 'boolean',
 });
 
-const { t } = useI18n();
+const snacks = useSnacksStore();
+const { t, locale } = useI18n();
 
 const {
   emptySymbol,
@@ -131,30 +132,14 @@ const availableEndpoints = computedAsync(
           include: ['endpoint'],
         },
       });
-      return data;
-    } finally {
-      loadingEndpoints.value = false;
-    }
-  },
-  async () => {
-    if (!props.institution) {
+
+      return data
+        .map((cred) => ({ title: cred.endpoint.vendor, value: cred.endpointId }))
+        .sort((a, b) => a.title.localeCompare(b.title, locale.value, { sensitivity: 'base' }));
+    } catch (err) {
+      snacks.error(t('anErrorOccurred'), err);
       return [];
     }
-
-    const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
-      query: {
-        size: 0,
-        distinct: 'endpointId',
-        include: ['endpoint'],
-      },
-    });
-
-    // Map sushi items with id of endpoint as key
-    const itemsPerEndpoint = Map.groupBy(Object.values(sushiItems), (item) => item.endpointId);
-
-    return Array.from(itemsPerEndpoint)
-      .map(([id, items]) => ({ value: id, title: items[0].endpoint.vendor }))
-      .sort((a, b) => a.title.localeCompare(b.title));
   },
   [],
   { lazy: true, evaluating: loadingEndpoints },
@@ -169,19 +154,24 @@ const availablePackages = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
-    const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
-      query: {
+    try {
+      const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
         signal: abortController.signal,
-        size: 0,
-        distinct: 'packages',
-      },
-    });
+        query: {
+          size: 0,
+          distinct: 'packages',
+        },
+      });
 
-    // Merge all packages in one array them make unique
-    const packages = new Set(items.flatMap((item) => item.packages ?? []));
+      // Merge all packages in one array them make unique
+      const packages = new Set(items.flatMap((item) => item.packages ?? []));
 
-    return Array.from(packages)
-      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
+      return Array.from(packages)
+        .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
+    } catch (err) {
+      snacks.error(t('anErrorOccurred'), err);
+      return [];
+    }
   },
   [],
   { lazy: true, evaluating: loadingPackages },

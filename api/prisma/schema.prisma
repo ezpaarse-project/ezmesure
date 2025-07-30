@@ -196,6 +196,8 @@ model Space {
   imageUrl               String?
   /// A list of index patterns that should be available in the space
   indexPatterns          Json[]
+  /// The list of features that are turned off in the space
+  disabledFeatures       String[]
   /// Member permissions associated to this space
   permissions            SpacePermission[]
   /// Permissions granted by role for this space
