@@ -385,8 +385,8 @@ const emit = defineEmits({
   'update:modelValue': (item) => !!item,
 });
 
-const { t } = useI18n();
 const snacks = useSnacksStore();
+const { t, locale } = useI18n();
 const { openConfirm } = useDialogStore();
 
 const saving = shallowRef(false);
@@ -405,19 +405,24 @@ const availableTags = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
-    const endpointItems = await $fetch('/api/sushi-endpoints', {
-      signal: abortController.signal,
-      query: {
-        size: 0,
-        distinct: 'tags',
-      },
-    });
+    try {
+      const items = await $fetch('/api/sushi-endpoints', {
+        signal: abortController.signal,
+        query: {
+          size: 0,
+          distinct: 'tags',
+        },
+      });
 
-    // Merge all tags in one array them make unique
-    const tags = new Set(items.flatMap((item) => item.tags ?? []));
+      // Merge all tags in one array them make unique
+      const tags = new Set(items.flatMap((item) => item.tags ?? []));
 
-    return Array.from(tags)
-      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
+      return Array.from(tags)
+        .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
+    } catch (err) {
+      snacks.error(t('anErrorOccurred'), err);
+      return [];
+    }
   },
   [],
   { lazy: true, evaluating: loadingTags },

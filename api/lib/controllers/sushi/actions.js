@@ -504,7 +504,7 @@ const checkConnection = async (sushi, params) => {
     sushi,
     institution: sushi.institution,
     endpoint,
-    reportType: endpoint.testedReport ?? 'pr',
+    reportType: endpoint.testedReport || 'pr',
     counterVersion,
   };
 
@@ -779,7 +779,7 @@ exports.getSushiUrls = async (ctx) => {
   const threeMonthAgo = subMonths(new Date(), 3);
 
   const options = {
-    reportType: endpoint.testedReport ?? 'pr',
+    reportType: endpoint.testedReport || 'pr',
     beginDate: format(threeMonthAgo, 'yyyy-MM'),
     endDate: format(threeMonthAgo, 'yyyy-MM'),
   };

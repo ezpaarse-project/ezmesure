@@ -230,7 +230,7 @@ const emit = defineEmits({
   'update:modelValue': (item) => !!item,
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const snacks = useSnacksStore();
 
 const loading = shallowRef(false);
@@ -239,7 +239,7 @@ const valid = shallowRef(false);
 const isAdvancedOpen = shallowRef(false);
 const loadingPackages = shallowRef(false);
 const packageSearch = shallowRef('');
-const sushi = ref({ ...(props.modelValue ?? {}) });
+const sushi = ref({ ...props.modelValue });
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -249,19 +249,24 @@ const availablePackages = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
-    const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
-      signal: abortController.signal,
-      query: {
-        size: 0,
-        distinct: 'packages',
-      },
-    });
+    try {
+      const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+        signal: abortController.signal,
+        query: {
+          size: 0,
+          distinct: 'packages',
+        },
+      });
 
-    // Merge all packages in one array them make unique
-    const packages = new Set(items.flatMap((item) => item.packages ?? []));
+      // Merge all packages in one array them make unique
+      const packages = new Set(items.flatMap((item) => item.packages ?? []));
 
-    return Array.from(packages)
-      .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
+      return Array.from(packages)
+        .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
+    } catch (err) {
+      snacks.error(t('anErrorOccurred'), err);
+      return [];
+    }
   },
   [],
   { lazy: true, evaluating: loadingPackages },

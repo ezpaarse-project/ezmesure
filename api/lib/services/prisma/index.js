@@ -3,6 +3,7 @@ const {
   Prisma,
   HarvestJobStatus,
   HarvestSessionStatus,
+  SushiAlertType,
 } = require('@prisma/client');
 
 module.exports = {
@@ -12,6 +13,7 @@ module.exports = {
   enums: {
     HarvestJobStatus,
     HarvestSessionStatus,
+    SushiAlertType,
   },
 
   PrismaErrors: {

@@ -376,7 +376,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   /* eslint-disable max-len */
   /**
    * @typedef {import('@prisma/client').Prisma.SushiCredentialsGetPayload<{ include: { endpoint: true, institution: true } }>} CredentialsToHarvest
-   * @typedef {Partial<HarvestJob> & { credentials: { id: string }, session: { id: string } }} BaseHarvestJob
+   * @typedef {Partial<HarvestJob> & { credentials: { id: string }, session: { id: string }, repository: { pattern: string } }} BaseHarvestJob
    */
   /* eslint-enable max-len */
 
@@ -610,11 +610,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    * @param {string} counterVersion - The version of COUNTER
    * @param {Map<string, string>} cache - The cache
    *
-   * @return {Promise<string | null>} The index, or null if couldn't be found
+   * @return {Promise<{ pattern?: string, index?: string }>} The index & repository
    */
   async #getIndexForInstitution(institution, counterVersion, cache) {
-    let prefix = cache.get(institution.id);
-    if (!prefix) {
+    let pattern = cache.get(institution.id);
+    if (!pattern) {
       const repositoriesService = new RepositoriesService(this);
 
       const repository = await repositoriesService.findFirst({
@@ -627,13 +627,14 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       });
 
       if (!repository?.pattern) {
-        return null;
+        return {};
       }
 
-      prefix = repository.pattern.replace(/[*]/g, '');
-      cache.set(institution.id, prefix);
+      pattern = repository.pattern;
+      cache.set(institution.id, pattern);
     }
 
+    const prefix = pattern.replace(/[*]/g, '');
     // Get index by COUNTER version
     let index;
     switch (counterVersion) {
@@ -645,7 +646,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         index = prefix;
         break;
     }
-    return index;
+    return { pattern, index };
   }
 
   /**
@@ -674,14 +675,17 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       // eslint-disable-next-line no-restricted-syntax
       for (const { version, beginDate, endDate } of counterVersions) {
+        const {
+          pattern,
+          index,
         // eslint-disable-next-line no-await-in-loop
-        const index = await this.#getIndexForInstitution(
+        } = await this.#getIndexForInstitution(
           institution,
           version,
-          state.institutionIndexPrefixes,
+          state.institutionPatterns,
         );
 
-        if (!index) {
+        if (!index || !pattern) {
           throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
         }
 
@@ -710,6 +714,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             yield {
               ...params,
               status: 'waiting',
+              repository: { pattern },
               credentials: { id: credentials.id },
               session: { id: session.id },
               reportType,
@@ -752,13 +757,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const credentialsToHarvest = await this.#getCredentialsToStart(session, options.restartAll);
     appLogger.verbose(`[harvest-start][${session.id}] Found [${credentialsToHarvest.length}] credentials to harvest`);
 
-    // Create index cache
-    const institutionIndexPrefixes = new Map();
+    // Create pattern cache
+    const institutionPatterns = new Map();
 
     // Get harvests jobs, using Array.fromAsync to wait for the whole iterator before continuing
     const jobList = await Array.fromAsync(
       this.#getJobsForCredentials(session, credentialsToHarvest, {
-        institutionIndexPrefixes,
+        institutionPatterns,
         forceRefreshSupported: options.forceRefreshSupported,
       }),
     );
@@ -803,6 +808,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           return service.create({
             data: {
               ...data,
+              repositoryPattern: undefined,
+              repository: {
+                connect: data.repository,
+              },
               credentials: {
                 connect: data.credentials,
               },
