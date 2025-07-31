@@ -81,7 +81,7 @@ const {
   status,
   error,
   refresh,
-} = useFetch('/api/kibana/api/features');
+} = await useFetch('/api/kibana/api/features', { lazy: true });
 
 const loading = computed(() => status.value === 'pending');
 const errorMessage = computed(() => error.value && getErrorMessage(error.value));
