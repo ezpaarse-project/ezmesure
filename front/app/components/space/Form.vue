@@ -142,7 +142,7 @@
                   <v-card
                     variant="outlined"
                     class="w-100"
-                    :title="$t('spaces.disabledFeatures')"
+                    :title="$t('spaces.featureVisibility')"
                   >
                     <SpaceFeaturesSelector v-model="space.disabledFeatures" />
                   </v-card>
