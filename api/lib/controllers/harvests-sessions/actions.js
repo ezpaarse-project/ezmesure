@@ -403,10 +403,6 @@ exports.getStopStatus = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
   }
 
-  if (session.status !== 'running') {
-    ctx.throw(409, ctx.$t('errors.harvest.sessionNotRunning', harvestId));
-  }
-
   ctx.status = 200;
   ctx.body = jobsStopped.get(session.id) ?? {
     status: session.status,
