@@ -252,20 +252,18 @@ exports.getStartStatus = async (ctx) => {
 
   const session = await harvestSessionService.findUnique({
     where: { id: harvestId },
-    include: { jobs: true },
+    select: { id: true, status: true, jobs: true },
   });
 
   if (!session) {
     ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
   }
 
-  const cached = jobsStarted.get(session.id);
-  if (!cached) {
-    ctx.throw(400, ctx.$t('errors.harvest.sessionNotRecentlyStarted', harvestId));
-  }
-
   ctx.status = 200;
-  ctx.body = cached;
+  ctx.body = jobsStarted.get(session.id) ?? {
+    status: session.status,
+    jobs: session.jobs,
+  };
 };
 
 exports.startOne = async (ctx) => {
@@ -398,7 +396,7 @@ exports.getStopStatus = async (ctx) => {
 
   const session = await harvestSessionService.findUnique({
     where: { id: harvestId },
-    include: { jobs: true },
+    select: { id: true, status: true, jobs: true },
   });
 
   if (!session) {
@@ -409,13 +407,11 @@ exports.getStopStatus = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.harvest.sessionNotRunning', harvestId));
   }
 
-  const cached = jobsStopped.get(session.id);
-  if (!cached) {
-    ctx.throw(400, ctx.$t('errors.harvest.sessionNotRecentlyStopped', harvestId));
-  }
-
   ctx.status = 200;
-  ctx.body = cached;
+  ctx.body = jobsStopped.get(session.id) ?? {
+    status: session.status,
+    jobs: session.jobs,
+  };
 };
 
 exports.stopOne = async (ctx) => {
