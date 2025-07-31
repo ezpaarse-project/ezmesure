@@ -168,7 +168,7 @@ const allEnabled = computed(() => disabledFeatures.length === 0);
 </script>
 
 <style scoped>
-  .v-treeview::v-deep .v-list-item--active:not(:hover) .v-list-item__overlay {
+  .v-treeview:deep(.v-list-item--active:not(:hover) .v-list-item__overlay) {
     background: none;
   }
 </style>
