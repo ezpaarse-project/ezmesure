@@ -19,8 +19,8 @@ errors:
     updateSessionAfterStart: Impossible de mettre a jour la session [%s] une fois lancée
     sessionAlreadyRunning: La session [%s] est déjà lancée
     sessionNotRunning: La session [%s] n'est pas lancée
-    sessionNotRecentlyStarted: La session [%s] n'as pas été lancée récemment
-    sessionNotRecentlyStopped: La session [%s] n'as pas été stopée récemment
+    sessionNotRecentlyStarted: La session [%s] n'a pas été lancée récemment
+    sessionNotRecentlyStopped: La session [%s] n'a pas été stoppée récemment
 
   queue:
     notFound: File d'attente introuvable
