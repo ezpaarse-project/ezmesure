@@ -2,6 +2,7 @@ const {
   PrismaClient,
   Prisma,
   HarvestJobStatus,
+  HarvestSessionStatus,
   SushiAlertType,
 } = require('@prisma/client');
 
@@ -11,6 +12,7 @@ module.exports = {
 
   enums: {
     HarvestJobStatus,
+    HarvestSessionStatus,
     SushiAlertType,
   },
 

@@ -10,6 +10,8 @@ const { appLogger } = require('../../services/logger');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 
+const JOBS_CACHE_DURATION = 5 * 60 * 1000;
+
 const standardQueryParams = prepareStandardQueryParams({
   schema,
   includableFields,
@@ -190,6 +192,80 @@ exports.upsertOne = async (ctx) => {
   ctx.body = upsertedSession;
 };
 
+const jobsStarted = new Map();
+
+async function startSession(session, options = {}) {
+  try {
+    const service = new HarvestSessionService();
+    const harvestJobs = service.start(session, options);
+
+    const now = new Date();
+    const jobs = [];
+    // Add jobs to queue
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const harvestJob of harvestJobs) {
+      jobs.push(harvestJob);
+      jobsStarted.set(session.id, {
+        status: 'starting',
+        jobs,
+      });
+
+      if (options.dryRun) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      const job = await harvestQueue.getJob(harvestJob.id);
+      if (job) {
+        await job.moveToDelayed(now + 100);
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      await harvestQueue.add(
+        'harvest',
+        { taskId: harvestJob.id, timeout: session.timeout },
+        { jobId: harvestJob.id },
+      );
+    }
+
+    jobsStarted.set(session.id, {
+      status: 'running',
+      jobs,
+    });
+  } catch (err) {
+    jobsStarted.set(session.id, {
+      status: 'starting',
+      error: err instanceof Error ? err.message : `${err}`,
+    });
+  }
+
+  setTimeout(() => {
+    jobsStarted.delete(session.id);
+  }, JOBS_CACHE_DURATION);
+}
+
+exports.getStartStatus = async (ctx) => {
+  const { harvestId } = ctx.params;
+
+  const harvestSessionService = new HarvestSessionService();
+
+  const session = await harvestSessionService.findUnique({
+    where: { id: harvestId },
+    select: { id: true, status: true, jobs: true },
+  });
+
+  if (!session) {
+    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
+  }
+
+  ctx.status = 200;
+  ctx.body = jobsStarted.get(session.id) ?? {
+    status: session.status,
+    jobs: session.jobs,
+  };
+};
+
 exports.startOne = async (ctx) => {
   ctx.action = 'harvest-sessions/start';
   ctx.type = 'json';
@@ -211,42 +287,25 @@ exports.startOne = async (ctx) => {
     return;
   }
 
-  if (await harvestSessionService.isActive(session)) {
+  if (HarvestSessionService.isActive(session)) {
     ctx.throw(409, ctx.$t('errors.harvest.sessionAlreadyRunning', harvestId));
     return;
   }
 
-  const harvestJobs = harvestSessionService.start(session, {
+  jobsStarted.set(session.id, { status: 'starting', jobs: [] });
+
+  // Don't await promise so it runs in the background
+  startSession(session, {
     restartAll,
     forceRefreshSupported,
     dryRun,
   });
 
-  const now = new Date();
-  const jobs = [];
-  // Add jobs to queue
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const harvestJob of harvestJobs) {
-    jobs.push(harvestJob);
-
-    if (!dryRun) {
-      const job = await harvestQueue.getJob(harvestJob.id);
-      if (job) {
-        await job.moveToDelayed(now + 100);
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-
-      await harvestQueue.add(
-        'harvest',
-        { taskId: harvestJob.id, timeout: session.timeout },
-        { jobId: harvestJob.id },
-      );
-    }
-  }
-
-  ctx.status = 201;
-  ctx.body = jobs;
+  ctx.status = 200;
+  ctx.body = {
+    ...session,
+    status: 'starting',
+  };
 };
 
 exports.deleteOne = async (ctx) => {
@@ -255,9 +314,100 @@ exports.deleteOne = async (ctx) => {
 
   const harvestSessionService = new HarvestSessionService();
 
-  await harvestSessionService.delete({ where: { id: harvestId } });
+  const where = { id: harvestId };
+
+  const session = await harvestSessionService.findUnique({ where });
+  if (!session) {
+    return null;
+  }
+
+  await harvestSessionService.update({ where, data: { deletedAt: new Date() } });
+
+  // Don't wait for promise to allow running in the background
+  harvestSessionService.delete({ where: { id: harvestId } })
+    .then(() => { appLogger.info(`[harvest-sessions] Deleted ${harvestId}`); })
+    .catch((error) => { appLogger.error(`[harvest-sessions] Couldn't delete ${harvestId}: ${error}`); });
 
   ctx.status = 204;
+};
+
+const jobsStopped = new Map();
+
+async function stopSession(session) {
+  try {
+    const service = new HarvestSessionService();
+    const harvestJobs = service.stop(session);
+
+    const jobs = [];
+    // Cancel jobs from queue
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const harvestJob of harvestJobs) {
+      try {
+        jobs.push(harvestJob);
+        jobsStopped.set(session.id, {
+          status: 'stopping',
+          jobs,
+        });
+
+        const job = await harvestQueue.getJob(harvestJob.id);
+        if (!job) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        // Remove job if not currently running
+        if (!await job.isActive()) {
+          await job.remove();
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        // Kill job if currently running
+        if (!job?.data?.pid) {
+          throw new Error('Cannot cancel job without PID');
+        }
+
+        process.kill(job.data.pid, 'SIGTERM');
+      } catch (error) {
+        appLogger.error(`[Harvest Queue] Failed to stop job ${harvestJob.id}: ${error}`);
+      }
+    }
+
+    jobsStopped.set(session.id, {
+      status: 'stopped',
+      jobs,
+    });
+  } catch (err) {
+    jobsStopped.set(session.id, {
+      status: 'stopping',
+      error: err instanceof Error ? err.message : `${err}`,
+    });
+  }
+
+  setTimeout(() => {
+    jobsStopped.delete(session.id);
+  }, JOBS_CACHE_DURATION);
+}
+
+exports.getStopStatus = async (ctx) => {
+  const { harvestId } = ctx.params;
+
+  const harvestSessionService = new HarvestSessionService();
+
+  const session = await harvestSessionService.findUnique({
+    where: { id: harvestId },
+    select: { id: true, status: true, jobs: true },
+  });
+
+  if (!session) {
+    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
+  }
+
+  ctx.status = 200;
+  ctx.body = jobsStopped.get(session.id) ?? {
+    status: session.status,
+    jobs: session.jobs,
+  };
 };
 
 exports.stopOne = async (ctx) => {
@@ -276,40 +426,19 @@ exports.stopOne = async (ctx) => {
     return;
   }
 
-  if (!await harvestSessionService.isActive(session)) {
+  if (!HarvestSessionService.isActive(session)) {
     ctx.status = 204;
     return;
   }
 
-  const harvestJobs = harvestSessionService.stop(session);
+  jobsStopped.set(session.id, { status: 'stopping', jobs: [] });
 
-  // Cancel jobs from queue
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const harvestJob of harvestJobs) {
-    try {
-      const job = await harvestQueue.getJob(harvestJob.id);
-      if (!job) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
+  // Don't await promise so it runs in the background
+  stopSession(session);
 
-      // Remove job if not currently running
-      if (!await job.isActive()) {
-        await job.remove();
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-
-      // Kill job if currently running
-      if (!job?.data?.pid) {
-        throw new Error('Cannot cancel job without PID');
-      }
-
-      process.kill(job.data.pid, 'SIGTERM');
-    } catch (error) {
-      appLogger.error(`[Harvest Queue] Failed to stop job ${harvestJob.id}: ${error}`);
-    }
-  }
-
-  ctx.status = 204;
+  ctx.status = 200;
+  ctx.body = {
+    ...session,
+    status: 'stopping',
+  };
 };

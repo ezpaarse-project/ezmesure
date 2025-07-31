@@ -366,21 +366,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   }
 
   /**
-   * Returns whether the session is terminated or not by checking its jobs' status
+   * Returns whether the session is terminated or not
    * @param {HarvestSession} session - The session to check
    */
-  async isActive(session) {
-    const harvestJobsService = new HarvestJobsService(this.prisma);
-    const activeJob = await harvestJobsService.findFirst({
-      where: {
-        sessionId: session.id,
-        status: {
-          notIn: HarvestJobsService.endStatuses,
-        },
-      },
-    });
-
-    return !!activeJob;
+  static isActive(session) {
+    return session.status === 'starting' || session.status === 'running';
   }
 
   /* eslint-disable max-len */
@@ -754,6 +744,14 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
     }
 
+    // Changing status to starting as we'll resolve endpoints, versions, etc.
+    if (!options.dryRun) {
+      await this.update({
+        where: { id: session.id },
+        data: { status: 'starting' },
+      });
+    }
+
     appLogger.verbose(`[harvest-start][${session.id}] Attempting to start session`);
 
     const credentialsToHarvest = await this.#getCredentialsToStart(session, options.restartAll);
@@ -828,11 +826,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
     if (options.dryRun) {
       appLogger.verbose(`[harvest-start][${session.id}] Running in dry mode, no real updates are done`);
-    } else {
-      await this.update({
-        where: { id: session.id },
-        data: { startedAt: new Date() },
-      });
     }
 
     let buffer = [];
@@ -878,6 +871,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     if (!session) {
       throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
     }
+
+    await this.update({
+      where: { id: session.id },
+      data: { status: 'stopping' },
+    });
 
     // Get jobs to cancel
     const jobsToCancel = await harvestJobsService.findMany({

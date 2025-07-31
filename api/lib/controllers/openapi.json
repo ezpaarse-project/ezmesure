@@ -1000,6 +1000,10 @@
           "id": {
             "$ref": "#/components/schemas/ItemID"
           },
+          "status": {
+            "description": "Status of the session",
+            "type": "string"
+          },
           "beginDate": {
             "description": "Begin date of the period to be harvested",
             "type": "string",
@@ -1086,6 +1090,9 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "deletedAt": {
+            "$ref": "#/components/schemas/ItemDeleteDate"
           },
           "_count": {
             "type": "object",
@@ -9374,6 +9381,53 @@
           "required": true
         }
       ],
+      "get": {
+        "summary": "Get status of harvest session start",
+        "tags": ["Harvests"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HarvestJob"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "419": {
+            "$ref": "#/components/responses/ConflictError"
+          }
+        },
+        "operationId": "get-harvests-sessions-_start",
+        "description": "Get status of harvest session start",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "post": {
         "summary": "Start a harvest session",
         "tags": ["Harvests"],
@@ -9438,6 +9492,53 @@
           "required": true
         }
       ],
+      "get": {
+        "summary": "Get status of harvest session stop",
+        "tags": ["Harvests"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HarvestJob"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "419": {
+            "$ref": "#/components/responses/ConflictError"
+          }
+        },
+        "operationId": "get-harvests-sessions-_stop",
+        "description": "Get status of harvest session stop",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "post": {
         "summary": "Stop a harvest session and cancel jobs under it",
         "tags": ["Harvests"],
