@@ -36,28 +36,29 @@
   </v-alert>
 
   <v-skeleton-loader
+    v-if="loading"
     type="list-item-avatar, list-item-avatar, list-item-avatar"
-    :loading="loading"
+  />
+
+  <v-treeview
+    v-else
+    :model-value="Array.from(enabledFeatures)"
+    :items="availableFeatures"
+    density="compact"
+    expand-icon="mdi-chevron-right"
+    collapse-icon="mdi-chevron-down"
+    item-value="id"
+    item-title="name"
+    select-strategy="classic"
+    selectable
+    @update:model-value="onSelectionChange($event)"
   >
-    <v-treeview
-      :model-value="Array.from(enabledFeatures)"
-      :items="availableFeatures"
-      density="compact"
-      expand-icon="mdi-chevron-right"
-      collapse-icon="mdi-chevron-down"
-      item-value="id"
-      item-title="name"
-      select-strategy="classic"
-      selectable
-      @update:model-value="onSelectionChange($event)"
-    >
-      <template #append="{ item }">
-        <span v-if="item?.children" class="text-caption text-grey">
-          {{ nbActiveChildren.get(item.id) }} / {{ item.children.length }}
-        </span>
-      </template>
-    </v-treeview>
-  </v-skeleton-loader>
+    <template #append="{ item }">
+      <span v-if="item?.children" class="text-caption text-grey">
+        {{ nbActiveChildren.get(item.id) }} / {{ item.children.length }}
+      </span>
+    </template>
+  </v-treeview>
 </template>
 
 <script setup>
