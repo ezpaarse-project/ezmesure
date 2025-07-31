@@ -76,13 +76,12 @@ const sortByOrder = (a, b) => (a.order < b.order ? -1 : 1);
 const emit = defineEmits({
   'update:modelValue': (features) => Array.isArray(features) && features.every((f) => typeof f === 'string'),
 });
-
 const {
   data: features,
   status,
   error,
   refresh,
-} = useAsyncData('features', () => $fetch('/api/kibana/api/features'));
+} = useFetch('/api/kibana/api/features');
 
 const loading = computed(() => status.value === 'pending');
 const errorMessage = computed(() => error.value && getErrorMessage(error.value));
