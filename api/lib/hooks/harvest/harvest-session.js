@@ -133,11 +133,53 @@ async function sendEndMail(session) {
 /**
  * @param {HarvestSession} session
  */
+const onHarvestSessionStart = async (session) => {
+  try {
+    await prisma.harvestSession.update({
+      where: { id: session.id },
+      data: {
+        status: 'running',
+        startedAt: new Date(),
+      },
+    });
+  } catch (err) {
+    appLogger.error(`[harvest-session][hooks] Error while updating status: ${err}`);
+  }
+};
+
+/**
+ * @param {HarvestSession} session
+ */
+const onHarvestSessionStop = async (session) => {
+  try {
+    await prisma.harvestSession.update({
+      where: { id: session.id },
+      data: { status: 'stopped' },
+    });
+  } catch (err) {
+    appLogger.error(`[harvest-session][hooks] Error while updating status: ${err}`);
+  }
+};
+
+/**
+ * @param {HarvestSession} session
+ */
 const onHarvestSessionEnd = async (session) => {
+  try {
+    await prisma.harvestSession.update({
+      where: { id: session.id },
+      data: { status: 'finished' },
+    });
+  } catch (err) {
+    appLogger.error(`[harvest-session][hooks] Error while updating status: ${err}`);
+  }
+
   if (session.sendEndMail) {
     await sendEndMail(session);
   }
 };
 
-// Using debounce here to avoid sending multiple mails
+registerHook('harvest-session:start', onHarvestSessionStart);
+registerHook('harvest-session:stop', onHarvestSessionStop);
+// Using debounce here to avoid triggering session end multiple times
 registerHook('harvest-session:end', onHarvestSessionEnd, { debounce: true });

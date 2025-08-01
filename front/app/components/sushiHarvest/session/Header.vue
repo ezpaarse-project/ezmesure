@@ -130,6 +130,7 @@ const props = defineProps({
 });
 
 const { t, locale } = useI18n();
+const snacks = useSnacksStore();
 const { isSupported: clipboard, copy } = useClipboard();
 
 const isCredentialsMenuOpen = shallowRef(false);

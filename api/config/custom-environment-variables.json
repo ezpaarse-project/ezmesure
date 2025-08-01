@@ -87,6 +87,14 @@
     "deleteSushi": {
       "schedule": "EZMESURE_DELETE_SUSHI_COUNTER_SCHEDULE",
       "maxDayAge": "EZMESURE_DELETE_SUSHI_COUNTER_FOLLOW_INTERVAL"
+    },
+    "alerts": {
+      "harvestedButUnsupported": {
+        "schedule": "EZMESURE_SUSHI_ALERT_HARVESTED_BUT_UNSUPPORTED_SCHEDULE"
+      },
+      "endpoint": {
+        "schedule": "EZMESURE_SUSHI_ALERT_ENDPOINT_SCHEDULE"
+      }
     }
   },
   "depositors": {

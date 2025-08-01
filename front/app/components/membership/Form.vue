@@ -513,7 +513,7 @@ function saveSpacePermissions() {
 async function save(actions) {
   loading.value = true;
 
-  const toDo = actions;
+  let toDo = actions;
   if (!actions) {
     toDo = [saveMembership, saveRepoPermissions, saveAliasPermissions, saveSpacePermissions];
   }

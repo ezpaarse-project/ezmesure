@@ -75,6 +75,7 @@ module.exports = async function process(param) {
 
   const {
     index,
+    repositoryPattern,
     session: {
       beginDate,
       endDate,
@@ -126,7 +127,7 @@ module.exports = async function process(param) {
   let esTaskId;
   try {
     const response = await elastic.deleteByQuery({
-      index,
+      index: repositoryPattern || index,
       wait_for_completion: false,
       body: {
         query: {

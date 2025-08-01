@@ -124,7 +124,7 @@ token:
   copyFailed: La copie du token a échoué
   clipped: Token copié dans le presse papier
 partners:
-  correspondents: Correspondants
+  correspondents: Contacts
   ecs: Événements de consultation
   ecsLoaded: chargés
   technical: Technique
@@ -134,7 +134,7 @@ partners:
   filteredCount: Nos {count} (sur {total}) partenaires
   automated: Automatisé
   links: Liens
-  noContacts: Pas de correspondants
+  noContacts: Pas de contacts
   noAutomations: Pas de services automatisés
   noLinks: Pas de liens
   auto:
@@ -703,12 +703,17 @@ sushi:
     nbFiles: 1 fichier|{count} fichiers
   alerts:
     title: Alertes
+    severity: Sévérité
     unsupportedButHarvested:
       title: Rapports moissonnés mais non supportés
-      severity: Sévérité
       error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
       empty: Aucun rapport non supporté n'a été moissonné !
       deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
+    endpoint:
+      title: Alertes/Messages des points d'accès COUNTER
+      message: Message
+      error: Une erreur est survenue lors de la moisson des alertes des points d'accès
+      empty: Aucune alerte n'a été trouvée !
   deleteReason: Raison de la suppression
   deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
@@ -941,7 +946,7 @@ spaces:
   id: Identifiant
   type: Type
   logo: Logo
-  disabledFeatures: Fonctionnalités désactivées
+  featureVisibility: Fonctionnalités visibles
   types:
     ezpaarse: ezPAARSE
     counter5: COUNTER
@@ -1118,8 +1123,8 @@ fixIt: Corriger
 leaveIt: Laisser tel quel
 nSelected: "{count} sélectionné(s)"
 deselect: Désélectionner
-selectAll: Tout sélectionner
-deselectAll: Tout desélectionner
+enableAll: Tout activer
+disableAll: Tout désactiver
 show: Afficher
 requiredFields: "* champs obligatoires"
 formSendingFailed: L'envoi du formulaire a échoué

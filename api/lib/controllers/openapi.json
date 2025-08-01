@@ -1000,6 +1000,10 @@
           "id": {
             "$ref": "#/components/schemas/ItemID"
           },
+          "status": {
+            "description": "Status of the session",
+            "type": "string"
+          },
           "beginDate": {
             "description": "Begin date of the period to be harvested",
             "type": "string",
@@ -1086,6 +1090,9 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "deletedAt": {
+            "$ref": "#/components/schemas/ItemDeleteDate"
           },
           "_count": {
             "type": "object",
@@ -2389,11 +2396,13 @@
       "SushiAlert": {
         "title": "Sushi Alert",
         "type": "object",
-        "required": ["type", "severity", "data"],
+        "required": ["id", "type", "severity", "context", "createdAt"],
         "properties": {
+          "id": { "type": "string" },
           "type": { "type": "string" },
           "severity": { "type": "string" },
-          "data": { "type": "object" }
+          "context": { "type": "object" },
+          "createdAt": { "$ref": "#/components/schemas/ItemCreationDate" }
         }
       }
     },
@@ -9372,6 +9381,53 @@
           "required": true
         }
       ],
+      "get": {
+        "summary": "Get status of harvest session start",
+        "tags": ["Harvests"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HarvestJob"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "419": {
+            "$ref": "#/components/responses/ConflictError"
+          }
+        },
+        "operationId": "get-harvests-sessions-_start",
+        "description": "Get status of harvest session start",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "post": {
         "summary": "Start a harvest session",
         "tags": ["Harvests"],
@@ -9436,6 +9492,53 @@
           "required": true
         }
       ],
+      "get": {
+        "summary": "Get status of harvest session stop",
+        "tags": ["Harvests"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HarvestJob"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "419": {
+            "$ref": "#/components/responses/ConflictError"
+          }
+        },
+        "operationId": "get-harvests-sessions-_stop",
+        "description": "Get status of harvest session stop",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "post": {
         "summary": "Stop a harvest session and cancel jobs under it",
         "tags": ["Harvests"],
@@ -11187,13 +11290,206 @@
         ],
         "parameters": [
           {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
             "name": "type",
-            "description": "",
             "in": "query",
             "schema": {
-              "type": "string",
-              "enum": ["harvestedButUnsupported"]
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/sushi-alerts/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get specific SUSHI alert",
+        "tags": ["Sushi"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SushiAlert"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-sushi-alerts-id",
+        "description": "Get SUSHI alert",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete specific SUSHI alerts",
+        "tags": ["Sushi"],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "delete-sushi-alerts-id",
+        "description": "Delete SUSHI alert",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sushi-alerts/_refresh/{type}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "type",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get status of refresh for a type of alerts",
+        "tags": ["Sushi"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["running"],
+                  "properties": {
+                    "running": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-sushi-alerts-refresh-type",
+        "description": "Get status of refresh for a type of alerts",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Force refresh for a type of alerts",
+        "tags": ["Sushi"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["running"],
+                  "properties": {
+                    "running": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "post-sushi-alerts-refresh-type",
+        "description": "Force refresh for a type of alerts",
+        "security": [
+          {
+            "bearerAuth": []
           }
         ]
       }
