@@ -13,7 +13,7 @@
 
           <v-card-text class="pa-0">
             <v-expansion-panels variant="accordion" :value="provider">
-              <v-expansion-panel>
+              <v-expansion-panel model:value="true">
                 <v-expansion-panel-title>
                   <div>
                     <img
@@ -62,6 +62,8 @@
 
                     <v-row>
                       <v-col>
+                        <!-- make v-text-field friendly with keePassXC -->
+                        <input aria-hidden="true" />
                         <v-text-field
                           v-model="credentials.password"
                           :label="$t('authenticate.password')"
