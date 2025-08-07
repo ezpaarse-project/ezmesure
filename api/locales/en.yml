@@ -107,6 +107,7 @@ errors:
     noEmail: mandatory email is missing from user profile
     failedToSave: Failed to save user data
     failedToUpdateRoles: Failed to update user roles
+    notATestUser: User is not a test user
 
     import:
       alreadyExists: User [%s] already exists

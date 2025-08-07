@@ -118,6 +118,15 @@ module.exports = {
       },
     },
   },
+  testUsers: {
+    lifespan: {
+      max: 24 * 60,
+      default: 60,
+    },
+    clean: {
+      schedule: '0 */15 * * * *',
+    },
+  },
   notifications: {
     sender: 'ezMESURE',
     cron: '0 0 0 * * *',
