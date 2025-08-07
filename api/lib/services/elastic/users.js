@@ -112,6 +112,34 @@ exports.getUserByUsername = async function getUserByUsername(username) {
 };
 
 /**
+ * Get all users in elastic with a username that match the given wildcard
+ *
+ * @param {string} wildcard - The wildcard expression
+ *
+ * @returns {Promise<ElasticUser[]>}
+ */
+exports.getUsersByWildcard = async function getUsersByWildcard(wildcard) {
+  const { body } = await elastic.search({
+    index: '.security',
+    _source_excludes: ['password'],
+    body: {
+      query: {
+        bool: {
+          filter: [{ term: { type: 'user' } }],
+          must: {
+            wildcard: {
+              username: { value: wildcard },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return body.hits.hits.map((hit) => hit._source);
+};
+
+/**
  * Update user in elastic.
  *
  * @param {Object} user - Config of user.
