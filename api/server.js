@@ -16,6 +16,7 @@ const metrics = require('./lib/services/metrics');
 const notifications = require('./lib/services/notifications');
 const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
+const testUsers = require('./lib/services/elastic/test-users');
 const sushi = require('./lib/services/sushi');
 const sushiCredentials = require('./lib/services/sushi-credentials');
 const sushiAlerts = require('./lib/services/sushi-alerts');
@@ -152,6 +153,7 @@ function start() {
   sushiAlerts.startCron();
   harvest.startCancelCron();
   cronMetrics.start();
+  testUsers.startCron();
 
   const server = app.listen(config.port);
   server.setTimeout(1000 * 60 * 30);

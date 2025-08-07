@@ -97,6 +97,15 @@
       }
     }
   },
+  "testUsers": {
+    "lifespan": {
+      "max": "EZMESURE_TEST_USERS_MAX_LIFESPAN",
+      "default": "EZMESURE_TEST_USERS_DEFAULT_LIFESPAN"
+    },
+    "clean": {
+      "schedule": "EZMESURE_TEST_USERS_CLEAN_SCHEDULE"
+    }
+  },
   "depositors": {
     "index": "EZMESURE_DEPOSITORS_INDEX",
     "spreadsheetId": "EZMESURE_DEPOSITORS_SPREADSHEET",

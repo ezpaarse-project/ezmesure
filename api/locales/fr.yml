@@ -107,6 +107,7 @@ errors:
     noEmail: L'email obligatoire est absent du profil utilisateur
     failedToSave: Impossible de sauvegarder les données utilisateur
     failedToUpdateRoles: Impossible de mettre à jour les rôles de l'utilisateur
+    notATestUser: L'utilisateur n'est pas un utilisateur de test
 
     import:
       alreadyExists: Ce compte [%s] existe déjà

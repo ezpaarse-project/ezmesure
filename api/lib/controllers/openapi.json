@@ -12098,6 +12098,149 @@
         "tags": ["Logs"]
       }
     },
+    "/test-users": {
+      "get": {
+        "summary": "List temporary test users",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operationId": "get-test-users",
+        "description": "List temporary test users.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cloneOf",
+            "in": "query",
+            "schema": {
+              "description": "Filter test users by the ID of the user they are cloned from",
+              "type": "string"
+            }
+          }
+        ],
+        "tags": ["Users"]
+      },
+      "post": {
+        "operationId": "post-test-users",
+        "summary": "Create a temporary test user",
+        "description": "Create a temporary test user.",
+        "tags": ["Users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["cloneOf"],
+                "properties": {
+                  "cloneOf": {
+                    "description": "The username of the user to clone",
+                    "type": "string",
+                    "example": "john.doe"
+                  },
+                  "lifespan": {
+                    "description": "The lifespan of the temporary user in minutes",
+                    "type": "number",
+                    "example": 60
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    {
+                      "description": "Password of the generated test user",
+                      "type": "object",
+                      "properties": {
+                        "password": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/test-users/{username}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "delete": {
+        "summary": "Delete a test user",
+        "description": "Delete a test user before his expiration",
+        "operationId": "delete-test-user-username",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Administration", "Users"],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "The user is not a test user"
+          }
+        }
+      }
+    },
     "/users": {
       "get": {
         "summary": "List users",
