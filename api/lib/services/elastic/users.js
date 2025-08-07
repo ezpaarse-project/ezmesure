@@ -43,6 +43,7 @@ exports.createAdmin = async function createAdmin() {
  * @param {string | undefined} user.email - Email of user.
  * @param {string | undefined} user.fullName - Full name of user.
  * @param {string[]} user.roles - Roles of user.
+ * @param {Object | undefined} user.metadata - User metadata.
  *
  * @return {Promise<ElasticUserCreated>} Created user.
  */
@@ -55,6 +56,7 @@ exports.createUser = async function createUser(user) {
       email: user.email,
       full_name: user.fullName,
       roles: user.roles || [],
+      metadata: user.metadata,
       password,
     },
   });
@@ -68,6 +70,7 @@ exports.createUser = async function createUser(user) {
  * @param {string | undefined} user.email - Email of user.
  * @param {string | undefined} user.fullName - Fullname of user.
  * @param {string[]} user.roles - Roles of user.
+ * @param {Object} user.metadata - User metadata.
  *
  * @return {Promise<ElasticUserCreated>} Created user.
  */
@@ -85,6 +88,7 @@ exports.upsertUser = async function upsertUser(user) {
       email: user.email,
       full_name: user.fullName,
       roles: user.roles || [],
+      metadata: user.metadata,
       password,
     },
   });
