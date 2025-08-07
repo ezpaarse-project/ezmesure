@@ -42,13 +42,14 @@ exports.createAdmin = async function createAdmin() {
  * @param {string} user.username - Username of user.
  * @param {string | undefined} user.email - Email of user.
  * @param {string | undefined} user.fullName - Full name of user.
+ * @param {string | undefined} user.password - Password of the user.
  * @param {string[]} user.roles - Roles of user.
  * @param {Object | undefined} user.metadata - User metadata.
  *
  * @return {Promise<ElasticUserCreated>} Created user.
  */
 exports.createUser = async function createUser(user) {
-  const password = await randomString();
+  const password = user.password ?? await randomString();
 
   return elastic.security.putUser({
     username: user.username,
