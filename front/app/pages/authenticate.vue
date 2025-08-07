@@ -51,7 +51,7 @@
                       <v-col>
                         <v-text-field
                           v-model="credentials.username"
-                          :placeholder="$t('authenticate.user')"
+                          :label="$t('authenticate.user')"
                           :rules="[() => !!credentials.username || ($t('authenticate.fieldIsRequired'))]"
                           prepend-icon="mdi-account"
                           variant="underlined"
@@ -62,10 +62,11 @@
 
                     <v-row>
                       <v-col>
-                        <!-- use placeholder to be friendly with keePassXC -->
+                        <!-- make v-text-field friendly with keePassXC -->
+                        <input aria-hidden="true" />
                         <v-text-field
                           v-model="credentials.password"
-                          :placeholder="$t('authenticate.password')"
+                          :label="$t('authenticate.password')"
                           :type="showPassword ? 'text' : 'password'"
                           :rules="[() => !!credentials.password || ($t('authenticate.fieldIsRequired'))]"
                           :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
