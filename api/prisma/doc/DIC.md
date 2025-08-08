@@ -2,6 +2,19 @@
 
 ## Enums
 
+### HarvestSessionStatus
+
+Possible statuses of an harvest session
+
+| Value    |
+|----------|
+| prepared |
+| starting |
+| running  |
+| finished |
+| stopping |
+| stopped  |
+
 ### HarvestJobStatus
 
 Possible statuses of a harvest job
@@ -15,6 +28,13 @@ Possible statuses of a harvest job
 | failed      |
 | cancelled   |
 | interrupted |
+
+### SushiAlertType
+
+| Value                     |
+|---------------------------|
+| HARVESTED_BUT_UNSUPPORTED |
+| ENDPOINT                  |
 
 ## Models
 
@@ -128,7 +148,9 @@ A kibana space
 | initials               | `String?`                      | Space initials                                                 |            |         |
 | color                  | `String?`                      | Space color                                                    |            |         |
 | type                   | `String`                       | Space type (ezpaarse, counter5)                                |            |         |
+| imageUrl               | `String?`                      | Space logo as a base64 data URL                                |            |         |
 | indexPatterns          | `Json[]`                       | A list of index patterns that should be available in the space |            |         |
+| disabledFeatures       | `String[]`                     | The list of features that are turned off in the space          |            |         |
 | permissions            | `SpacePermission[]`            | Member permissions associated to this space                    |            |         |
 | elasticRolePermissions | `ElasticRoleSpacePermission[]` | Permissions granted by role for this space                     |            |         |
 
@@ -158,6 +180,7 @@ A repository (a section of elasticsearch allocated to an institution)
 | aliases                | `RepositoryAlias[]`                 | Aliases associated to this repository            |            |         |
 | elasticRolePermissions | `ElasticRoleRepositoryPermission[]` | Permissions granted by role for this repository  |            |         |
 | aliasTemplates         | `RepositoryAliasTemplate[]`         | Alias templates that target this repository      |            |         |
+| harvestJobs            | `HarvestJob[]`                      | Harvest jobs using this repository               |            |         |
 
 ### RepositoryPermission
 
@@ -274,24 +297,27 @@ Represent the actions that are triggered
 
 Represent a harvest session
 
-| Property            | Type           | Description                                                                         | Attributes | Default  |
-|---------------------|----------------|-------------------------------------------------------------------------------------|------------|----------|
-| id                  | `String`       | ID of the session                                                                   | Id         | `cuid()` |
-| beginDate           | `String`       | Beginning of the requested period                                                   |            |          |
-| endDate             | `String`       | End of the requested period                                                         |            |          |
-| credentialsQuery    | `Json`         | Query to get sushi credentials                                                      |            |          |
-| jobs                | `HarvestJob[]` | Jobs created after request                                                          |            |          |
-| reportTypes         | `String[]`     | IDs of the requested reports (ex: tr_j1)                                            |            |          |
-| timeout             | `Int`          | Maximum execution time of a job                                                     |            | `600`    |
-| allowFaulty         | `Boolean`      | Whether the reports should be fetched even if credentials aren't verified or wrong  |            | `false`  |
-| downloadUnsupported | `Boolean`      | Whether the reports should be downloaded even if not supported by the endpoint      |            | `false`  |
-| forceDownload       | `Boolean`      | Whether the reports should be downloaded even if a local copy already exists        |            | `false`  |
-| sendEndMail         | `Boolean`      | Whether a mail should be sent when session ended                                    |            | `true`   |
-| ignoreValidation    | `Boolean?`     | Whether the reports should be inserted even if it does not pass the validation step |            |          |
-| params              | `Json?`        | Parameters to pass to jobs                                                          |            | `{}`     |
-| startedAt           | `DateTime?`    | Start date                                                                          |            |          |
-| createdAt           | `DateTime`     | Creation date                                                                       |            | `now()`  |
-| updatedAt           | `DateTime`     | Latest update date                                                                  |            |          |
+| Property               | Type                   | Description                                                                         | Attributes | Default    |
+|------------------------|------------------------|-------------------------------------------------------------------------------------|------------|------------|
+| id                     | `String`               | ID of the session                                                                   | Id         | `cuid()`   |
+| beginDate              | `String`               | Beginning of the requested period                                                   |            |            |
+| endDate                | `String`               | End of the requested period                                                         |            |            |
+| credentialsQuery       | `Json`                 | Query to get sushi credentials                                                      |            |            |
+| jobs                   | `HarvestJob[]`         | Jobs created after request                                                          |            |            |
+| reportTypes            | `String[]`             | IDs of the requested reports (ex: tr_j1)                                            |            |            |
+| allowedCounterVersions | `String[]`             | Allowed COUNTER versions (ex: ['5.1', '5'])                                         |            |            |
+| timeout                | `Int`                  | Maximum execution time of a job                                                     |            | `600`      |
+| allowFaulty            | `Boolean`              | Whether the reports should be fetched even if credentials aren't verified or wrong  |            | `false`    |
+| downloadUnsupported    | `Boolean`              | Whether the reports should be downloaded even if not supported by the endpoint      |            | `false`    |
+| forceDownload          | `Boolean`              | Whether the reports should be downloaded even if a local copy already exists        |            | `false`    |
+| sendEndMail            | `Boolean`              | Whether a mail should be sent when session ended                                    |            | `true`     |
+| ignoreValidation       | `Boolean?`             | Whether the reports should be inserted even if it does not pass the validation step |            |            |
+| params                 | `Json?`                | Parameters to pass to jobs                                                          |            | `{}`       |
+| status                 | `HarvestSessionStatus` | Status of session                                                                   |            | `prepared` |
+| startedAt              | `DateTime?`            | Start date                                                                          |            |            |
+| deletedAt              | `DateTime?`            | Deletion date                                                                       |            |            |
+| createdAt              | `DateTime`             | Creation date (the first time is got prepared)                                      |            | `now()`    |
+| updatedAt              | `DateTime`             | Latest update date                                                                  |            |            |
 
 ### HarvestJob
 
@@ -306,10 +332,12 @@ Represent the execution of a harvest job
 | startedAt       | `DateTime?`        | Start date (when the job moved from waiting to running)                                                 |            |          |
 | status          | `HarvestJobStatus` | Job status                                                                                              |            |          |
 | reportType      | `String`           | ID of the harvested report (ex: tr_j1)                                                                  |            |          |
+| counterVersion  | `String`           | Version of COUNTER to harvest (ex: 5.1)                                                                 |            |          |
 | session         | `HarvestSession`   | Session that created the job                                                                            |            |          |
 | beginDate       | `String`           | Beginning of the requested period, may differ from session's cause of supported periods                 |            |          |
 | endDate         | `String`           | End of the requested period, may differ from session's cause of supported periods                       |            |          |
 | index           | `String`           | Index where the harvested data should be inserted                                                       |            |          |
+| repository      | `Repository?`      | Repository including the index                                                                          |            |          |
 | runningTime     | `Int?`             | Job running time                                                                                        |            |          |
 | result          | `Json?`            | Job result                                                                                              |            |          |
 | errorCode       | `String?`          | Error code, if a fatal exception was encountered                                                        |            |          |
@@ -368,39 +396,40 @@ A job step
 
 A SUSHI endpoint
 
-| Property                  | Type                 | Description                                                                                                    | Attributes | Default  |
-|---------------------------|----------------------|----------------------------------------------------------------------------------------------------------------|------------|----------|
-| id                        | `String`             | ID of the endpoint                                                                                             | Id         | `cuid()` |
-| createdAt                 | `DateTime`           | Creation date                                                                                                  |            | `now()`  |
-| updatedAt                 | `DateTime`           | Latest update date                                                                                             |            |          |
-| sushiUrl                  | `String`             | Base URL of the SUSHI service                                                                                  |            |          |
-| vendor                    | `String`             | Vendor name of the endpoint                                                                                    |            |          |
-| tags                      | `String[]`           | Abritrary tag list associated to the endpoint                                                                  |            |          |
-| description               | `String?`            | Description of the endpoint                                                                                    |            |          |
-| counterVersions           | `String[]`           | Counter versions of the SUSHI service                                                                          |            |          |
-| technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                                                |            |          |
-| active                    | `Boolean`            | Whether the endpoint is active and can be harvested                                                            |            | `true`   |
-| activeUpdatedAt           | `DateTime`           | Date on which the active status was last modified                                                              |            | `now()`  |
-| requireCustomerId         | `Boolean`            | Whether the endpoint requires a customer ID                                                                    |            | `false`  |
-| requireRequestorId        | `Boolean`            | Whether the endpoint requires a requestor ID                                                                   |            | `false`  |
-| requireApiKey             | `Boolean`            | Whether the endpoint requires an API key                                                                       |            | `false`  |
-| ignoreReportValidation    | `Boolean`            | Whether report validation errors should be ignored                                                             |            | `false`  |
-| disabledUntil             | `DateTime?`          | Date until which the endpoint is disabled (no harvest allowed)                                                 |            |          |
-| defaultCustomerId         | `String?`            | Default value for the customer_id parameter                                                                    |            |          |
-| defaultRequestorId        | `String?`            | Default value for the requestor_id parameter                                                                   |            |          |
-| defaultApiKey             | `String?`            | Default value for the api_key parameter                                                                        |            |          |
-| paramSeparator            | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")                        |            |          |
-| supportedReports          | `String[]`           | [Deprecated] List report IDs that are supported by the endpoint                                                |            |          |
-| ignoredReports            | `String[]`           | [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported |            |          |
-| additionalReports         | `String[]`           | [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint       |            |          |
-| supportedReportsUpdatedAt | `DateTime?`          | [Deprecated] Date on which the list of supported reports was last updated                                      |            |          |
-| supportedData             | `Json`               | List of reports that are supported (or unsupported) by the endpoint, with periods available                    |            | `{}`     |
-| supportedDataUpdatedAt    | `DateTime?`          | Date on which the list of supported data was last updated                                                      |            |          |
-| harvestDateFormat         | `String?`            | Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")                          |            |          |
-| testedReport              | `String?`            | Report used when testing endpoint                                                                              |            |          |
-| registryId                | `String?`            | Id of platform in https://registry.countermetrics.org                                                          |            |          |
-| credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                                 |            |          |
-| params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                                   |            |          |
+| Property                    | Type                 | Description                                                                                                                                      | Attributes | Default  |
+|-----------------------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|------------|----------|
+| id                          | `String`             | ID of the endpoint                                                                                                                               | Id         | `cuid()` |
+| createdAt                   | `DateTime`           | Creation date                                                                                                                                    |            | `now()`  |
+| updatedAt                   | `DateTime`           | Latest update date                                                                                                                               |            |          |
+| sushiUrl                    | `String`             | Base URL of the SUSHI service                                                                                                                    |            |          |
+| vendor                      | `String`             | Vendor name of the endpoint                                                                                                                      |            |          |
+| tags                        | `String[]`           | Abritrary tag list associated to the endpoint                                                                                                    |            |          |
+| description                 | `String?`            | Description of the endpoint                                                                                                                      |            |          |
+| counterVersions             | `String[]`           | Counter versions of the SUSHI service                                                                                                            |            |          |
+| counterVersionsAvailability | `Json`               | Minimum period where a COUNTER version can be used. If not provided, version can be used for every period. Format: { [version: string]: string } |            | `{}`     |
+| technicalProvider           | `String?`            | Technical provider of the endpoint (ex: Atypon)                                                                                                  |            |          |
+| active                      | `Boolean`            | Whether the endpoint is active and can be harvested                                                                                              |            | `true`   |
+| activeUpdatedAt             | `DateTime`           | Date on which the active status was last modified                                                                                                |            | `now()`  |
+| requireCustomerId           | `Boolean`            | Whether the endpoint requires a customer ID                                                                                                      |            | `false`  |
+| requireRequestorId          | `Boolean`            | Whether the endpoint requires a requestor ID                                                                                                     |            | `false`  |
+| requireApiKey               | `Boolean`            | Whether the endpoint requires an API key                                                                                                         |            | `false`  |
+| ignoreReportValidation      | `Boolean`            | Whether report validation errors should be ignored                                                                                               |            | `false`  |
+| disabledUntil               | `DateTime?`          | Date until which the endpoint is disabled (no harvest allowed)                                                                                   |            |          |
+| defaultCustomerId           | `String?`            | Default value for the customer_id parameter                                                                                                      |            |          |
+| defaultRequestorId          | `String?`            | Default value for the requestor_id parameter                                                                                                     |            |          |
+| defaultApiKey               | `String?`            | Default value for the api_key parameter                                                                                                          |            |          |
+| paramSeparator              | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")                                                          |            |          |
+| supportedReports            | `String[]`           | [Deprecated] List report IDs that are supported by the endpoint                                                                                  |            |          |
+| ignoredReports              | `String[]`           | [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported                                   |            |          |
+| additionalReports           | `String[]`           | [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint                                         |            |          |
+| supportedReportsUpdatedAt   | `DateTime?`          | [Deprecated] Date on which the list of supported reports was last updated                                                                        |            |          |
+| supportedData               | `Json`               | List of reports that are supported (or unsupported) by the endpoint, with periods available                                                      |            | `{}`     |
+| supportedDataUpdatedAt      | `DateTime?`          | Date on which the list of supported data was last updated                                                                                        |            |          |
+| harvestDateFormat           | `String?`            | Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")                                                            |            |          |
+| testedReport                | `String?`            | Report used when testing endpoint                                                                                                                |            |          |
+| registryId                  | `String?`            | Id of platform in https://registry.countermetrics.org                                                                                            |            |          |
+| credentials                 | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                                                                   |            |          |
+| params                      | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                                                                     |            |          |
 
 ### SushiCredentials
 
@@ -442,3 +471,13 @@ A set of SUSHI credentials, associated to a SUSHI endpoint
 | createdAt    | `DateTime`           | Creation date                     |            | `now()` |
 | updatedAt    | `DateTime`           | Latest update date                |            |         |
 | credentials  | `SushiCredentials[]` | Credentials related to task       |            |         |
+
+### SushiAlert
+
+| Property  | Type             | Description                                     | Attributes | Default  |
+|-----------|------------------|-------------------------------------------------|------------|----------|
+| id        | `String`         | ID of the alert                                 | Id         | `cuid()` |
+| type      | `SushiAlertType` | Type of the alert                               |            |          |
+| severity  | `String`         | Severity of the alert (info, warn, error, etc.) |            |          |
+| context   | `Json`           | Context about alert                             |            | `{}`     |
+| createdAt | `DateTime`       | Creation date                                   |            | `now()`  |
