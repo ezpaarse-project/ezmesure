@@ -4,3 +4,4 @@ npm-debug.log
 storage
 ezmesure.local.env.sh
 certificates/
+rabbitmq/definitions.d/00-users.json

@@ -124,7 +124,7 @@ token:
   copyFailed: La copie du token a échoué
   clipped: Token copié dans le presse papier
 partners:
-  correspondents: Correspondants
+  correspondents: Contacts
   ecs: Événements de consultation
   ecsLoaded: chargés
   technical: Technique
@@ -134,7 +134,7 @@ partners:
   filteredCount: Nos {count} (sur {total}) partenaires
   automated: Automatisé
   links: Liens
-  noContacts: Pas de correspondants
+  noContacts: Pas de contacts
   noAutomations: Pas de services automatisés
   noLinks: Pas de liens
   auto:
@@ -212,7 +212,7 @@ endpoints:
   endpoint: Point d'accès
   toolbarTitle: Point d'accès COUNTER ({count})
   pageDescription: Gérez ici la liste des points d'accès COUNTER disponibles.
-  pageDescription2: Seule la version 5 du protocole COUNTER est supportée.
+  pageDescription2: Seules les versions 5 et 5.1 du protocole COUNTER sont supportées.
   manageEndpoints: >
     Gérer le point d'accès
     |Gérer {count} points d'accès
@@ -251,9 +251,14 @@ endpoints:
   lastMonthAvailable: Dernier mois disponible
   undefinedAvailable: Indéfini
   addAdditionalReport: Ajouter un rapport additionnel
+  addAdditionalReportDesc: Vous pouvez ajouter un rapport qui ne se trouve pas dans la liste des rapports fournie par l'éditeur (ou celle par défaut dans ezMESURE). Cela permet de combler des trous côté éditeur ou de moissonner des rapports non standards.
   undoReport: Annuler les modifications
   manuallyEdited: Modification manuelles
   ignoreReportValidation: Ignorer la validation du rapport
+  supportedVersionsDesc: Le code de pratique COUNTER est complété et mis à jour si nécessaire en fonction des contributions de la communauté qu'il sert. Chaque nouvelle version est disponible en tant que version numérotée sur le site web COUNTER. Le tableau ci-dessous permet d'indiquer à ezMESURE quelles versions sont supportées par le point d'accès, et quel est le premier mois disponible pour chaque version. Cette date sera utilisée pour définir quelle version utiliser lors du moissonnage.
+  addCustomVersion: Ajouter une version
+  customVersion: Version COUNTER
+  customVersionDesc: Vous pouvez ajouter une version qui n'est pas encore supportée par ezMESURE. Elle ne sera pas utilisée pour le moissonnage, mais permet de définir certains paramètres en vue d'une intégration prochaine.
   description: Description
   paramSeparatorDesc: ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2} lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard {separator} pour ces champs multivalués, renseignez le séparateur ici.
   paramSeparator: Séparateur
@@ -343,9 +348,6 @@ institutions:
     localisation: Localisation
     automations: Automatisations
     monitor: Contrôle
-    dropImageHere: Déposez votre image ici
-    invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : {accept}'
-    imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : 2mb'
     noDataFound: Les informations de votre établissement n'ont pas pu être récupérées.
     dataSent: Informations d'établissement transmises
     updated: Établissement mis à jour
@@ -385,6 +387,8 @@ institutions:
     propertyName: Nom de propriété
     noCustomProps: Aucune propriété personnalisée
     addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite
+    tags: Étiquettes
+    tagsDescription: Les étiquettes permettent d'organiser les établissements en leur associant des mots-clés.
   members:
     noMembers: Aucun membre
     title: Membres ({count})
@@ -439,7 +443,7 @@ institutions:
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
-    pageDescription2: Seule la version 5 du protocole COUNTER est supportée.
+    pageDescription2: Seules les versions 5 et 5.1 du protocole COUNTER sont supportées.
     addCredentials: Ajouter des identifiants
     updateCredentials: Mettre à jour des identifiants
     unabletToRetriveSushiInformations: Impossible de récupérer les informations des plateformes sushi
@@ -699,12 +703,17 @@ sushi:
     nbFiles: 1 fichier|{count} fichiers
   alerts:
     title: Alertes
+    severity: Sévérité
     unsupportedButHarvested:
       title: Rapports moissonnés mais non supportés
-      severity: Sévérité
       error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
       empty: Aucun rapport non supporté n'a été moissonné !
       deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
+    endpoint:
+      title: Alertes/Messages des points d'accès COUNTER
+      message: Message
+      error: Une erreur est survenue lors de la moisson des alertes des points d'accès
+      empty: Aucune alerte n'a été trouvée !
   deleteReason: Raison de la suppression
   deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
@@ -887,12 +896,6 @@ repositoryAliases:
     field: Champ
     isNot: Inverser le filtre
     value: Valeur(s)
-    nameTemplate:
-      exists: "{field} existe"
-      exists:not: "{field} n'existe pas"
-      values: "{0}|{0} {1}, etc."
-      is: "{field} est {valueText}"
-      is:not: "{field} n'est pas {valueText}"
 
 orphanAliases:
   toolbarTitle: Alias orphelins ({count})
@@ -942,6 +945,8 @@ spaces:
   noSpace: Aucun espace n'est encore attribué
   id: Identifiant
   type: Type
+  logo: Logo
+  featureVisibility: Fonctionnalités visibles
   types:
     ezpaarse: ezPAARSE
     counter5: COUNTER
@@ -967,7 +972,9 @@ harvest:
       endpoints: "{n} point d'accès|{n} points d'accès"
       reportTypes: "{n} type de rapport|{n} types de rapport"
       credentials: "{n} identifiant|{n} identifiants"
+      counterVersions: "{n} version de COUNTER|{n} versions de COUNTER"
     credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés"
+    reportsMenuTitle: Rapports COUNTER
     sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
@@ -989,10 +996,11 @@ harvest:
     updated: Éléments mis à jour
     failed: Éléments non récupérés
     unableToRetrive: Impossible de récupérer les tâches de moissonnage
-    unableToRetriveMeta: Impossible de récupérer les informations à propos des tâches
-      de moissonnage
+    unableToRetriveMeta: Impossible de récupérer les informations à propos des tâches de moissonnage
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
+    counterVersionTooltip: Moissonne un rapport COUNTER {version}
+    noData: Aucune donnée dans le rapport moissonné
 elasticRoles:
   toolbarTitle: Rôles Elastic ({count})
   newRole: Nouveau rôle
@@ -1070,6 +1078,10 @@ statuses:
   updated: Mis à jour
   deleted: Supprimé
   error: Erreur
+images:
+  dropImageHere: Déposez votre image ici
+  invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : {accept}'
+  imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : {size}'
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
@@ -1111,6 +1123,8 @@ fixIt: Corriger
 leaveIt: Laisser tel quel
 nSelected: "{count} sélectionné(s)"
 deselect: Désélectionner
+enableAll: Tout activer
+disableAll: Tout désactiver
 show: Afficher
 requiredFields: "* champs obligatoires"
 formSendingFailed: L'envoi du formulaire a échoué
@@ -1166,3 +1180,4 @@ archivedSince: Archivé depuis le {date}
 deleted: Supprimé
 deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
+version: Version

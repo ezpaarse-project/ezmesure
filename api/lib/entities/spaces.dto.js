@@ -24,6 +24,9 @@ const schema = {
   initials: Joi.string().trim().allow('').max(2)
     .empty(null),
   color: Joi.string().trim().allow('').empty(null),
+  imageUrl: Joi.string().trim().base64().allow(null),
+
+  disabledFeatures: Joi.array().items(Joi.string().trim().min(1)),
 
   indexPatterns: Joi.array().items(Joi.object({
     title: Joi.string().required().min(1),

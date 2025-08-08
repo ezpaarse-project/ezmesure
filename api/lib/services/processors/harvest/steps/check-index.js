@@ -2,7 +2,7 @@
 
 const elastic = require('../../../elastic');
 
-const publisherIndexTemplate = require('../../../../utils/publisher-template');
+const publisherIndexTemplates = require('../../../../utils/sushi-templates');
 
 const HarvestError = require('../HarvestError');
 
@@ -75,10 +75,12 @@ module.exports = async function process(param) {
 
   const {
     index,
+    repositoryPattern,
     session: {
       beginDate,
       endDate,
     },
+    counterVersion,
   } = task;
 
   const indexStep = await steps.create('index');
@@ -100,10 +102,15 @@ module.exports = async function process(param) {
   timeout.reset();
 
   if (!indexExists) {
+    const template = publisherIndexTemplates.get(counterVersion);
+    if (!template) {
+      throw new HarvestError(`Failed to get template for version [${counterVersion}]`);
+    }
+
     try {
       await elastic.indices.create({
         index,
-        body: publisherIndexTemplate,
+        body: template,
       });
     } catch (e) {
       throw new HarvestError(`Failed to create index [${index}]`, { cause: e });
@@ -120,7 +127,7 @@ module.exports = async function process(param) {
   let esTaskId;
   try {
     const response = await elastic.deleteByQuery({
-      index,
+      index: repositoryPattern || index,
       wait_for_completion: false,
       body: {
         query: {

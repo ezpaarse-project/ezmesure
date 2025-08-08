@@ -109,6 +109,14 @@ module.exports = {
       schedule: '0 */15 * * * *',
       followInterval: 10000,
     },
+    alerts: {
+      harvestedButUnsupported: {
+        schedule: '0 0 0 * * 0',
+      },
+      endpoint: {
+        schedule: '0 0 0 * * *',
+      },
+    },
   },
   notifications: {
     sender: 'ezMESURE',

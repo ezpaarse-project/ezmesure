@@ -14,7 +14,7 @@ import { defineStore, ref } from '#imports';
 
 export const useDialogStore = defineStore('dialog', () => {
   let close;
-  const show = ref(false);
+  const show = shallowRef(false);
   /**
    * @type {Ref<DialogData>}
    */

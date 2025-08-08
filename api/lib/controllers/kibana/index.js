@@ -18,10 +18,12 @@ const kibanaProxy = createProxyMiddleware({
   target: url || `http://${host}:${port}`,
   changeOrigin: true,
   pathRewrite: { '^/kibana': '/' },
-  logProvider: () => appLogger,
-  onProxyReq: (proxyReq) => {
-    proxyReq.setHeader('Authorization', `Basic ${authString}`);
-    proxyReq.setHeader('kbn-xsrf', true);
+  logger: appLogger,
+  on: {
+    proxyReq: (proxyReq) => {
+      proxyReq.setHeader('Authorization', `Basic ${authString}`);
+      proxyReq.setHeader('kbn-xsrf', true);
+    },
   },
 });
 

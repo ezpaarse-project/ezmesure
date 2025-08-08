@@ -192,8 +192,12 @@ model Space {
   color                  String?
   /// Space type (ezpaarse, counter5)
   type                   String                       @db.VarChar(50)
+  /// Space logo as a base64 data URL
+  imageUrl               String?
   /// A list of index patterns that should be available in the space
   indexPatterns          Json[]
+  /// The list of features that are turned off in the space
+  disabledFeatures       String[]
   /// Member permissions associated to this space
   permissions            SpacePermission[]
   /// Permissions granted by role for this space
@@ -223,23 +227,25 @@ model SpacePermission {
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
   /// The institution this repository is associated to
-  institutions            Institution[]
+  institutions           Institution[]
   /// Creation date
-  createdAt               DateTime                          @default(now())
+  createdAt              DateTime                          @default(now())
   /// Latest update date
-  updatedAt               DateTime                          @updatedAt
+  updatedAt              DateTime                          @updatedAt
   /// The index pattern (ex: b-bibcnrs*)
-  pattern                 String                            @id
+  pattern                String                            @id
   /// The repository type (ezpaarse, counter5)
-  type                    String                            @db.VarChar(50)
+  type                   String                            @db.VarChar(50)
   /// Member permissions associated to this repository
-  permissions             RepositoryPermission[]
+  permissions            RepositoryPermission[]
   /// Aliases associated to this repository
-  aliases                 RepositoryAlias[]
+  aliases                RepositoryAlias[]
   /// Permissions granted by role for this repository
-  elasticRolePermissions  ElasticRoleRepositoryPermission[]
+  elasticRolePermissions ElasticRoleRepositoryPermission[]
   /// Alias templates that target this repository
-  aliasTemplates RepositoryAliasTemplate[]
+  aliasTemplates         RepositoryAliasTemplate[]
+  /// Harvest jobs using this repository
+  harvestJobs            HarvestJob[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -418,40 +424,62 @@ model Action {
   data          Json         @default("{}")
 }
 
+/// Possible statuses of an harvest session
+enum HarvestSessionStatus {
+  /// The session is prepared, ready to be started
+  prepared
+  /// The session is starting, preparing things before launching jobs
+  starting
+  /// The session is running, it launched jobs and wait for them to finish
+  running
+  /// The session terminated
+  finished
+  /// The session is stopping
+  stopping
+  /// The session was forcefully stopped
+  stopped
+}
+
 /// Represent a harvest session
 model HarvestSession {
   /// ID of the session
-  id                  String       @id @default(cuid())
+  id                     String               @id @default(cuid())
   /// Beginning of the requested period
-  beginDate           String
+  beginDate              String
   /// End of the requested period
-  endDate             String
+  endDate                String
   /// Query to get sushi credentials
-  credentialsQuery    Json
+  credentialsQuery       Json
   /// Jobs created after request
-  jobs                HarvestJob[]
+  jobs                   HarvestJob[]
   /// IDs of the requested reports (ex: tr_j1)
-  reportTypes         String[]
+  reportTypes            String[]
+  /// Allowed COUNTER versions (ex: ['5.1', '5'])
+  allowedCounterVersions String[]
   /// Maximum execution time of a job
-  timeout             Int          @default(600)
+  timeout                Int                  @default(600)
   /// Whether the reports should be fetched even if credentials aren't verified or wrong
-  allowFaulty         Boolean      @default(false)
+  allowFaulty            Boolean      @default(false)
   /// Whether the reports should be downloaded even if not supported by the endpoint
-  downloadUnsupported Boolean      @default(false)
+  downloadUnsupported    Boolean      @default(false)
   /// Whether the reports should be downloaded even if a local copy already exists
-  forceDownload       Boolean      @default(false)
+  forceDownload          Boolean              @default(false)
   /// Whether a mail should be sent when session ended
-  sendEndMail            Boolean      @default(true)
+  sendEndMail            Boolean              @default(true)
   /// Whether the reports should be inserted even if it does not pass the validation step
-  ignoreValidation    Boolean?
+  ignoreValidation       Boolean?
   /// Parameters to pass to jobs
-  params              Json?        @default("{}")
+  params                 Json?                @default("{}")
+  /// Status of session
+  status                 HarvestSessionStatus @default(prepared)
   /// Start date
-  startedAt           DateTime?
-  /// Creation date
-  createdAt           DateTime     @default(now())
+  startedAt              DateTime?
+  /// Deletion date
+  deletedAt              DateTime?
+  /// Creation date (the first time is got prepared)
+  createdAt              DateTime             @default(now())
   /// Latest update date
-  updatedAt           DateTime     @updatedAt
+  updatedAt              DateTime             @updatedAt
 }
 
 /// Possible statuses of a harvest job
@@ -475,45 +503,51 @@ enum HarvestJobStatus {
 /// Represent the execution of a harvest job
 model HarvestJob {
   /// ID of the job
-  id              String           @id @default(cuid())
+  id                String           @id @default(cuid())
   /// ID of the SUSHI credentials
-  credentialsId   String
+  credentialsId     String
   /// SUSHI credentials used to harvest
-  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  credentials       SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
   /// Creation date
-  createdAt       DateTime         @default(now())
+  createdAt         DateTime         @default(now())
   /// Latest update date
-  updatedAt       DateTime         @updatedAt
+  updatedAt         DateTime         @updatedAt
   /// Start date (when the job moved from waiting to running)
-  startedAt       DateTime?
+  startedAt         DateTime?
   /// Job status
-  status          HarvestJobStatus
+  status            HarvestJobStatus
   /// ID of the harvested report (ex: tr_j1)
-  reportType      String
+  reportType        String
+  /// Version of COUNTER to harvest (ex: 5.1)
+  counterVersion    String
   /// ID of the harvest session
-  sessionId       String
+  sessionId         String
   /// Session that created the job
-  session         HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session           HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   /// Beginning of the requested period, may differ from session's cause of supported periods
-  beginDate       String
+  beginDate         String
   /// End of the requested period, may differ from session's cause of supported periods
-  endDate         String
+  endDate           String
   /// Index where the harvested data should be inserted
-  index           String
+  index             String
+  /// Repository pattern including the index
+  repositoryPattern String?
+  /// Repository including the index
+  repository        Repository?      @relation(fields: [repositoryPattern], references: [pattern], onDelete: SetNull)
   /// Job running time
-  runningTime     Int?
+  runningTime       Int?
   /// Job result
-  result          Json?
+  result            Json?
   /// Error code, if a fatal exception was encountered
-  errorCode       String?
+  errorCode         String?
   /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
-  sushiExceptions Json[]
+  sushiExceptions   Json[]
   /// Job logs
-  logs            Log[]
+  logs              Log[]
   /// Job steps
-  steps           Step[]
+  steps             Step[]
   /// States affected by current job
-  harvests        Harvest[]
+  harvests          Harvest[]
 }
 
 /// Harvest state of a SUSHI item, for a specific month and report ID
@@ -592,67 +626,69 @@ model Step {
 /// A SUSHI endpoint
 model SushiEndpoint {
   /// ID of the endpoint
-  id                        String             @id @default(cuid())
+  id                          String             @id @default(cuid())
   /// Creation date
-  createdAt                 DateTime           @default(now())
+  createdAt                   DateTime           @default(now())
   /// Latest update date
-  updatedAt                 DateTime           @updatedAt
+  updatedAt                   DateTime           @updatedAt
   /// Base URL of the SUSHI service
-  sushiUrl                  String
+  sushiUrl                    String
   /// Vendor name of the endpoint
-  vendor                    String
+  vendor                      String
   /// Abritrary tag list associated to the endpoint
-  tags                      String[]
+  tags                        String[]
   /// Description of the endpoint
-  description               String?
+  description                 String?
   /// Counter versions of the SUSHI service
-  counterVersions           String[]           @default(["5"])
+  counterVersions             String[]           @default(["5"])
+  /// Minimum period where a COUNTER version can be used. If not provided, version can be used for every period. Format: { [version: string]: string }
+  counterVersionsAvailability Json               @default("{}")
   /// Technical provider of the endpoint (ex: Atypon)
-  technicalProvider         String?
+  technicalProvider           String?
   /// Whether the endpoint is active and can be harvested
-  active                    Boolean            @default(true)
+  active                      Boolean            @default(true)
   /// Date on which the active status was last modified
-  activeUpdatedAt           DateTime           @default(now())
+  activeUpdatedAt             DateTime           @default(now())
   /// Whether the endpoint requires a customer ID
-  requireCustomerId         Boolean            @default(false)
+  requireCustomerId           Boolean            @default(false)
   /// Whether the endpoint requires a requestor ID
-  requireRequestorId        Boolean            @default(false)
+  requireRequestorId          Boolean            @default(false)
   /// Whether the endpoint requires an API key
-  requireApiKey             Boolean            @default(false)
+  requireApiKey               Boolean            @default(false)
   /// Whether report validation errors should be ignored
-  ignoreReportValidation    Boolean            @default(false)
+  ignoreReportValidation      Boolean            @default(false)
   /// Date until which the endpoint is disabled (no harvest allowed)
-  disabledUntil             DateTime?
+  disabledUntil               DateTime?
   /// Default value for the customer_id parameter
-  defaultCustomerId         String?
+  defaultCustomerId           String?
   /// Default value for the requestor_id parameter
-  defaultRequestorId        String?
+  defaultRequestorId          String?
   /// Default value for the api_key parameter
-  defaultApiKey             String?
+  defaultApiKey               String?
   /// Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")
-  paramSeparator            String?
+  paramSeparator              String?
   /// [Deprecated] List report IDs that are supported by the endpoint
-  supportedReports          String[]
+  supportedReports            String[]
   /// [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported
-  ignoredReports            String[]
+  ignoredReports              String[]
   /// [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint
-  additionalReports         String[]
+  additionalReports           String[]
   /// [Deprecated] Date on which the list of supported reports was last updated
-  supportedReportsUpdatedAt DateTime?
+  supportedReportsUpdatedAt   DateTime?
   /// List of reports that are supported (or unsupported) by the endpoint, with periods available
-  supportedData             Json               @default("{}")
+  supportedData               Json               @default("{}")
   /// Date on which the list of supported data was last updated
-  supportedDataUpdatedAt    DateTime?
+  supportedDataUpdatedAt      DateTime?
   /// Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")
-  harvestDateFormat         String?
+  harvestDateFormat           String?
   /// Report used when testing endpoint
-  testedReport              String?
+  testedReport                String?
   /// Id of platform in https://registry.countermetrics.org
-  registryId                String?
+  registryId                  String?
   /// SUSHI credentials associated with the endpoint
-  credentials               SushiCredentials[]
+  credentials                 SushiCredentials[]
   /// Additionnal default parameters. Each param has a name, a value, and a scope.
-  params                    Json[]
+  params                      Json[]
 }
 
 /// A set of SUSHI credentials, associated to a SUSHI endpoint
@@ -724,4 +760,22 @@ model SushiCredentialsDeletionTask {
   updatedAt    DateTime           @updatedAt
   /// Credentials related to task
   credentials  SushiCredentials[]
+}
+
+enum SushiAlertType {
+  HARVESTED_BUT_UNSUPPORTED
+  ENDPOINT
+}
+
+model SushiAlert {
+  /// ID of the alert
+  id        String         @id @default(cuid())
+  /// Type of the alert
+  type      SushiAlertType
+  /// Severity of the alert (info, warn, error, etc.)
+  severity  String
+  /// Context about alert
+  context   Json           @default("{}")
+  /// Creation date
+  createdAt DateTime       @default(now())
 }

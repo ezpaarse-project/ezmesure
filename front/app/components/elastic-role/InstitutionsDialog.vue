@@ -1,0 +1,49 @@
+<template>
+  <v-dialog
+    :model-value="isOpen"
+    width="700"
+    @update:model-value="close()"
+  >
+    <ElasticRoleInstitutions
+      :role="role"
+      show-role
+      @update:model-value="hasChanged = true"
+    >
+      <template #actions>
+        <v-btn
+          :text="$t('close')"
+          variant="text"
+          @click="close()"
+        />
+      </template>
+    </ElasticRoleInstitutions>
+  </v-dialog>
+</template>
+
+<script setup>
+const emit = defineEmits({
+  'update:modelValue': () => true,
+});
+
+const isOpen = shallowRef(false);
+const hasChanged = shallowRef(false);
+/** @type {Ref<object|null>} */
+const role = ref(null);
+
+function open(elasticRole) {
+  role.value = elasticRole;
+  hasChanged.value = false;
+  isOpen.value = true;
+}
+
+function close() {
+  if (hasChanged.value) {
+    emit('update:modelValue');
+  }
+  isOpen.value = false;
+}
+
+defineExpose({
+  open,
+});
+</script>

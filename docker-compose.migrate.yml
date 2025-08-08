@@ -19,9 +19,7 @@ services:
         condition: service_healthy
 
   migrate_reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-api:2.1.1
-    entrypoint: ""
-    command: ["/bin/sh", "-c", "npm run db:install && npm run db:migrate"]
+    image: ghcr.io/ezpaarse-project/ezreeport-migrate:dev
     environment:
       - http_proxy
       - https_proxy

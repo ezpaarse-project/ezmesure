@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const Papa = require('papaparse');
 const rison = require('rison-node');
 const elastic = require('../../services/elastic');
-const publisherTemplate = require('../../utils/publisher-template');
+const publisherIndexTemplates = require('../../utils/sushi-templates');
 
 exports.aggregate = async function aggregate(ctx) {
   const { index, extension } = ctx.request.params;
@@ -201,9 +201,14 @@ exports.counter5 = async function counter5(ctx) {
   const { body: exists } = await elastic.indices.exists({ index: destIndex });
 
   if (!exists) {
+    const template = publisherIndexTemplates.get('5');
+    if (!template) {
+      ctx.throw(409, ctx.$t('errors.index.noTemplateFound', '5', 'publisher'));
+    }
+
     await elastic.indices.create({
       index: destIndex,
-      body: publisherTemplate,
+      body: template,
     });
   }
 

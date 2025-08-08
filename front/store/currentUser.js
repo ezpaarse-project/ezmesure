@@ -13,12 +13,18 @@ export const useCurrentUserStore = defineStore('current-user', () => {
   const institutions = computed(() => memberships.value.map((m) => m.institution));
 
   const spacesPermissions = computed(() => {
-    const entries = memberships.value.flatMap((m) => m.spacePermissions ?? []);
+    const entries = memberships.value.flatMap((m) => {
+      const perms = m.spacePermissions ?? [];
+      return perms.map((p) => [p.spaceId, p]);
+    });
     return Array.from(new Map(entries).values());
   });
 
   const reposPermissions = computed(() => {
-    const entries = memberships.value.flatMap((m) => m.repositoryPermissions ?? []);
+    const entries = memberships.value.flatMap((m) => {
+      const perms = m.repositoryPermissions ?? [];
+      return perms.map((p) => [p.repositoryPattern, p]);
+    });
     return Array.from(new Map(entries).values());
   });
 

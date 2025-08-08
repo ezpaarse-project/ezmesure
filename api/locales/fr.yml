@@ -18,6 +18,9 @@ errors:
     sessionNotFound: La session [%s] n'existe pas
     updateSessionAfterStart: Impossible de mettre a jour la session [%s] une fois lancée
     sessionAlreadyRunning: La session [%s] est déjà lancée
+    sessionNotRunning: La session [%s] n'est pas lancée
+    sessionNotRecentlyStarted: La session [%s] n'a pas été lancée récemment
+    sessionNotRecentlyStopped: La session [%s] n'a pas été stoppée récemment
 
   queue:
     notFound: File d'attente introuvable
@@ -130,6 +133,7 @@ errors:
   index:
     notFound: Index [%s] introuvable
     alreadyExists: L'index [%s] existe déjà
+    noTemplateFound: Aucun modèle n'a été trouvé pour la version [%s] d'un index [%s]
 
   indexPattern:
     notFound: Index pattern [%s] introuvable dans l'espace [%s]

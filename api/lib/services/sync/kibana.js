@@ -10,6 +10,8 @@ const RepositoriesService = require('../../entities/repositories.service');
 const SpacesService = require('../../entities/spaces.service');
 const ElasticRoleService = require('../../entities/elastic-roles.service');
 
+const { syncUser } = require('./elastic/users');
+
 const {
   generateRoleNameFromSpace,
   generateKibanaFeatures,
@@ -32,6 +34,10 @@ const { syncSchedule, dateFormat } = config.get('kibana');
  * @returns {Promise<string | undefined>}
  */
 const getSpaceLogo = async (space) => {
+  if (space.imageUrl) {
+    return space.imageUrl;
+  }
+
   let data;
   switch (space.type) {
     case 'counter5':
@@ -119,6 +125,7 @@ const syncSpace = async (space) => {
     initials: space.initials || undefined,
     color: space.color || undefined,
     imageUrl: await getSpaceLogo(space),
+    disabledFeatures: space.disabledFeatures,
   };
 
   const spaceExists = (await kibana.getSpace(space.id)).status !== 404;
@@ -223,6 +230,10 @@ async function syncCustomRole(roleName) {
       repositoryPermissions: true,
       repositoryAliasPermissions: true,
       spacePermissions: true,
+      users: true,
+      institutions: {
+        include: { memberships: true },
+      },
     },
   });
   if (!role) {
@@ -252,6 +263,30 @@ async function syncCustomRole(roleName) {
     appLogger.verbose(`[kibana] Role [${role.name}] has been upserted`);
   } catch (error) {
     appLogger.error(`[kibana] Role [${role.name}] cannot be upserted:\n${error}`);
+  }
+
+  try {
+    const usernamesToSync = new Set(
+      [...role.users, ...role.institutions.flatMap((i) => i.memberships)]
+        .map(({ username }) => username),
+    );
+
+    const usersToSync = await prisma.client.user.findMany({
+      where: { username: { in: Array.from(usernamesToSync) } },
+    });
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const user of usersToSync) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await syncUser(user);
+        appLogger.verbose(`[kibana] Roles of user [${user.username}] for [${role.name}] has been synced`);
+      } catch (err) {
+        appLogger.error(`[kibana] Couldn't sync roles of [${user.username}] for [${role.name}]:\n${err}`);
+      }
+    }
+  } catch (error) {
+    appLogger.error(`[kibana] Couldn't sync roles of users for [${role.name}]:\n${error}`);
   }
 }
 

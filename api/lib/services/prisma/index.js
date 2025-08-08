@@ -1,4 +1,10 @@
-const { PrismaClient, Prisma, HarvestJobStatus } = require('@prisma/client');
+const {
+  PrismaClient,
+  Prisma,
+  HarvestJobStatus,
+  HarvestSessionStatus,
+  SushiAlertType,
+} = require('@prisma/client');
 
 module.exports = {
   Prisma,
@@ -6,6 +12,8 @@ module.exports = {
 
   enums: {
     HarvestJobStatus,
+    HarvestSessionStatus,
+    SushiAlertType,
   },
 
   PrismaErrors: {

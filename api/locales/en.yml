@@ -18,6 +18,9 @@ errors:
     sessionNotFound: The session [%s] does not exist
     updateSessionAfterStart: Impossible to update the session [%s] once started
     sessionAlreadyRunning: The session [%s] is already running
+    sessionNotRunning: The session [%s] is not running
+    sessionNotRecentlyStarted: The session [%s] wasn't started recently
+    sessionNotRecentlyStopped: The session [%s] wasn't stopped recently
 
   queue:
     notFound: Queue not found
@@ -129,6 +132,7 @@ errors:
   index:
     notFound: Index [%s] not found
     alreadyExists: Index [%s] already exists
+    noTemplateFound: No template found for version [%s] of a [%s] index
 
   indexPattern:
     notFound: Index pattern [%s] not found in space [%s]

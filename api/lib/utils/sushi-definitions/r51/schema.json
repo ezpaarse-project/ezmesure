@@ -1,0 +1,4698 @@
+{
+  "info": {
+    "version": "5.1.0.1"
+  },
+  "definitions": {
+    "Status": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string",
+          "description": "Description of the service."
+        },
+        "Service_Active": {
+          "type": "boolean",
+          "description": "Indicator if the service is currently able to deliver reports."
+        },
+        "Registry_Record": {
+          "type": "string",
+          "pattern": "^(https://registry.countermetrics.org/(platform|usage-data-host)/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|)$",
+          "description": "The link to the platform’s COUNTER Registry record. Report providers who do not have a Registry record MUST omit this element."
+        },
+        "Note": {
+          "type": "string",
+          "description": "A general note about the service."
+        },
+        "Alerts": {
+          "type": "array",
+          "description": "Any alerts related to service interruptions and status.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "Date_Time": {
+                "type": "string",
+                "description": "Date-time of the alert, in RFC3339 date-time format.",
+                "format": "date-time"
+              },
+              "Alert": {
+                "type": "string",
+                "description": "Text of the alert."
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "Service_Active"
+      ],
+      "description": "Status of a reporting service supported by a COUNTER API server.",
+      "title": "Status Information"
+    },
+    "Member": {
+      "title": "Member Information",
+      "description": "Customer ID and (if required for API requests) requestor ID for an institution.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Institution_Name": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Name of the institution."
+        },
+        "Institution_ID": {
+          "$ref": "#/definitions/Institution_ID",
+          "description": "Other identifiers for the institution (besides the customer ID)."
+        },
+        "Customer_ID": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Customer ID for requests to the API for this institution."
+        },
+        "Requestor_ID": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Requestor ID for requests to the API for the institution. This element MUST be omitted if the requestor ID is identical to the requestor ID in the request (or the COUNTER API server does not use requestor IDs)."
+        },
+        "Notes": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Additional notes regarding the institution."
+        }
+      },
+      "required": [
+        "Institution_Name",
+        "Customer_ID"
+      ]
+    },
+    "Report": {
+      "type": "object",
+      "title": "Report Information",
+      "description": "Information about a report supported by a COUNTER API server.",
+      "properties": {
+        "Report_Name": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Name of the report. For COUNTER Reports and Stadard Views of COUNTER Reports this is the Report_Name in the Report_Header."
+        },
+        "Report_ID": {
+          "type": "string",
+          "minLength": 2,
+          "description": "ID of the report used in the request (in lower case). For COUNTER Reports and Standard Views of COUNTER Reports this is the Report_ID in the Report_Header."
+        },
+        "Release": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Release version of the report."
+        },
+        "Report_Description": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Short description of the report."
+        },
+        "Path": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Path to use when requesting this report. Optional but recommended for custom reports. For COUNTER Reports and Standard Views of COUNTER Reports the path MUST be identical with the path specified in the Code of Practice, if the element is not omitted."
+        },
+        "First_Month_Available": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}$",
+          "description": "First month for which usage data has been processed and is available."
+        },
+        "Last_Month_Available": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}$",
+          "description": "Last month for which usage data has been processed and is available."
+        }
+      },
+      "required": [
+        "Report_Name",
+        "Report_ID",
+        "Release",
+        "Report_Description",
+        "First_Month_Available",
+        "Last_Month_Available"
+      ]
+    },
+    "PR": {
+      "title": "PR - Platform Report",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/PR_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PR_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "PR_P1": {
+      "title": "PR_P1 - Platform Usage",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/PR_P1_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PR_P1_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "DR": {
+      "title": "DR - Database Report",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/DR_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DR_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "DR_D1": {
+      "title": "DR_D1 - Database Search and Item Usage",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/DR_D1_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DR_D1_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "DR_D2": {
+      "title": "DR_D2 - Database Access Denied",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/DR_D2_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DR_D2_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR": {
+      "title": "TR - Title Report",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR_B1": {
+      "title": "TR_B1 - Book Requests (Controlled)",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_B1_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_B1_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR_B2": {
+      "title": "TR_B2 - Book Access Denied",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_B2_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_B2_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR_B3": {
+      "title": "TR_B3 - Book Usage by Access Type",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_B3_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_B3_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR_J1": {
+      "title": "TR_J1 - Journal Requests (Controlled)",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_J1_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_J1_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR_J2": {
+      "title": "TR_J2 - Journal Access Denied",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_J2_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_J2_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR_J3": {
+      "title": "TR_J3 - Journal Usage by Access Type",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_J3_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_J3_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "TR_J4": {
+      "title": "TR_J4 - Journal Requests by YOP (Controlled)",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/TR_J4_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TR_J4_Report_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "IR": {
+      "title": "IR - Item Report",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/IR_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/IR_Parent_Item"
+              },
+              {
+                "$ref": "#/definitions/IR_No_Parent_Item"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "IR_A1": {
+      "title": "IR_A1 - Journal Article Requests",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/IR_A1_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/IR_A1_Parent_Item"
+              },
+              {
+                "$ref": "#/definitions/IR_A1_No_Parent_Item"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "IR_M1": {
+      "title": "IR_M1 - Multimedia Item Requests",
+      "type": "object",
+      "properties": {
+        "Report_Header": {
+          "$ref": "#/definitions/IR_M1_Report_Header"
+        },
+        "Report_Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IR_M1_No_Parent_Item"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Report_Header",
+        "Report_Items"
+      ]
+    },
+    "Base_Report_Header": {
+      "type": "object",
+      "title": "Base Report_Header",
+      "properties": {
+        "Report_Name": {
+          "type": "string",
+          "description": "The name of the report."
+        },
+        "Report_ID": {
+          "type": "string",
+          "description": "The unique identifier of the report."
+        },
+        "Release": {
+          "const": "5.1",
+          "type": "string",
+          "description": "The COUNTER release this report complies with."
+        },
+        "Institution_Name": {
+          "type": "string",
+          "minLength": 2,
+          "description": "The name of the organization to which the usage is attributed."
+        },
+        "Institution_ID": {
+          "$ref": "#/definitions/Institution_ID",
+          "description": "A series of identifiers that represent the institution. The customer ID used for requesting the report MUST be included, usually with the platform ID as namespace. For reports to “The World”, Institution_ID should be 0000000000000000, with the platform ID as namespace."
+        },
+        "Report_Filters": {
+          "type": "object",
+          "description": "A series of report filters applied on the reported usage, including Begin_Date and End_Date (see the Base_Report_Filters object)."
+        },
+        "Exceptions": {
+          "type": "array",
+          "minItems": 1,
+          "description": "An indication of some difference between the usage that was requested and the usage that is being presented in the report. See the Exception objects for details.",
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Exception_0"
+              },
+              {
+                "$ref": "#/definitions/Exception_1-999"
+              },
+              {
+                "$ref": "#/definitions/Exception_3030"
+              },
+              {
+                "$ref": "#/definitions/Exception_3031"
+              },
+              {
+                "$ref": "#/definitions/Exception_3032"
+              },
+              {
+                "$ref": "#/definitions/Exception_3040"
+              },
+              {
+                "$ref": "#/definitions/Exception_3050"
+              },
+              {
+                "$ref": "#/definitions/Exception_3060"
+              },
+              {
+                "$ref": "#/definitions/Exception_3061"
+              },
+              {
+                "$ref": "#/definitions/Exception_3062"
+              },
+              {
+                "$ref": "#/definitions/Exception_3063"
+              },
+              {
+                "$ref": "#/definitions/Exception_3070"
+              }
+            ]
+          }
+        },
+        "Created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time the usage was prepared, in RFCRFC3339 date-time format."
+        },
+        "Created_By": {
+          "type": "string",
+          "minLength": 2,
+          "description": "The name of the organization or system that created the COUNTER report."
+        },
+        "Registry_Record": {
+          "type": "string",
+          "pattern": "^(https://registry.countermetrics.org/(platform|usage-data-host)/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|)$",
+          "description": "The link to the platform’s COUNTER Registry record. Report providers who do not have a Registry record MUST leave the value blank."
+        }
+      },
+      "required": [
+        "Report_Name",
+        "Report_ID",
+        "Release",
+        "Institution_Name",
+        "Institution_ID",
+        "Report_Filters",
+        "Created",
+        "Created_By",
+        "Registry_Record"
+      ]
+    },
+    "Base_Report_Filters": {
+      "type": "object",
+      "properties": {
+        "Begin_Date": {
+          "type": "string",
+          "format": "date"
+        },
+        "End_Date": {
+          "type": "string",
+          "format": "date"
+        },
+        "Platform": {
+          "type": "string",
+          "minLength": 2
+        }
+      },
+      "required": [
+        "Begin_Date",
+        "End_Date"
+      ],
+      "title": "Base Report_Filters"
+    },
+    "PR_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "PR",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Platform Report",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/PR_Report_Filters"
+            },
+            "Report_Attributes": {
+              "$ref": "#/definitions/PR_Report_Attributes"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR - Report_Header"
+    },
+    "PR_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Filter"
+            },
+            "Data_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Article",
+                  "Audiovisual",
+                  "Book",
+                  "Book_Segment",
+                  "Conference",
+                  "Conference_Item",
+                  "Database_Full_Item",
+                  "Dataset",
+                  "Image",
+                  "Interactive_Resource",
+                  "Journal",
+                  "Multimedia",
+                  "News_Item",
+                  "Newspaper_or_Newsletter",
+                  "Other",
+                  "Patent",
+                  "Platform",
+                  "Reference_Item",
+                  "Reference_Work",
+                  "Report",
+                  "Software",
+                  "Sound",
+                  "Standard",
+                  "Thesis_or_Dissertation",
+                  "Unspecified"
+                ]
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Searches_Platform",
+                  "Total_Item_Investigations",
+                  "Total_Item_Requests",
+                  "Unique_Item_Investigations",
+                  "Unique_Item_Requests",
+                  "Unique_Title_Investigations",
+                  "Unique_Title_Requests"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Filters"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR - Report_Filters"
+    },
+    "PR_Report_Attributes": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Attributes_To_Show": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Access_Method",
+                  "Institution_Name",
+                  "Customer_ID",
+                  "Country_Name",
+                  "Country_Code",
+                  "Subdivision_Name",
+                  "Subdivision_Code",
+                  "Attributed"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Granularity_Attribute"
+        }
+      ],
+      "minProperties": 1,
+      "unevaluatedProperties": false,
+      "title": "PR - Report_Attributes"
+    },
+    "PR_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Platform_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/PR_Attribute_Performance_Platform"
+                  },
+                  {
+                    "$ref": "#/definitions/PR_Attribute_Performance_Other"
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR - Report_Item"
+    },
+    "PR_Attribute_Performance_Platform": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Data_Type": {
+              "type": "string",
+              "const": "Platform"
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Attribute"
+            },
+            "Performance": {
+              "$ref": "#/definitions/PR_Performance_Platform"
+            }
+          },
+          "required": [
+            "Data_Type",
+            "Performance"
+          ]
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Attributes"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR - Attribute_Performance Platform"
+    },
+    "PR_Attribute_Performance_Other": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Data_Type": {
+              "type": "string",
+              "enum": [
+                "Article",
+                "Audiovisual",
+                "Book",
+                "Book_Segment",
+                "Conference",
+                "Conference_Item",
+                "Database_Full_Item",
+                "Dataset",
+                "Image",
+                "Interactive_Resource",
+                "Journal",
+                "Multimedia",
+                "News_Item",
+                "Newspaper_or_Newsletter",
+                "Other",
+                "Patent",
+                "Reference_Item",
+                "Reference_Work",
+                "Report",
+                "Software",
+                "Sound",
+                "Standard",
+                "Thesis_or_Dissertation",
+                "Unspecified"
+              ]
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Attribute"
+            },
+            "Performance": {
+              "$ref": "#/definitions/PR_Performance_Other"
+            }
+          },
+          "required": [
+            "Data_Type",
+            "Performance"
+          ]
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Attributes"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR - Attribute_Performance Other"
+    },
+    "PR_Performance_Platform": {
+      "title": "PR - Performance Platform",
+      "type": "object",
+      "properties": {
+        "Searches_Platform": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "PR_Performance_Other": {
+      "title": "PR - Performance Other",
+      "type": "object",
+      "properties": {
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "PR_P1_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "PR_P1",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Platform Usage",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/PR_P1_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR_P1 - Report_Header"
+    },
+    "PR_P1_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Searches_Platform",
+                "Total_Item_Requests",
+                "Unique_Item_Requests",
+                "Unique_Title_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR_P1 - Report_Filters"
+    },
+    "PR_P1_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Platform_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/PR_P1_Attribute_Performance_Platform"
+                  },
+                  {
+                    "$ref": "#/definitions/PR_P1_Attribute_Performance_Other"
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "PR_P1 - Report_Item"
+    },
+    "PR_P1_Attribute_Performance_Platform": {
+      "title": "PR_P1 - Attribute_Performance Platform",
+      "type": "object",
+      "properties": {
+        "Data_Type": {
+          "type": "string",
+          "const": "Platform"
+        },
+        "Performance": {
+          "$ref": "#/definitions/PR_P1_Performance_Platform"
+        }
+      },
+      "required": [
+        "Data_Type",
+        "Performance"
+      ],
+      "additionalProperties": false
+    },
+    "PR_P1_Attribute_Performance_Other": {
+      "title": "PR_P1 - Attribute_Performance Other",
+      "type": "object",
+      "properties": {
+        "Data_Type": {
+          "type": "string",
+          "enum": [
+            "Article",
+            "Audiovisual",
+            "Book",
+            "Book_Segment",
+            "Conference",
+            "Conference_Item",
+            "Database_Full_Item",
+            "Dataset",
+            "Image",
+            "Interactive_Resource",
+            "Journal",
+            "Multimedia",
+            "News_Item",
+            "Newspaper_or_Newsletter",
+            "Other",
+            "Patent",
+            "Reference_Item",
+            "Reference_Work",
+            "Report",
+            "Software",
+            "Sound",
+            "Standard",
+            "Thesis_or_Dissertation",
+            "Unspecified"
+          ]
+        },
+        "Performance": {
+          "$ref": "#/definitions/PR_P1_Performance_Other"
+        }
+      },
+      "required": [
+        "Data_Type",
+        "Performance"
+      ],
+      "additionalProperties": false
+    },
+    "PR_P1_Performance_Platform": {
+      "title": "PR_P1 - Performance Platform",
+      "type": "object",
+      "properties": {
+        "Searches_Platform": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "PR_P1_Performance_Other": {
+      "title": "PR_P1 - Performance Other",
+      "type": "object",
+      "properties": {
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "DR_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "DR",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Database Report",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/DR_Report_Filters"
+            },
+            "Report_Attributes": {
+              "$ref": "#/definitions/DR_Report_Attributes"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR - Report_Header"
+    },
+    "DR_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Database": {
+              "type": "string",
+              "minLength": 2
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Filter"
+            },
+            "Data_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Audiovisual",
+                  "Book",
+                  "Conference",
+                  "Database_Aggregated",
+                  "Database_AI",
+                  "Database_Full",
+                  "Database_Full_Item",
+                  "Image",
+                  "Interactive_Resource",
+                  "Journal",
+                  "Multimedia",
+                  "Newspaper_or_Newsletter",
+                  "Other",
+                  "Patent",
+                  "Reference_Work",
+                  "Report",
+                  "Sound",
+                  "Standard",
+                  "Thesis_or_Dissertation",
+                  "Unspecified"
+                ]
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Searches_Automated",
+                  "Searches_Federated",
+                  "Searches_Regular",
+                  "Total_Item_Investigations",
+                  "Total_Item_Requests",
+                  "Unique_Item_Investigations",
+                  "Unique_Item_Requests",
+                  "Unique_Title_Investigations",
+                  "Unique_Title_Requests",
+                  "Limit_Exceeded",
+                  "No_License"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Filters"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR - Report_Filters"
+    },
+    "DR_Report_Attributes": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Attributes_To_Show": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Access_Method",
+                  "Institution_Name",
+                  "Customer_ID",
+                  "Country_Name",
+                  "Country_Code",
+                  "Subdivision_Name",
+                  "Subdivision_Code",
+                  "Attributed"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Granularity_Attribute"
+        }
+      ],
+      "minProperties": 1,
+      "unevaluatedProperties": false,
+      "title": "DR - Report_Attributes"
+    },
+    "DR_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Database_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/DR_Attribute_Performance_Database"
+                  },
+                  {
+                    "$ref": "#/definitions/DR_Attribute_Performance_Other"
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR - Report_Item"
+    },
+    "DR_Attribute_Performance_Database": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Data_Type": {
+              "type": "string",
+              "enum": [
+                "Database_Aggregated",
+                "Database_AI",
+                "Database_Full"
+              ]
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Attribute"
+            },
+            "Performance": {
+              "$ref": "#/definitions/DR_Performance_Database"
+            }
+          },
+          "required": [
+            "Data_Type",
+            "Performance"
+          ]
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Attributes"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR - Attribute_Performance Database"
+    },
+    "DR_Attribute_Performance_Other": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Data_Type": {
+              "type": "string",
+              "enum": [
+                "Audiovisual",
+                "Book",
+                "Conference",
+                "Database_Full_Item",
+                "Image",
+                "Interactive_Resource",
+                "Journal",
+                "Multimedia",
+                "Newspaper_or_Newsletter",
+                "Other",
+                "Patent",
+                "Reference_Work",
+                "Report",
+                "Sound",
+                "Standard",
+                "Thesis_or_Dissertation",
+                "Unspecified"
+              ]
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Attribute"
+            },
+            "Performance": {
+              "$ref": "#/definitions/DR_Performance_Other"
+            }
+          },
+          "required": [
+            "Data_Type",
+            "Performance"
+          ]
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Attributes"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR - Attribute_Performance Other"
+    },
+    "DR_Performance_Database": {
+      "title": "DR - Performance Database",
+      "type": "object",
+      "properties": {
+        "Searches_Automated": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Searches_Regular": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Searches_Federated": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Limit_Exceeded": {
+          "$ref": "#/definitions/Counts"
+        },
+        "No_License": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "DR_Performance_Other": {
+      "title": "DR - Performance Other",
+      "type": "object",
+      "properties": {
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "DR_D1_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "DR_D1",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Database Search and Item Usage",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/DR_D1_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR_D1 - Report_Header"
+    },
+    "DR_D1_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Searches_Automated",
+                "Searches_Federated",
+                "Searches_Regular",
+                "Total_Item_Investigations",
+                "Total_Item_Requests",
+                "Unique_Item_Investigations",
+                "Unique_Item_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR_D1 - Report_Filters"
+    },
+    "DR_D1_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Database_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/DR_D1_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR_D1 - Report_Item"
+    },
+    "DR_D1_Attribute_Performance": {
+      "title": "DR_D1 - Attribute_Performance",
+      "type": "object",
+      "properties": {
+        "Performance": {
+          "$ref": "#/definitions/DR_D1_Performance"
+        }
+      },
+      "required": [
+        "Performance"
+      ],
+      "additionalProperties": false
+    },
+    "DR_D1_Performance": {
+      "title": "DR_D1 - Performance",
+      "type": "object",
+      "properties": {
+        "Searches_Automated": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Searches_Regular": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Searches_Federated": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "DR_D2_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "DR_D2",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Database Access Denied",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/DR_D2_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR_D2 - Report_Header"
+    },
+    "DR_D2_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Limit_Exceeded",
+                "No_License"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR_D2 - Report_Filters"
+    },
+    "DR_D2_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Database_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/DR_D2_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "DR_D2 - Report_Item"
+    },
+    "DR_D2_Attribute_Performance": {
+      "title": "DR_D2 - Attribute_Performance",
+      "type": "object",
+      "properties": {
+        "Performance": {
+          "$ref": "#/definitions/DR_D2_Performance"
+        }
+      },
+      "required": [
+        "Performance"
+      ],
+      "additionalProperties": false
+    },
+    "DR_D2_Performance": {
+      "title": "DR_D2 - Performance",
+      "type": "object",
+      "properties": {
+        "Limit_Exceeded": {
+          "$ref": "#/definitions/Counts"
+        },
+        "No_License": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "TR_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Title Report",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_Report_Filters"
+            },
+            "Report_Attributes": {
+              "$ref": "#/definitions/TR_Report_Attributes"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR - Report_Header"
+    },
+    "TR_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Item_ID": {
+              "type": "string",
+              "minLength": 2
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Filter"
+            },
+            "Access_Type": {
+              "$ref": "#/definitions/Access_Type_Filter"
+            },
+            "Data_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Book",
+                  "Conference",
+                  "Journal",
+                  "Newspaper_or_Newsletter",
+                  "Other",
+                  "Patent",
+                  "Reference_Work",
+                  "Report",
+                  "Standard",
+                  "Thesis_or_Dissertation",
+                  "Unspecified"
+                ]
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Total_Item_Investigations",
+                  "Total_Item_Requests",
+                  "Unique_Item_Investigations",
+                  "Unique_Item_Requests",
+                  "Unique_Title_Investigations",
+                  "Unique_Title_Requests",
+                  "Limit_Exceeded",
+                  "No_License"
+                ]
+              }
+            },
+            "YOP": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^([0-9]{4}|[0-9]{4}-[0-9]{4})$"
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Filters"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR - Report_Filters"
+    },
+    "TR_Report_Attributes": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Attributes_To_Show": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "YOP",
+                  "Access_Type",
+                  "Access_Method",
+                  "Institution_Name",
+                  "Customer_ID",
+                  "Country_Name",
+                  "Country_Code",
+                  "Subdivision_Name",
+                  "Subdivision_Code",
+                  "Attributed",
+                  "Book_Segment_Count"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Granularity_Attribute"
+        }
+      ],
+      "minProperties": 1,
+      "unevaluatedProperties": false,
+      "title": "TR - Report_Attributes"
+    },
+    "TR_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Book_Segment_Count": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "The number of Book_Segments within a Book. This is a common extension, support is optional (see Section 11 of the Code of Practice for details)."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR - Report_Item"
+    },
+    "TR_Attribute_Performance": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Data_Type": {
+              "type": "string",
+              "enum": [
+                "Book",
+                "Conference",
+                "Journal",
+                "Newspaper_or_Newsletter",
+                "Other",
+                "Patent",
+                "Reference_Work",
+                "Report",
+                "Standard",
+                "Thesis_or_Dissertation",
+                "Unspecified"
+              ]
+            },
+            "YOP": {
+              "type": "string",
+              "pattern": "^[0-9]{4}$"
+            },
+            "Access_Type": {
+              "$ref": "#/definitions/Access_Type_Attribute"
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Attribute"
+            },
+            "Performance": {
+              "$ref": "#/definitions/TR_Performance"
+            }
+          },
+          "required": [
+            "Data_Type",
+            "Performance"
+          ]
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Attributes"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR - Attribute_Performance"
+    },
+    "TR_Performance": {
+      "title": "TR - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Limit_Exceeded": {
+          "$ref": "#/definitions/Counts"
+        },
+        "No_License": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "TR_B1_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR_B1",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Book Requests (Controlled)",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_B1_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B1 - Report_Header"
+    },
+    "TR_B1_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Access_Type": {
+              "type": "array",
+              "const": [
+                "Controlled"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Book",
+                "Reference_Work"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Total_Item_Requests",
+                "Unique_Title_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Access_Type",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B1 - Report_Filters"
+    },
+    "TR_B1_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_B1_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B1 - Report_Item"
+    },
+    "TR_B1_Attribute_Performance": {
+      "title": "TR_B1 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Data_Type": {
+          "type": "string",
+          "enum": [
+            "Book",
+            "Reference_Work"
+          ]
+        },
+        "YOP": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        },
+        "Performance": {
+          "$ref": "#/definitions/TR_B1_Performance"
+        }
+      },
+      "required": [
+        "Data_Type",
+        "YOP",
+        "Performance"
+      ]
+    },
+    "TR_B1_Performance": {
+      "title": "TR_B1 - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "TR_B2_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR_B2",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Book Access Denied",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_B2_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B2 - Report_Header"
+    },
+    "TR_B2_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Book",
+                "Reference_Work"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Limit_Exceeded",
+                "No_License"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B2 - Report_Filters"
+    },
+    "TR_B2_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_B2_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B2 - Report_Item"
+    },
+    "TR_B2_Attribute_Performance": {
+      "title": "TR_B2 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Data_Type": {
+          "type": "string",
+          "enum": [
+            "Book",
+            "Reference_Work"
+          ]
+        },
+        "YOP": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        },
+        "Performance": {
+          "$ref": "#/definitions/TR_B2_Performance"
+        }
+      },
+      "required": [
+        "Data_Type",
+        "YOP",
+        "Performance"
+      ]
+    },
+    "TR_B2_Performance": {
+      "title": "TR_B2 - Performance",
+      "type": "object",
+      "properties": {
+        "Limit_Exceeded": {
+          "$ref": "#/definitions/Counts"
+        },
+        "No_License": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "TR_B3_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR_B3",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Book Usage by Access Type",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_B3_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B3 - Report_Header"
+    },
+    "TR_B3_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Book",
+                "Reference_Work"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Total_Item_Investigations",
+                "Total_Item_Requests",
+                "Unique_Item_Investigations",
+                "Unique_Item_Requests",
+                "Unique_Title_Investigations",
+                "Unique_Title_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B3 - Report_Filters"
+    },
+    "TR_B3_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_B3_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_B3 - Report_Item"
+    },
+    "TR_B3_Attribute_Performance": {
+      "title": "TR_B3 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Data_Type": {
+          "type": "string",
+          "enum": [
+            "Book",
+            "Reference_Work"
+          ]
+        },
+        "YOP": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        },
+        "Access_Type": {
+          "$ref": "#/definitions/Access_Type_Attribute"
+        },
+        "Performance": {
+          "$ref": "#/definitions/TR_B3_Performance"
+        }
+      },
+      "required": [
+        "Data_Type",
+        "YOP",
+        "Access_Type",
+        "Performance"
+      ]
+    },
+    "TR_B3_Performance": {
+      "title": "TR_B3 - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Title_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "TR_J1_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR_J1",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Journal Requests (Controlled)",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_J1_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J1 - Report_Header"
+    },
+    "TR_J1_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Access_Type": {
+              "type": "array",
+              "const": [
+                "Controlled"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Journal"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Total_Item_Requests",
+                "Unique_Item_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Access_Type",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J1 - Report_Filters"
+    },
+    "TR_J1_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_J1_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J1 - Report_Item"
+    },
+    "TR_J1_Attribute_Performance": {
+      "title": "TR_J1 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Performance": {
+          "$ref": "#/definitions/TR_J1_Performance"
+        }
+      },
+      "required": [
+        "Performance"
+      ]
+    },
+    "TR_J1_Performance": {
+      "title": "TR_J1 - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "TR_J2_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR_J2",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Journal Access Denied",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_J2_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J2 - Report_Header"
+    },
+    "TR_J2_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Journal"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Limit_Exceeded",
+                "No_License"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J2 - Report_Filters"
+    },
+    "TR_J2_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_J2_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J2 - Report_Item"
+    },
+    "TR_J2_Attribute_Performance": {
+      "title": "TR_J2 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Performance": {
+          "$ref": "#/definitions/TR_J2_Performance"
+        }
+      },
+      "required": [
+        "Performance"
+      ]
+    },
+    "TR_J2_Performance": {
+      "title": "TR_J2 - Performance",
+      "type": "object",
+      "properties": {
+        "Limit_Exceeded": {
+          "$ref": "#/definitions/Counts"
+        },
+        "No_License": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "TR_J3_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR_J3",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Journal Usage by Access Type",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_J3_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J3 - Report_Header"
+    },
+    "TR_J3_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Journal"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Total_Item_Investigations",
+                "Total_Item_Requests",
+                "Unique_Item_Investigations",
+                "Unique_Item_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J3 - Report_Filters"
+    },
+    "TR_J3_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_J3_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J3 - Report_Item"
+    },
+    "TR_J3_Attribute_Performance": {
+      "title": "TR_J3 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Access_Type": {
+          "$ref": "#/definitions/Access_Type_Attribute"
+        },
+        "Performance": {
+          "$ref": "#/definitions/TR_J3_Performance"
+        }
+      },
+      "required": [
+        "Access_Type",
+        "Performance"
+      ]
+    },
+    "TR_J3_Performance": {
+      "title": "TR_J3 - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "TR_J4_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "TR_J4",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Journal Requests by YOP (Controlled)",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/TR_J4_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J4 - Report_Header"
+    },
+    "TR_J4_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Access_Type": {
+              "type": "array",
+              "const": [
+                "Controlled"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Journal"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Total_Item_Requests",
+                "Unique_Item_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Access_Type",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J4 - Report_Filters"
+    },
+    "TR_J4_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Title_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/TR_J4_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "TR_J4 - Report_Item"
+    },
+    "TR_J4_Attribute_Performance": {
+      "title": "TR_J4 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "YOP": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        },
+        "Performance": {
+          "$ref": "#/definitions/TR_J4_Performance"
+        }
+      },
+      "required": [
+        "YOP",
+        "Performance"
+      ]
+    },
+    "TR_J4_Performance": {
+      "title": "TR_J4 - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "IR_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "IR",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Item Report",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/IR_Report_Filters"
+            },
+            "Report_Attributes": {
+              "$ref": "#/definitions/IR_Report_Attributes"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR - Report_Header"
+    },
+    "IR_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Author": {
+              "type": "string",
+              "minLength": 2
+            },
+            "Item_ID": {
+              "type": "string",
+              "minLength": 2
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Filter"
+            },
+            "Access_Type": {
+              "$ref": "#/definitions/Access_Type_Filter"
+            },
+            "Data_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Article",
+                  "Audiovisual",
+                  "Book_Segment",
+                  "Conference_Item",
+                  "Database_Full_Item",
+                  "Dataset",
+                  "Image",
+                  "Interactive_Resource",
+                  "Multimedia",
+                  "News_Item",
+                  "Other",
+                  "Patent",
+                  "Reference_Item",
+                  "Report",
+                  "Software",
+                  "Sound",
+                  "Standard",
+                  "Thesis_or_Dissertation",
+                  "Unspecified"
+                ]
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Total_Item_Investigations",
+                  "Total_Item_Requests",
+                  "Unique_Item_Investigations",
+                  "Unique_Item_Requests",
+                  "Limit_Exceeded",
+                  "No_License"
+                ]
+              }
+            },
+            "YOP": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^([0-9]{4}|[0-9]{4}-[0-9]{4})$"
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Filters"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR - Report_Filters"
+    },
+    "IR_Report_Attributes": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Attributes_To_Show": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "YOP",
+                  "Access_Type",
+                  "Access_Method",
+                  "Authors",
+                  "Publication_Date",
+                  "Article_Version",
+                  "Institution_Name",
+                  "Customer_ID",
+                  "Country_Name",
+                  "Country_Code",
+                  "Subdivision_Name",
+                  "Subdivision_Code",
+                  "Attributed"
+                ]
+              }
+            },
+            "Include_Parent_Details": {
+              "type": "string",
+              "enum": [
+                "False",
+                "True"
+              ]
+            },
+            "Include_Component_Details": {
+              "type": "string",
+              "enum": [
+                "False",
+                "True"
+              ]
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Granularity_Attribute"
+        }
+      ],
+      "minProperties": 1,
+      "unevaluatedProperties": false,
+      "title": "IR - Report_Attributes"
+    },
+    "IR_Parent_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Parent_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/IR_Report_Item"
+              }
+            }
+          },
+          "required": [
+            "Items"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR - Parent_Item"
+    },
+    "IR_No_Parent_Item": {
+      "type": "object",
+      "properties": {
+        "Items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/IR_Report_Item"
+          }
+        }
+      },
+      "required": [
+        "Items"
+      ],
+      "title": "IR - No Parent_Item",
+      "additionalProperties": false
+    },
+    "IR_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/IR_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR - Report_Item"
+    },
+    "IR_Attribute_Performance": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Data_Type": {
+              "type": "string",
+              "enum": [
+                "Article",
+                "Audiovisual",
+                "Book_Segment",
+                "Conference_Item",
+                "Database_Full_Item",
+                "Dataset",
+                "Image",
+                "Interactive_Resource",
+                "Multimedia",
+                "News_Item",
+                "Other",
+                "Patent",
+                "Reference_Item",
+                "Report",
+                "Software",
+                "Sound",
+                "Standard",
+                "Thesis_or_Dissertation",
+                "Unspecified"
+              ]
+            },
+            "YOP": {
+              "type": "string",
+              "pattern": "^[0-9]{4}$"
+            },
+            "Access_Type": {
+              "$ref": "#/definitions/Access_Type_Attribute"
+            },
+            "Access_Method": {
+              "$ref": "#/definitions/Access_Method_Attribute"
+            },
+            "Performance": {
+              "$ref": "#/definitions/IR_Performance"
+            },
+            "Components": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IR_Component_Item"
+              },
+              "uniqueItems": true,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "Data_Type",
+            "Performance"
+          ]
+        },
+        {
+          "$ref": "#/definitions/Common_Extensions_Attributes"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR - Attribute_Performance"
+    },
+    "IR_Performance": {
+      "title": "IR - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Limit_Exceeded": {
+          "$ref": "#/definitions/Counts"
+        },
+        "No_License": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "unevaluatedProperties": false
+    },
+    "IR_Component_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Component_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/IR_Component_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR - Component_Item"
+    },
+    "IR_Component_Attribute_Performance": {
+      "title": "IR - Component Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Data_Type": {
+          "type": "string",
+          "enum": [
+            "Article",
+            "Audiovisual",
+            "Book_Segment",
+            "Conference_Item",
+            "Database_Full_Item",
+            "Dataset",
+            "Image",
+            "Interactive_Resource",
+            "Multimedia",
+            "News_Item",
+            "Other",
+            "Patent",
+            "Reference_Item",
+            "Report",
+            "Software",
+            "Sound",
+            "Standard",
+            "Thesis_or_Dissertation",
+            "Unspecified"
+          ]
+        },
+        "Performance": {
+          "$ref": "#/definitions/IR_Component_Performance"
+        }
+      },
+      "required": [
+        "Data_Type",
+        "Performance"
+      ]
+    },
+    "IR_Component_Performance": {
+      "title": "IR - Component Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Investigations": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Limit_Exceeded": {
+          "$ref": "#/definitions/Counts"
+        },
+        "No_License": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 1,
+      "unevaluatedProperties": false
+    },
+    "IR_A1_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "IR_A1",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Journal Article Requests",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/IR_A1_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR_A1 - Report_Header"
+    },
+    "IR_A1_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Article"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Total_Item_Requests",
+                "Unique_Item_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR_A1 - Report_Filters"
+    },
+    "IR_A1_Parent_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Base_Parent_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/IR_A1_Report_Item"
+              }
+            }
+          },
+          "required": [
+            "Items"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR_A1 - Parent_Item"
+    },
+    "IR_A1_No_Parent_Item": {
+      "type": "object",
+      "properties": {
+        "Items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/IR_A1_Report_Item"
+          }
+        }
+      },
+      "required": [
+        "Items"
+      ],
+      "title": "IR_A1 - No Parent_Item",
+      "additionalProperties": false
+    },
+    "IR_A1_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/IR_A1_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR_A1 - Report_Item"
+    },
+    "IR_A1_Attribute_Performance": {
+      "title": "IR_A1 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Access_Type": {
+          "$ref": "#/definitions/Access_Type_Attribute"
+        },
+        "Performance": {
+          "$ref": "#/definitions/IR_A1_Performance"
+        }
+      },
+      "required": [
+        "Access_Type",
+        "Performance"
+      ]
+    },
+    "IR_A1_Performance": {
+      "title": "IR_A1 - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "IR_M1_Report_Header": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Header"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Report_ID": {
+              "const": "IR_M1",
+              "type": "string"
+            },
+            "Report_Name": {
+              "const": "Multimedia Item Requests",
+              "type": "string"
+            },
+            "Report_Filters": {
+              "$ref": "#/definitions/IR_M1_Report_Filters"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR_M1 - Report_Header"
+    },
+    "IR_M1_Report_Filters": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base_Report_Filters"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Access_Method": {
+              "type": "array",
+              "const": [
+                "Regular"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Data_Type": {
+              "type": "array",
+              "const": [
+                "Audiovisual",
+                "Image",
+                "Interactive_Resource",
+                "Multimedia",
+                "Sound"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "Metric_Type": {
+              "type": "array",
+              "const": [
+                "Total_Item_Requests",
+                "Unique_Item_Requests"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "Access_Method",
+            "Data_Type",
+            "Metric_Type"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR_M1 - Report_Filters"
+    },
+    "IR_M1_No_Parent_Item": {
+      "type": "object",
+      "properties": {
+        "Items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/IR_M1_Report_Item"
+          }
+        }
+      },
+      "required": [
+        "Items"
+      ],
+      "title": "IR_M1 - No Parent_Item",
+      "additionalProperties": false
+    },
+    "IR_M1_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Base_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Attribute_Performance": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/IR_M1_Attribute_Performance"
+              }
+            }
+          },
+          "required": [
+            "Attribute_Performance"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "title": "IR_M1 - Report_Item"
+    },
+    "IR_M1_Attribute_Performance": {
+      "title": "IR_M1 - Attribute_Performance",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Data_Type": {
+          "type": "string",
+          "enum": [
+            "Audiovisual",
+            "Image",
+            "Interactive_Resource",
+            "Multimedia",
+            "Sound"
+          ]
+        },
+        "Performance": {
+          "$ref": "#/definitions/IR_M1_Performance"
+        }
+      },
+      "required": [
+        "Data_Type",
+        "Performance"
+      ]
+    },
+    "IR_M1_Performance": {
+      "title": "IR_M1 - Performance",
+      "type": "object",
+      "properties": {
+        "Total_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        },
+        "Unique_Item_Requests": {
+          "$ref": "#/definitions/Counts"
+        }
+      },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "Platform_Report_Item": {
+      "title": "Platform Report_Item",
+      "type": "object",
+      "properties": {
+        "Platform": {
+          "type": "string",
+          "minLength": 2
+        }
+      },
+      "required": [
+        "Platform"
+      ]
+    },
+    "Database_Report_Item": {
+      "title": "Database Report_Item",
+      "type": "object",
+      "properties": {
+        "Database": {
+          "type": "string",
+          "minLength": 2
+        },
+        "Publisher": {
+          "type": "string"
+        },
+        "Publisher_ID": {
+          "$ref": "#/definitions/Publisher_ID"
+        },
+        "Platform": {
+          "type": "string",
+          "minLength": 2
+        },
+        "Item_ID": {
+          "$ref": "#/definitions/Item_ID"
+        }
+      },
+      "required": [
+        "Database",
+        "Publisher",
+        "Platform"
+      ]
+    },
+    "Title_Report_Item": {
+      "title": "Title Report_Item",
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Publisher": {
+          "type": "string"
+        },
+        "Publisher_ID": {
+          "$ref": "#/definitions/Publisher_ID"
+        },
+        "Platform": {
+          "type": "string",
+          "minLength": 2
+        },
+        "Item_ID": {
+          "$ref": "#/definitions/Item_ID"
+        }
+      },
+      "required": [
+        "Title",
+        "Publisher",
+        "Platform"
+      ]
+    },
+    "Item_Base_Report_Item": {
+      "title": "Item Base Report_Item",
+      "type": "object",
+      "properties": {
+        "Item": {
+          "type": "string"
+        },
+        "Publisher": {
+          "type": "string"
+        },
+        "Publisher_ID": {
+          "$ref": "#/definitions/Publisher_ID"
+        },
+        "Platform": {
+          "type": "string",
+          "minLength": 2
+        },
+        "Item_ID": {
+          "$ref": "#/definitions/Item_ID"
+        }
+      },
+      "required": [
+        "Item",
+        "Publisher",
+        "Platform"
+      ]
+    },
+    "Item_Report_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Base_Report_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Authors": {
+              "$ref": "#/definitions/Authors"
+            },
+            "Publication_Date": {
+              "type": "string",
+              "format": "date"
+            },
+            "Article_Version": {
+              "$ref": "#/definitions/Article_Version"
+            }
+          }
+        }
+      ],
+      "title": "Item Report_Item"
+    },
+    "Item_Base_Parent_Item": {
+      "title": "Item Base Parent_Item",
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Authors": {
+          "$ref": "#/definitions/Authors"
+        },
+        "Article_Version": {
+          "$ref": "#/definitions/Article_Version"
+        },
+        "Item_ID": {
+          "$ref": "#/definitions/Item_ID"
+        }
+      },
+      "required": [
+        "Item_ID"
+      ]
+    },
+    "Item_Parent_Item": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item_Base_Parent_Item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Publication_Date": {
+              "type": "string",
+              "format": "date"
+            },
+            "Data_Type": {
+              "type": "string",
+              "enum": [
+                "Book",
+                "Conference",
+                "Database_Full",
+                "Journal",
+                "Newspaper_or_Newsletter",
+                "Reference_Work"
+              ]
+            }
+          }
+        }
+      ],
+      "title": "Item Parent_Item"
+    },
+    "Item_Component_Item": {
+      "title": "Item Component_Item",
+      "type": "object",
+      "properties": {
+        "Item": {
+          "type": "string"
+        },
+        "Item_ID": {
+          "$ref": "#/definitions/Item_ID"
+        },
+        "Authors": {
+          "$ref": "#/definitions/Authors"
+        },
+        "Publication_Date": {
+          "type": "string",
+          "format": "date"
+        },
+        "Article_Version": {
+          "$ref": "#/definitions/Article_Version"
+        }
+      },
+      "required": [
+        "Item_ID"
+      ]
+    },
+    "Access_Method_Attribute": {
+      "title": "Access_Method Attribute",
+      "type": "string",
+      "enum": [
+        "Regular",
+        "TDM"
+      ]
+    },
+    "Access_Method_Filter": {
+      "title": "Access_Method Filter",
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "Regular",
+          "TDM"
+        ]
+      }
+    },
+    "Access_Type_Attribute": {
+      "title": "Access_Type Attribute",
+      "type": "string",
+      "enum": [
+        "Controlled",
+        "Open",
+        "Free_To_Read"
+      ]
+    },
+    "Access_Type_Filter": {
+      "title": "Access_Type Filter",
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "Controlled",
+          "Free_To_Read",
+          "Open"
+        ]
+      }
+    },
+    "Granularity_Attribute": {
+      "title": "Granularity Attribute",
+      "type": "object",
+      "properties": {
+        "Granularity": {
+          "type": "string",
+          "enum": [
+            "Month",
+            "Totals"
+          ]
+        }
+      }
+    },
+    "Common_Extensions_Filters": {
+      "title": "Common Extensions Filters",
+      "type": "object",
+      "properties": {
+        "Attributed": {
+          "type": "string",
+          "enum": [
+            "No",
+            "Yes"
+          ]
+        },
+        "Country_Code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "Subdivision_Code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$"
+        }
+      }
+    },
+    "Common_Extensions_Attributes": {
+      "title": "Common Extensions Attributes",
+      "type": "object",
+      "properties": {
+        "Customer_ID": {
+          "type": "string",
+          "minLength": 2,
+          "description": "When a COUNTER Report contains usage for multiple organizations, this element can be used to break the usage down by institution. This is a common extension, support is optional (see Section 11 of the Code of Practice for details)."
+        },
+        "Institution_Name": {
+          "type": "string",
+          "minLength": 2,
+          "description": "When a COUNTER Report contains usage for multiple organizations, this element can be used to break the usage down by institution. This is a common extension, support is optional (see Section 11 of the Code of Practice for details)."
+        },
+        "Country_Name": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Name of the country according to ISO 3166-1. This is a common extension, support is optional (see Section 11 of the Code of Practice for details)."
+        },
+        "Country_Code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "ISO 3166-1 alpha-2 code of the country. This is a common extension, support is optional (see Section 11 of the Code of Practice for details)."
+        },
+        "Subdivision_Name": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Name of the country subdivision according to ISO 3166-2. This is a common extension, support is optional (see Section 11 of the Code of Practice for details)."
+        },
+        "Subdivision_Code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$",
+          "description": "ISO 3166-2 code of the country subdivision. This is a common extension, support is optional (see Section 11 of the Code of Practice for details)."
+        },
+        "Attributed": {
+          "type": "string",
+          "description": "Whether the report provider was able to attribute the usage to an institution or not. This is a common extension, support is optional (see Section 11 of the Code of Practice for details).",
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        }
+      }
+    },
+    "Authors": {
+      "title": "Authors",
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "minLength": 2
+          },
+          "ISNI": {
+            "type": "string",
+            "pattern": "^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{3}[0-9X]$"
+          },
+          "ORCID": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$"
+          }
+        },
+        "required": [
+          "Name"
+        ]
+      }
+    },
+    "Article_Version": {
+      "title": "Article_Versoin",
+      "type": "string",
+      "enum": [
+        "AO",
+        "SMUR",
+        "AM",
+        "P",
+        "VoR",
+        "CVoR",
+        "EVoR"
+      ]
+    },
+    "Organization_ID": {
+      "title": "Organization_ID",
+      "type": "object",
+      "properties": {
+        "ISNI": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{3}[0-9X]$"
+          }
+        },
+        "ROR": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^0[a-z0-9]{6}[0-9]{2}$"
+          }
+        },
+        "Proprietary": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_./]{1,17}:.+"
+          }
+        }
+      }
+    },
+    "Institution_ID": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Organization_ID"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ISIL": {
+              "type": "array",
+              "uniqueItems": true,
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^([A-Z]{2}|[a-zA-Z0-9]{3,4})-.{1,11}$"
+              }
+            },
+            "OCLC": {
+              "type": "array",
+              "uniqueItems": true,
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              }
+            }
+          }
+        }
+      ],
+      "minProperties": 1,
+      "unevaluatedProperties": false,
+      "title": "Institution_ID"
+    },
+    "Publisher_ID": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Organization_ID"
+        }
+      ],
+      "minProperties": 1,
+      "unevaluatedProperties": false,
+      "title": "Publisher_ID"
+    },
+    "Item_ID": {
+      "type": "object",
+      "properties": {
+        "DOI": {
+          "type": "string",
+          "pattern": "^10\\.[1-9][0-9]{2}[0-9.]*\\/.+$"
+        },
+        "ISBN": {
+          "type": "string",
+          "pattern": "^97[89]-[0-9]+-[0-9]+-[0-9]+-[0-9]$",
+          "minLength": 17,
+          "maxLength": 17
+        },
+        "Online_ISSN": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{3}[0-9X]$"
+        },
+        "Print_ISSN": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{3}[0-9X]$"
+        },
+        "Proprietary": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_./]{1,17}:.+"
+        },
+        "URI": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false,
+      "title": "Item_ID"
+    },
+    "Counts": {
+      "title": "Counts",
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]{4}-(0[1-9]|1[0-2])$": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "Exception": {
+      "title": "Exception",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "description": "Exception Code. See Table D.1 in the Code of Practice, Appendix D."
+        },
+        "Message": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Exception Message. See Table D.1 in the Code of Practice, Appendix D."
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false
+    },
+    "Exception_0": {
+      "title": "Exception 0",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 0
+        },
+        "Message": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Exception Message."
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "Info or Debug Message. These Messages will never be standardized and service providers can design them as they see fit.\n\nNote: The standard Exceptions with Code > 999 MUST be used for the indicated invocation conditions, it is neither permitted to use custom Exceptions with Code <= 999 instead nor to define custom Exceptions with Code > 999."
+    },
+    "Exception_1-999": {
+      "title": "Exception 1-999",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Warning Message. This range is reserved for the use of service providers to supply their own custom warnings.\n\nNote: The standard Exceptions with Code > 999 MUST be used for the indicated invocation conditions, it is neither permitted to use custom Exceptions with Code <= 999 instead nor to define custom Exceptions with Code > 999.",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "description": "Exception Code.",
+          "minimum": 1,
+          "maximum": 999
+        },
+        "Message": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Exception Message."
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ]
+    },
+    "Exception_1000": {
+      "title": "Exception 1000",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 1000
+        },
+        "Message": {
+          "type": "string",
+          "const": "Service Not Available"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The service is executing a request, but due to internal errors cannot complete the request. If possible, the server should provide an explanation in the additional Data element."
+    },
+    "Exception_1010": {
+      "title": "Exception 1010",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 1010
+        },
+        "Message": {
+          "type": "string",
+          "const": "Service Busy"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The service is too busy to execute the incoming request. The client should retry the request after some reasonable time."
+    },
+    "Exception_1011": {
+      "title": "Exception 1011",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 1011
+        },
+        "Message": {
+          "type": "string",
+          "const": "Report Queued for Processing"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "Services queueing incoming report requests must return a response with this Exception and no payload to inform the client about the processing status. The client should retry the request after some reasonable time."
+    },
+    "Exception_1020": {
+      "title": "Exception 1020",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 1020
+        },
+        "Message": {
+          "type": "string",
+          "const": "Client has made too many requests"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "If the service sets a limit on the number of requests a client can make within a given timeframe, the server will return this Exception when the client exceeds that limit. The server would provide an explanation of the limit in the additional Data element."
+    },
+    "Exception_1030": {
+      "title": "Exception 1030",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 1030
+        },
+        "Message": {
+          "type": "string",
+          "const": "Insufficient Information to Process Request"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "There is insufficient data in the request to begin processing (e.g. missing requestor_id, no customer_id, etc.)."
+    },
+    "Exception_2000": {
+      "title": "Exception 2000",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 2000
+        },
+        "Message": {
+          "type": "string",
+          "const": "Requestor Not Authorized to Access Service"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "If requestor_id is not recognized or not authorized by the service."
+    },
+    "Exception_2010": {
+      "title": "Exception 2010",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 2010
+        },
+        "Message": {
+          "type": "string",
+          "const": "Requestor is Not Authorized to Access Usage for Institution"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "If requestor_id has not been authorized to harvest usage for the institution identified by the customer_id, or if the customer_id is not recognized."
+    },
+    "Exception_2011": {
+      "title": "Exception 2011",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 2011
+        },
+        "Message": {
+          "type": "string",
+          "const": "Global Reports Not Supported"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "Reporting to “The World”, customer_id 0000000000000000, is not supported."
+    },
+    "Exception_2020": {
+      "title": "Exception 2020",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 2020
+        },
+        "Message": {
+          "type": "string",
+          "const": "APIKey Invalid"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The service requires a valid APIKey to access usage data and the key provided was not valid or not authorized for the data being requested."
+    },
+    "Exception_3020": {
+      "title": "Exception 3020",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3020
+        },
+        "Message": {
+          "type": "string",
+          "const": "Invalid Date Arguments"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "Any format or logic errors involving date computations (e.g., end_date cannot be less than begin_date)."
+    },
+    "Exception_3030": {
+      "title": "Exception 3030",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3030
+        },
+        "Message": {
+          "type": "string",
+          "const": "No Usage Available for Requested Dates"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The service did not find any data for the specified date range and other filters (if any).\n\nNote: If the usage for a requested month either hasn’t been processed yet or is no longer available, only Exception 3031 or 3032 must be returned for that month."
+    },
+    "Exception_3031": {
+      "title": "Exception 3031",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3031
+        },
+        "Message": {
+          "type": "string",
+          "const": "Usage Not Ready for Requested Dates"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The service has not yet processed the usage for one or more of the requested months, if some months are available that data should be returned. The Exception should include the months not processed in the additional Data element.\n\nNote: If the requested begin_date is the current or a future month, the server should return Exception 3020. If the requested end_date is the current or a future month, the server may continue processing the request and include Exception 3031, the End_Date Report_Filter then should be set to the previous month (the last month that could have been processed)."
+    },
+    "Exception_3032": {
+      "title": "Exception 3032",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3032
+        },
+        "Message": {
+          "type": "string",
+          "const": "Usage No Longer Available for Requested Dates"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The service does not have the usage for one or more of the requested months because the requested begin_date is earlier than the first month for which data has been processed and is available. If some months are available that data should be returned. The Exception should include the information about the months processed and available in the additional Data element."
+    },
+    "Exception_3040": {
+      "title": "Exception 3040",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3040
+        },
+        "Message": {
+          "type": "string",
+          "const": "Partial Data Returned"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The request could not be fulfilled in its entirety, since some of the requested data is missing. The server should return the available data and provide an explanation in the additional Data element.\n\nNote: This Exception is not intended for the conditions already covered by Exceptions 3030, 3031 and 3032. A use case for this Exception for example would be that usage data is missing because the logging has failed. Usually this Exception indicates a permanent error."
+    },
+    "Exception_3050": {
+      "title": "Exception 3050",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3050
+        },
+        "Message": {
+          "type": "string",
+          "const": "Parameter Not Recognized in this Context"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The request contained one or more parameters that are not recognized by the server in the context of the report being serviced. The server should list the names of unsupported parameters in the additional Data element.\n\nNote: The server is expected to ignore unsupported parameters and continue to process the request, returning data that is available without the parameter being applied.\n\nNote: This Exception is only applicable for report requests. For report list, member list and server status requests parameters not recognized by the server should be ignored."
+    },
+    "Exception_3060": {
+      "title": "Exception 3060",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3060
+        },
+        "Message": {
+          "type": "string",
+          "const": "Invalid ReportFilter Value"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The request contained one or more filter values that are not supported by the server. The server should list the names of unsupported filter values in the additional Data element.\n\nNote: The server is expected to ignore unsupported filters and continue to process the request, returning data that is available without the filter being applied.\n\nNote: If the begin_date or end_date value is invalid, the server must return Exception 3020. If the service requires a platform parameter, and the platform value is invalid, the server should return Exception 1030."
+    },
+    "Exception_3061": {
+      "title": "Exception 3061",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3061
+        },
+        "Message": {
+          "type": "string",
+          "const": "Incongruous ReportFilter Value"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "A filter element includes multiple values in a pipe-delimited list; however, the supplied values are not all of the same scope (e.g., item_id filter includes article level DOIs and journal level DOIs or ISSNs).\n\nNote: The server is expected to ignore the invalid filters and continue to process the request, returning data that is available without the filter being applied."
+    },
+    "Exception_3062": {
+      "title": "Exception 3062",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3062
+        },
+        "Message": {
+          "type": "string",
+          "const": "Invalid ReportAttribute Value"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The request contained one or more report attribute values that are not supported by the server. The server should list the names of unsupported report attribute values in the additional Data element.\n\nNote: The server is expected to ignore unsupported report attributes and continue to process the request, returning data that is available without the report attribute being applied."
+    },
+    "Exception_3063": {
+      "title": "Exception 3063",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3063
+        },
+        "Message": {
+          "type": "string",
+          "const": "Components Not Supported"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "The request contained include_component_details=True, but reporting on component usage is not supported.\n\nNote: The server is expected to ignore unsupported report attributes and continue to process the request, returning data that is available without the report attribute being applied."
+    },
+    "Exception_3070": {
+      "title": "Exception 3070",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "const": 3070
+        },
+        "Message": {
+          "type": "string",
+          "const": "Required ReportFilter Missing"
+        },
+        "Help_URL": {
+          "type": "string",
+          "description": "URL to a help page that explains the Exception in more detail.",
+          "format": "uri"
+        },
+        "Data": {
+          "type": "string",
+          "description": "Additional data provided by the server to clarify the Exception."
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "description": "A required filter was not included in the request. Which filters are required will depend on the report and the service being called. The server should list the names of the missing filters in the additional Data element.\n\nNote: If begin_date or end_date is missing, the server must return Exception 1030. If the service requires a platform parameter, and platform is missing, the server also should return Exception 1030.\n\nNote: Currently there are no other required report filters, so this Exception should not occur."
+    }
+  }
+}

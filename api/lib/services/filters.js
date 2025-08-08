@@ -31,7 +31,7 @@ const isFilter = (obj) => {
  * @returns {InstitutionPropertyWhereInput}
  */
 const customPropFilter = (fieldId, value) => {
-  if (!value) {
+  if (value == null) {
     return { fieldId };
   }
 

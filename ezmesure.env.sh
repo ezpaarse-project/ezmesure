@@ -45,8 +45,11 @@ export ES_JAVA_OPTS="-Xms2g -Xmx2g"
 export EZMESURE_ES_MEM_LIMIT="4g"
 
 # ezREEPORT specific
+export EZREEPORT_RABBITMQ_USERNAME="ezreeport"
+export EZREEPORT_RABBITMQ_PASSWORD=""
+export EZREEPORT_RABBITMQ_VHOST="/ezreeport"
 export EZREEPORT_POSTGRES_DB="ezreeport"
-export EZREEPORT_REPORT_CRON_TZ="Europe/Paris"
+export EZREEPORT_TZ="Europe/Paris"
 
 if [[ -f $LOCAL_ENV_FILE ]] ; then
   source "$LOCAL_ENV_FILE"

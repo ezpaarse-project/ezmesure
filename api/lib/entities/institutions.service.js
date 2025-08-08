@@ -200,57 +200,47 @@ module.exports = class InstitutionsService extends BasePrismaService {
    * @param {Filter[] | JsonValue[]} conditions
    * @returns {Promise<Institution[]>}
    */
-  async findManyByConditions(conditions, getPrismaManyQuery) {
+  async findManyByConditions(conditions) {
     /** @type {InstitutionWhereInput[]} */
-    const propsFilters = [];
-    /** @type {KoaQuery} */
-    const query = {};
-    /** @type {KoaQuery} */
-    const notQuery = {};
+    const institutionsQueries = [];
 
-    conditions.forEach((condition) => {
-      if (!isFilter(condition)) { return; }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const condition of conditions) {
+      if (!isFilter(condition)) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
+      /** @type {InstitutionWhereInput} */
+      let item;
       const { field, value, isNot } = condition;
 
-      if (condition.field.startsWith('customProps.')) {
-        propsFilters.push({
+      if (field.startsWith('customProps.')) {
+        item = {
           customProps: {
             [isNot ? 'none' : 'some']: customPropFilter(field.slice(12), value),
           },
-        });
-      } else if (isNot) {
-        notQuery[field] = value;
+        };
+      } else if (Array.isArray(value)) {
+        item = {
+          [field]: { [isNot ? 'notIn' : 'in']: value },
+        };
       } else {
-        query[field] = value;
+        item = {
+          [field]: { [isNot ? 'not' : 'equals']: value ?? null },
+        };
       }
-    });
 
-    // TODO: need refactor
-    /** @type {InstitutionWhereInput} */
-    const institutionsQuery = getPrismaManyQuery({ query: { ...query } })?.where;
-    /** @type {InstitutionWhereInput} */
-    const institutionsNotQuery = getPrismaManyQuery({ query: { ...notQuery } })?.where;
-
-    if (!Array.isArray(institutionsQuery.AND)) {
-      institutionsQuery.AND = institutionsQuery.AND ? [institutionsQuery.AND] : [];
-    }
-
-    if (propsFilters.length > 0) {
-      institutionsQuery.AND = [
-        ...institutionsQuery.AND,
-        ...propsFilters,
-        { NOT: institutionsNotQuery.AND },
-      ];
+      institutionsQueries.push(item);
     }
 
     /** @type {InstitutionWithProps[]} */
     let institutions = [];
 
-    if (Object.keys(institutionsQuery).length > 0) {
+    if (institutionsQueries.length > 0) {
       // @ts-ignore
       institutions = await this.findMany({
-        where: institutionsQuery,
+        where: { AND: institutionsQueries },
         include: { customProps: true },
       });
     }

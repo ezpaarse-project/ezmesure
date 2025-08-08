@@ -1,0 +1,13 @@
+// Copy this file into definitions.d and rename it as `00-users.json`
+// once "password_hash" are generated using one of the following :
+// - rabbitmqctl hash_password $PASSWORD
+// - docker compose -f docker-compose.dev.yml run --rm rabbitmq rabbitmqctl hash_password $PASSWORD
+{
+  "users": [
+    {
+      "name": "ezreeport",
+      "password_hash": "",
+      "tags": []
+    }
+  ]
+}
