@@ -725,6 +725,17 @@ authenticate:
   loginFailed: The information transmitted did not allow you to authenticate
   failed: An error occurred
   impersonate: Impersonate
+impersonate:
+  ezmesureDesc: Take the identity of the user in the ezMESURE interface.
+  kibanaDesc: Create test users in Kibana.
+  createTestUser: Create a test user
+  connectedToKibana: Connected to Kibana
+testUsers:
+  description: The Kibana accounts created here are based on the current user. They are temporary and allow you to check the proper functioning of the account in Kibana. Please note that passwords are no longer accessible once this window is closed.
+  expires: 'Expires on {date}'
+  copyUsername: Copy the username
+  copyPassword: Copy the password
+  loginToKibana: Log in to Kibana
 password:
   forgot: Forgot your password ?
   reset: Reset password
@@ -1162,3 +1173,4 @@ deleted: Deleted
 deletedSince: Deleted since {date}
 cantCancel: This operation cannot be undone.
 version: Version
+back: Back

@@ -122,7 +122,7 @@ services:
     restart: unless-stopped
 
   reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-aio:dev
+    image: ghcr.io/ezpaarse-project/ezreeport-aio:rc
     environment:
       # proxy
       - http_proxy
