@@ -177,6 +177,7 @@ const props = defineProps({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 const { copy } = useClipboard();
+const { refresh: refreshSession } = useAuth();
 
 const windowId = ref('root');
 const connectingToKibana = ref(false);
