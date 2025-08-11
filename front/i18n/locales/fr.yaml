@@ -65,9 +65,9 @@ myspace:
   infos: Mes informations
   repos: Mes entrepôts
   spaces: Mes espaces
-  roles: 'Mes roles :'
+  roles: 'Mes rôles :'
 files:
-  title: Mes dépots
+  title: Mes dépôts
   manageN: >
     Gérer les fichiers|
     Gérer {count} fichiers
@@ -430,7 +430,7 @@ institutions:
     notEditable: Ce membre n'est pas modifiable
     accessRights: Droits d'accès
     institutionManagement: Gestion de l'établissement
-    roles: Roles
+    roles: Rôles
     roleNames:
       contact:doc: Contact documentaire
       contact:tech: Contact technique
@@ -827,7 +827,7 @@ users:
     membershipsCount: >
       1 établissement
       |{count} établissements
-    roles: Roles
+    roles: Rôles
     no_roles: Aucun rôle
     permissions: Permissions
     no_permissions: Aucune permission
