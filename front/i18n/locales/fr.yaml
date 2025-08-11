@@ -753,7 +753,7 @@ password:
   newPassword: Nouveau mot de passe Kibana
   repeatNewPassword: Répéter le nouveau mot de passe Kibana
   passwordIsRequired: Mot de passe requis
-  enterUser: Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.
+  enterUser: Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de réinitialiser votre mot de passe.
   checkYourEmail: Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.
   waitFewMinutes: S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.
   notEqual: Les mots de passes ne correspondent pas
