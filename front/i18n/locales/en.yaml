@@ -726,7 +726,7 @@ authenticate:
   failed: An error occurred
   impersonate: Impersonate
 password:
-  forgot: Forgout your password ?
+  forgot: Forgot your password ?
   reset: Reset password
   save: Save password
   user: User
