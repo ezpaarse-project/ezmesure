@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 ENV_FILE="$SCRIPT_DIR/../ezmesure.local.env.sh"
@@ -16,8 +16,8 @@ fi
 declare -A defaults
 declare -A answers
 
-HASH_1=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-HASH_2=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+HASH_1=$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+HASH_2=$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
 defaults[EZMESURE_DISABLE_SHIBBOLETH]="true"
 defaults[EZMESURE_AUTH_SECRET]="$HASH_1"
