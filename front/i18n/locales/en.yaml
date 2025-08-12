@@ -482,6 +482,7 @@ institutions:
     resetNbChecks: You will reset {count} connection states. Untested identifiers are not taken into account.
     cannotResetCheck: Failed to reset connection status for {name}
     connection: Connection
+    connectionStatus: 'Connection status'
     untested: Untested
     operational: Valid credentials
     operationalShort: Valid

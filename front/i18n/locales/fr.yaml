@@ -486,6 +486,7 @@ institutions:
       |Vous allez réinitialiser {count} états de connexion. Les identifiants non testés ne sont pas pris en compte.
     cannotResetCheck: Impossible de réinitialiser l'état de connexion pour {name}
     connection: Connexion
+    connectionStatus: Statut de connexion
     untested: Non testé
     operational: Identifiants valides
     operationalShort: Valides
