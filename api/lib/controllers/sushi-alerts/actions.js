@@ -61,10 +61,10 @@ exports.deleteOneAlert = async (ctx) => {
   ctx.status = 204;
 };
 
-exports.getUnsupportedButHarvestedState = (ctx) => {
+exports.getUnsupportedButHarvestedState = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = getUpdateHarvestButUnsupportedAlerts();
+  ctx.body = await getUpdateHarvestButUnsupportedAlerts();
 };
 
 exports.refreshUnsupportedButHarvestedUpdateAlerts = async (ctx) => {
@@ -73,10 +73,10 @@ exports.refreshUnsupportedButHarvestedUpdateAlerts = async (ctx) => {
   ctx.body = await startUpdateHarvestButUnsupportedAlerts();
 };
 
-exports.getEndpointState = (ctx) => {
+exports.getEndpointState = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = getUpdateEndpointAlerts();
+  ctx.body = await getUpdateEndpointAlerts();
 };
 
 exports.refreshEndpointAlerts = async (ctx) => {
