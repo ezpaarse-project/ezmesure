@@ -15,7 +15,7 @@ let harvestedButUnsupportedJobIsRunning = false;
 
 async function updateHarvestedButUnsupported() {
   harvestedButUnsupportedJobIsRunning = true;
-  appLogger.verbose('[sushi-alerts] Starting updating HARVEST_BUT_UNSUPPORTED alerts');
+  appLogger.info('[sushi-alerts] Starting updating HARVEST_BUT_UNSUPPORTED alerts');
 
   const service = new SushiAlertsService();
   try {
@@ -61,7 +61,7 @@ let endpointJobIsRunning = false;
 
 async function updateEndpointAlerts() {
   endpointJobIsRunning = true;
-  appLogger.verbose('[sushi-alerts] Starting updating ENDPOINT alerts');
+  appLogger.info('[sushi-alerts] Starting updating ENDPOINT alerts');
 
   const service = new SushiAlertsService();
   try {

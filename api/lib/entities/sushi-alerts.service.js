@@ -206,7 +206,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
       harvestCount += 1;
       // Log progress
       if (harvestCount % 10000 === 0) {
-        appLogger.verbose(`[sushi-alerts][HARVESTED_BUT_UNSUPPORTED] Still processing... (Prepared [${operations.size}] operations; Analysed [${harvestCount}] harvests)`);
+        appLogger.info(`[sushi-alerts][HARVESTED_BUT_UNSUPPORTED] Still processing... (Prepared [${operations.size}] operations; Analysed [${harvestCount}] harvests)`);
       }
 
       const id = `${harvest.credentialsId}:${harvest.reportId}:${harvest.status}`;
@@ -280,7 +280,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
       }));
     }
 
-    appLogger.verbose(`[sushi-alerts][HARVESTED_BUT_UNSUPPORTED] Completed ! Running [${operations.size}] operations (Analysed [${harvestCount}] harvests)`);
+    appLogger.info(`[sushi-alerts][HARVESTED_BUT_UNSUPPORTED] Completed ! Running [${operations.size}] operations (Analysed [${harvestCount}] harvests)`);
     await SushiAlertsService.$transaction(Array.from(operations.values()));
   }
 
@@ -322,7 +322,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
       },
     });
 
-    appLogger.verbose(`[sushi-alerts][ENDPOINT] Found [${endpointsToDo.length}] endpoints to check`);
+    appLogger.info(`[sushi-alerts][ENDPOINT] Found [${endpointsToDo.length}] endpoints to check`);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const endpoint of endpointsToDo) {
@@ -418,7 +418,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
       },
     }));
 
-    appLogger.verbose(`[sushi-alerts][ENDPOINT] Completed ! Running [${operations.length}] operations (Checked [${endpointsToDo.length}] endpoints)`);
+    appLogger.info(`[sushi-alerts][ENDPOINT] Completed ! Running [${operations.length}] operations (Checked [${endpointsToDo.length}] endpoints)`);
     await SushiAlertsService.$transaction(operations);
   }
 };

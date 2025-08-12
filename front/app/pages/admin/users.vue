@@ -129,7 +129,6 @@ definePageMeta({
 });
 
 const { t } = useI18n();
-const { refresh: refreshSession } = useAuth();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
