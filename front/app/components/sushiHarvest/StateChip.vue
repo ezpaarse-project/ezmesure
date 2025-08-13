@@ -113,7 +113,7 @@ const supportedReports = computed(() => {
 const harvests = computed(() => {
   let value = props.modelValue;
 
-  if (supportedReports.value) {
+  if ((supportedReports.value?.size ?? 0) > 0) {
     value = value.filter((h) => supportedReports.value.has(h.reportId));
   }
 
