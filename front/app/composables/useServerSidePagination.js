@@ -10,10 +10,13 @@ import {
 /**
  * @typedef {object} CustomFetchOptions
  * @property {string} url URL to fetch
- * @property {(data: any) => any} transform Transform data before return
+ * @property {(data: any) => any} [transform] Transform data before return
+ *
+ * @typedef {object} CustomAsyncOptions
+ * @property {string} [key] Key to use for caching
  *
  * @typedef {import('nitropack').NitroFetchOptions & CustomFetchOptions} FetchOptions
- * @typedef {import('nuxt/app').AsyncDataOptions} AsyncDataOptions
+ * @typedef {import('nuxt/app').AsyncDataOptions & CustomAsyncOptions} AsyncDataOptions
  *
  * @typedef {object} Params
  * @property {FetchOptions} fetch Params to pass to underlying `$fetch`
@@ -66,7 +69,7 @@ export default async function useServerSidePagination(params = {}) {
    * Fetch data
    */
   const asyncData = useAsyncData(
-    `${params.fetch.url}.ssp`,
+    params.async?.key || `${params.fetch.url}.ssp`,
     async () => {
       try {
         // Extract url from fetch options
