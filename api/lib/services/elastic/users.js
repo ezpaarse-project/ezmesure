@@ -196,6 +196,29 @@ exports.updatePassword = function updatePassword(username, password) {
 };
 
 /**
+ * Set a random password for a user in elastic
+ *
+ * @param {string} username - Username of user.
+ *
+ * @returns {Promise<{ username: string, password: string }>} Updated user.
+ */
+exports.setRandomPasswordForUser = async function updatePassword(username) {
+  const password = await randomString();
+
+  await elastic.security.changePassword({
+    username,
+    body: {
+      password,
+    },
+  });
+
+  return {
+    username,
+    password,
+  };
+};
+
+/**
  * Delete user in elastic.
  *
  * @param {string} username - Username of user.
