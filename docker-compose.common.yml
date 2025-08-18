@@ -110,6 +110,7 @@ services:
       - EZMESURE_DISABLE_SHIBBOLETH
       - SHIBBOLETH_SP_URL
       - SHIBBOLETH_DS_URL
+      - EZMESURE_AUTH_URL=${EZMESURE_AUTH_URL:-http://auth:5556}
       - EZMESURE_FRONT_URL=${EZMESURE_FRONT_URL:-http://front:8080}
       - EZMESURE_API_URL=${EZMESURE_API_URL:-http://api:3000}
       - EZMESURE_KIBANA_URL=http://${EZMESURE_KIBANA_HOST:-kibana}:${EZMESURE_KIBANA_PORT:-5601}
@@ -119,6 +120,23 @@ services:
       - ./rp/apache2/ssl:/etc/ssl/certificates
       - ./rp/sp-log/:/var/log/shibboleth/
       - ./rp/sp-cache:/var/cache/shibboleth
+    restart: unless-stopped
+
+  # We use dex as default authentication provider, you can choose another one that fits your needs,
+  # as longs as it provides OIDC authentication
+  auth:
+    image: 'dexidp/dex'
+    environment:
+      - EZMESURE_PUBLIC_URL
+      - EZMESURE_OIDC_ISSUER_URI
+      - EZMESURE_OIDC_CLIENT_ID
+      - EZMESURE_OIDC_CLIENT_SECRET
+      - EZMESURE_ADMIN_EMAIL
+      - EZMESURE_ADMIN_USERNAME
+      - EZMESURE_ADMIN_PASSWORD_HASH
+      - EZMESURE_APPLICATION_NAME
+    volumes:
+      - ./dex/config.yaml:/etc/dex/config.docker.yaml
     restart: unless-stopped
 
   reporting:

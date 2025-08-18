@@ -36,7 +36,6 @@ export EZMESURE_ES_INITIAL_MASTER_NODES=""
 
 # these values are overwriten by ezmesure.local.env.sh values
 export NODE_ENV="dev"
-export EZMESURE_PUBLIC_URL="https://${EZMESURE_DOMAIN}"
 export EZMESURE_ES_NODE_MASTER="true"
 export EZMESURE_ES_NODE_DATA="true"
 export EZMESURE_ES_NODE_INGEST="true"
@@ -51,13 +50,38 @@ export EZREEPORT_RABBITMQ_VHOST="/ezreeport"
 export EZREEPORT_POSTGRES_DB="ezreeport"
 export EZREEPORT_TZ="Europe/Paris"
 
+export EZMESURE_ADMIN_PASSWORD="changeme"
+
+# OIDC vars
+export EZMESURE_OIDC_CLIENT_ID="ezmesure"
+export EZMESURE_OIDC_SCOPES="[\"openid\",\"profile\",\"email\"]"
+
+# Check your IDP configuration
+export EZMESURE_OIDC_CLIENT_SECRET="changeme"
+
 if [[ -f $LOCAL_ENV_FILE ]] ; then
   source "$LOCAL_ENV_FILE"
 fi
 
 # set ezmesure Domain
+export EZMESURE_PUBLIC_URL="https://${EZMESURE_DOMAIN}"
 export APPLI_APACHE_SERVERNAME="https://${EZMESURE_DOMAIN}"
 export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}/sp"
+
+# OIDC vars
+
+export EZMESURE_ADMIN_PASSWORD_HASH="$(echo $EZMESURE_ADMIN_PASSWORD | htpasswd -BinC 10 admin | cut -d: -f2)"
+
+# OpenID Connect 1.0 - Uncomment if provider supports it
+export EZMESURE_OIDC_DISCOVERY_URI="https://${EZMESURE_DOMAIN}/auth/.well-known/openid-configuration"
+# OAuth 2.0 - Uncomment if provider supports it
+# export EZMESURE_OIDC_DISCOVERY_URI="https://${EZMESURE_DOMAIN}/auth/.well-known/oauth-authorization-server"
+
+export EZMESURE_OIDC_ISSUER_URI="https://${EZMESURE_DOMAIN}/auth"
+export EZMESURE_OIDC_AUTH_URI="https://${EZMESURE_DOMAIN}/auth/auth"
+export EZMESURE_OIDC_TOKEN_URI="https://${EZMESURE_DOMAIN}/auth/token"
+export EZMESURE_OIDC_INTROSPECTION_URI="https://${EZMESURE_DOMAIN}/auth/token/introspect"
+export EZMESURE_OIDC_USERINFO_URI="https://${EZMESURE_DOMAIN}/auth/userinfo"
 
 # set local EZMESURE_ES_DISCOVERY variable
 # should contain all ES cluster IP host except local IP address

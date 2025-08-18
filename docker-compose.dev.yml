@@ -11,10 +11,13 @@ services:
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
       - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
     working_dir: /usr/src/app
+    extra_hosts:
+      - "${EZMESURE_DOMAIN}:host-gateway"
     environment:
       - http_proxy
       - https_proxy
       - no_proxy=localhost,kibana
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
       - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
       - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
       - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
@@ -32,6 +35,16 @@ services:
       - EZMESURE_ADMIN_PASSWORD
       - EZMESURE_ADMIN_EMAIL
       - EZMESURE_AUTH_SECRET
+      - EZMESURE_OIDC_CLIENT_ID
+      - EZMESURE_OIDC_CLIENT_SECRET
+      - EZMESURE_OIDC_CONFIG_URI
+      - EZMESURE_OIDC_DISCOVERY_URI
+      - EZMESURE_OIDC_ISSUER_URI
+      - EZMESURE_OIDC_AUTH_URI
+      - EZMESURE_OIDC_TOKEN_URI
+      - EZMESURE_OIDC_INTROSPECTION_URI
+      - EZMESURE_OIDC_USERINFO_URI
+      - EZMESURE_OIDC_SCOPES
       - EZMESURE_SMTP_HOST=maildev
       - EZMESURE_SMTP_PORT=25
       - EZMESURE_SMTP_SECURE=false
