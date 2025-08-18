@@ -5,9 +5,8 @@ const serve = require('koa-static');
 const mount = require('koa-mount');
 const path = require('path');
 
-const { renaterLogin, elasticLogin, logout } = require('./auth/auth');
 const logs = require('./logs');
-const authorize = require('./auth');
+const auth = require('./auth');
 const partners = require('./partners');
 const metrics = require('./metrics');
 const institutions = require('./institutions');
@@ -42,22 +41,6 @@ const openapi = require('./openapi.json');
 const app = new Koa();
 
 const publicRouter = router();
-publicRouter.get('/login', renaterLogin);
-publicRouter.get('/logout', logout);
-
-publicRouter.route({
-  method: 'POST',
-  path: '/login/local',
-  handler: elasticLogin,
-  validate: {
-    type: 'json',
-    body: {
-      username: Joi.string().required().trim().min(1),
-      password: Joi.string().required().trim().min(1),
-      callbackUrl: Joi.string(),
-    },
-  },
-});
 
 publicRouter.get('/', async (ctx) => {
   ctx.status = 200;
@@ -79,7 +62,7 @@ app.use(partners.prefix('/partners').middleware());
 app.use(metrics.prefix('/metrics').middleware());
 app.use(contact.prefix('/contact').middleware());
 
-app.use(authorize.prefix('/profile').middleware());
+app.use(auth.prefix('/auth').middleware());
 app.use(logs.prefix('/logs').middleware());
 app.use(institutions.prefix('/institutions').middleware());
 app.use(customFields.prefix('/custom-fields').middleware());

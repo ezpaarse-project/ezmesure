@@ -4,7 +4,7 @@ const config = require('config');
 const UsersService = require('../../entities/users.service');
 const { sendActivateUserMail } = require('../auth/mail');
 const { appLogger } = require('../../services/logger');
-const { activateUserLink } = require('../auth/password');
+const { activateUserLink } = require('../auth/activate/actions');
 const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');

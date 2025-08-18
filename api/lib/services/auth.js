@@ -1,5 +1,7 @@
 const { auth } = require('config');
-const jwt = require('koa-jwt');
+
+const openid = require('../utils/openid');
+
 const InstitutionsService = require('../entities/institutions.service');
 const SushiEndpointService = require('../entities/sushi-endpoints.service');
 const SushiCredentialsService = require('../entities/sushi-credentials.service');
@@ -12,14 +14,52 @@ const { MEMBER_ROLES } = require('../entities/memberships.dto');
 
 const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
 
-const requireJwt = jwt({
-  secret: auth.secret,
-  cookie: auth.cookie,
-  key: 'jwtdata',
-});
+const requireJwt = async (ctx, next) => {
+  const token = ctx.cookies.get(auth.cookie);
+  if (!token) {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+
+  // TODO: support header
+
+  let jwtData;
+  try {
+    jwtData = await openid.getTokenInfo(token);
+  } catch {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+
+  if (!jwtData.active) {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+
+  ctx.state.jwtToken = token;
+  ctx.state.jwtData = jwtData;
+  await next();
+};
 
 const requireUser = async (ctx, next) => {
-  const username = ctx.state?.jwtdata?.username;
+  const { jwtToken, jwtData } = ctx.state ?? {};
+
+  if (!jwtToken || !jwtData) {
+    ctx.throw(401, ctx.$t('errors.auth.noUsername'));
+    return;
+  }
+
+  let username;
+  try {
+    const userProps = openid.getUserFromInfo(
+      await openid.getUserInfo(jwtToken, jwtData.sub),
+    );
+
+    username = userProps.username;
+  } catch {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
 
   if (!username) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
