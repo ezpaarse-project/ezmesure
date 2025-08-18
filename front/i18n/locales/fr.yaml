@@ -742,6 +742,9 @@ authenticate:
   loginFailed: Les informations transmises n'ont pas permis de vous authentifier
   failed: Une erreur est survenue
   impersonate: Emprunter l'identité
+  loading:
+    title: Redirection en cours...
+    text: Veuillez patienter... Vous êtes redirigé vers la page d'authentification.
 impersonate:
   ezmesureDesc: Prendre l'identité de l'utilisateur dans l'interface d'ezMESURE.
   kibanaDesc: Créer des utilisateurs test dans Kibana.

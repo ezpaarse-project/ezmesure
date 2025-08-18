@@ -6,10 +6,10 @@ export default {
   provider: {
     type: 'local',
     endpoints: {
-      signIn: { path: '/login/local', method: 'post' },
-      signOut: { path: '/logout', method: 'get' },
+      signIn: false,
+      signOut: false,
       signUp: false,
-      getSession: { path: '/profile', method: 'get' },
+      getSession: { path: '/auth', method: 'get' },
     },
     token: {
       cookieName: 'eztoken',

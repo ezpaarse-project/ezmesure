@@ -726,6 +726,9 @@ authenticate:
   loginFailed: The information transmitted did not allow you to authenticate
   failed: An error occurred
   impersonate: Impersonate
+  loading:
+    title: Redirecting...
+    text: Please wait... You are being redirected to the authentication page.
 impersonate:
   ezmesureDesc: Take the identity of the user in the ezMESURE interface.
   kibanaDesc: Create test users in Kibana.

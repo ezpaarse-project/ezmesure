@@ -8,7 +8,6 @@ import vuetifyOptions from './config/vuetify.options';
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      shibbolethDisabled: false,
       supportMail: 'ezteam@couperin.org',
       currentInstance: '',
     },
