@@ -7,13 +7,24 @@ const { appLogger } = require('../services/logger');
 const { setRandomPasswordForUser } = require('../services/elastic/users');
 const { loginUser } = require('../services/kibana');
 
-router.use(requireJwt, requireUser);
+const { redirectToFront } = require('./auth/oauth/middlewares');
 
 router.route({
   method: 'GET',
   path: '/',
   handler: [
+    redirectToFront,
     async (ctx) => {
+      try {
+        await requireJwt(ctx, () => {});
+      } catch {
+        // Try to login with OAuth
+        ctx.redirect('/api/auth/oauth/login?origin=/kibana/login');
+        return;
+      }
+
+      await requireUser(ctx, () => {});
+
       const { user } = ctx.state;
       const { next, msg } = ctx.query;
 
