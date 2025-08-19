@@ -297,6 +297,7 @@ const {
     sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
   },
   async: {
+    key: 'archived-sushi-table',
     deep: true,
   },
 });

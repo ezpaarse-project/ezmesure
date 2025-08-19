@@ -482,6 +482,7 @@ institutions:
     resetNbChecks: You will reset {count} connection states. Untested identifiers are not taken into account.
     cannotResetCheck: Failed to reset connection status for {name}
     connection: Connection
+    connectionStatus: 'Connection status'
     untested: Untested
     operational: Valid credentials
     operationalShort: Valid
@@ -725,8 +726,19 @@ authenticate:
   loginFailed: The information transmitted did not allow you to authenticate
   failed: An error occurred
   impersonate: Impersonate
+impersonate:
+  ezmesureDesc: Take the identity of the user in the ezMESURE interface.
+  kibanaDesc: Create test users in Kibana.
+  createTestUser: Create a test user
+  connectedToKibana: Connected to Kibana
+testUsers:
+  description: The Kibana accounts created here are based on the current user. They are temporary and allow you to check the proper functioning of the account in Kibana. Please note that passwords are no longer accessible once this window is closed.
+  expires: 'Expires on {date}'
+  copyUsername: Copy the username
+  copyPassword: Copy the password
+  loginToKibana: Log in to Kibana
 password:
-  forgot: Forgout your password ?
+  forgot: Forgot your password ?
   reset: Reset password
   save: Save password
   user: User
@@ -737,9 +749,7 @@ password:
   repeatPassword: Repeat password
   passwordIsRequired: Password required
   backToLogin: Back to login
-  enterUser:
-    Please enter your username so we can send you an email to retrieve your
-    password.
+  enterUser: Please enter your username so we can send you an email to reset your password.
   checkYourEmail: Check your email for a link to reset your password.
   waitFewMinutes: If it doesn’t appear within a few minutes, check your spam folder
   notEqual: Passwords don't match
@@ -1164,3 +1174,4 @@ deleted: Deleted
 deletedSince: Deleted since {date}
 cantCancel: This operation cannot be undone.
 version: Version
+back: Back

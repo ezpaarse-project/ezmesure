@@ -13,7 +13,7 @@
 
           <v-card-text class="pa-0">
             <v-expansion-panels variant="accordion" :value="provider">
-              <v-expansion-panel>
+              <v-expansion-panel model:value="true">
                 <v-expansion-panel-title>
                   <div>
                     <img
@@ -51,7 +51,7 @@
                       <v-col>
                         <v-text-field
                           v-model="credentials.username"
-                          :label="$t('authenticate.user')"
+                          :placeholder="$t('authenticate.user')"
                           :rules="[() => !!credentials.username || ($t('authenticate.fieldIsRequired'))]"
                           prepend-icon="mdi-account"
                           variant="underlined"
@@ -64,7 +64,7 @@
                       <v-col>
                         <v-text-field
                           v-model="credentials.password"
-                          :label="$t('authenticate.password')"
+                          :placeholder="$t('authenticate.password')"
                           :type="showPassword ? 'text' : 'password'"
                           :rules="[() => !!credentials.password || ($t('authenticate.fieldIsRequired'))]"
                           :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"

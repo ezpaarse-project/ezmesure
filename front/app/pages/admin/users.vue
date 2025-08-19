@@ -73,10 +73,9 @@
             <v-divider />
 
             <v-list-item
-              v-if="clipboard"
               :title="$t('authenticate.impersonate')"
               prepend-icon="mdi-login"
-              @click="impersonateUser(item)"
+              @click="impersonateDialogRef?.open(item)"
             />
             <v-list-item
               v-if="clipboard"
@@ -117,6 +116,9 @@
       ref="membershipsDialogRef"
       @update:model-value="refresh()"
     />
+    <UserImpersonateDialog
+      ref="impersonateDialogRef"
+    />
   </div>
 </template>
 
@@ -127,7 +129,6 @@ definePageMeta({
 });
 
 const { t } = useI18n();
-const { refresh: refreshSession } = useAuth();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
@@ -136,6 +137,7 @@ const selectedUsers = ref([]);
 
 const userFormDialogRef = useTemplateRef('userFormDialogRef');
 const membershipsDialogRef = useTemplateRef('membershipsDialogRef');
+const impersonateDialogRef = useTemplateRef('impersonateDialogRef');
 
 const {
   refresh,
@@ -294,16 +296,5 @@ async function copyMailList(items) {
     return;
   }
   snacks.info(t('emailsCopied'));
-}
-
-async function impersonateUser(item) {
-  try {
-    await $fetch(`/api/users/${item.username}/_impersonate`, { method: 'POST' });
-    await refreshSession();
-  } catch (err) {
-    snacks.error(t('anErrorOccurred'), err);
-    return;
-  }
-  await navigateTo('/myspace');
 }
 </script>

@@ -237,12 +237,20 @@ const tabs = computed(
 );
 
 const rows = computed(() => {
+  console.log(props.modelValue);
   const entries = Object.entries(innerSupportedData.value[currentVersion.value] ?? {});
-  return entries.sort(([a], [b]) => a.localeCompare(b));
+  return entries.filter(([, data]) => !!data).sort(([a], [b]) => a.localeCompare(b));
 });
 
 function patchSupportedData(reportId, params) {
-  const data = { ...innerSupportedData.value[currentVersion.value]?.[reportId] };
+  // Remove unwanted versions
+  const supportedData = Object.fromEntries(
+    Object.entries(innerSupportedData.value)
+      .filter(([version]) => props.versions.includes(version)),
+  );
+
+  const data = { ...supportedData[currentVersion.value]?.[reportId] };
+
   if ('supported' in params) {
     data.supported = { value: params.supported, manual: true };
   }
@@ -253,11 +261,13 @@ function patchSupportedData(reportId, params) {
     data.lastMonthAvailable = { value: params.lastMonthAvailable, manual: true };
   }
 
-  innerSupportedData.value[currentVersion.value] = {
-    ...innerSupportedData.value[currentVersion.value],
-    [reportId]: data,
+  innerSupportedData.value = {
+    ...supportedData,
+    [currentVersion.value]: {
+      ...supportedData[currentVersion.value],
+      [reportId]: data,
+    },
   };
-
   emit('update:modelValue', innerSupportedData.value);
 }
 
@@ -272,28 +282,40 @@ function resetForm() {
 }
 
 function undoSupportedData(reportId, field) {
+  // Remove unwanted versions
+  const supportedData = Object.fromEntries(
+    Object.entries(innerSupportedData.value)
+      .filter(([version]) => props.versions.includes(version)),
+  );
+
   const original = originalSupportedData.value[currentVersion.value]?.[reportId];
-  const data = { ...innerSupportedData.value[currentVersion.value]?.[reportId] };
+  let data = { ...supportedData[currentVersion.value]?.[reportId] };
 
   if (field === 'supported' && original?.[field]?.raw == null) {
-    delete innerSupportedData.value[currentVersion.value]?.[reportId];
-
-    emit('update:modelValue', innerSupportedData.value);
-    return;
+    data = undefined;
+  } else {
+    const value = original?.[field]?.raw;
+    data[field] = value != null ? { raw: value, value, manual: false } : undefined;
   }
 
-  const value = original?.[field]?.raw;
-  data[field] = value != null ? { raw: value, value, manual: false } : undefined;
-  innerSupportedData.value[currentVersion.value] = {
-    ...innerSupportedData.value[currentVersion.value],
-    [reportId]: data,
+  innerSupportedData.value = {
+    ...supportedData,
+    [currentVersion.value]: {
+      ...supportedData[currentVersion.value],
+      [reportId]: data,
+    },
   };
-
   emit('update:modelValue', innerSupportedData.value);
 }
 
 function patchToAll(params) {
-  const data = { ...innerSupportedData.value };
+  // Remove unwanted versions
+  const supportedData = Object.fromEntries(
+    Object.entries(innerSupportedData.value)
+      .filter(([version]) => props.versions.includes(version)),
+  );
+
+  const data = { ...supportedData[currentVersion.value] };
 
   // eslint-disable-next-line no-restricted-syntax
   for (const reportId of Object.keys(data)) {
@@ -308,7 +330,10 @@ function patchToAll(params) {
     }
   }
 
-  innerSupportedData.value = data;
+  innerSupportedData.value = {
+    ...supportedData,
+    [currentVersion.value]: data,
+  };
   emit('update:modelValue', innerSupportedData.value);
 }
 </script>

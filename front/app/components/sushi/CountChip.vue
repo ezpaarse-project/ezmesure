@@ -1,42 +1,57 @@
 <template>
+  <v-chip
+    :text="`${modelValue.length}`"
+    :variant="!modelValue.length ? 'outlined' : undefined"
+    :to="to"
+    prepend-icon="mdi-key"
+    size="small"
+  />
+
   <v-menu
-    :disabled="modelValue.length <= 0"
-    location="end center"
-    offset="8"
+    location="start center"
+    offset="5"
+    open-delay="50"
     open-on-hover
   >
     <template #activator="{ props: menu }">
-      <v-chip
-        :text="`${modelValue.length}`"
-        :variant="!modelValue.length ? 'outlined' : undefined"
-        :to="to"
-        prepend-icon="mdi-key"
-        size="small"
+      <ProgressLinearStack
+        :model-value="bars"
+        height="8"
         v-bind="menu"
+        class="mt-1"
       />
     </template>
 
-    <v-card>
-      <v-card-text class="d-flex justify-center">
-        <ProgressCircularStack
-          :model-value="statuses"
-          :labels="['success', 'unauthorized', 'failed']"
-          size="100"
-        >
-          <template #label="{ label }">
-            <v-chip
-              :text="`${label.value}`"
-              :color="label.color"
-              :prepend-icon="label.originalItem.icon"
-              size="small"
-              density="comfortable"
-              variant="flat"
-              style="margin: 1px 0"
-            />
+    <v-sheet min-width="300">
+      <v-table density="comfortable">
+        <tbody>
+          <tr>
+            <th colspan="2">
+              {{ $t('institutions.sushi.connectionStatus') }}
+            </th>
+          </tr>
+
+          <template v-for="row in bars">
+            <tr v-if="row.value > 0" :key="row.key">
+              <td>
+                <v-icon
+                  v-if="row.icon"
+                  :icon="row.icon"
+                  :color="row.iconColor || row.color"
+                  start
+                />
+
+                {{ row.label }}
+              </td>
+
+              <td class="text-right">
+                {{ row.valueStr }}
+              </td>
+            </tr>
           </template>
-        </ProgressCircularStack>
-      </v-card-text>
-    </v-card>
+        </tbody>
+      </v-table>
+    </v-sheet>
   </v-menu>
 </template>
 
@@ -52,19 +67,46 @@ const props = defineProps({
   },
 });
 
-const statuses = computed(() => {
-  const itemsPerStatus = Object.groupBy(props.modelValue, (item) => item.connection?.status || 'untested');
+const { t, locale } = useI18n();
 
-  return Object.entries(itemsPerStatus ?? {})
-    .map(([key, items]) => {
-      const { icon, color } = sushiStatus.get(key) ?? {};
+const bars = computed(() => {
+  const formatter = new Intl.NumberFormat(locale.value, { style: 'percent' });
+
+  const entries = [
+    ...sushiStatus.entries(),
+    [undefined, { color: 'grey-lighten-3', icon: 'mdi-help-circle-outline', iconColor: 'grey' }],
+  ];
+
+  return entries.map(
+    ([key, style]) => {
+      // Get label from status
+      let label;
+      switch (key) {
+        case 'success':
+          label = t('institutions.sushi.operational');
+          break;
+        case 'unauthorized':
+          label = t('institutions.sushi.invalidCredentials');
+          break;
+        case 'failed':
+          label = t('error');
+          break;
+        default:
+          label = t('institutions.sushi.untested');
+          break;
+      }
+
+      const count = props.modelValue.filter((sushi) => key === sushi.connection?.status).length;
+      const value = count / props.modelValue.length;
+
       return {
         key,
-        label: items.length,
-        value: items.length / props.modelValue.length,
-        icon,
-        color,
+        label,
+        value,
+        valueStr: formatter.format(value),
+        ...style,
       };
-    });
+    },
+  );
 });
 </script>

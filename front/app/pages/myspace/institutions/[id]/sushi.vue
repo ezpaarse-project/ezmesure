@@ -173,15 +173,14 @@
           <v-tabs-window-item :value="item.value" class="pa-4">
             {{ item.description }}
 
-            <template v-if="TABS_COMPONENTS[item.value]">
-              <component
-                :is="TABS_COMPONENTS[item.value]"
-                :institution="institution"
-                :is-locked="lockStatus?.locked"
-                :can-edit="canEdit"
-                :define-tab="(tab) => { tabsData.set(item.value, tab); }"
-              />
-            </template>
+            <component
+              :is="TABS_COMPONENTS[item.value]"
+              v-if="TABS_COMPONENTS[item.value]"
+              :institution="institution"
+              :is-locked="lockStatus?.locked"
+              :can-edit="canEdit"
+              :define-tab="(tab) => { tabsData.set(item.value, tab); }"
+            />
           </v-tabs-window-item>
         </template>
       </v-tabs>
