@@ -4,8 +4,12 @@ location /kibana {
   proxy_pass  ${EZMESURE_KIBANA_URL};
 }
 
-location = /kibana/login/ {
-  rewrite     ^/kibana/login/$ /_kbb break;
+location ~* ^/kibana/(s/[a-z-]+/)?login/?$ {
+  rewrite     ^.*$ /_kbb break;
 
   proxy_pass  ${EZMESURE_API_URL};
+}
+
+location ~* ^/kibana/s/[a-z-]+/security/account/?$ {
+  rewrite     ^.*$ /myspace/profile redirect;
 }
