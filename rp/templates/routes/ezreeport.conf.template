@@ -1,0 +1,7 @@
+location /report/api {
+  rewrite     ^/report/api(/.*)$ $1 break;
+
+  include /etc/nginx/conf.d/utils/ws-proxy.conf;
+
+  proxy_pass  ${EZMESURE_REPORT_URL};
+}

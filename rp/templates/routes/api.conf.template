@@ -1,0 +1,5 @@
+location /api {
+  rewrite     ^/api(/.*)$ $1 break;
+
+  proxy_pass  ${EZMESURE_API_URL};
+}

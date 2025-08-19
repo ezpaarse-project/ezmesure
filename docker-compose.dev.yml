@@ -74,7 +74,6 @@ services:
       - NODE_ENV
       - NUXT_PUBLIC_CURRENT_INSTANCE
       - NUXT_PUBLIC_SUPPORT_MAIL
-      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
     tmpfs: /tmp
     command: npm run dev -- --host 0.0.0.0
     restart: "no"

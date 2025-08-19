@@ -77,7 +77,6 @@ services:
     environment:
       - NUXT_PUBLIC_CURRENT_INSTANCE
       - NUXT_PUBLIC_SUPPORT_MAIL
-      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
       - HOST=0.0.0.0
       - PORT=8080
     restart: unless-stopped

@@ -1,0 +1,5 @@
+location / {
+  include /etc/nginx/conf.d/utils/ws-proxy.conf; # Needed for HMR
+
+  proxy_pass  ${EZMESURE_FRONT_URL};
+}
