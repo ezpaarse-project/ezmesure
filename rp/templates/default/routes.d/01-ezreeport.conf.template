@@ -3,5 +3,5 @@ location /report/api {
 
   include /etc/nginx/conf.d/utils/ws-proxy.conf;
 
-  proxy_pass  ${EZMESURE_REPORT_URL};
+  proxy_pass  http://ezreeport_server;
 }

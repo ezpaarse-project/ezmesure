@@ -1,0 +1,74 @@
+module: satosa.backends.saml2.SAMLBackend
+name: SAML2
+config:
+  # idp_blacklist_file: /path/to/blacklist.json
+
+  acr_mapping:
+    "": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified"
+
+  disco_srv: ${SAML_DS_URL}
+
+  entityid_endpoint: true
+  mirror_force_authn: no
+  memorize_idp: no
+  use_memorized_idp_when_force_authn: no
+  send_requester_id: no
+  enable_metadata_reload: no
+  acs_selection_strategy: prefer_matching_host
+
+  sp_config:
+    name: Renater
+    description: Renater SP
+
+    key_file: /etc/satosa/certs/sp.key
+    cert_file: /etc/satosa/certs/sp.crt
+
+    organization:
+      display_name: ${SAML_ORG_DISPLAY_NAME}
+      name: ${SAML_ORG_DISPLAY_NAME}
+      url: ${SAML_ORG_URL}
+
+    contact_person:
+      - contact_type: support
+        email_address: ${SAML_SERVERADMIN}
+        given_name: Support
+
+    metadata:
+      remote:
+        - url: ${SAML_METADATA_URL}
+          cert: /etc/satosa/certs/metadata.crt
+
+    entityid: ${SAML_ENTITY_ID}
+    accepted_time_diff: 60
+    service:
+      sp:
+        name: ${SAML_DISPLAY_NAME}
+        ui_info:
+          display_name:
+            - lang: en
+              text: "${SAML_DISPLAY_NAME}"
+            - lang: fr
+              text: "${SAML_DISPLAY_NAME}"
+          description:
+            - lang: en
+              text: "${SAML_DISPLAY_NAME}"
+            - lang: fr
+              text: "${SAML_DISPLAY_NAME}"
+        authn_requests_signed: false
+        want_response_signed: true
+        allow_unsolicited: true
+        endpoints:
+          assertion_consumer_service:
+          # [<base_url>/<name>/...
+          - ['${SATOSA_PUBLIC_URL}/SAML2/ACS/POST', 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST']
+          single_logout_service:
+          - ['${SATOSA_PUBLIC_URL}/SAML2/SLO/POST', 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST']
+          discovery_response:
+          - ['${SATOSA_PUBLIC_URL}/SAML2/DISCO', 'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol']
+
+        # name_id_format: a list of strings to set the <NameIDFormat> element in SP metadata
+        # name_id_policy_format: a string to set the Format attribute in the NameIDPolicy element
+        # of the authentication request
+        # name_id_format_allow_create: sets the AllowCreate attribute in the NameIDPolicy element
+        # of the authentication request
+        name_id_format_allow_create: true

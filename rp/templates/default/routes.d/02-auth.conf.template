@@ -1,5 +1,5 @@
 location /auth {
   # Don't rewrite as Dex excepts the /auth
 
-  proxy_pass  ${EZMESURE_AUTH_URL};
+  proxy_pass  http://auth_server;
 }

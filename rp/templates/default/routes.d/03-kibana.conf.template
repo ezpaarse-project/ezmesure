@@ -1,13 +1,13 @@
 location /kibana {
   rewrite     ^/kibana(/.*)$ $1 break;
 
-  proxy_pass  ${EZMESURE_KIBANA_URL};
+  proxy_pass  http://kibana_server;
 }
 
 location ~* ^/kibana/(s/[a-z-]+/)?login/?$ {
   rewrite     ^.*$ /_kbb break;
 
-  proxy_pass  ${EZMESURE_API_URL};
+  proxy_pass  http://api_server;
 }
 
 location ~* ^/kibana/s/[a-z-]+/security/account/?$ {

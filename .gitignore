@@ -6,3 +6,9 @@ ezmesure.local.env.sh
 certificates/
 
 rabbitmq/definitions.d/00-users.json
+
+satosa/certs/*
+!satosa/certs/.gitkeep
+
+rp/certs/*
+!rp/certs/.gitkeep

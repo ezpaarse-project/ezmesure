@@ -1,4 +1,4 @@
-issuer: {{ getenv "EZMESURE_OIDC_ISSUER_URI" }}
+issuer: {{ getenv "OIDC_ISSUER_URI" }}
 
 storage:
   type: sqlite3
@@ -32,9 +32,9 @@ oauth2:
   alwaysShowLoginScreen: false
 
 staticClients:
-- id: {{ getenv "EZMESURE_OIDC_CLIENT_ID" }}
-  secret: {{ getenv "EZMESURE_OIDC_CLIENT_SECRET" }}
-  name: '{{ getenv "EZMESURE_APPLICATION_NAME"}}'
+- id: {{ getenv "OIDC_CLIENT_ID" }}
+  secret: {{ getenv "OIDC_CLIENT_SECRET" }}
+  name: {{ getenv "OIDC_CLIENT_NAME"}}
   redirectURIs:
     - '{{ getenv "EZMESURE_PUBLIC_URL" }}/api/auth/oauth/login/callback'
 
@@ -42,3 +42,16 @@ connectors:
 - type: mockCallback
   id: mock
   name: Mock
+{{- if getenv "SATOSA_ENABLED" }}
+- type: oidc
+  id: satosa
+  name: Renater
+  config:
+    issuer: {{ getenv "SATOSA_PUBLIC_URL" }}
+    clientId: dex
+    clientSecret: dex-secret
+    redirectURI: '{{ getenv "OIDC_ISSUER_URI" }}/callback'
+
+    rootCAs:
+      - /etc/ssl/ezmesure.pem
+{{- end }}

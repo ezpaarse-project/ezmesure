@@ -1,0 +1,43 @@
+BASE: ${SATOSA_PUBLIC_URL}
+
+COOKIE_STATE_NAME: "SATOSA_STATE"
+CONTEXT_STATE_DELETE: yes
+STATE_ENCRYPTION_KEY: "asdASD123"
+
+cookies_samesite_compat:
+  - ["SATOSA_STATE", "SATOSA_STATE_LEGACY"]
+
+INTERNAL_ATTRIBUTES: "/etc/satosa/internal_attributes.yaml"
+
+BACKEND_MODULES:
+  - "/etc/satosa/plugins/backends/saml2_backend.yaml"
+
+FRONTEND_MODULES:
+  - "/etc/satosa/plugins/frontends/oidc_frontend.yaml"
+
+LOGGING:
+  version: 1
+  formatters:
+    simple:
+      format: "[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s"
+  handlers:
+    stdout:
+      class: logging.StreamHandler
+      stream: "ext://sys.stdout"
+      level: DEBUG
+      formatter: simple
+  loggers:
+    satosa:
+      level: DEBUG
+    saml2:
+      level: DEBUG
+    oidcendpoint:
+      level: DEBUG
+    pyop:
+      level: DEBUG
+    oic:
+      level: DEBUG
+  root:
+    level: DEBUG
+    handlers:
+      - stdout

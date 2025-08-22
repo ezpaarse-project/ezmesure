@@ -1,3 +1,5 @@
+include:
+  - docker-compose.auth.yml
 services:
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
@@ -45,16 +47,11 @@ services:
       - SERVER_BASEPATH
       - SERVER_PUBLICBASEURL=https://${EZMESURE_DOMAIN}${SERVER_BASEPATH}
       - SERVER_DEFAULTROUTE=/app/dashboards
-      - SERVER_HOST
-      - SERVER_PORT
       - THIS_HOST
       - ELASTICSEARCH_HOSTS
       - XPACK_MONITORING_ENABLED
       - KIBANA_DEFAULTAPPID
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
-      - APPLI_APACHE_SERVERNAME
-      - REPORTING_URL=${EZMESURE_REPORTING_URL:-http://legacy-reporting:3000}
-      - EZMESURE_APPLICATION_NAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
       - "./kibana/config/certificates:/usr/share/kibana/config/x-pack/certificates"
@@ -100,32 +97,22 @@ services:
     environment:
       - http_proxy
       - https_proxy
+
+      - NGINX_RESOLVER=${NGINX_RESOLVER:-127.0.0.11}
       - NGINX_PROTOCOL=${NGINX_PROTOCOL:-https}
-      - NGINX_HOST=${EZMESURE_DOMAIN}
-      - EZMESURE_AUTH_URL=${EZMESURE_AUTH_URL:-http://auth:5556}
-      - EZMESURE_FRONT_URL=${EZMESURE_FRONT_URL:-http://front:8080}
-      - EZMESURE_API_URL=${EZMESURE_API_URL:-http://api:3000}
-      - EZMESURE_KIBANA_URL=http://${EZMESURE_KIBANA_HOST:-kibana}:${EZMESURE_KIBANA_PORT:-5601}
-      - EZMESURE_REPORT_URL=http://${EZMESURE_REPORT_HOST:-reporting}:${EZREEPORT_API_HTTP_PORT:-8080}
+
+      - EZMESURE_DOMAIN
+      - SATOSA_DOMAIN
+
+      - SATOSA_HOST=satosa:8080
+      - AUTH_HOST=auth:5556
+      - FRONT_HOST=front:8080
+      - API_HOST=api:3000
+      - KIBANA_HOST=kibana:5601
+      - REPORT_HOST=reporting:8080
     volumes:
       - ./rp/templates:/etc/nginx/templates
-    restart: unless-stopped
-
-  # We use dex as default authentication provider, you can choose another one that fits your needs,
-  # as longs as it provides OIDC authentication
-  auth:
-    image: 'dexidp/dex'
-    environment:
-      - EZMESURE_PUBLIC_URL
-      - EZMESURE_OIDC_ISSUER_URI
-      - EZMESURE_OIDC_CLIENT_ID
-      - EZMESURE_OIDC_CLIENT_SECRET
-      - EZMESURE_ADMIN_EMAIL
-      - EZMESURE_ADMIN_USERNAME
-      - EZMESURE_ADMIN_PASSWORD_HASH
-      - EZMESURE_APPLICATION_NAME
-    volumes:
-      - ./dex/config.yaml:/etc/dex/config.docker.yaml
+      - ./rp/certs:/etc/nginx/ssl
     restart: unless-stopped
 
   reporting:
@@ -137,11 +124,11 @@ services:
       - no_proxy=${no_proxy},localhost,postgres,rabbitmq
 
       # ports
-      - API_HTTP_PORT=${EZREEPORT_API_HTTP_PORT:-8080}
-      - WORKER_HTTP_PORT=${EZREEPORT_WORKER_HTTP_PORT:-8180}
-      - SCHEDULER_HTTP_PORT=${EZREEPORT_SCHEDULER_HTTP_PORT:-8280}
-      - MAIL_HTTP_PORT=${EZREEPORT_MAIL_HTTP_PORT:-8380}
-      - FILES_HTTP_PORT=${EZREEPORT_FILES_HTTP_PORT:-8480}
+      - API_HTTP_PORT=8080
+      - WORKER_HTTP_PORT=8180
+      - SCHEDULER_HTTP_PORT=8280
+      - MAIL_HTTP_PORT=8380
+      - FILES_HTTP_PORT=8480
 
       # rabbitmq
       - RABBITMQ_PROTOCOL=${EZMESURE_RABBITMQ_PROTOCOL:-amqp}
@@ -188,7 +175,6 @@ services:
       - EMAIL_SUPPORT_TEAM=${EZREEPORT_MAIL_DEV_TEAM}
       - EMAIL_ATTEMPTS=${EZREEPORT_MAIL_ATTEMPTS}
       - EMAIL_ATTEMPTS_INTERVAL=${EZREEPORT_MAIL_ATTEMPTS_INTERVAL}
-      - API_URL=${APPLI_APACHE_SERVERNAME}/report/api
 
       # files var
       - FILES_CONCURRENCE=${EZREEPORT_FILES_CONCURRENCE:-1}
