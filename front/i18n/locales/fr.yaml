@@ -742,9 +742,9 @@ authenticate:
   loginFailed: Les informations transmises n'ont pas permis de vous authentifier
   failed: Une erreur est survenue
   impersonate: Emprunter l'identité
-  loading:
-    title: Redirection en cours...
-    text: Veuillez patienter... Vous êtes redirigé vers la page d'authentification.
+  loadingDesc: Vous serez redirigé vers la page d'authentification dans quelques instants !
+  longLoadingDesc: Si vous voyez cette page après quelques instants, veuillez vérifier votre connexion internet, ou cliquer sur le bouton ci-dessous
+  longLoadingBtn: Accéder à la page de connexion
 impersonate:
   ezmesureDesc: Prendre l'identité de l'utilisateur dans l'interface d'ezMESURE.
   kibanaDesc: Créer des utilisateurs test dans Kibana.
@@ -1197,3 +1197,4 @@ deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
 version: Version
 back: Retour
+pleaseWait: Veuillez patienter...
