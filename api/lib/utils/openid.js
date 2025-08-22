@@ -134,7 +134,7 @@ module.exports.getUserInfo = async (accessToken, subject) => {
  *
  * @param {openid.UserInfoResponse} userInfo
  *
- * @returns {Omit<import('@prisma/client').User, 'createdAt' | 'updatedAt'>}
+ * @returns {Omit<import('@prisma/client').User, 'createdAt' | 'updatedAt' | 'lastActivity'>}
  */
 module.exports.getUserFromInfo = (userInfo) => {
   if (!userInfo.email) {

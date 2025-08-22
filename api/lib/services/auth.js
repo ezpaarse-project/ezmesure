@@ -13,6 +13,8 @@ const SpacesService = require('../entities/spaces.service');
 
 const { MEMBER_ROLES } = require('../entities/memberships.dto');
 
+const { appLogger } = require('./logger');
+
 const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
 
 /**
@@ -175,11 +177,21 @@ const requireUser = async (ctx, next) => {
   }
 
   const usersService = new UsersService();
-  const user = await usersService.findUnique({ where: { username } });
+  let user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
+  }
+
+  // Update last activity of user
+  try {
+    user = await usersService.update({
+      where: { username },
+      data: { lastActivity: new Date() },
+    });
+  } catch (err) {
+    appLogger.warn(`[requireUser] Couldn't update last activity date: ${err.message || err}`);
   }
 
   ctx.state.user = user;

@@ -130,6 +130,8 @@ model User {
   createdAt    DateTime      @default(now())
   /// Latest update date
   updatedAt    DateTime      @updatedAt
+  /// Date of last activity
+  lastActivity DateTime      @default(now())
   /// Whether the user has admin access or not
   isAdmin      Boolean       @default(false)
   /// Arbitrary metadata
@@ -459,9 +461,9 @@ model HarvestSession {
   /// Maximum execution time of a job
   timeout                Int                  @default(600)
   /// Whether the reports should be fetched even if credentials aren't verified or wrong
-  allowFaulty            Boolean      @default(false)
+  allowFaulty            Boolean              @default(false)
   /// Whether the reports should be downloaded even if not supported by the endpoint
-  downloadUnsupported    Boolean      @default(false)
+  downloadUnsupported    Boolean              @default(false)
   /// Whether the reports should be downloaded even if a local copy already exists
   forceDownload          Boolean              @default(false)
   /// Whether a mail should be sent when session ended

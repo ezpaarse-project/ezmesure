@@ -380,6 +380,13 @@
           "createdAt": {
             "$ref": "#/components/schemas/ItemCreationDate"
           },
+          "lastAcitvity": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Last activity date",
+            "readOnly": true
+          },
           "fullName": {
             "description": "User full name",
             "type": "string",
