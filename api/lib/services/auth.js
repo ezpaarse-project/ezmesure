@@ -1,4 +1,5 @@
 const { auth } = require('config');
+const jwt = require('jsonwebtoken');
 
 const openid = require('../utils/openid');
 
@@ -14,48 +15,155 @@ const { MEMBER_ROLES } = require('../entities/memberships.dto');
 
 const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
 
-const requireJwt = async (ctx, next) => {
-  const token = ctx.cookies.get(auth.cookie);
-  if (!token) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
-    return;
+/**
+ * Get JWT data of cookie using OpenID provider
+ *
+ * @param {string} cookie - The cookie found in request
+ *
+ * @returns {Promise<{ type: 'oauth', token: string, data: unknown }>}
+ */
+async function getJWTDataFromCookie(cookie) {
+  let data;
+
+  try {
+    data = await openid.getTokenInfo(cookie);
+  } catch {
+    throw new Error("Can't get token");
   }
 
-  // TODO: support header
+  if (!data.active) {
+    throw new Error('Token is revoked');
+  }
 
-  let jwtData;
+  return {
+    type: 'oauth',
+    token: cookie,
+    data,
+  };
+}
+
+/**
+ * Get JWT data of header using JWT methods
+ *
+ * @param {string} header - The header found in request
+ *
+ * @returns {Promise<{ type: 'api_key', token: string, data: unknown }>}
+ */
+function getJWTDataFromHeader(header) {
+  const matches = /Bearer (?<token>.+)/i.exec(header);
+  const { token } = matches.groups ?? {};
+  if (!token) {
+    throw new Error("Can't get token");
+  }
+
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, auth.secret, {}, (err, data) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve({
+        type: 'api_key',
+        token,
+        data,
+      });
+    });
+  });
+}
+
+/**
+ * Check if request have a valid JWT, and decode it's cotent
+ *
+ * @param {import('koa').Context} ctx - Koa context
+ * @param {import('koa').Next} next - Next handler
+ */
+const requireJwt = async (ctx, next) => {
+  let jwtData = {};
+
   try {
-    jwtData = await openid.getTokenInfo(token);
+    const cookie = ctx.cookies.get(auth.cookie);
+    if (cookie) {
+      jwtData = await getJWTDataFromCookie(cookie);
+    }
+
+    const header = ctx.get('authorization');
+    if (header) {
+      jwtData = await getJWTDataFromHeader(header);
+    }
   } catch {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  if (!jwtData.active) {
+  if (!jwtData.token || !jwtData.data) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  ctx.state.jwtToken = token;
   ctx.state.jwtData = jwtData;
   await next();
 };
 
-const requireUser = async (ctx, next) => {
-  const { jwtToken, jwtData } = ctx.state ?? {};
+/**
+ * Get username from OAuth (using OpenID provider)
+ *
+ * @param {string} token - The token found in request
+ * @param {unknown} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data
+ */
+async function getUsernameFromOAuth(token, data) {
+  const userProps = openid.getUserFromInfo(
+    await openid.getUserInfo(token, data.sub),
+  );
 
-  if (!jwtToken || !jwtData) {
+  return userProps.username;
+}
+
+/**
+ * Get username from API_KEY
+ *
+ * @param {string} token - The token found in request
+ * @param {unknown} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data. Returns a promise to prepare
+ * for next upgrades (api keys in DB, etc.)
+ */
+function getUsernameFromApiKey(token, data) {
+  return Promise.resolve(data.username);
+}
+
+/**
+ * Check if request have a valid user
+ *
+ * Needs `requireJWT`
+ *
+ * @param {import('koa').Context} ctx - Koa context
+ * @param {import('koa').Next} next - Next handler
+ */
+const requireUser = async (ctx, next) => {
+  const { jwtData } = ctx.state ?? {};
+
+  if (!jwtData?.token || !jwtData?.data) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
     return;
   }
 
   let username;
-  try {
-    const userProps = openid.getUserFromInfo(
-      await openid.getUserInfo(jwtToken, jwtData.sub),
-    );
 
-    username = userProps.username;
+  try {
+    switch (jwtData.type) {
+      case 'oauth':
+        username = await getUsernameFromOAuth(jwtData.token, jwtData.data);
+        break;
+      case 'api_key':
+        username = await getUsernameFromApiKey(jwtData.token, jwtData.data);
+        break;
+
+      default:
+        throw new Error('JWT type unsupported');
+    }
   } catch {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
@@ -67,7 +175,6 @@ const requireUser = async (ctx, next) => {
   }
 
   const usersService = new UsersService();
-
   const user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
