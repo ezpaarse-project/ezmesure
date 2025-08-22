@@ -6,6 +6,7 @@ const { prepareStandardQueryParams } = require('../../../services/std-query');
 
 const UsersService = require('../../../entities/users.service');
 const MembershipsService = require('../../../entities/memberships.service');
+const MembershipRolesService = require('../../../entities/memberships-roles.service');
 const InstitutionsService = require('../../../entities/institutions.service');
 
 const {
@@ -18,6 +19,7 @@ const {
     techContact: TECH_CONTACT,
   },
 } = require('../../../entities/memberships.dto');
+const RolesService = require('../../../entities/roles.service');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
@@ -237,4 +239,100 @@ exports.requestMembership = async (ctx) => {
 
   ctx.type = 'json';
   ctx.status = 204;
+};
+
+exports.removeInstitutionMemberRole = async (ctx) => {
+  const { user } = ctx.state;
+  const { institutionId, username, roleId } = ctx.params;
+
+  await MembershipRolesService.$transaction(async (membershipRolesService) => {
+    if (!user.isAdmin) {
+      const membershipService = new MembershipsService(membershipRolesService);
+      const membership = await membershipService.findByID(institutionId, username);
+
+      if (!membership?.permissions?.includes('membership:write')) {
+        ctx.throw(403, ctx.$t('errors.perms.feature'));
+      }
+    }
+
+    const membershipRole = await membershipRolesService.findUnique({
+      where: {
+        username_institutionId_roleId: { roleId, username, institutionId },
+      },
+      select: {
+        role: {
+          select: {
+            restricted: true,
+          },
+        },
+      },
+    });
+
+    if (!membershipRole) {
+      return null;
+    }
+
+    if (membershipRole.role.restricted && !user.isAdmin) {
+      ctx.throw(403, ctx.$t('errors.role.restricted'));
+    }
+
+    await membershipRolesService.delete({
+      where: {
+        username_institutionId_roleId: { roleId, username, institutionId },
+      },
+    });
+  });
+
+  ctx.status = 204;
+};
+
+exports.addInstitutionMemberRole = async (ctx) => {
+  const { user } = ctx.state;
+  const { institutionId, username, roleId } = ctx.params;
+
+  const updatedMembership = await MembershipsService.$transaction(async (membershipsService) => {
+    if (!user.isAdmin) {
+      const membership = await membershipsService.findByID(institutionId, username);
+
+      if (!membership?.permissions?.includes('membership:write')) {
+        ctx.throw(403, ctx.$t('errors.perms.feature'));
+      }
+    }
+
+    const memberRoleService = new RolesService(membershipsService);
+    const role = await memberRoleService.findUnique({ where: { id: roleId } });
+
+    if (!role) {
+      ctx.throw(404, ctx.$t('errors.role.notFound'));
+    }
+
+    if (role.restricted && !user.isAdmin) {
+      ctx.throw(403, ctx.$t('errors.role.restricted'));
+    }
+
+    return membershipsService.update({
+      where: {
+        username_institutionId: { username, institutionId },
+      },
+      data: {
+        roles: {
+          connectOrCreate: {
+            where: {
+              username_institutionId_roleId: { username, institutionId, roleId },
+            },
+            create: {
+              roleId,
+            },
+          },
+        },
+      },
+      include: {
+        user: true,
+        roles: true,
+      },
+    });
+  });
+
+  ctx.status = 200;
+  ctx.body = updatedMembership;
 };

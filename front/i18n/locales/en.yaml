@@ -22,6 +22,7 @@ menu:
   profile: Profile
   members: Members
   users: Users
+  roles: Roles
   elasticRoles: Elastic Roles
   logout: Logout
   contact: Contact
@@ -438,6 +439,8 @@ institutions:
       memberships: Members
       sushi: COUNTER credentials
       reporting: ezREEPORT
+      repositories: Repositories
+      spaces: Kibana spaces
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
@@ -993,6 +996,19 @@ harvest:
     unableToDelete: Unable to delete the harvesting task
     counterVersionTooltip: Harvest a COUNTER {version} report
     noData: No data in the harvested report
+roles:
+  toolbarTitle: Roles ({count})
+  pageDesc: Enter here the roles that you want to be able to assign to institution members.
+  newRole: New role
+  editRole: Update role
+  manageRoles: >
+    Manage roles
+    |Manage {count} roles
+  restricted: Restricted
+  onlyAdmins: Only assignable by administrators
+  notOnlyAdmins: Assignable by users
+  assignments: Assignments
+  definePermissionsPreset: Define permissions presets
 elasticRoles:
   toolbarTitle: Elastic Roles ({count})
   newRole: New role
