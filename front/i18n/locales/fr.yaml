@@ -842,6 +842,7 @@ users:
     membershipsCount: >
       1 établissement
       |{count} établissements
+    lastActivity: Dernière activitée
     roles: Rôles
     no_roles: Aucun rôle
     permissions: Permissions

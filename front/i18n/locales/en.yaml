@@ -826,6 +826,7 @@ users:
     membershipsCount: >
       {count} institution
       |{count} institutions
+    lastActivity: Last activity
     roles: Roles
     no_roles: No roles
     permissions: Permissions
