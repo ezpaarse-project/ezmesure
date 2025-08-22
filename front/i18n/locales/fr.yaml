@@ -22,6 +22,7 @@ menu:
   profile: Profil
   members: Membres
   users: Utilisateurs
+  roles: Rôles
   elasticRoles: Rôles Elastic
   logout: Déconnexion
   contact: Contact
@@ -440,6 +441,8 @@ institutions:
       memberships: Membres
       sushi: ezCOUNTER
       reporting: ezREEPORT
+      repositories: Entrepôts
+      spaces: Espaces Kibana
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
@@ -1013,6 +1016,19 @@ harvest:
     unableToDelete: Impossible de supprimer la tâche de moissonnage
     counterVersionTooltip: Moissonne un rapport COUNTER {version}
     noData: Aucune donnée dans le rapport moissonné
+roles:
+  toolbarTitle: Rôles ({count})
+  pageDesc: Entrez ici les rôles que vous souhaitez pouvoir attribuer aux membres des établissements.
+  newRole: Nouveau rôle
+  editRole: Mise à jour du rôle
+  manageRoles: >
+    Gérer les rôles
+    |Gérer {count} rôles
+  restricted: Restreint
+  onlyAdmins: Assignable uniquement par les administrateurs
+  notOnlyAdmins: Assignable par les utilisateurs
+  assignments: Assignations
+  definePermissionsPreset: Définir des permissions par défaut
 elasticRoles:
   toolbarTitle: Rôles Elastic ({count})
   newRole: Nouveau rôle
