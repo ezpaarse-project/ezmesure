@@ -91,6 +91,8 @@ const includableFields = [
   'institution.elasticRoles.repositoryAliasPermissions',
   'institution.elasticRoles.repositoryAliasPermissions.alias',
   'institution.elasticRoles.repositoryAliasPermissions.alias.repository',
+  'roles',
+  'roles.role',
 ];
 
 /**

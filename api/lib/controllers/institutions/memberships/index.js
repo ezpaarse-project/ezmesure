@@ -18,6 +18,8 @@ const {
   removeInstitutionMember,
   getInstitutionMember,
   requestMembership,
+  addInstitutionMemberRole,
+  removeInstitutionMemberRole,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
@@ -98,6 +100,32 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
       username: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/memberships/:username/roles/:roleId',
+  handler: removeInstitutionMemberRole,
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
+      roleId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/memberships/:username/roles/:roleId',
+  handler: addInstitutionMemberRole,
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
+      roleId: Joi.string().trim().required(),
     },
   },
 });

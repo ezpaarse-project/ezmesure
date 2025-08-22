@@ -66,6 +66,8 @@ model Institution {
   repositoryAliases   RepositoryAlias[]
   /// Custom properties
   customProps         InstitutionProperty[]
+  /// Custom roles
+  roles               Role[]
 }
 
 model InstitutionProperty {
@@ -153,7 +155,7 @@ model Membership {
   /// The institution
   institution                Institution                 @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// Roles of the member inside the institution
-  roles                      String[]
+  roles                      MembershipRole[]
   /// Permissions of the user for the institution (members management, SUSHI, ezREEPORT...)
   permissions                String[]
   /// Permissions of the user for the institution spaces
@@ -358,6 +360,46 @@ model ElasticRole {
   spacePermissions           ElasticRoleSpacePermission[]
 }
 
+/// Custom role to give to users
+model Role {
+  /// ID of the role
+  id                String           @id
+  /// Label of the role
+  label             String
+  /// Description of the role
+  description       String?
+  /// Whether the role can be attributed by regular users or only by admins
+  restricted        Boolean          @default(true)
+  /// Permissions preset
+  permissionsPreset Json?
+  /// ID of the institution, if the role is scoped to an institution
+  institutionId     String?
+  /// Institution that owns that role, if the role is scoped to an institution
+  institution       Institution?     @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  /// Creation date
+  createdAt         DateTime         @default(now())
+  /// Latest update date
+  updatedAt         DateTime         @updatedAt
+  /// Memberships using this role
+  membershipRoles   MembershipRole[]
+}
+
+/// A alias permission (access rights of a member for a specific alias)
+model MembershipRole {
+  /// Username of the member
+  username      String
+  /// Institution of the member
+  institutionId String
+  /// The member
+  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  /// Name of the role
+  roleId        String
+  /// The role
+  role          Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([username, institutionId, roleId])
+}
+
 /// Permission on repository granted by a role
 model ElasticRoleRepositoryPermission {
   /// Name of the concerned role
@@ -459,9 +501,9 @@ model HarvestSession {
   /// Maximum execution time of a job
   timeout                Int                  @default(600)
   /// Whether the reports should be fetched even if credentials aren't verified or wrong
-  allowFaulty            Boolean      @default(false)
+  allowFaulty            Boolean              @default(false)
   /// Whether the reports should be downloaded even if not supported by the endpoint
-  downloadUnsupported    Boolean      @default(false)
+  downloadUnsupported    Boolean              @default(false)
   /// Whether the reports should be downloaded even if a local copy already exists
   forceDownload          Boolean              @default(false)
   /// Whether a mail should be sent when session ended
