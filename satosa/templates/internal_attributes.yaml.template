@@ -1,14 +1,11 @@
 attributes:
-  address:
-    openid: [address.street_address]
-    saml: [postaladdress]
-  displayname:
+  displayName:
     openid: [nickname]
     saml: [displayName]
-  edupersontargete:
+  eduPersonTargetedID:
     openid: [sub]
     saml: [eduPersonTargetedID]
-  givenname:
+  givenName:
     openid: [given_name]
     saml: [givenName]
   mail:
@@ -20,5 +17,5 @@ attributes:
   surname:
     openid: [family_name]
     saml: [sn, surname]
-user_id_from_attrs: [edupersontargetedid]
-user_id_to_attr: edupersontargetedid
+user_id_from_attrs: [eduPersonTargetedID]
+user_id_to_attr: eduPersonTargetedID

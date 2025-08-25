@@ -52,6 +52,9 @@ connectors:
     clientSecret: dex-secret
     redirectURI: '{{ getenv "OIDC_ISSUER_URI" }}/callback'
 
+    insecureSkipEmailVerified: true # SATOSA doesn't provide "email_verified" (as it's a proxy)
+    getUserInfo: true # SATOSA doesn't expose user in the IDToken, dex should query user info to get user
+
     rootCAs:
       - /etc/ssl/ezmesure.pem
 {{- end }}
