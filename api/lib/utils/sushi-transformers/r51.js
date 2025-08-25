@@ -49,7 +49,7 @@ module.exports = function prepareC51Transformer(report) {
               Item_ID: parent.Item_ID,
               Publication_Date: parent.Publication_Date,
 
-              Item: parent.Item,
+              Item_Name: parent.Item,
               Data_Type: parent.Data_Type,
               Authors: parent.Authors,
               Article_Version: parent.Article_Version,
