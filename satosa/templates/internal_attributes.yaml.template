@@ -17,5 +17,15 @@ attributes:
   surname:
     openid: [family_name]
     saml: [sn, surname]
+
+  eduPersonIdp:
+    openid: [idp]
+    saml: [idp, schacHomeOrganization]
+  eduPersonOrganization:
+    openid: [organisation]
+    saml: [o]
+  eduPersonUnit:
+    openid: [unit]
+    saml: [ou]
 user_id_from_attrs: [eduPersonTargetedID]
 user_id_to_attr: eduPersonTargetedID

@@ -158,6 +158,9 @@ module.exports.getUserFromInfo = (userInfo) => {
     isAdmin: false,
     metadata: {
       uid: userInfo.sub,
+      idp: userInfo.idp,
+      org: userInfo.organisation,
+      unit: userInfo.unit,
     },
   };
 };
