@@ -21,12 +21,8 @@ export ELASTICSEARCH_USERNAME="elastic"
 export ELASTICSEARCH_PASSWORD="changeme"
 export KIBANA_PASSWORD="changeme"
 export ELASTICSEARCH_HOSTS="https://elastic:9200"
-export SERVER_BASEPATH="/kibana"
-export SERVER_HOST="0.0.0.0"
-export SERVER_PORT="5601"
 export XPACK_MONITORING_ENABLED="true"
 export XPACK_SECURITY_ENCRYPTIONKEY="e558e233df22145278e760c7b26ea9e9c9f72102"
-export XPACK_REPORTING_KIBANASERVER_HOSTNAME=${THIS_HOST}
 
 # default values for elastic.yml or kibana.yml configuration
 export EZMESURE_ES_DISCOVERY=""
