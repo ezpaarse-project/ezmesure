@@ -83,18 +83,15 @@
 </template>
 
 <script setup>
-const { public: config } = useRuntimeConfig();
-const { data: user, signOut } = useAuth();
+const { data: user } = useAuth();
 const { isOpen } = storeToRefs(useDrawerStore());
 const { foreignSpacesPermissions } = storeToRefs(useCurrentUserStore());
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
 
 async function logout() {
-  if (!config.shibbolethDisabled) {
-    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
-    return;
-  }
-
-  await signOut({ callbackUrl: '/' });
+  await navigateTo(
+    { path: '/api/auth/oauth/logout' },
+    { external: true },
+  );
 }
 </script>

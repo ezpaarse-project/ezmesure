@@ -48,7 +48,23 @@
   },
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
-    "cookie": "EZMESURE_AUTH_COOKIE"
+    "cookie": "EZMESURE_AUTH_COOKIE",
+    "oidc": {
+      "client": {
+        "id": "EZMESURE_OIDC_CLIENT_ID",
+        "secret": "EZMESURE_OIDC_CLIENT_SECRET"
+      },
+      "uris": {
+        "discovery": "EZMESURE_OIDC_DISCOVERY_URI",
+
+        "issuer": "EZMESURE_OIDC_ISSUER_URI",
+        "authorization": "EZMESURE_OIDC_AUTH_URI",
+        "token": "EZMESURE_OIDC_TOKEN_URI",
+        "introspection": "EZMESURE_OIDC_INTROSPECTION_URI",
+        "userinfo": "EZMESURE_OIDC_USERINFO_URI"
+      },
+      "scopes": { "__name": "EZMESURE_OIDC_SCOPES", "__format": "json" }
+    }
   },
   "admin": {
     "username": "EZMESURE_ADMIN_USERNAME",

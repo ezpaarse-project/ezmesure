@@ -1,0 +1,52 @@
+services:
+  # We use dex as default authentication provider, you can choose another one that fits your needs,
+  # as longs as it provides OIDC authentication
+  auth:
+    image: 'dexidp/dex'
+    extra_hosts:
+      - "satosa.${EZMESURE_DOMAIN}:host-gateway"
+    environment:
+      - SATOSA_ENABLED
+
+      - EZMESURE_PUBLIC_URL
+      - SATOSA_PUBLIC_URL
+
+      - SATOSA_ENVSUBST_TEMPLATE_DIR
+      - SATOSA_ENVSUBST_TEMPLATE_SUFFIX
+      - SATOSA_ENVSUBST_OUTPUT_DIR
+      - SATOSA_ENVSUBST_FILTER
+
+      - OIDC_ISSUER_URI=${EZMESURE_OIDC_ISSUER_URI}
+      - OIDC_CLIENT_NAME=${EZMESURE_APPLICATION_NAME}
+      - OIDC_CLIENT_ID=${EZMESURE_OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${EZMESURE_OIDC_CLIENT_SECRET}
+
+      - EZMESURE_ADMIN_EMAIL
+      - EZMESURE_ADMIN_USERNAME
+      - EZMESURE_ADMIN_PASSWORD_HASH
+    volumes:
+      - ./auth/dex.yaml:/etc/dex/config.docker.yaml
+      - ./satosa/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
+    restart: unless-stopped
+
+  # We use SATOSA to proxy auth to Renater, you can skip that if your institutional provider already
+  # provides OIDC authentication
+  satosa:
+    build:
+      context: ./satosa
+    environment:
+      - EZMESURE_PUBLIC_URL
+      - SATOSA_PUBLIC_URL
+
+      - SAML_ORG_DISPLAY_NAME
+      - SAML_ORG_URL
+
+      - SAML_DISPLAY_NAME=${EZMESURE_APPLICATION_NAME}
+      - SAML_DS_URL
+      - SAML_SERVERADMIN
+      - SAML_ENTITY_ID
+      - SAML_METADATA_URL
+    volumes:
+      - ./satosa/certs:/etc/satosa/certs/
+      - ./satosa/templates:/etc/satosa-templates/
+    restart: never

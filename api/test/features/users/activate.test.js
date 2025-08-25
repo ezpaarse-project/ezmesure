@@ -37,7 +37,7 @@ describe('[users]: Test activate users features', () => {
       it(`#01 Should activate user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'POST',
-          url: '/profile/_activate',
+          url: '/auth/_activate',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
