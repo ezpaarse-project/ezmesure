@@ -38,11 +38,8 @@ router.route({
       try {
         esUser = await setRandomPasswordForUser(user.username);
       } catch (err) {
-        appLogger.error('Failed to update password');
-
-        const b64Err = Buffer.from(JSON.stringify(err)).toString('base64');
-        ctx.redirect(`/?error=${b64Err}`);
-        return;
+        appLogger.error(`[kibana-bridge] Failed to update password: ${err}`);
+        throw err;
       }
 
       let cookies = [];
@@ -50,10 +47,8 @@ router.route({
         const res = await loginUser(esUser.username, esUser.password, ctx.href);
         cookies = res.headers['set-cookie'].map((str) => parseCookie(str));
       } catch (err) {
-        appLogger.error('Failed to login into kibana');
-
-        const b64Err = Buffer.from(JSON.stringify(err)).toString('base64');
-        ctx.redirect(`/?error=${b64Err}`);
+        appLogger.error(`[kibana-bridge] Failed to login into kibana: ${err}`);
+        throw err;
       }
 
       // eslint-disable-next-line no-restricted-syntax
@@ -62,7 +57,7 @@ router.route({
         ctx.cookies.set(name, value, Object.fromEntries(params));
       }
 
-      ctx.redirect(next || '/spaces/space_selector');
+      ctx.redirect(next || '/kibana');
     },
   ],
 });
