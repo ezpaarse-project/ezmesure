@@ -104,8 +104,8 @@
         />
       </template>
 
-      <template #[`item.user.lastActivity`]="{ item }">
-        <LocalDate :model-value="item.lastActivity" />
+      <template #[`item.user.lastActivity`]="{ value }">
+        <LocalDate :model-value="value" />
       </template>
 
       <template #[`item.actions`]="{ item }">
