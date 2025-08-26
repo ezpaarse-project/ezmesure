@@ -72,6 +72,7 @@ const {
     search: undefined,
   },
   async: {
+    key: 'sushi-alerts-endpoint',
     lazy: true,
   },
 });

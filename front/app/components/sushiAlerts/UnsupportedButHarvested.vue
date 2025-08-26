@@ -114,6 +114,7 @@ const {
     search: undefined,
   },
   async: {
+    key: 'sushi-alerts-harvested-but-unsupported',
     lazy: true,
   },
 });
