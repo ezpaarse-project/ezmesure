@@ -51,7 +51,7 @@ async function getJWTDataFromCookie(cookie) {
  *
  * @returns {Promise<{ type: 'api_key', token: string, data: unknown }>}
  */
-function getJWTDataFromHeader(header) {
+function getJWTDataFromAuthHeader(header) {
   const matches = /Bearer (?<token>.+)/i.exec(header);
   const { token } = matches.groups ?? {};
   if (!token) {
@@ -66,7 +66,7 @@ function getJWTDataFromHeader(header) {
       }
 
       resolve({
-        type: 'api_key',
+        type: 'old_jwt',
         token,
         data,
       });
@@ -91,7 +91,7 @@ const requireJwt = async (ctx, next) => {
 
     const header = ctx.get('authorization');
     if (header) {
-      jwtData = await getJWTDataFromHeader(header);
+      jwtData = await getJWTDataFromAuthHeader(header);
     }
   } catch {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
@@ -124,15 +124,14 @@ async function getUsernameFromOAuth(token, data) {
 }
 
 /**
- * Get username from API_KEY
+ * Get username from old jwt
  *
  * @param {string} token - The token found in request
  * @param {unknown} data - The data of the token
  *
- * @returns {Promise<string>} - The username found in data. Returns a promise to prepare
- * for next upgrades (api keys in DB, etc.)
+ * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
  */
-function getUsernameFromApiKey(token, data) {
+function getUsernameFromOldJWT(token, data) {
   return Promise.resolve(data.username);
 }
 
@@ -159,8 +158,8 @@ const requireUser = async (ctx, next) => {
       case 'oauth':
         username = await getUsernameFromOAuth(jwtData.token, jwtData.data);
         break;
-      case 'api_key':
-        username = await getUsernameFromApiKey(jwtData.token, jwtData.data);
+      case 'old_jwt':
+        username = await getUsernameFromOldJWT(jwtData.token, jwtData.data);
         break;
 
       default:
