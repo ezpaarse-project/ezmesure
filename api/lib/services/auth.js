@@ -49,7 +49,7 @@ async function getJWTDataFromCookie(cookie) {
  *
  * @param {string} header - The header found in request
  *
- * @returns {Promise<{ type: 'api_key', token: string, data: unknown }>}
+ * @returns {Promise<{ type: 'old_jwt', token: string, data: unknown }>}
  */
 function getJWTDataFromAuthHeader(header) {
   const matches = /Bearer (?<token>.+)/i.exec(header);
@@ -89,9 +89,9 @@ const requireJwt = async (ctx, next) => {
       jwtData = await getJWTDataFromCookie(cookie);
     }
 
-    const header = ctx.get('authorization');
-    if (header) {
-      jwtData = await getJWTDataFromAuthHeader(header);
+    const authHeader = ctx.get('authorization');
+    if (authHeader) {
+      jwtData = await getJWTDataFromAuthHeader(authHeader);
     }
   } catch {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
