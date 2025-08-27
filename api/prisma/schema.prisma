@@ -66,6 +66,8 @@ model Institution {
   repositoryAliases   RepositoryAlias[]
   /// Custom properties
   customProps         InstitutionProperty[]
+  /// API Keys related to institution
+  apiKeys             ApiKey[]
 }
 
 model InstitutionProperty {
@@ -142,6 +144,8 @@ model User {
   elasticRoles ElasticRole[]
   /// Actions that were triggered by the user
   actions      Action[]
+  /// API Keys created or related by user (cf. institution field of ApiKey)
+  apiKeys      ApiKey[]
 }
 
 /// A membership (a user belonging to an institution)
@@ -248,6 +252,8 @@ model Repository {
   aliasTemplates         RepositoryAliasTemplate[]
   /// Harvest jobs using this repository
   harvestJobs            HarvestJob[]
+  /// Permissions granted by api keys for this repository
+  apiKeyPermissions      ApiKeyRepositoryPermission[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -294,6 +300,8 @@ model RepositoryAlias {
   permissions            RepositoryAliasPermission[]
   /// Permissions granted by role for this alias
   elasticRolePermissions ElasticRoleRepositoryAliasPermission[]
+  /// Permissions granted by api keys for this alias
+  apiKeyPermissions      ApiKeyRepositoryAliasPermission[]
 }
 
 /// A repository alias template (used to generate repository aliases)
@@ -780,4 +788,74 @@ model SushiAlert {
   context   Json           @default("{}")
   /// Creation date
   createdAt DateTime       @default(now())
+}
+
+// An API Key to authenticate users or institutions
+model ApiKey {
+  /// ID of the key
+  id                         String                            @id @default(cuid())
+  /// Value of the key, shouldn't be published and should be a hash of the actual value
+  value                      String                            @unique
+  /// Institution id related to the key. If no institution are related, ApiKey is related to user
+  institutionId              String?
+  /// Institution related to the key. If no institution are related, ApiKey is related to user
+  institution                Institution?                      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  // User related to the key. If institution is related, this field represents the creator
+  username                   String?
+  // User related to the key. If institution is related, this field represents the creator
+  user                       User?                             @relation(fields: [username], references: [username])
+  /// Name of the key
+  name                       String
+  /// Description of the key
+  description                String                            @default("")
+  /// Permissions of the key (members management, SUSHI, ezREEPORT...)
+  permissions                String[]
+  /// Permissions of the user for the institution repositories
+  repositoryPermissions      ApiKeyRepositoryPermission[]
+  /// Permissions of the user for the institution aliases
+  repositoryAliasPermissions ApiKeyRepositoryAliasPermission[]
+  /// Whether the key is active
+  active                     Boolean                           @default(true)
+  /// Date on which the active status was last modified
+  activeUpdatedAt            DateTime                          @default(now())
+  /// Creation date
+  createdAt                  DateTime                          @default(now())
+  /// Latest update date
+  updatedAt                  DateTime                          @updatedAt
+  /// Expiration date
+  expiresAt                  DateTime?
+  /// Date of last activity
+  lastActivity               DateTime                          @default(now())
+
+  @@index([value])
+}
+
+/// A repository permission for an ApiKey
+model ApiKeyRepositoryPermission {
+  /// ID of the key
+  apiKeyId   String
+  /// The related ApiKey
+  apiKey     ApiKey     @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  /// Pattern of the repository
+  pattern    String
+  /// The repository
+  repository Repository @relation(fields: [pattern], references: [pattern], onDelete: Cascade)
+  /// Whether the api key has a readonly access to the repository
+  readonly   Boolean    @default(false)
+
+  @@id([apiKeyId, pattern])
+}
+
+/// A alias permission for an ApiKey
+model ApiKeyRepositoryAliasPermission {
+  /// ID of the key
+  apiKeyId     String
+  /// The related ApiKey
+  apiKey       ApiKey          @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  // Pattern of the alias
+  aliasPattern String
+  /// The alias
+  alias        RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+
+  @@id([apiKeyId, aliasPattern])
 }
