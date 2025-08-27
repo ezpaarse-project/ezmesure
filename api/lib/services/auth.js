@@ -1,5 +1,6 @@
 const { auth } = require('config');
 const jwt = require('jsonwebtoken');
+const { isAfter } = require('date-fns');
 
 const openid = require('../utils/openid');
 
@@ -10,21 +11,34 @@ const UsersService = require('../entities/users.service');
 const RepositoriesService = require('../entities/repositories.service');
 const RepositoryAliasesService = require('../entities/repository-aliases.service');
 const SpacesService = require('../entities/spaces.service');
+const ApiKeysService = require('../entities/api-key.service');
 
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 const { MEMBER_ROLES } = require('../entities/memberships.dto');
 
+const { appLogger } = require('./logger');
+
+/**
+ * @typedef {KoaContext} KoaContext
+ * @typedef {KoaNext} KoaNext
+ * @typedef {import('openid-client').IntrospectionResponse} IntrospectionResponse
+ * @typedef {import('jsonwebtoken').JwtPayload} JwtPayload
+ * @typedef {import('@prisma/client').ApiKey} ApiKey
+ * @typedef {import('@prisma/client').User} User
+ * @typedef {import('@prisma/client').Institution} Institution
+ */
+
 const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
 
 /**
- * Get JWT data of cookie using OpenID provider
+ * Get auth data of cookie using OpenID provider
  *
  * @param {string} cookie - The cookie found in request
  *
- * @returns {Promise<{ type: 'oauth', token: string, data: unknown }>}
+ * @returns {Promise<{ type: 'oauth', token: string, data: IntrospectionResponse }>}
  */
-async function getJWTDataFromCookie(cookie) {
+async function getAuthDataFromCookie(cookie) {
   let data;
 
   try {
@@ -45,13 +59,13 @@ async function getJWTDataFromCookie(cookie) {
 }
 
 /**
- * Get JWT data of header using JWT methods
+ * Get auth data of header using JWT methods
  *
  * @param {string} header - The header found in request
  *
- * @returns {Promise<{ type: 'old_jwt', token: string, data: unknown }>}
+ * @returns {Promise<{ type: 'old_jwt', token: string, data: JwtPayload }>}
  */
-function getJWTDataFromAuthHeader(header) {
+function getAuthDataFromAuthHeader(header) {
   const matches = /Bearer (?<token>.+)/i.exec(header);
   const { token } = matches.groups ?? {};
   if (!token) {
@@ -75,35 +89,75 @@ function getJWTDataFromAuthHeader(header) {
 }
 
 /**
- * Check if request have a valid JWT, and decode it's cotent
+ * Get auth data of header using API Key
  *
- * @param {import('koa').Context} ctx - Koa context
- * @param {import('koa').Next} next - Next handler
+ * @param {string} header - The header found in request
+ *
+ * @returns {Promise<{ type: 'api_key', token: string, data: ApiKey }>}
  */
-const requireJwt = async (ctx, next) => {
-  let jwtData = {};
+async function getAuthDataFromApiHeader(header) {
+  const hash = ApiKeysService.getHashValue(header);
+
+  const service = new ApiKeysService();
+  const data = await service.findUnique({ where: { value: hash } });
+
+  if (!data) {
+    throw new Error("Can't get API key");
+  }
+
+  if (!data.active) {
+    throw new Error('API key is revoked');
+  }
+
+  if (isAfter(new Date(), data.expiresAt)) {
+    throw new Error('API key is expired');
+  }
+
+  return {
+    type: 'api_key',
+    token: hash,
+    data,
+  };
+}
+
+/**
+ * Check if request have a valid auth
+ *
+ * @param {KoaContext} ctx - Koa context
+ * @param {KoaNext} next - Next handler
+ */
+const requireAuth = async (ctx, next) => {
+  let authData = {};
 
   try {
+    // Check if a OAuth token is present
     const cookie = ctx.cookies.get(auth.cookie);
     if (cookie) {
-      jwtData = await getJWTDataFromCookie(cookie);
+      authData = await getAuthDataFromCookie(cookie);
     }
 
+    // Check if a deprecated JWT token is present
     const authHeader = ctx.get('authorization');
     if (authHeader) {
-      jwtData = await getJWTDataFromAuthHeader(authHeader);
+      authData = await getAuthDataFromAuthHeader(authHeader);
+    }
+
+    // Check if an API Key is present
+    const apikeyHeader = ctx.get('x-api-key');
+    if (apikeyHeader) {
+      authData = await getAuthDataFromApiHeader(apikeyHeader);
     }
   } catch {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  if (!jwtData.token || !jwtData.data) {
+  if (!authData.token || !authData.data) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  ctx.state.jwtData = jwtData;
+  ctx.state.authData = authData;
   await next();
 };
 
@@ -111,7 +165,7 @@ const requireJwt = async (ctx, next) => {
  * Get username from OAuth (using OpenID provider)
  *
  * @param {string} token - The token found in request
- * @param {unknown} data - The data of the token
+ * @param {IntrospectionResponse} data - The data of the token
  *
  * @returns {Promise<string>} - The username found in data
  */
@@ -127,7 +181,7 @@ async function getUsernameFromOAuth(token, data) {
  * Get username from old jwt
  *
  * @param {string} token - The token found in request
- * @param {unknown} data - The data of the token
+ * @param {JwtPayload} data - The data of the token
  *
  * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
  */
@@ -136,62 +190,201 @@ function getUsernameFromOldJWT(token, data) {
 }
 
 /**
+ * Get username from api key
+ *
+ * @param {string} token - The token found in request
+ * @param {ApiKey} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
+ */
+function getUsernameFromApiKey(token, data) {
+  if (data.institutionId) {
+    return Promise.reject(Error('API key is scoped to an institution'));
+  }
+
+  if (!data.username) {
+    return Promise.reject(new Error("User doesn't exist"));
+  }
+
+  return Promise.resolve(data.username);
+}
+
+/**
+ * Get user from given auth data
+ *
+ * @param {{ type: string, token: string, data: unknown }} param0 - The auth authData
+ *
+ * @returns {Promise<User | null | undefined>}
+ */
+async function getUserFromAuthData({ type, token, data }) {
+  if (!token || !data) {
+    return undefined;
+  }
+
+  let username = '';
+  switch (type) {
+    case 'oauth':
+      username = await getUsernameFromOAuth(token, data);
+      break;
+    case 'old_jwt':
+      username = await getUsernameFromOldJWT(token, data);
+      break;
+    case 'api_key':
+      username = await getUsernameFromApiKey(token, data);
+      break;
+
+    default:
+      throw new Error('auth type unsupported');
+  }
+
+  const service = new UsersService();
+  return service.findUnique({ where: { username } });
+}
+
+/**
+ * Get institution id from api key
+ *
+ * @param {string} token - The token found in request
+ * @param {ApiKey} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
+ */
+function getInstitutionIdFromApiKey(token, data) {
+  if (!data.institutionId) {
+    return Promise.reject(Error('API key is scoped to an institution'));
+  }
+  return Promise.resolve(data.institutionId);
+}
+
+/**
+ * Get institution from given auth data
+ *
+ * @param {{ type: string, token: string, data: unknown }} param0 - The auth authData
+ *
+ * @returns {Promise<Institution | null | undefined>}
+ */
+async function getInstitutionFromAuthData({ type, token, data }) {
+  if (!token || !data) {
+    return undefined;
+  }
+
+  let id;
+  switch (type) {
+    case 'api_key':
+      id = await getInstitutionIdFromApiKey(token, data);
+      break;
+
+    default:
+      throw new Error('auth type unsupported');
+  }
+
+  const service = new InstitutionsService();
+  return service.findUnique({ where: { id } });
+}
+
+/**
  * Check if request have a valid user
  *
- * Needs `requireJWT`
+ * Needs `requireAuth`
  *
- * @param {import('koa').Context} ctx - Koa context
- * @param {import('koa').Next} next - Next handler
+ * @param {KoaContext} ctx - Koa context
+ * @param {KoaNext} next - Next handler
  */
 const requireUser = async (ctx, next) => {
-  const { jwtData } = ctx.state ?? {};
-
-  if (!jwtData?.token || !jwtData?.data) {
-    ctx.throw(401, ctx.$t('errors.auth.noUsername'));
-    return;
-  }
-
-  let username;
-
+  let user;
   try {
-    switch (jwtData.type) {
-      case 'oauth':
-        username = await getUsernameFromOAuth(jwtData.token, jwtData.data);
-        break;
-      case 'old_jwt':
-        username = await getUsernameFromOldJWT(jwtData.token, jwtData.data);
-        break;
+    user = await getUserFromAuthData(ctx.state?.authData ?? {});
+  } catch (err) {
+    appLogger.warn(`[auth] Couldn't get user from auth data: ${err}`);
+    user = null;
+  }
 
-      default:
-        throw new Error('JWT type unsupported');
+  if (user) {
+    ctx.state.user = user;
+    ctx.state.userIsAdmin = user.isAdmin;
+    triggerHooks('user:action', user);
+    if (ctx.state.authData.type === 'api_key') {
+      triggerHooks('api-key:action', ctx.state.authData.data);
     }
-  } catch {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+
+    await next();
     return;
   }
 
-  if (!username) {
+  if (user === undefined) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
     return;
   }
 
-  const usersService = new UsersService();
-  const user = await usersService.findUnique({ where: { username } });
-
-  if (!user) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
-    return;
-  }
-
-  ctx.state.user = user;
-  ctx.state.userIsAdmin = user.isAdmin;
-  triggerHooks('user:action', user);
-
-  await next();
+  ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
 };
 
+/**
+ * Check if request have a valid user, or a valid API Key
+ *
+ * Needs `requireAuth`
+ *
+ * @param {KoaContext} ctx - Koa context
+ * @param {KoaNext} next - Next handler
+ */
+const requireUserOrInstitution = async (ctx, next) => {
+  let user;
+  try {
+    user = await getUserFromAuthData(ctx.state?.authData ?? {});
+  } catch (err) {
+    appLogger.warn(`[auth] Couldn't get user from auth data: ${err}`);
+    user = null;
+  }
+
+  if (user) {
+    ctx.state.user = user;
+    ctx.state.userIsAdmin = user.isAdmin;
+    triggerHooks('user:action', user);
+    if (ctx.state.authData.type === 'api_key') {
+      triggerHooks('api-key:action', ctx.state.authData.data);
+    }
+
+    await next();
+    return;
+  }
+
+  let institution;
+  try {
+    institution = await getInstitutionFromAuthData(ctx.state?.authData ?? {});
+  } catch (err) {
+    appLogger.warn(`[auth] Couldn't get institution from auth data: ${err}`);
+    institution = null;
+  }
+
+  if (institution) {
+    triggerHooks('api-key:action', ctx.state.authData.data);
+
+    await next();
+    return;
+  }
+
+  if (user === undefined) {
+    ctx.throw(401, ctx.$t('errors.auth.noUsername'));
+    return;
+  }
+
+  ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+};
+
+/**
+ * Check if request have a user that have accepted terms
+ *
+ * Needs `requireUser` or `requireUserOrInstitution`
+ *
+ * @param {KoaContext} ctx - Koa context
+ * @param {KoaNext} next - Next handler
+ */
 const requireTermsOfUse = async (ctx, next) => {
-  if (!ctx.state?.user?.metadata?.acceptedTerms) {
+  if (!ctx.state?.authData) {
+    ctx.throw(403, ctx.$t('errors.termsOfUse'));
+    return;
+  }
+  if (ctx.state?.user && !ctx.state.user.metadata?.acceptedTerms) {
     ctx.throw(403, ctx.$t('errors.termsOfUse'));
     return;
   }
@@ -199,6 +392,15 @@ const requireTermsOfUse = async (ctx, next) => {
   await next();
 };
 
+/**
+ * Check if request have a user that have the provided role(s)
+ *
+ * Needs `requireUser`
+ *
+ * @param {string | string[]} role
+ *
+ * @returns {(ctx: KoaContext, next: KoaNext) => Promise<void>} The handler
+ */
 const requireAnyRole = (role) => async (ctx, next) => {
   const { user } = ctx.state;
 
@@ -211,6 +413,14 @@ const requireAnyRole = (role) => async (ctx, next) => {
   await next();
 };
 
+/**
+ * Check if request have a user that is admin
+ *
+ * Needs `requireUser`
+ *
+ * @param {KoaContext} ctx - Koa context
+ * @param {KoaNext} next - Next handler
+ */
 const requireAdmin = (ctx, next) => {
   if (!ctx.state?.user?.isAdmin) {
     ctx.throw(403, ctx.$t('errors.perms.feature'));
@@ -222,6 +432,8 @@ const requireAdmin = (ctx, next) => {
 /**
  * Middleware that fetches an item from a model and put it in ctx.state
  * Looks for {modelName}Id in the route params by default
+ *
+ * Needs `requireUser`
  */
 function fetchModel(modelName, opts = {}) {
   const {
@@ -372,8 +584,11 @@ function requireValidatedInstitution(opts = {}) {
 }
 
 module.exports = {
-  requireJwt,
+  requireAuth,
+  /** @deprecated use `requireAuth` (currently an alias) */
+  requireJwt: requireAuth,
   requireUser,
+  requireUserOrInstitution,
   requireAdmin,
   requireTermsOfUse,
   requireAnyRole,
