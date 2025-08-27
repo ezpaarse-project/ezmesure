@@ -19,7 +19,7 @@ const onUserAction = async (user) => {
       data: { lastActivity: new Date() },
     });
   } catch (err) {
-    appLogger.warn(`[requireUser] Couldn't update last activity date: ${err.message || err}`);
+    appLogger.warn(`ouldn't update last activity date: ${err.message || err}`);
   }
 };
 

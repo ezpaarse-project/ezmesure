@@ -4,6 +4,7 @@ const { client: prisma } = require('../services/prisma');
  * @typedef {import('@prisma/client').Space} Space
  * @typedef {import('@prisma/client').Repository} Repository
  * @typedef {import('@prisma/client').RepositoryAlias} RepositoryAlias
+ * @typedef {import('@prisma/client').ApiKey} ApiKey
  */
 
 /**
@@ -22,6 +23,27 @@ const generateRoleNameFromRepository = (repository, modifier) => `repository.${r
  * @param {RepositoryAlias} alias
  */
 const generateRoleNameFromAlias = (alias) => `alias.${alias.pattern}`;
+
+/**
+ * @param {ApiKey} apiKey
+ */
+const generateUsernameFromApiKey = (apiKey) => {
+  if (!apiKey.institutionId) {
+    throw new Error("The api key isn't related to an institution");
+  }
+
+  // From https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#Short-SHA-1 :
+  //
+  // Generally, eight to ten characters are more than enough to be unique within a project.
+  // For example, as of February 2019, the Linux kernel (which is a fairly sizable project)
+  // has over 875,000 commits and almost seven million objects in its object database,
+  // with no two objects whose SHA-1s are identical in the first 12 characters.
+  // ---
+  // If we have more than 875,000 api keys in ezMESURE, there's a lot we'll need to refactor first
+  const shortHash = apiKey.value.slice(0, 10);
+
+  return `key.${apiKey.institutionId}.${shortHash}`;
+};
 
 /**
  *
@@ -139,11 +161,50 @@ const generateUserRoles = async (username) => {
   return Array.from(roles);
 };
 
+const generateApiKeyRoles = async (id) => {
+  const apiKey = await prisma.apiKey.findUnique({
+    where: { id },
+    include: {
+      institution: {
+        select: { elasticRoles: true },
+      },
+      repositoryPermissions: {
+        include: {
+          repository: true,
+        },
+      },
+      repositoryAliasPermissions: {
+        include: {
+          alias: true,
+        },
+      },
+    },
+  });
+
+  if (!apiKey.institution) {
+    throw new Error("The api key isn't related to an institution");
+  }
+
+  if (!apiKey) {
+    return [];
+  }
+
+  return Array.from(
+    new Set([
+      ...apiKey.repositoryPermissions.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')),
+      ...apiKey.repositoryAliasPermissions.map((perm) => generateRoleNameFromAlias(perm.alias)),
+      ...apiKey.institution.elasticRoles.map((role) => role.name),
+    ]),
+  );
+};
+
 module.exports = {
   generateRoleNameFromAlias,
   generateRoleNameFromSpace,
   generateRoleNameFromRepository,
+  generateUsernameFromApiKey,
   generateElasticPermissions,
   generateKibanaFeatures,
   generateUserRoles,
+  generateApiKeyRoles,
 };

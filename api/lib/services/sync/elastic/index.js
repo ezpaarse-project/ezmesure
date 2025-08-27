@@ -11,6 +11,7 @@ const {
 } = require('./repositories');
 const { syncRepositoryAlias, syncRepositoryAliases, unmountAlias } = require('./alias');
 const { syncUser, syncUsers } = require('./users');
+const { syncApiKey, syncApiKeys } = require('./api-keys');
 
 const { syncSchedule } = config.get('elasticsearch');
 
@@ -18,6 +19,7 @@ const sync = async () => {
   await syncRepositories();
   await syncRepositoryAliases();
   await syncUsers();
+  await syncApiKeys();
 };
 
 /**
@@ -54,4 +56,6 @@ module.exports = {
   syncRepositoryIndexTemplate,
   syncUser,
   syncUsers,
+  syncApiKey,
+  syncApiKeys,
 };
