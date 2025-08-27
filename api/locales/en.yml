@@ -9,6 +9,12 @@ errors:
   termsOfUse: You must accept the terms of use before using this service
   unauthorized: You are not authorized to access this route
 
+  upload:
+    noDir: Unable to set a location for files
+
+  apiKey:
+    notFound: API key doesn't exists
+
   harvest:
     noTarget: Please provide a target index, or associate a prefix to the institution [%s]
     taskExists: "COUNTER credentials [%s] already have an associated task (status: [%s])"

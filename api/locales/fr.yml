@@ -9,6 +9,12 @@ errors:
   termsOfUse: Vous devez acceptez les conditions d'utilisation avant d'utiliser ce service
   unauthorized: Vous n'êtes pas autorisés à utiliser cette route
 
+  upload:
+    noDir: Impossible de définir un emplacement pour déposer les fichiers
+
+  apiKey:
+    notFound: La clé d'API n'existe pas
+
   harvest:
     noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
     taskExists: "Les identifiants COUNTER [%s] ont déjà une tâche associée (statut: [%s])"
