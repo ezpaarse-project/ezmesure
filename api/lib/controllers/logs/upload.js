@@ -1,8 +1,9 @@
+const path = require('node:path');
+const zlib = require('node:zlib');
+
 const fse = require('fs-extra');
-const path = require('path');
 const csv = require('csv');
 const parse = require('co-busboy');
-const zlib = require('zlib');
 const config = require('config');
 
 const { isValid: dateIsValid, format: formatDate } = require('date-fns');
@@ -11,6 +12,8 @@ const validator = require('../../services/validator');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/index-template');
 const { appLogger } = require('../../services/logger');
+
+const { getElasticUsername, hasElasticPermission } = require('./utils');
 
 const storagePath = config.get('storage.path');
 
@@ -188,48 +191,48 @@ function readStream(stream, index, username, splittedFields) {
       const tryBulk = () => {
         nbTries += 1;
 
-        elastic.bulk({
-          body: docsToInsert,
-        }, {
-          headers: { 'es-security-runas-user': username },
-        }, (err, { body }) => {
-          if (err) {
-            if (nbTries > bulkMaxTries) {
-              appLogger.error(`[ec-upload] Bulk operation reached maximum number of attempts:\n${err}`);
-              return callback(err);
+        elastic.bulk(
+          { body: docsToInsert },
+          { headers: { 'es-security-runas-user': username } },
+          (err, { body }) => {
+            if (err) {
+              if (nbTries > bulkMaxTries) {
+                appLogger.error(`[ec-upload] Bulk operation reached maximum number of attempts:\n${err}`);
+                return callback(err);
+              }
+
+              const waitTime = bulkBaseRetryDelay * (2 ** (nbTries - 1));
+              appLogger.error(`[ec-upload] Bulk operation failed (attempt: ${nbTries}, retrying in ${waitTime}ms):\n${err}`);
+
+              return setTimeout(() => tryBulk(), waitTime);
             }
 
-            const waitTime = bulkBaseRetryDelay * (2 ** (nbTries - 1));
-            appLogger.error(`[ec-upload] Bulk operation failed (attempt: ${nbTries}, retrying in ${waitTime}ms):\n${err}`);
+            (body.items || []).forEach((i) => {
+              if (!i.index) {
+                result.failed += 1;
+                return result.failed;
+              }
 
-            return setTimeout(() => tryBulk(), waitTime);
-          }
+              if (i.index.result === 'created') {
+                result.inserted += 1;
+                return result.inserted;
+              }
+              if (i.index.result === 'updated') {
+                result.updated += 1;
+                return result.updated;
+              }
 
-          (body.items || []).forEach((i) => {
-            if (!i.index) {
-              result.failed += 1;
-              return result.failed;
-            }
-
-            if (i.index.result === 'created') {
-              result.inserted += 1;
-              return result.inserted;
-            }
-            if (i.index.result === 'updated') {
-              result.updated += 1;
-              return result.updated;
-            }
-
-            if (i.index.error) {
+              if (i.index.error) {
               // eslint-disable-next-line no-use-before-define
-              addError(i.index.error);
-            }
+                addError(i.index.error);
+              }
 
-            result.failed += 1;
-          });
+              result.failed += 1;
+            });
 
-          bulkInsert(callback);
-        });
+            bulkInsert(callback);
+          },
+        );
       };
 
       tryBulk();
@@ -244,30 +247,22 @@ function readStream(stream, index, username, splittedFields) {
 }
 
 module.exports = async function upload(ctx) {
-  const { index } = ctx.request.params;
-
   ctx.action = 'indices/insert';
+
+  const { index } = ctx.request.params;
   ctx.index = ctx.request.params.index;
 
   const startTime = process.hrtime.bigint();
-  const { username, email } = ctx.state.user;
-  let perm;
+  const username = getElasticUsername(ctx);
+  const { email } = ctx.state.user; // ?
 
+  let canWrite = false;
   try {
-    ({ body: perm } = await elastic.security.hasPrivileges({
-      username,
-      body: {
-        index: [{ names: [index], privileges: ['write'] }],
-      },
-    }, {
-      headers: { 'es-security-runas-user': username },
-    }));
+    canWrite = await hasElasticPermission(index, 'write', username);
   } catch (err) {
     appLogger.error(`[ec-upload] Failed to get privileges of [${username}] on index [${index}]:\n${err}`);
     throw new Error(err);
   }
-
-  const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
 
   if (!canWrite) {
     return ctx.throw(403, ctx.$t('errors.perms.writeInIndex', index));
@@ -277,8 +272,19 @@ module.exports = async function upload(ctx) {
     return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
-  let exists;
+  let uploadDir;
+  if (ctx.state.user) {
+    uploadDir = path.resolve(storagePath, ctx.state.user.email.split('@')[1], username);
+  }
+  if (ctx.state.authData.data.institutionId) {
+    uploadDir = path.resolve(storagePath, ctx.state.authData.data.institutionId);
+  }
 
+  if (!uploadDir) {
+    return ctx.throw(500, ctx.$t('errors.upload.noDir'));
+  }
+
+  let exists;
   try {
     ({ body: exists } = await elastic.indices.exists({ index }));
   } catch (err) {
@@ -290,10 +296,7 @@ module.exports = async function upload(ctx) {
     await createIndex(index);
   }
 
-  const domain = email.split('@')[1];
-  const userDir = path.resolve(storagePath, domain, username);
-
-  await fse.ensureDir(userDir);
+  await fse.ensureDir(uploadDir);
 
   const splitHeader = ctx.request.headers['split-fields'];
   const splitReg = /([^()]+?)\((.+?)\)/ig;
@@ -311,7 +314,7 @@ module.exports = async function upload(ctx) {
     const now = new Date();
     const encoding = ctx.request.headers['content-encoding'];
     const isGzip = encoding && encoding.toLowerCase().includes('gzip');
-    const filePath = path.resolve(userDir, `${now.toISOString()}.csv`);
+    const filePath = path.resolve(uploadDir, `${now.toISOString()}.csv`);
 
     let stream = ctx.req;
 
@@ -352,7 +355,7 @@ module.exports = async function upload(ctx) {
     if (part.length) { continue; }
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
-    const filePath = path.resolve(userDir, part.filename.replace(/\s/g, '_'));
+    const filePath = path.resolve(uploadDir, part.filename.replace(/\s/g, '_'));
 
     let stream = part;
 

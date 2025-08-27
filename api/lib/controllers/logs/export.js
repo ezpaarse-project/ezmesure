@@ -1,11 +1,17 @@
-const { PassThrough } = require('stream');
-const crypto = require('crypto');
+const { PassThrough } = require('node:stream');
+const crypto = require('node:crypto');
+
 const Papa = require('papaparse');
 const rison = require('rison-node');
+
 const elastic = require('../../services/elastic');
 const publisherIndexTemplates = require('../../utils/sushi-templates');
 
+const { getElasticUsername, hasElasticPermission } = require('./utils');
+
 exports.aggregate = async function aggregate(ctx) {
+  ctx.action = 'export/aggregate';
+
   const { index, extension } = ctx.request.params;
   const {
     fields: rawFields = '',
@@ -15,7 +21,6 @@ exports.aggregate = async function aggregate(ctx) {
     delimiter = ';',
     missing = true,
   } = ctx.request.query;
-  ctx.action = 'export/aggregate';
 
   ctx.type = extension === 'csv' ? 'text/csv' : 'application/x-ndjson';
   ctx.attachment(`aggregation.${extension}`);
@@ -34,7 +39,7 @@ exports.aggregate = async function aggregate(ctx) {
     let filterParam;
     try {
       filterParam = rison.decode_object(filterString);
-    } catch (e) {
+    } catch {
       ctx.throw(400, ctx.$t('errors.aggregate.invalidFilterFormat'));
       return;
     }
@@ -91,28 +96,31 @@ exports.aggregate = async function aggregate(ctx) {
     ctx.body.write('\n');
   }
 
+  const username = getElasticUsername(ctx);
+
   async function nextPage(nextKey) {
-    const { body: result } = await elastic.search({
-      index,
-      body: {
-        size: 0,
-        query: { bool },
-        aggs: {
-          main: {
-            composite: {
-              size: 1000,
-              sources: aggregatedFields.map((field) => ({
-                [field]: { terms: { field, missing_bucket: missing } },
-              })),
-              after: nextKey,
+    const { body: result } = await elastic.search(
+      {
+        index,
+        body: {
+          size: 0,
+          query: { bool },
+          aggs: {
+            main: {
+              composite: {
+                size: 1000,
+                sources: aggregatedFields.map((field) => ({
+                  [field]: { terms: { field, missing_bucket: missing } },
+                })),
+                after: nextKey,
+              },
             },
           },
         },
+        timeout: '30s',
       },
-      timeout: '30s',
-    }, {
-      headers: { 'es-security-runas-user': ctx.state.user.username },
-    });
+      { headers: { 'es-security-runas-user': username } },
+    );
 
     const aggregations = result && result.aggregations && result.aggregations;
     const buckets = aggregations && aggregations.main && aggregations.main.buckets;
@@ -151,7 +159,8 @@ exports.counter5 = async function counter5(ctx) {
   ctx.action = 'export/counter5';
   ctx.type = 'json';
 
-  const { username } = ctx.state.user;
+  const username = getElasticUsername(ctx);
+
   const { index: sourceIndex } = ctx.request.params;
   const {
     from,
@@ -174,25 +183,13 @@ exports.counter5 = async function counter5(ctx) {
     errors: [],
   };
 
-  const { body: perm } = await elastic.security.hasPrivileges({
-    username,
-    body: {
-      index: [
-        { names: [sourceIndex], privileges: ['read'] },
-        { names: [destIndex], privileges: ['write'] },
-      ],
-    },
-  }, {
-    headers: { 'es-security-runas-user': username },
-  });
-
-  const canRead = perm && perm.index && perm.index[sourceIndex] && perm.index[sourceIndex].read;
-  const canWrite = perm && perm.index && perm.index[destIndex] && perm.index[destIndex].write;
-
+  const canRead = await hasElasticPermission(sourceIndex, 'read', username);
   if (!canRead) {
     ctx.throw(403, ctx.$t('errors.perms.readIndex', sourceIndex));
     return;
   }
+
+  const canWrite = await hasElasticPermission(destIndex, 'write', username);
   if (!canWrite) {
     ctx.throw(403, ctx.$t('errors.perms.writeInIndex', destIndex));
     return;
@@ -204,6 +201,7 @@ exports.counter5 = async function counter5(ctx) {
     const template = publisherIndexTemplates.get('5');
     if (!template) {
       ctx.throw(409, ctx.$t('errors.index.noTemplateFound', '5', 'publisher'));
+      return;
     }
 
     await elastic.indices.create({
@@ -244,59 +242,63 @@ exports.counter5 = async function counter5(ctx) {
 
   do {
     // eslint-disable-next-line no-await-in-loop
-    const { body: result } = await elastic.search({
-      index: sourceIndex,
-      body: {
-        size: 0,
-        query: {
-          bool: { filter },
-        },
-        aggs: {
-          main: {
-            composite: {
-              size: 1000,
-              after: nextKey,
-              sources: [
-                { date: { date_histogram: { field: 'datetime', calendar_interval: '1M', format: 'yyyy-MM' } } },
-                ...fields.map((field) => ({ [field]: { terms: { field, missing_bucket: true } } })),
-              ],
-            },
-            aggregations: {
-              uniqueItems: {
-                cardinality: {
-                  precision_threshold: 3000,
-                  script: {
-                    lang: 'painless',
-                    source: `
+    const { body: result } = await elastic.search(
+      {
+        index: sourceIndex,
+        body: {
+          size: 0,
+          query: {
+            bool: { filter },
+          },
+          aggs: {
+            main: {
+              composite: {
+                size: 1000,
+                after: nextKey,
+                sources: [
+                  { date: { date_histogram: { field: 'datetime', calendar_interval: '1M', format: 'yyyy-MM' } } },
+                  ...fields.map(
+                    (field) => ({ [field]: { terms: { field, missing_bucket: true } } }),
+                  ),
+                ],
+              },
+              aggregations: {
+                uniqueItems: {
+                  cardinality: {
+                    precision_threshold: 3000,
+                    script: {
+                      lang: 'painless',
+                      source: `
                       if (doc.containsKey(params.sessionField) && doc.containsKey('unitid')) {
                         return doc[params.sessionField].value + '_' + doc['unitid'].value;
                       } else {
                         return null;
                       }
                     `,
-                    params: {
-                      sessionField,
+                      params: {
+                        sessionField,
+                      },
                     },
                   },
                 },
-              },
-              requests: {
-                filter: { terms: { rtype: [...requestRtypes] } },
-                aggregations: {
-                  uniqueItems: {
-                    cardinality: {
-                      precision_threshold: 3000,
-                      script: {
-                        lang: 'painless',
-                        source: `
+                requests: {
+                  filter: { terms: { rtype: [...requestRtypes] } },
+                  aggregations: {
+                    uniqueItems: {
+                      cardinality: {
+                        precision_threshold: 3000,
+                        script: {
+                          lang: 'painless',
+                          source: `
                           if (doc.containsKey(params.sessionField) && doc.containsKey('unitid')) {
                             return doc[params.sessionField].value + '_' + doc['unitid'].value;
                           } else {
                             return null;
                           }
                         `,
-                        params: {
-                          sessionField,
+                          params: {
+                            sessionField,
+                          },
                         },
                       },
                     },
@@ -306,11 +308,10 @@ exports.counter5 = async function counter5(ctx) {
             },
           },
         },
+        timeout: '30s',
       },
-      timeout: '30s',
-    }, {
-      headers: { 'es-security-runas-user': username },
-    });
+      { headers: { 'es-security-runas-user': username } },
+    );
 
     const aggregations = result && result.aggregations && result.aggregations;
     const buckets = aggregations && aggregations.main && aggregations.main.buckets;
