@@ -36,12 +36,6 @@
 </template>
 
 <script setup>
-const LEVEL_ICONS = {
-  none: 'mdi-eye-off',
-  read: 'mdi-book',
-  write: 'mdi-book-edit',
-};
-
 const props = defineProps({
   modelValue: {
     type: String,
@@ -73,7 +67,7 @@ const { t } = useI18n();
 
 const levelOptions = computed(() => props.levels.map((level) => ({
   text: t(`permissions.${level}`),
-  icon: LEVEL_ICONS[level],
+  icon: permLevelColors.get(level)?.icon,
   value: level,
 })));
 

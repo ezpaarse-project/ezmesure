@@ -1,3 +1,9 @@
+export const permLevelColors = new Map([
+  ['none', { color: 'grey', icon: 'mdi-eye-off' }],
+  ['read', { color: 'primary', icon: 'mdi-book' }],
+  ['write', { color: 'accent', icon: 'mdi-book-edit' }],
+]);
+
 export const repoColors = new Map([
   ['ezpaarse', 'teal'],
   ['counter5', 'red'],

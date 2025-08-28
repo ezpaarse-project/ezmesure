@@ -440,6 +440,7 @@ institutions:
       memberships: Membres
       sushi: ezCOUNTER
       reporting: ezREEPORT
+      api-keys: Clés d'API
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
@@ -1089,6 +1090,15 @@ customFields:
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
   restrictToAdmins: Restreindre aux administrateurs
+api-keys:
+  title: Clés d'API ({count})
+  newKey: Nouvelle clé d'API
+  editKey: Édition d'une clé d'API
+  expiresAt: Expire
+  permissions: Permissions
+  deleteN: Vous allez révoquer l'accès d'une clé d'API. Elle ne pourra plus être utilisée pour accéder à ezMESURE.|Vous allez révoquer l'accès de {count} clés d'API. Elle ne pourrons plus être utilisées pour accéder à ezMESURE.
+  institution:
+    user: Créateur
 statuses:
   created: Créé
   updated: Mis à jour
@@ -1199,3 +1209,4 @@ cantCancel: Cette action est irreversible
 version: Version
 back: Retour
 pleaseWait: Veuillez patienter...
+never: Jamais

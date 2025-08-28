@@ -12,4 +12,5 @@ export const featureScopes = [
   'memberships',
   'sushi',
   'reporting',
+  'api-keys',
 ];

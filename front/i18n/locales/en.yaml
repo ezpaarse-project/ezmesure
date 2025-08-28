@@ -438,6 +438,7 @@ institutions:
       memberships: Members
       sushi: COUNTER credentials
       reporting: ezREEPORT
+      api-keys: API keys
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
@@ -1070,6 +1071,15 @@ customFields:
   descriptionFr: French description
   descriptionEn: English description
   manageCustomField: Manage custom field|Manage {count} custom fields
+api-keys:
+  title: API keys ({count})
+  newKey: New API key
+  editKey: Edit API key
+  expiresAt: Expires
+  permissions: Permissions
+  deleteN: You are about to revoke access for an API key. It will no longer be able to be used to access ezMESURE.|You are about to revoke access for {count} API keys. They will no longer be able to be used to access ezMESURE.
+  institution:
+    user: Creator
 statuses:
   created: Created
   updated: Updated
@@ -1180,3 +1190,4 @@ cantCancel: This operation cannot be undone.
 version: Version
 back: Back
 pleaseWait: Please wait...
+never: Never

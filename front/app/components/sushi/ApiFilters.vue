@@ -122,7 +122,6 @@ const availableEndpoints = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
-    loadingEndpoints.value = true;
     try {
       const data = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
         signal: abortController.signal,
