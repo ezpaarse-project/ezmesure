@@ -167,6 +167,7 @@ exports.createOne = async (ctx) => {
  */
 exports.updateOne = async (ctx) => {
   const { institutionId, apiKeyId } = ctx.params;
+  const { body } = ctx.request;
 
   const result = await ApiKeysService.$transaction(async (service) => {
     // Looking if key exists for institution
@@ -178,11 +179,18 @@ exports.updateOne = async (ctx) => {
       return;
     }
 
+    // Update date if modified
+    let activeUpdatedAt;
+    if (body.active !== apiKey.active) {
+      activeUpdatedAt = new Date();
+    }
+
     // Update API key with new attributes
     const newApiKey = await service.update({
       where: { id: apiKeyId },
       data: {
-        ...ctx.request.body,
+        ...body,
+        activeUpdatedAt,
       },
     });
 

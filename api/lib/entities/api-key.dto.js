@@ -18,7 +18,7 @@ const schema = {
   value: Joi.string().trim(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
-  expiresAt: Joi.date().min('now'),
+  expiresAt: Joi.date().min('now').allow(null),
 
   active: Joi.boolean(),
   activeUpdatedAt: Joi.date(),
