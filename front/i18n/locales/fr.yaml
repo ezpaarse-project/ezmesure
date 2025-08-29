@@ -820,6 +820,7 @@ clipboard:
   textCopied: Texte copié dans le presse-papier
 users:
   toolbarTitle: Utilisateurs ({count})
+  title: Utilisateur
   manageUsers: >
     Gérer les utilisateurs
     |Gérer {count} utilisateurs

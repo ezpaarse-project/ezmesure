@@ -38,8 +38,8 @@ const user = ref(undefined);
 
 async function open(s, opts) {
   apiKey.value = s;
-  institution.value = opts.institution;
-  user.value = opts.user;
+  institution.value = opts?.institution;
+  user.value = opts?.user;
   isOpen.value = true;
 }
 

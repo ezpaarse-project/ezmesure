@@ -517,7 +517,7 @@ function deleteApiKeys(items) {
       }
 
       if (!items) {
-        selectedMembers.value = [];
+        selectedKeys.value = [];
       }
 
       await apiKeysRefresh();

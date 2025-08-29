@@ -45,10 +45,6 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  institution: {
-    type: Object,
-    default: () => undefined,
-  },
 });
 
 const { t, locale } = useI18n();
@@ -69,7 +65,7 @@ const fields = computed(() => [
     cols: 4,
   },
   {
-    value: props.institution ? props.modelValue.user.fullName : undefined,
+    value: props.modelValue.institution ? props.modelValue.user.fullName : undefined,
     label: t('api-keys.institution.user'),
     cols: 4,
   },

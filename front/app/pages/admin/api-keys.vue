@@ -1,45 +1,22 @@
 <template>
-  <SkeletonPageLoader
-    v-if="!institution"
-    :error="error"
-    show
-    show-refresh
-    @click:refresh="refresh()"
-  />
-  <div v-else>
+  <div>
     <SkeletonPageBar
       v-model="query"
+      :title="toolbarTitle"
       :refresh="refresh"
       search
       @update:model-value="debouncedRefresh()"
     >
-      <template #title>
-        <InstitutionBreadcrumbs :institution="institution" :current="toolbarTitle" />
-      </template>
-
       <v-btn
         v-if="apiKeyFormDialogRef"
         :text="$t('add')"
-        :disabled="!canEdit"
         prepend-icon="mdi-plus"
         variant="tonal"
         color="green"
         class="mr-2"
-        @click="apiKeyFormDialogRef.open(undefined, { institution })"
+        @click="apiKeyFormDialogRef.open(undefined)"
       />
     </SkeletonPageBar>
-
-    <v-container fluid>
-      <v-row>
-        <v-col>
-          <i18n-t keypath="api-keys.whatDoesKey.text" tag="p">
-            <template #header>
-              <v-code>{{ $t('api-keys.whatDoesKey.header') }}</v-code>
-            </template>
-          </i18n-t>
-        </v-col>
-      </v-row>
-    </v-container>
 
     <v-data-table-server
       v-model="selectedKeys"
@@ -50,8 +27,20 @@
       return-object
       v-bind="vDataTableOptions"
     >
-      <template #[`item.repositoryPermissions`]="{ value }">
-        <v-menu :disabled="value.length <= 0" location="start">
+      <template #[`item.institution.name`]="{ value, item }">
+        <nuxt-link v-if="value" :to="`/admin/institutions/${item.institutionId}`">
+          {{ value }}
+        </nuxt-link>
+      </template>
+
+      <template #[`item.user.username`]="{ value, item }">
+        <span v-if="!item.institutionId">
+          {{ value }}
+        </span>
+      </template>
+
+      <template #[`item.repositoryPermissions`]="{ value, item: key }">
+        <v-menu v-if="key.institutionId" :disabled="value.length <= 0" location="start">
           <template #activator="{ props: menu }">
             <v-chip
               :text="`${value.length}`"
@@ -88,8 +77,8 @@
         </v-menu>
       </template>
 
-      <template #[`item.repositoryAliasPermissions`]="{ value }">
-        <v-menu :disabled="value.length <= 0" location="end">
+      <template #[`item.repositoryAliasPermissions`]="{ value, item: key }">
+        <v-menu v-if="key.institutionId" :disabled="value.length <= 0" location="end">
           <template #activator="{ props: menu }">
             <v-chip
               :text="`${value.length}`"
@@ -124,7 +113,6 @@
           :model-value="item.active"
           :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
           :loading="activeLoadingMap.get(item.id)"
-          :readonly="!canEdit"
           density="compact"
           color="primary"
           hide-details
@@ -162,14 +150,12 @@
             <v-list-item
               v-if="apiKeyFormDialogRef"
               :title="$t('modify')"
-              :disabled="!canEdit"
               prepend-icon="mdi-pencil"
-              @click="apiKeyFormDialogRef.open(item, { institution })"
+              @click="apiKeyFormDialogRef.open(item)"
             />
 
             <v-list-item
               :title="$t('revoke')"
-              :disabled="!canEdit"
               prepend-icon="mdi-delete"
               @click="deleteApiKeys([item])"
             />
@@ -189,7 +175,7 @@
       <template #expanded-row="{ columns, item }">
         <tr>
           <td :colspan="columns.length">
-            <ApiKeyDetails :model-value="item" :institution="institution" />
+            <ApiKeyDetails :model-value="item" />
           </td>
         </tr>
       </template>
@@ -202,7 +188,6 @@
       <template #actions>
         <v-list-item
           :title="$t('revoke')"
-          :disabled="!canEdit"
           prepend-icon="mdi-delete"
           @click="deleteApiKeys()"
         />
@@ -211,7 +196,6 @@
 
         <v-list-item
           :title="$t('institutions.sushi.activeSwitch')"
-          :disabled="!canEdit"
           prepend-icon="mdi-toggle-switch"
           @click="toggleActiveStates()"
         />
@@ -229,18 +213,14 @@
 import { isAfter } from 'date-fns';
 
 definePageMeta({
-  layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
-  alias: ['/admin/institutions/:id/api-keys'],
+  layout: 'admin',
+  middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
 const now = new Date();
 
-const { params } = useRoute();
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
-const { data: user } = useAuthState();
-const { hasPermission } = useCurrentUserStore();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
@@ -250,20 +230,16 @@ const activeLoadingMap = ref(new Map());
 const apiKeyFormDialogRef = useTemplateRef('apiKeyFormDialogRef');
 
 const {
-  error,
-  data: institution,
-} = await useFetch(`/api/institutions/${params.id}`);
-
-const {
   refresh,
   itemLength,
   query,
   vDataTableOptions,
 } = await useServerSidePagination({
   fetch: {
-    url: `/api/institutions/${params.id}/api-keys`,
+    url: '/api/api-keys',
     query: {
       include: [
+        'institution',
         'user',
         'repositoryPermissions.repository',
         'repositoryAliasPermissions.alias.repository',
@@ -275,7 +251,7 @@ const {
     repositoryAliasPermissions: 'repositoryAliasPermissions._count',
   },
   data: {
-    sortBy: [{ key: 'name', order: 'asc' }],
+    sortBy: [{ key: 'institution.name', order: 'asc' }],
   },
   async: {
     deep: true,
@@ -283,21 +259,22 @@ const {
 });
 
 /**
- * If user can edit api keys
- */
-const canEdit = computed(() => {
-  if (user.value?.isAdmin) {
-    return true;
-  }
-  return hasPermission(params.id, 'api-keys:write', { throwOnNoMembership: true });
-});
-/**
  * Table headers
  */
 const headers = computed(() => [
   {
     title: t('name'),
     value: 'name',
+    sortable: true,
+  },
+  {
+    title: t('institutions.title'),
+    value: 'institution.name',
+    sortable: true,
+  },
+  {
+    title: t('users.title'),
+    value: 'user.username',
     sortable: true,
   },
   {
@@ -375,7 +352,7 @@ async function toggleActiveStates(items) {
       try {
         const active = !item.active;
         // eslint-disable-next-line no-await-in-loop
-        await $fetch(`/api/institutions/${item.institutionId}/api-keys/${item.id}`, {
+        await $fetch(`/api/api-keys/${item.id}`, {
           method: 'PUT',
           body: {
             name: item.name,
@@ -423,7 +400,7 @@ function deleteApiKeys(items) {
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(
-          (item) => $fetch(`/api/institutions/${institution.value.id}/api-keys/${item.id}`, {
+          (item) => $fetch(`/api/api-keys/${item.id}`, {
             method: 'DELETE',
           }).catch((err) => {
             snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);

@@ -806,6 +806,7 @@ clipboard:
   textCopied: Text copied in the clipboard
 users:
   toolbarTitle: Users ({count})
+  title: User
   manageUsers: >
     Manage users
     |Manage {count} users

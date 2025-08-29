@@ -15,12 +15,26 @@
             <v-row v-if="!isEditing && !props.institution && !props.user">
               <v-col>
                 <v-card
-                  :title="$t('general')"
-                  prepend-icon="mdi-format-list-bulleted"
+                  :title="$t('...')"
+                  prepend-icon="mdi-"
                   variant="outlined"
                 >
                   <template #text>
-                    A
+                    <v-row>
+                      <v-col cols="12">
+                        <InstitutionAutoComplete
+                          v-model="selectedInstitution"
+                          :required="!selectedUser"
+                        />
+                      </v-col>
+
+                      <v-col cols="12">
+                        <UserAutoComplete
+                          v-model="selectedUser"
+                          :required="!selectedInstitution"
+                        />
+                      </v-col>
+                    </v-row>
                   </template>
                 </v-card>
               </v-col>
@@ -282,8 +296,8 @@ const datePickerOpen = shallowRef(false);
 const windowId = shallowRef('root');
 const apiKey = ref({ ...props.modelValue });
 
-const { cloned: selectedInstitution } = useCloned(() => props.institution ?? {});
-const { cloned: selectedUser } = useCloned(() => props.user ?? {});
+const { cloned: selectedInstitution } = useCloned(() => props.institution ?? null);
+const { cloned: selectedUser } = useCloned(() => props.user ?? null);
 
 /** @type {Ref<Map<string, string>>} */
 const permissions = ref(new Map());
@@ -329,6 +343,7 @@ const repositories = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
+    repoError.value = '';
     try {
       return $fetch(url, {
         signal: abortController.signal,
@@ -368,6 +383,7 @@ const repositoryAliases = computedAsync(
     const abortController = new AbortController();
     onCancel(() => abortController.abort());
 
+    aliasesError.value = '';
     try {
       return $fetch(url, {
         signal: abortController.signal,
