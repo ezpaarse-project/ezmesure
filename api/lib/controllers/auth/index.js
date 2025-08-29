@@ -2,9 +2,6 @@ const router = require('koa-joi-router')();
 
 const { requireJwt, requireUser } = require('../../services/auth');
 
-const oauth = require('./oauth');
-const activate = require('./activate');
-
 const {
   standardMembershipsQueryParams,
   standardElasticRolesQueryParams,
@@ -16,10 +13,21 @@ const {
   getCurrentUserElasticRoles,
 } = require('./actions');
 
+// Sub routes
+
+const oauth = require('./oauth');
+const activate = require('./activate');
+const apiKeys = require('./api-keys');
+
 router.use(oauth.prefix('/oauth').middleware());
 router.use(activate.prefix('/_activate').middleware());
+router.use(apiKeys.prefix('/api-keys').middleware());
+
+// Global middlewares
 
 router.use(requireJwt, requireUser);
+
+// Routes
 
 router.route({
   method: 'GET',

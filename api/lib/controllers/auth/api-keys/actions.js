@@ -28,10 +28,10 @@ exports.standardQueryParams = standardQueryParams;
  * @param {KoaContext} ctx
  */
 exports.getAll = async (ctx) => {
-  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
-  prismaQuery.where.institutionId = institutionId;
+  prismaQuery.where.username = user.username;
   prismaQuery.omit = { value: true }; // avoid exposing api-key's hash
 
   const service = new ApiKeysService();
@@ -48,10 +48,11 @@ exports.getAll = async (ctx) => {
  * @param {KoaContext} ctx
  */
 exports.getOne = async (ctx) => {
-  const { institutionId, apiKeyId } = ctx.params;
+  const { user } = ctx.state;
+  const { apiKeyId } = ctx.params;
 
   const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: apiKeyId });
-  prismaQuery.where.institutionId = institutionId;
+  prismaQuery.where.username = user.username;
   prismaQuery.omit = { value: true }; // avoid exposing api-key's hash
 
   const service = new ApiKeysService();
@@ -73,64 +74,27 @@ exports.getOne = async (ctx) => {
  * @param {KoaContext} ctx
  */
 exports.createOne = async (ctx) => {
-  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
   const { body } = ctx.request;
 
   // Value that must be present in the header for auth
   const value = uuid();
-
-  // Prevent API keys to have permissions on other API keys
-  const permissions = body.permissions.filter((perm) => perm.split(':')[0] !== 'api-keys');
-  
-  // TODO: filter permissions that user doesn't have to avoid escalation
 
   const result = await ApiKeysService.$transaction(async (service) => {
     // Creating API Key in database
     const newApiKey = await service.create({
       data: {
         ...body,
-        permissions,
         // Hashing value to avoid malicious access in case of database dump
         value: ApiKeysService.getHashValue(value),
+        // API key have the permissions of the user
+        permissions: undefined,
+        repositoryPermissions: undefined,
+        repositoryAliasPermissions: undefined,
 
-        // Create repository permissions
-        repositoryPermissions: {
-          create: body.repositoryPermissions.map((perm) => ({
-            ...perm,
-            pattern: undefined,
-            // Connect to repository of institution
-            repository: {
-              connect: {
-                pattern: perm.pattern,
-                institutions: { some: { id: institutionId } },
-              },
-            },
-          })),
-        },
-
-        // Create alias permissions
-        repositoryAliasPermissions: {
-          create: body.repositoryAliasPermissions.map((perm) => ({
-            ...perm,
-            aliasPattern: undefined,
-            // Connect to alias of institution
-            alias: {
-              connect: {
-                pattern: perm.aliasPattern,
-                institutions: { some: { id: institutionId } },
-              },
-            },
-          })),
-        },
-
-        // Link api key to institution
-        institution: {
-          connect: { id: institutionId },
-        },
-
-        // Keep author
+        // Link api key to user
         user: {
-          connect: { username: ctx.state.user.username },
+          connect: { username: user.username },
         },
       },
       include: {
@@ -149,11 +113,8 @@ exports.createOne = async (ctx) => {
           state: { ...newApiKey, value: undefined }, // avoid exposing api-key's hash in actions
         },
 
-        institution: {
-          connect: { id: institutionId },
-        },
         author: {
-          connect: { username: ctx.state.user.username },
+          connect: { username: user.username },
         },
       },
     });
@@ -176,13 +137,14 @@ exports.createOne = async (ctx) => {
  * @param {KoaContext} ctx
  */
 exports.updateOne = async (ctx) => {
-  const { institutionId, apiKeyId } = ctx.params;
+  const { user } = ctx.state;
+  const { apiKeyId } = ctx.params;
   const { body } = ctx.request;
 
   const result = await ApiKeysService.$transaction(async (service) => {
     // Looking if key exists for institution
     const apiKey = await service.findUnique({
-      where: { id: apiKeyId, institutionId },
+      where: { id: apiKeyId, username: user.username },
     });
     if (!apiKey) {
       ctx.throw(404, ctx.$t('errors.apiKey.notFound', apiKeyId));
@@ -215,11 +177,8 @@ exports.updateOne = async (ctx) => {
           oldState: { ...apiKey, value: undefined },
         },
 
-        institution: {
-          connect: { id: institutionId },
-        },
         author: {
-          connect: { username: ctx.state.user.username },
+          connect: { username: user.username },
         },
       },
     });
@@ -239,12 +198,13 @@ exports.updateOne = async (ctx) => {
  * @param {KoaContext} ctx
  */
 exports.deleteOne = async (ctx) => {
-  const { institutionId, apiKeyId } = ctx.params;
+  const { user } = ctx.state;
+  const { apiKeyId } = ctx.params;
 
   await ApiKeysService.$transaction(async (service) => {
     // Looking if key exists for institution
     const apiKey = await service.findUnique({
-      where: { id: apiKeyId, institutionId },
+      where: { id: apiKeyId, username: user.username },
     });
     if (!apiKey) {
       return;
@@ -263,12 +223,8 @@ exports.deleteOne = async (ctx) => {
           oldState: { ...apiKey, value: undefined }, // avoid exposing api-key's hash
         },
 
-        institution: {
-          connect: { id: institutionId },
-        },
-
         author: {
-          connect: { username: ctx.state.user.username },
+          connect: { username: user.username },
         },
       },
     });

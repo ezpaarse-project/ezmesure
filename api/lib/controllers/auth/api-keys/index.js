@@ -2,8 +2,6 @@ const router = require('koa-joi-router')();
 
 const { Joi } = require('koa-joi-router');
 
-const { FEATURES } = require('../../../entities/memberships.dto');
-
 const {
   createSchema,
   updateSchema,
@@ -14,8 +12,6 @@ const {
   requireUser,
   requireTermsOfUse,
   forbidAPIKeys,
-  fetchInstitution,
-  requireMemberPermissions,
 } = require('../../../services/auth');
 
 const {
@@ -39,14 +35,9 @@ router.route({
   path: '/',
   handler: [
     forbidAPIKeys,
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.apiKeys.read),
     getAll,
   ],
   validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
     query: standardQueryParams.manyValidation,
   },
 });
@@ -56,14 +47,9 @@ router.route({
   path: '/',
   handler: [
     forbidAPIKeys,
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.apiKeys.write),
     createOne,
   ],
   validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
     type: 'json',
     body: createSchema,
   },
@@ -74,13 +60,10 @@ router.route({
   path: '/:apiKeyId',
   handler: [
     forbidAPIKeys,
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.apiKeys.read),
     getOne,
   ],
   validate: {
     params: {
-      institutionId: Joi.string().trim().required(),
       apiKeyId: Joi.string().trim().required(),
     },
     query: standardQueryParams.oneValidation,
@@ -92,13 +75,10 @@ router.route({
   path: '/:apiKeyId',
   handler: [
     forbidAPIKeys,
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.apiKeys.write),
     updateOne,
   ],
   validate: {
     params: {
-      institutionId: Joi.string().trim().required(),
       apiKeyId: Joi.string().trim().required(),
     },
     type: 'json',
@@ -111,13 +91,10 @@ router.route({
   path: '/:apiKeyId',
   handler: [
     forbidAPIKeys,
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.apiKeys.write),
     deleteOne,
   ],
   validate: {
     params: {
-      institutionId: Joi.string().trim().required(),
       apiKeyId: Joi.string().trim().required(),
     },
   },

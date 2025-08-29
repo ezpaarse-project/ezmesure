@@ -431,6 +431,22 @@ const requireAdmin = (ctx, next) => {
 };
 
 /**
+ * Forbids API keys from accessing that ressource
+ *
+ *  Needs `requireAuth`
+ *
+ * @param {KoaContext} ctx - Koa context
+ * @param {KoaNext} next - Next handler
+ */
+const forbidAPIKeys = (ctx, next) => {
+  if (!ctx.state?.authData || ctx.state.authData?.type === 'api_key') {
+    ctx.throw(403, ctx.$t('errors.perms.feature'));
+  }
+
+  return next();
+};
+
+/**
  * Middleware that fetches an item from a model and put it in ctx.state
  * Looks for {modelName}Id in the route params by default
  *
@@ -596,6 +612,7 @@ module.exports = {
   requireContact,
   requireMemberPermissions,
   requireValidatedInstitution,
+  forbidAPIKeys,
   fetchModel,
   fetchInstitution: (opts = {}) => fetchModel('institution', { state: 'institution', ...opts }),
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
