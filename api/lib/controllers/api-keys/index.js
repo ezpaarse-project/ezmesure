@@ -3,16 +3,18 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
 const {
+  schema,
+
   createSchema,
   updateSchema,
-} = require('../../../entities/api-key.dto');
+} = require('../../entities/api-key.dto');
 
 const {
   requireAuth,
   requireUser,
-  requireTermsOfUse,
+  requireAdmin,
   forbidAPIKeys,
-} = require('../../../services/auth');
+} = require('../../services/auth');
 
 const {
   standardQueryParams,
@@ -26,7 +28,7 @@ const {
 
 // Global middlewares
 
-router.use(requireAuth, requireUser, requireTermsOfUse, forbidAPIKeys);
+router.use(requireAuth, requireUser, requireAdmin, forbidAPIKeys);
 
 // Routes
 
@@ -49,7 +51,10 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: createSchema,
+    body: createSchema.append({
+      institutionId: schema.institutionId,
+      username: schema.username,
+    }),
   },
 });
 

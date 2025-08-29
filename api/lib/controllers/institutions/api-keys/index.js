@@ -30,7 +30,7 @@ const {
 
 // Global middlewares
 
-router.use(requireAuth, requireUser, requireTermsOfUse);
+router.use(requireAuth, requireUser, requireTermsOfUse, forbidAPIKeys);
 
 // Routes
 
@@ -38,7 +38,6 @@ router.route({
   method: 'GET',
   path: '/',
   handler: [
-    forbidAPIKeys,
     fetchInstitution(),
     requireMemberPermissions(FEATURES.apiKeys.read),
     getAll,
@@ -55,7 +54,6 @@ router.route({
   method: 'POST',
   path: '/',
   handler: [
-    forbidAPIKeys,
     fetchInstitution(),
     requireMemberPermissions(FEATURES.apiKeys.write),
     createOne,
@@ -73,7 +71,6 @@ router.route({
   method: 'GET',
   path: '/:apiKeyId',
   handler: [
-    forbidAPIKeys,
     fetchInstitution(),
     requireMemberPermissions(FEATURES.apiKeys.read),
     getOne,
@@ -91,7 +88,6 @@ router.route({
   method: 'PUT',
   path: '/:apiKeyId',
   handler: [
-    forbidAPIKeys,
     fetchInstitution(),
     requireMemberPermissions(FEATURES.apiKeys.write),
     updateOne,
@@ -110,7 +106,6 @@ router.route({
   method: 'DELETE',
   path: '/:apiKeyId',
   handler: [
-    forbidAPIKeys,
     fetchInstitution(),
     requireMemberPermissions(FEATURES.apiKeys.write),
     deleteOne,

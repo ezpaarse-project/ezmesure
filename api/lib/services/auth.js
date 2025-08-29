@@ -491,6 +491,7 @@ function fetchModel(modelName, opts = {}) {
 
         const institutionsService = new InstitutionsService();
         item = modelId && (await institutionsService.findUnique(findOptions));
+
         break;
       }
 

@@ -1,6 +1,5 @@
 const Koa = require('koa');
 const router = require('koa-joi-router');
-const { Joi } = require('koa-joi-router');
 const serve = require('koa-static');
 const mount = require('koa-mount');
 const path = require('path');
@@ -35,6 +34,7 @@ const kibana = require('./kibana');
 const activity = require('./activity');
 const actions = require('./actions');
 const sync = require('./sync');
+const apiKeys = require('./api-keys');
 const kibanaBridge = require('./kibana-bridge');
 
 const openapi = require('./openapi.json');
@@ -90,6 +90,7 @@ app.use(kibana.prefix('/kibana').middleware());
 app.use(actions.prefix('/actions').middleware());
 app.use(activity.prefix('/activity').middleware());
 app.use(sync.prefix('/sync').middleware());
+app.use(apiKeys.prefix('/api-keys').middleware());
 
 app.use(kibanaBridge.prefix('/_kbb').middleware());
 
