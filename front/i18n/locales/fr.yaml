@@ -1103,6 +1103,12 @@ api-keys:
   deleteN: >
     Vous allez révoquer l'accès d'une clé d'API. Elle ne pourra plus être utilisée pour accéder à ezMESURE.
     |Vous allez révoquer l'accès de {count} clés d'API. Elle ne pourrons plus être utilisées pour accéder à ezMESURE.
+  created:
+    title: Votre clé d'API est prête !
+    text:
+      instructions: Vous pouvez l'utiliser en utilisant le header HTTP {header} lors des requêtes à l'API d'ezMESURE.
+      save: Pensez à la sauvegarder dans un endroit sécurisé (par exemple un gestionnaire de mots de passes comme {pass}) car {warn}
+      warning: votre clé d'API ne sera affichée qu'une seule fois !
   institution:
     user: Créateur
 statuses:

@@ -1086,6 +1086,12 @@ api-keys:
   deleteN: >
     You are about to revoke access for an API key. It will no longer be able to be used to access ezMESURE.
     |You are about to revoke access for {count} API keys. They will no longer be able to be used to access ezMESURE.
+  created:
+    title: Your API key is ready !
+    text:
+      instructions: You can use it by providing the HTTP header {header} while requesting ezMESURE's API.
+      save: Remeber to save it in a safe location (a password manager like {pass} for example) because
+      warning: your API key will be shown only once !
   institution:
     user: Creator
 statuses:
