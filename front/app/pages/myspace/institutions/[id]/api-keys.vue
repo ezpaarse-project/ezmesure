@@ -161,6 +161,15 @@
               prepend-icon="mdi-delete"
               @click="deleteApiKeys([item])"
             />
+
+            <v-divider />
+
+            <v-list-item
+              v-if="clipboard"
+              :title="$t('copyId')"
+              prepend-icon="mdi-identifier"
+              @click="copyKeyId(item)"
+            />
           </v-list>
         </v-menu>
       </template>
@@ -173,6 +182,29 @@
         </tr>
       </template>
     </v-data-table-server>
+
+    <SelectionMenu
+      v-model="selectedKeys"
+      :text="$t('api-keys.manageN', selectedKeys.length)"
+    >
+      <template #actions>
+        <v-list-item
+          :title="$t('revoke')"
+          :disabled="!canEdit"
+          prepend-icon="mdi-delete"
+          @click="deleteApiKeys()"
+        />
+
+        <v-divider />
+
+        <v-list-item
+          :title="$t('institutions.sushi.activeSwitch')"
+          :disabled="!canEdit"
+          prepend-icon="mdi-toggle-switch"
+          @click="toggleActiveStates()"
+        />
+      </template>
+    </SelectionMenu>
 
     <ApiKeyFormDialog
       ref="apiKeyFormDialogRef"
@@ -194,6 +226,7 @@ const now = new Date();
 
 const { params } = useRoute();
 const { t, locale } = useI18n();
+const { isSupported: clipboard, copy } = useClipboard();
 const { data: user } = useAuthState();
 const { hasPermission } = useCurrentUserStore();
 const { openConfirm } = useDialogStore();
@@ -397,5 +430,24 @@ function deleteApiKeys(items) {
       await refresh();
     },
   });
+}
+
+/**
+ * Put key ID into clipboard
+ *
+ * @param {object} param0 API key
+ */
+async function copyKeyId({ id }) {
+  if (!id) {
+    return;
+  }
+
+  try {
+    await copy(id);
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
+    return;
+  }
+  snacks.info(t('clipboard.textCopied'));
 }
 </script>

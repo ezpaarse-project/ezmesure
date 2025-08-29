@@ -391,7 +391,9 @@ institutions:
     noMembers: No members
     title: Members ({count})
     createMailList: Copy emails
-    manageN: Manage members|Manage {count} members
+    manageN: >
+      Manage members
+      |Manage {count} members
     deleteN: You are about to revoke {count} member's access.|You are about to revoke {count} members' access.
     technical: Technical
     documentary: Documentary
@@ -1073,11 +1075,17 @@ customFields:
   manageCustomField: Manage custom field|Manage {count} custom fields
 api-keys:
   title: API keys ({count})
+  keys: API keys
   newKey: New API key
   editKey: Edit API key
   expiresAt: Expires
   permissions: Permissions
-  deleteN: You are about to revoke access for an API key. It will no longer be able to be used to access ezMESURE.|You are about to revoke access for {count} API keys. They will no longer be able to be used to access ezMESURE.
+  manageN: >
+    Manage API key
+    |Manage {count} API keys
+  deleteN: >
+    You are about to revoke access for an API key. It will no longer be able to be used to access ezMESURE.
+    |You are about to revoke access for {count} API keys. They will no longer be able to be used to access ezMESURE.
   institution:
     user: Creator
 statuses:

@@ -36,6 +36,13 @@
           prepend-icon="mdi-file-chart-outline"
           variant="text"
         />
+
+        <v-btn
+          :text="$t('api-keys.keys')"
+          :to="`/admin/institutions/${institution.id}/api-keys`"
+          prepend-icon="mdi-lock-open"
+          variant="text"
+        />
       </div>
     </div>
 

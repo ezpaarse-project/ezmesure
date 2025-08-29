@@ -1092,11 +1092,17 @@ customFields:
   restrictToAdmins: Restreindre aux administrateurs
 api-keys:
   title: Clés d'API ({count})
+  keys: Clés d'API
   newKey: Nouvelle clé d'API
   editKey: Édition d'une clé d'API
   expiresAt: Expire
   permissions: Permissions
-  deleteN: Vous allez révoquer l'accès d'une clé d'API. Elle ne pourra plus être utilisée pour accéder à ezMESURE.|Vous allez révoquer l'accès de {count} clés d'API. Elle ne pourrons plus être utilisées pour accéder à ezMESURE.
+  manageN: >
+    Gérer les clés d'API|
+    Gérer {count} clés d'API
+  deleteN: >
+    Vous allez révoquer l'accès d'une clé d'API. Elle ne pourra plus être utilisée pour accéder à ezMESURE.
+    |Vous allez révoquer l'accès de {count} clés d'API. Elle ne pourrons plus être utilisées pour accéder à ezMESURE.
   institution:
     user: Créateur
 statuses:

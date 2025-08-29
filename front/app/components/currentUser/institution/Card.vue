@@ -82,6 +82,14 @@
           prepend-icon="mdi-file-chart-outline"
           variant="text"
         />
+
+        <v-btn
+          :text="$t('api-keys.keys')"
+          :to="`/myspace/institutions/${institution.id}/api-keys`"
+          :disabled="!allowedActions.apiKeys"
+          prepend-icon="mdi-lock-open"
+          variant="text"
+        />
       </div>
 
       <v-tabs v-model="tab" grow>
@@ -257,6 +265,7 @@ const allowedActions = computed(() => {
     sushi: perms.has('sushi:read') || perms.has('sushi:write'),
     members: perms.has('memberships:read') || perms.has('memberships:write'),
     reports: perms.has('reporting:read') || perms.has('reporting:write'),
+    apiKeys: perms.has('api-keys:read') || perms.has('api-keys:write'),
   };
 });
 </script>
