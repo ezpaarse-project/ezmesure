@@ -40,6 +40,7 @@ menu:
     alerts: Alertes
   sync: Synchronisation
   customFields: Custom fields
+  api-keys: API keys
 home:
   whatDoesEzMESURE: What does ezMESURE ?
   supportedBy: This service is supported by
@@ -115,7 +116,8 @@ kibana:
     text: This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, fille the form below or go to your {accountLink}.
     accountLink: Kibana account
 token:
-  title: Authentication token
+  title: Authentication token [Deprecated]
+  deprecated: This method of authentication is deprecated and will be removed in a future version of ezMESURE, please use API keys.
   whatDoesToken:
     text: "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
     header: "Authorization: Bearer [insert the token here]"
@@ -1080,6 +1082,9 @@ api-keys:
   editKey: Edit API key
   expiresAt: Expires
   permissions: Permissions
+  whatDoesKey:
+    text: "An API key is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
+    header: 'X-API-Key: [insert key here]'
   manageN: >
     Manage API key
     |Manage {count} API keys

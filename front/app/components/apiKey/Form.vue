@@ -89,29 +89,27 @@
             </v-row>
 
             <template v-if="!isEditing">
-              <v-row>
-                <v-col cols="12">
-                  <v-card
-                    :title="$t('institutions.members.institutionManagement')"
-                    prepend-icon="mdi-office-building"
-                    variant="outlined"
-                  >
-                    <template #text>
-                      <v-list>
-                        <MembershipPermissionItem
-                          v-for="feature in features"
-                          :key="feature.scope"
-                          v-model="permissions"
-                          :feature="feature"
-                        />
-                      </v-list>
-                    </template>
-                  </v-card>
-                </v-col>
-              </v-row>
-
               <v-slide-x-transition>
-                <v-row v-if="selectedInstitution || selectedUser">
+                <v-row v-if="selectedInstitution?.id">
+                  <v-col cols="12">
+                    <v-card
+                      :title="$t('institutions.members.institutionManagement')"
+                      prepend-icon="mdi-office-building"
+                      variant="outlined"
+                    >
+                      <template #text>
+                        <v-list>
+                          <MembershipPermissionItem
+                            v-for="feature in features"
+                            :key="feature.scope"
+                            v-model="permissions"
+                            :feature="feature"
+                          />
+                        </v-list>
+                      </template>
+                    </v-card>
+                  </v-col>
+
                   <v-col cols="12">
                     <v-card
                       :title="$t('repositories.repositories')"
@@ -274,6 +272,7 @@ const now = addDays(new Date(), 1);
 
 const { t, locale } = useI18n();
 const { data: currentUser } = useAuthState();
+const { reposPermissions, aliasPermissions } = storeToRefs(useCurrentUserStore());
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
 
@@ -321,6 +320,10 @@ const repositories = computedAsync(
     }
     if (selectedUser.value?.username) {
       url = `/api/users/${selectedUser.value.username}/repositories`;
+
+      if (selectedUser.value.username === currentUser.value.username) {
+        return reposPermissions.value.map((perm) => perm.repository);
+      }
     }
 
     const abortController = new AbortController();
@@ -356,6 +359,10 @@ const repositoryAliases = computedAsync(
     }
     if (selectedUser.value?.username) {
       url = `/api/users/${selectedUser.value.username}/repository-aliases`;
+
+      if (selectedUser.value.username === currentUser.value.username) {
+        return aliasPermissions.value.map((perm) => perm.alias);
+      }
     }
 
     const abortController = new AbortController();

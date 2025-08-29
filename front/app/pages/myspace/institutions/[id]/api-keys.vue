@@ -29,6 +29,18 @@
       />
     </SkeletonPageBar>
 
+    <v-container fluid>
+      <v-row>
+        <v-col>
+          <i18n-t keypath="api-keys.whatDoesKey.text" tag="p">
+            <template #header>
+              <v-code>{{ $t('api-keys.whatDoesKey.header') }}</v-code>
+            </template>
+          </i18n-t>
+        </v-col>
+      </v-row>
+    </v-container>
+
     <v-data-table-server
       v-model="selectedKeys"
       :headers="headers"
@@ -93,8 +105,8 @@
               <v-list lines="two" density="compact">
                 <v-list-item
                   v-for="item in value"
-                  :key="item.pattern"
-                  :title="item.pattern"
+                  :key="item.aliasPattern"
+                  :title="item.aliasPattern"
                 >
                   <template #subtitle>
                     <RepositoryTypeChip :model-value="item.alias.repository" size="small" />
@@ -254,12 +266,13 @@ const {
       include: [
         'user',
         'repositoryPermissions.repository',
-        'repositoryAliasPermissions.alias',
+        'repositoryAliasPermissions.alias.repository',
       ],
     },
   },
   sortMapping: {
     repositoryPermissions: 'repositoryPermissions._count',
+    repositoryAliasPermissions: 'repositoryAliasPermissions._count',
   },
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],

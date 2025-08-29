@@ -40,6 +40,7 @@ menu:
     alerts: Alertes
   sync: Synchronisation
   customFields: Champs personnalisés
+  api-keys: Clés d'API
 home:
   whatDoesEzMESURE: Qu'est-ce qu'ezMESURE ?
   supportedBy: Ce service est soutenu par
@@ -115,7 +116,8 @@ kibana:
     text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, remplissez le formulaire ci-dessous ou accédez à votre {accountLink}.
     accountLink: compte Kibana
 token:
-  title: Token d'autentification
+  title: Token d'autentification [Déprécié]
+  deprecated: Cette méthode d'authentification est dépréciée et sera retirée dans une future mise à jour d'ezMESURE. Merci d'utiliser les clés d'API.
   whatDoesToken:
     text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}'
     header: 'Authorization: Bearer [insérez le token ici]'
@@ -1097,6 +1099,9 @@ api-keys:
   editKey: Édition d'une clé d'API
   expiresAt: Expire
   permissions: Permissions
+  whatDoesKey:
+    text: "Une clé d'API est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}"
+    header: 'X-API-Key: [insérez la clé ici]'
   manageN: >
     Gérer les clés d'API|
     Gérer {count} clés d'API

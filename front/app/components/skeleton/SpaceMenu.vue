@@ -54,12 +54,6 @@
         prepend-icon="mdi-account-key"
         class="text-grey-darken-3"
       />
-      <v-list-item
-        :title="$t('menu.authentificationToken')"
-        to="/myspace/token"
-        prepend-icon="mdi-key"
-        class="text-grey-darken-3"
-      />
 
       <v-list-item
         :title="user.fullName"
