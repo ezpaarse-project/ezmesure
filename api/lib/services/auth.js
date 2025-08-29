@@ -109,7 +109,7 @@ async function getAuthDataFromApiHeader(header) {
     throw new Error('API key is revoked');
   }
 
-  if (isAfter(new Date(), data.expiresAt)) {
+  if (data.expiresAt && isAfter(new Date(), data.expiresAt)) {
     throw new Error('API key is expired');
   }
 
@@ -147,7 +147,8 @@ const requireAuth = async (ctx, next) => {
     if (apikeyHeader) {
       authData = await getAuthDataFromApiHeader(apikeyHeader);
     }
-  } catch {
+  } catch (err) {
+    appLogger.warn(`[auth] Couldn't get auth data: ${err}`);
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
