@@ -31,6 +31,14 @@
           color="primary"
           prepend-icon="mdi-file-chart-outline"
         />
+
+        <v-list-item
+          :disabled="!user.isAdmin && !allowedActions.apiKeys"
+          :to="`/myspace/institutions/${institution.id}/api-keys`"
+          :title="$t('api-keys.keys')"
+          color="primary"
+          prepend-icon="mdi-lock-open"
+        />
       </v-list>
 
       <template v-if="spaces.length > 0">
@@ -134,6 +142,7 @@ const allowedActions = computed(() => {
     sushi: perms.has('sushi:read') || perms.has('sushi:write'),
     members: perms.has('memberships:read') || perms.has('memberships:write'),
     reports: perms.has('reporting:read') || perms.has('reporting:write'),
+    apiKeys: perms.has('api-keys:read') || perms.has('api-keys:write'),
   };
 });
 </script>
