@@ -808,11 +808,11 @@ model ApiKey {
   name                       String
   /// Description of the key
   description                String                            @default("")
-  /// Permissions of the key (members management, SUSHI, ezREEPORT...)
+  /// Permissions of the key (members management, SUSHI, ezREEPORT...). Only relevant if API key is related to an institution.
   permissions                String[]
-  /// Permissions of the user for the institution repositories
+  /// Permissions of the key for the institution repositories. Only relevant if API key is related to an institution.
   repositoryPermissions      ApiKeyRepositoryPermission[]
-  /// Permissions of the user for the institution aliases
+  /// Permissions of the key for the institution aliases. Only relevant if API key is related to an institution.
   repositoryAliasPermissions ApiKeyRepositoryAliasPermission[]
   /// Whether the key is active
   active                     Boolean                           @default(true)

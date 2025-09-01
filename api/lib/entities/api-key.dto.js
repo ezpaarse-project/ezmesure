@@ -15,7 +15,8 @@ const { PERMISSIONS } = require('./memberships.dto');
  */
 const schema = {
   id: Joi.string().trim(),
-  value: Joi.string().trim(),
+  // Protected field, may be present in responses
+  // value: Joi.string().trim(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
   expiresAt: Joi.date().min('now').allow(null),
@@ -43,7 +44,6 @@ const schema = {
  */
 const immutableFields = [
   'id',
-  'value',
   'updatedAt',
   'createdAt',
   'activeUpdatedAt',

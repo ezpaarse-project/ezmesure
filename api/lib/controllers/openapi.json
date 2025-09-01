@@ -79,6 +79,9 @@
     },
     {
       "name": "Users"
+    },
+    {
+      "name": "API Keys"
     }
   ],
   "components": {
@@ -127,21 +130,20 @@
         "enum": ["doc_contact", "tech_contact", "guest"]
       },
       "MemberPermissions": {
-        "type": "array",
-        "items": {
-          "type": "string",
-          "enum": [
-            "institution:read",
-            "institution:write",
-            "memberships:read",
-            "memberships:write",
-            "sushi:read",
-            "sushi:write",
-            "sushi:delete",
-            "reporting:read",
-            "reporting:write"
-          ]
-        }
+        "type": "string",
+        "enum": [
+          "institution:read",
+          "institution:write",
+          "memberships:read",
+          "memberships:write",
+          "sushi:read",
+          "sushi:write",
+          "sushi:delete",
+          "api-keys:write",
+          "api-keys:delete",
+          "reporting:read",
+          "reporting:write"
+        ]
       },
       "ItemID": {
         "type": "string",
@@ -723,10 +725,9 @@
             "$ref": "#/components/schemas/Repository",
             "readOnly": true
           },
-          "permissions": {
+          "readonly": {
             "description": "User permissions for the repository",
-            "type": "string",
-            "enum": ["read", "read_write"]
+            "type": "boolean"
           },
           "locked": {
             "description": "Whether the permission can be modified by admins only",
@@ -815,11 +816,6 @@
           "alias": {
             "$ref": "#/components/schemas/RepositoryAlias",
             "readOnly": true
-          },
-          "permissions": {
-            "description": "User permissions for the repository",
-            "type": "string",
-            "enum": ["read", "read_write"]
           },
           "locked": {
             "description": "Whether the permission can be modified by admins only",
@@ -1655,6 +1651,13 @@
                   "synchronized": { "type": "integer" }
                 }
               },
+              "apiKeys": {
+                "type": "object",
+                "properties": {
+                  "errors": { "type": "integer" },
+                  "synchronized": { "type": "integer" }
+                }
+              },
               "ezreeportUsers": {
                 "type": "object",
                 "properties": {
@@ -2067,6 +2070,135 @@
           "updatedAt",
           "createdAt"
         ]
+      },
+      "ApiKeyRepositoryAliasPermission": {
+        "title": "API key Repository Alias Permission",
+        "description": "Represent permissions of a API key for a repository",
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "$ref": "#/components/schemas/ApiKey",
+            "readOnly": true
+          },
+          "repository": {
+            "$ref": "#/components/schemas/Repository",
+            "readOnly": true
+          }
+        }
+      },
+      "ApiKeyRepositoryPermission": {
+        "title": "API key Repository Permission",
+        "description": "Represent permissions of a user for an alias",
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "$ref": "#/components/schemas/User",
+            "readOnly": true
+          },
+          "alias": {
+            "$ref": "#/components/schemas/RepositoryAlias",
+            "readOnly": true
+          },
+          "readonly": {
+            "description": "API key permissions for the repository",
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiKey": {
+        "title": "API key",
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "active",
+          "activeUpdatedAt",
+          "permissions",
+          "repositoryPermissions",
+          "repositoryAliasPermissions",
+          "expiresAt",
+          "createdAt",
+          "updatedAt",
+          "lastAcitvity"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": ""
+          },
+          "name": {
+            "description": "Arbitrary name to identify the API key",
+            "type": "string"
+          },
+          "description": {
+            "description": "Arbitrary comment about the API key",
+            "type": "string"
+          },
+          "active": {
+            "description": "Whether the credentials are active",
+            "type": "boolean"
+          },
+          "activeUpdatedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Date of the last change of the credentials active state",
+            "readOnly": true
+          },
+          "institution": {
+            "description": "The institution that is related to API key. If null, API key is related to user",
+            "nullable": true,
+            "allOf": [{ "$ref": "#/components/schemas/Institution" }]
+          },
+          "user": {
+            "description": "The user that is related to API key. If institution is not null, this field is the creator of the API key",
+            "nullable": true,
+            "allOf": [{ "$ref": "#/components/schemas/User" }]
+          },
+          "permissions": {
+            "description": "A list of user permissions associated to the API key. Only relevant if API key is related to an institution.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberPermissions"
+            }
+          },
+          "repositoryPermissions": {
+            "description": "Repository permissions of the API key. Only relevant if API key is related to an institution.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiKeyRepositoryPermission"
+            }
+          },
+          "repositoryAliasPermissions": {
+            "description": "Repository alias permissions of the API key. Only relevant if API key is related to an institution.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiKeyRepositoryAliasPermission"
+            }
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Expiration date of the item",
+            "readOnly": true
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "lastAcitvity": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Last activity date",
+            "readOnly": true
+          }
+        }
       },
       "ElasticRole": {
         "title": "Elastic Role",
@@ -5196,6 +5328,380 @@
         }
       }
     },
+    "/institutions/{id}/api-keys": {
+      "get": {
+        "summary": "List api keys of institution",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiKey"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operationId": "get-institution-id-api-keys",
+        "description": "List API keys of institution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "user",
+                  "repositoryPermissions",
+                  "repositoryPermissions.repository",
+                  "repositoryAliasPermissions",
+                  "repositoryAliasPermissions.alias",
+                  "repositoryAliasPermissions.alias.repository"
+                ]
+              }
+            }
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "activeUpdatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "activeUpdatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "tags": ["Institutions", "API Keys"]
+      },
+      "post": {
+        "summary": "Create an API key for institution",
+        "operationId": "post-institution-id-api-key",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    { "$ref": "#/components/schemas/ApiKey" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "description": "The value to use in header. Only showed when creating the API key."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Create an API key for institution",
+        "tags": ["API Keys", "Institutions"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKey"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/institutions/{id}/api-keys/{apiKeyId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "apiKeyId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get an API key of institution",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "user",
+                  "repositoryPermissions",
+                  "repositoryPermissions.repository",
+                  "repositoryAliasPermissions",
+                  "repositoryAliasPermissions.alias",
+                  "repositoryAliasPermissions.alias.repository"
+                ]
+              }
+            }
+          }
+        ],
+        "operationId": "get-institution-id-api-key-id",
+        "description": "Get an API key by its id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["API Keys", "Institutions"]
+      },
+      "put": {
+        "summary": "Replace an API key of institution",
+        "operationId": "put-institutions-id-api-key-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Replace an API key, note that you can't change permissions",
+        "tags": ["API Keys", "Institutions"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an API key",
+        "operationId": "delete-institution-id-api-key-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete an API key",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Institutions", "API Keys"]
+      }
+    },
     "/logs": {
       "get": {
         "tags": ["Indices"],
@@ -6158,6 +6664,372 @@
           }
         },
         "operationId": "getAuthToken"
+      }
+    },
+    "/auth/api-keys": {
+      "get": {
+        "summary": "List api keys of current user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiKey"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operationId": "get-auth-api-keys",
+        "description": "List API keys of current user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "user",
+                  "repositoryPermissions",
+                  "repositoryPermissions.repository",
+                  "repositoryAliasPermissions",
+                  "repositoryAliasPermissions.alias",
+                  "repositoryAliasPermissions.alias.repository"
+                ]
+              }
+            }
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "activeUpdatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "activeUpdatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "tags": ["Authentication", "API Keys"]
+      },
+      "post": {
+        "summary": "Create an API key for current user",
+        "operationId": "post-auth-api-key",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    { "$ref": "#/components/schemas/ApiKey" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "description": "The value to use in header. Only showed when creating the API key."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Create an API key",
+        "tags": ["API Keys", "Authentication"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKey"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api-keys/{apiKeyId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "apiKeyId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get an API key of current user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "user",
+                  "repositoryPermissions",
+                  "repositoryPermissions.repository",
+                  "repositoryAliasPermissions",
+                  "repositoryAliasPermissions.alias",
+                  "repositoryAliasPermissions.alias.repository"
+                ]
+              }
+            }
+          }
+        ],
+        "operationId": "get-auth-api-key-id",
+        "description": "Get an API key by its id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["API Keys", "Authentication"]
+      },
+      "put": {
+        "summary": "Replace an API key for current user",
+        "operationId": "put-auth-api-key-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Replace an API key, note that you can't change permissions",
+        "tags": ["API Keys", "Authentication"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an API key of current user",
+        "operationId": "delete-auth-api-key-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete an API key of current user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Authentication", "API Keys"]
       }
     },
     "/queues": {
@@ -12825,6 +13697,372 @@
             "bearerAuth": []
           }
         ]
+      }
+    },
+    "/api-keys": {
+      "get": {
+        "summary": "List api keys",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiKey"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operationId": "get-api-keys",
+        "description": "List API keys",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "user",
+                  "repositoryPermissions",
+                  "repositoryPermissions.repository",
+                  "repositoryAliasPermissions",
+                  "repositoryAliasPermissions.alias",
+                  "repositoryAliasPermissions.alias.repository"
+                ]
+              }
+            }
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "activeUpdatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "activeUpdatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "tags": ["Administration", "API Keys"]
+      },
+      "post": {
+        "summary": "Create an API key",
+        "operationId": "post-api-key",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    { "$ref": "#/components/schemas/ApiKey" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "description": "The value to use in header. Only showed when creating the API key."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Create an API key",
+        "tags": ["API Keys", "Administration"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKey"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api-keys/{apiKeyId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "apiKeyId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get an API key",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "user",
+                  "repositoryPermissions",
+                  "repositoryPermissions.repository",
+                  "repositoryAliasPermissions",
+                  "repositoryAliasPermissions.alias",
+                  "repositoryAliasPermissions.alias.repository"
+                ]
+              }
+            }
+          }
+        ],
+        "operationId": "get-api-key-id",
+        "description": "Get an API key by its id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["API Keys", "Administration"]
+      },
+      "put": {
+        "summary": "Replace an API key",
+        "operationId": "put-api-key-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Replace an API key, note that you can't change permissions or link it to another user/institution",
+        "tags": ["API Keys", "Administration"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an API key",
+        "operationId": "delete-api-key-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete an API key",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Administration", "API Keys"]
       }
     }
   }
