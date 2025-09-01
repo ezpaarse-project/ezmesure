@@ -1100,6 +1100,8 @@ api-keys:
   editKey: Édition d'une clé d'API
   expiresAt: Expire
   permissions: Permissions
+  subject: Objet de la clé
+  subjectDesc: En tant qu'administrateur, vous devez définir si la clé d'API est liée à un établissement OU à un utilisateur.
   whatDoesKey:
     text: "Une clé d'API est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}"
     header: 'X-API-Key: [insérez la clé ici]'

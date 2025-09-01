@@ -1083,6 +1083,8 @@ api-keys:
   editKey: Edit API key
   expiresAt: Expires
   permissions: Permissions
+  subject: Subject of the key
+  subjectDesc: As adminstrator, you must define if the API key will be related to an institution OR to an user.
   whatDoesKey:
     text: "An API key is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
     header: 'X-API-Key: [insert key here]'

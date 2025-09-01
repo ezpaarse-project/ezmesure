@@ -15,16 +15,23 @@
             <v-row v-if="!isEditing && !props.institution && !props.user">
               <v-col>
                 <v-card
-                  :title="$t('...')"
-                  prepend-icon="mdi-"
+                  :title="$t('api-keys.subject')"
+                  prepend-icon="mdi-link-variant"
                   variant="outlined"
                 >
                   <template #text>
                     <v-row>
                       <v-col cols="12">
+                        <p>
+                          {{ $t('api-keys.subjectDesc') }}
+                        </p>
+                      </v-col>
+
+                      <v-col cols="12">
                         <InstitutionAutoComplete
                           v-model="selectedInstitution"
                           :required="!selectedUser"
+                          @update:model-value="() => { selectedUser = null }"
                         />
                       </v-col>
 
@@ -32,6 +39,7 @@
                         <UserAutoComplete
                           v-model="selectedUser"
                           :required="!selectedInstitution"
+                          @update:model-value="() => { selectedInstitution = null }"
                         />
                       </v-col>
                     </v-row>
@@ -286,7 +294,6 @@ const now = addDays(new Date(), 1);
 
 const { t, locale } = useI18n();
 const { data: currentUser } = useAuthState();
-const { reposPermissions, aliasPermissions } = storeToRefs(useCurrentUserStore());
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
 
@@ -333,11 +340,7 @@ const repositories = computedAsync(
       url = `/api/institutions/${selectedInstitution.value.id}/repositories`;
     }
     if (selectedUser.value?.username) {
-      url = `/api/users/${selectedUser.value.username}/repositories`;
-
-      if (selectedUser.value.username === currentUser.value.username) {
-        return reposPermissions.value.map((perm) => perm.repository);
-      }
+      return [];
     }
 
     const abortController = new AbortController();
@@ -373,11 +376,7 @@ const repositoryAliases = computedAsync(
       url = `/api/institutions/${selectedInstitution.value.id}/repository-aliases`;
     }
     if (selectedUser.value?.username) {
-      url = `/api/users/${selectedUser.value.username}/repository-aliases`;
-
-      if (selectedUser.value.username === currentUser.value.username) {
-        return aliasPermissions.value.map((perm) => perm.alias);
-      }
+      return [];
     }
 
     const abortController = new AbortController();
