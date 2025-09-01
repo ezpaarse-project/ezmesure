@@ -1,6 +1,7 @@
 const { v4: uuid } = require('uuid');
 
 const ActionsService = require('../../../entities/actions.service');
+const MembershipsService = require('../../../entities/memberships.service');
 const ApiKeysService = require('../../../entities/api-key.service');
 
 const { schema, includableFields } = require('../../../entities/api-key.dto');
@@ -9,6 +10,9 @@ const { prepareStandardQueryParams } = require('../../../services/std-query');
 
 /**
  * @typedef {import('koa').Context} KoaContext
+ *
+ * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
+ * @typedef {import('@prisma/client').RepositoryAliasPermission} RepositoryAliasPermission
  */
 
 // Query params for sub routes
@@ -68,6 +72,54 @@ exports.getOne = async (ctx) => {
 };
 
 /**
+ * Limit permissions of API Key by its user
+ *
+ * @param {string} inputPermission - Permissions wanted for API key
+ * @param {Set<string>} userPermissions - Permissions of user
+ *
+ * @returns {boolean} Should the permissions be granted
+ */
+function limitPermissionsByUser(inputPermission, userPermissions) {
+  return userPermissions.has(inputPermission);
+}
+
+/**
+ * Limit permissions of API Key by its user
+ *
+ * @param {RepositoryPermission} inputPermission - Permissions wanted for API key
+ * @param {Map<string, RepositoryPermission>} userPermissions - Permissions of user
+ *
+ * @returns {boolean} Should the permissions be granted
+ */
+function limitRepositoryPermissionsByUser(inputPermission, userPermissions) {
+  const permission = userPermissions.get(inputPermission.repositoryPattern);
+  // User doesn't have permission on this repository
+  if (!permission) {
+    return false;
+  }
+
+  // User has write permission, can give both write and read
+  if (permission.readonly === false) {
+    return true;
+  }
+
+  // Can give same level
+  return permission.readonly === inputPermission.readonly;
+}
+
+/**
+ * Limit permissions of API Key by its user
+ *
+ * @param {RepositoryAliasPermission} inputPermission - Permissions wanted for API key
+ * @param {Map<string, RepositoryAliasPermission>} userPermissions - Permissions of user
+ *
+ * @returns {boolean} Should the permissions be granted
+ */
+function limitAliasPermissionsByUser(inputPermission, userPermissions) {
+  return userPermissions.has(inputPermission.aliasPattern);
+}
+
+/**
  * Create API key for an institution
  *
  * @param {KoaContext} ctx
@@ -75,14 +127,50 @@ exports.getOne = async (ctx) => {
 exports.createOne = async (ctx) => {
   const { institutionId } = ctx.params;
   const { body } = ctx.request;
+  const { user } = ctx.state;
 
   // Value that must be present in the header for auth
   const value = uuid();
 
+  let { repositoryPermissions, repositoryAliasPermissions } = body;
   // Prevent API keys to have permissions on other API keys
-  const permissions = body.permissions.filter((perm) => perm.split(':')[0] !== 'api-keys');
-  
-  // TODO: filter permissions that user doesn't have to avoid escalation
+  let permissions = body.permissions.filter((perm) => perm.split(':')[0] !== 'api-keys');
+
+  // Avoid privileges escalation
+  if (!user.isAdmin) {
+    const service = new MembershipsService();
+
+    const memberships = await service.findMany({
+      where: { username: user.username },
+      include: { repositoryPermissions: true, repositoryAliasPermissions: true },
+    });
+
+    // filter permissions that user doesn't have
+    const userPermissions = new Set(
+      memberships.flatMap((mem) => mem.permissions),
+    );
+    permissions = permissions.filter(
+      (perm) => limitPermissionsByUser(perm, userPermissions),
+    );
+
+    // filter repository permissions that user doesn't have
+    const userRepositories = new Map(
+      memberships.flatMap((mem) => mem.repositoryPermissions)
+        .map((perm) => [perm.repositoryPattern, perm]),
+    );
+    repositoryPermissions = repositoryPermissions.filter(
+      (perm) => limitRepositoryPermissionsByUser(perm, userRepositories),
+    );
+
+    // filter alias permissions that user doesn't have
+    const userAliases = new Map(
+      memberships.flatMap((mem) => mem.repositoryAliasPermissions)
+        .map((perm) => [perm.aliasPattern, perm]),
+    );
+    repositoryAliasPermissions = repositoryAliasPermissions.filter(
+      (perm) => limitAliasPermissionsByUser(perm, userAliases),
+    );
+  }
 
   const result = await ApiKeysService.$transaction(async (service) => {
     // Creating API Key in database
@@ -95,7 +183,7 @@ exports.createOne = async (ctx) => {
 
         // Create repository permissions
         repositoryPermissions: {
-          create: body.repositoryPermissions.map((perm) => ({
+          create: repositoryPermissions.map((perm) => ({
             ...perm,
             pattern: undefined,
             // Connect to repository of institution
@@ -110,7 +198,7 @@ exports.createOne = async (ctx) => {
 
         // Create alias permissions
         repositoryAliasPermissions: {
-          create: body.repositoryAliasPermissions.map((perm) => ({
+          create: repositoryAliasPermissions.map((perm) => ({
             ...perm,
             aliasPattern: undefined,
             // Connect to alias of institution
@@ -130,7 +218,7 @@ exports.createOne = async (ctx) => {
 
         // Keep author
         user: {
-          connect: { username: ctx.state.user.username },
+          connect: { username: user.username },
         },
       },
       include: {
@@ -153,7 +241,7 @@ exports.createOne = async (ctx) => {
           connect: { id: institutionId },
         },
         author: {
-          connect: { username: ctx.state.user.username },
+          connect: { username: user.username },
         },
       },
     });

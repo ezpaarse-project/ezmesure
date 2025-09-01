@@ -31,7 +31,7 @@ router.route({
   path: '/',
   handler: [
     fetchInstitution(),
-    requireMemberPermissions(FEATURES.memberships.read),
+    requireMemberPermissions(FEATURES.institution.read),
     getInstitutionRepositoryAliases,
   ],
   validate: {
