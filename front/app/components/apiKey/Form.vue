@@ -122,10 +122,11 @@
                       <template #text>
                         <v-list>
                           <MembershipPermissionItem
-                            v-for="feature in features"
+                            v-for="{ feature, permission } in features"
                             :key="feature.scope"
                             v-model="permissions"
                             :feature="feature"
+                            :max="permission"
                           />
                         </v-list>
                       </template>
@@ -142,10 +143,11 @@
                       <template v-if="(repositories?.length ?? 0) > 0" #text>
                         <v-list density="compact">
                           <MembershipRepositoryPermissionItem
-                            v-for="repo in repositories"
-                            :key="repo.pattern"
+                            v-for="{ repository, permission } in repositories"
+                            :key="repository.pattern"
                             v-model="repositoryPermissions"
-                            :repository="repo"
+                            :repository="repository"
+                            :max="permission?.readonly ? 'read' : 'write'"
                           />
                         </v-list>
                       </template>
@@ -170,7 +172,7 @@
                       <template v-if="(repositoryAliases?.length ?? 0) > 0" #text>
                         <v-list density="compact">
                           <MembershipRepositoryAliasPermissionItem
-                            v-for="alias in repositoryAliases"
+                            v-for="{ alias } in repositoryAliases"
                             :key="alias.pattern"
                             v-model="repositoryAliasPermissions"
                             :alias="alias"
@@ -271,6 +273,9 @@ import { addDays } from 'date-fns';
 import { getErrorMessage } from '@/lib/errors';
 import { featureScopes } from '@/lib/permissions/utils';
 
+// Prevents to manage API keys from API keys
+const FORBBIDEN_SCOPES = ['api-keys'];
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -296,6 +301,11 @@ const { t, locale } = useI18n();
 const { data: currentUser } = useAuthState();
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
+const {
+  memberships: currentMemberships,
+  reposPermissions,
+  aliasPermissions,
+} = storeToRefs(useCurrentUserStore());
 
 const saving = shallowRef(false);
 const valid = shallowRef(false);
@@ -327,7 +337,16 @@ const formRef = useTemplateRef('formRef');
  */
 const isEditing = computed(() => !!props.modelValue?.id);
 /**
- * Get repositories
+ * Map of current user permissions
+ */
+const reposPermissionsMap = computed(() => new Map(
+  reposPermissions.value.map((perm) => [
+    perm.repositoryPattern,
+    { ...perm, repository: undefined },
+  ]),
+));
+/**
+ * Get repositories for selected institution
  */
 const repositories = computedAsync(
   async (onCancel) => {
@@ -335,11 +354,7 @@ const repositories = computedAsync(
       return [];
     }
 
-    let url = '/api/repositories';
-    if (selectedInstitution.value?.id) {
-      url = `/api/institutions/${selectedInstitution.value.id}/repositories`;
-    }
-    if (selectedUser.value?.username) {
+    if (!selectedInstitution.value?.id) {
       return [];
     }
 
@@ -348,12 +363,19 @@ const repositories = computedAsync(
 
     repoError.value = '';
     try {
-      return $fetch(url, {
+      const data = await $fetch(`/api/institutions/${selectedInstitution.value.id}/repositories`, {
         signal: abortController.signal,
         query: {
           size: 0,
         },
       });
+
+      return data
+        .map((repository) => ({
+          repository,
+          permission: reposPermissionsMap.value.get(repository.pattern),
+        }))
+        .filter(({ permission }) => (currentUser.value.isAdmin ? true : !!permission));
     } catch (err) {
       repoError.value = getErrorMessage(err, t('anErrorOccurred'));
       return [];
@@ -363,7 +385,16 @@ const repositories = computedAsync(
   { lazy: true, evaluating: repoStatus },
 );
 /**
- * Get repository aliases
+ * Map of current user permissions
+ */
+const aliasPermissionsMap = computed(() => new Map(
+  aliasPermissions.value.map((perm) => [
+    perm.aliasPattern,
+    { ...perm, alias: undefined },
+  ]),
+));
+/**
+ * Get repository aliases for selected institution
  */
 const repositoryAliases = computedAsync(
   async (onCancel) => {
@@ -371,11 +402,7 @@ const repositoryAliases = computedAsync(
       return [];
     }
 
-    let url = '/api/repository-aliases';
-    if (selectedInstitution.value?.id) {
-      url = `/api/institutions/${selectedInstitution.value.id}/repository-aliases`;
-    }
-    if (selectedUser.value?.username) {
+    if (!selectedInstitution.value?.id) {
       return [];
     }
 
@@ -384,13 +411,20 @@ const repositoryAliases = computedAsync(
 
     aliasesError.value = '';
     try {
-      return $fetch(url, {
+      const data = await $fetch(`/api/institutions/${selectedInstitution.value.id}/repository-aliases`, {
         signal: abortController.signal,
         query: {
           size: 0,
           include: ['repository'],
         },
       });
+
+      return data
+        .map((alias) => ({
+          alias,
+          permission: aliasPermissionsMap.value.get(alias.pattern),
+        }))
+        .filter(({ permission }) => (currentUser.value.isAdmin ? true : !!permission));
     } catch (err) {
       aliasesError.value = getErrorMessage(err, t('anErrorOccurred'));
       return [];
@@ -416,15 +450,37 @@ const expiresAtFormatted = computed(() => {
   return dateFormat(expiresAt.value, locale.value, 'PPP');
 });
 /**
+ * Map of permissions of current user for selected institution
+ */
+const currentUserPermissions = computed(() => {
+  if (!selectedInstitution.value?.id) {
+    return undefined;
+  }
+
+  const membership = currentMemberships.value.find(
+    ({ institutionId }) => institutionId === selectedInstitution.value.id,
+  );
+  if (!membership) {
+    return undefined;
+  }
+
+  return new Map(membership.permissions.map((perm) => perm.split(':', 2)));
+});
+/**
  * Available features
  */
 const features = computed(
   () => featureScopes
-    .filter((scope) => !['api-keys'].includes(scope)) // Prevents to manage API keys from API keys
     .map((scope) => ({
-      scope,
-      text: t(`institutions.members.featureLabels.${scope}`),
-    })),
+      feature: {
+        scope,
+        text: t(`institutions.members.featureLabels.${scope}`),
+      },
+      permission: currentUser.value.isAdmin ? 'write' : currentUserPermissions.value?.get(scope) ?? 'never',
+    }))
+    .filter(
+      ({ feature, permission }) => !FORBBIDEN_SCOPES.includes(feature.scope) && permission !== 'never',
+    ),
 );
 
 async function save() {

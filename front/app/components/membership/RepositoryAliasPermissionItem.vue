@@ -9,6 +9,7 @@
         v-model="value"
         :readonly="readonly"
         :levels="['none', 'read']"
+        :max="max"
         mandatory
       />
     </template>
@@ -34,6 +35,10 @@ const props = defineProps({
   readonly: {
     type: Boolean,
     default: false,
+  },
+  max: {
+    type: String,
+    default: undefined,
   },
 });
 
