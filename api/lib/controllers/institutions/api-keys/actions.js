@@ -8,12 +8,17 @@ const { schema, includableFields } = require('../../../entities/api-key.dto');
 
 const { prepareStandardQueryParams } = require('../../../services/std-query');
 
+/* eslint-disable max-len */
 /**
  * @typedef {import('koa').Context} KoaContext
  *
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
  * @typedef {import('@prisma/client').RepositoryAliasPermission} RepositoryAliasPermission
+ * @typedef {import('@prisma/client').Prisma.ApiKeyCreateInput} ApiKeyCreateInput
+ * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionCreateInput} ApiKeyRepositoryPermissionCreateInput
+ * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryAliasPermissionCreateInput} ApiKeyRepositoryAliasPermissionCreateInput
  */
+/* eslint-enable max-len */
 
 // Query params for sub routes
 
@@ -183,32 +188,38 @@ exports.createOne = async (ctx) => {
 
         // Create repository permissions
         repositoryPermissions: {
-          create: repositoryPermissions.map((perm) => ({
-            ...perm,
-            pattern: undefined,
-            // Connect to repository of institution
-            repository: {
-              connect: {
-                pattern: perm.pattern,
-                institutions: { some: { id: institutionId } },
+          create: repositoryPermissions.map(
+            /** @returns {ApiKeyRepositoryPermissionCreateInput} */
+            (perm) => ({
+              ...perm,
+              repositoryPattern: undefined,
+              // Connect to repository of institution
+              repository: {
+                connect: {
+                  pattern: perm.repositoryPattern,
+                  institutions: { some: { id: institutionId } },
+                },
               },
-            },
-          })),
+            }),
+          ),
         },
 
         // Create alias permissions
         repositoryAliasPermissions: {
-          create: repositoryAliasPermissions.map((perm) => ({
-            ...perm,
-            aliasPattern: undefined,
-            // Connect to alias of institution
-            alias: {
-              connect: {
-                pattern: perm.aliasPattern,
-                institutions: { some: { id: institutionId } },
+          create: repositoryAliasPermissions.map(
+            /** @returns {ApiKeyRepositoryAliasPermissionCreateInput} */
+            (perm) => ({
+              ...perm,
+              aliasPattern: undefined,
+              // Connect to alias of institution
+              alias: {
+                connect: {
+                  pattern: perm.aliasPattern,
+                  institutions: { some: { id: institutionId } },
+                },
               },
-            },
-          })),
+            }),
+          ),
         },
 
         // Link api key to institution

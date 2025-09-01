@@ -24,6 +24,7 @@ const {
   createOne,
   updateOne,
   deleteOne,
+  importMany,
 } = require('./actions');
 
 // Global middlewares
@@ -39,7 +40,9 @@ router.route({
     getAll,
   ],
   validate: {
-    query: standardQueryParams.manyValidation,
+    query: standardQueryParams.manyValidation.append({
+      source: Joi.string().valid('*'),
+    }),
   },
 });
 
@@ -68,7 +71,9 @@ router.route({
     params: {
       apiKeyId: Joi.string().trim().required(),
     },
-    query: standardQueryParams.oneValidation,
+    query: standardQueryParams.oneValidation.append({
+      source: Joi.string().allow('*'),
+    }),
   },
 });
 
@@ -97,6 +102,21 @@ router.route({
     params: {
       apiKeyId: Joi.string().trim().required(),
     },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: [
+    importMany,
+  ],
+  validate: {
+    type: 'json',
+    query: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: Joi.array(),
   },
 });
 

@@ -9,6 +9,8 @@ const {
 
 const { PERMISSIONS } = require('./memberships.dto');
 
+const valueSchema = Joi.string().trim();
+
 /**
  * Base schema
  * @type {Record<string, import('joi').AnySchema>}
@@ -16,7 +18,7 @@ const { PERMISSIONS } = require('./memberships.dto');
 const schema = {
   id: Joi.string().trim(),
   // Protected field, may be present in responses
-  // value: Joi.string().trim(),
+  // value: valueSchema,
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
   expiresAt: Joi.date().min('now').allow(null),
@@ -97,10 +99,8 @@ const updateSchema = withModifiers(
  * Schema to be applied when a regular user import multiple api keys
  */
 const importSchema = Joi.array().required().items({
-  ...schema,
-  id: schema.id,
-  institutionId: schema.institutionId,
-  username: schema.username,
+  ...createSchema,
+  value: valueSchema,
 });
 
 module.exports = {
