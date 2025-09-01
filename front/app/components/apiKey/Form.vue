@@ -470,8 +470,8 @@ async function save() {
             ([scope, level]) => `${scope}:${level}`,
           ),
           repositoryPermissions: Array.from(repositoryPermissions.value.entries()).map(
-            ([pattern, level]) => ({
-              pattern,
+            ([repositoryPattern, level]) => ({
+              repositoryPattern,
               readonly: level === 'read',
             }),
           ),
