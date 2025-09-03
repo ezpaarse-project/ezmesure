@@ -35,6 +35,11 @@
       return-object
       v-bind="vDataTableOptions"
     >
+      <template #[`item.label`]="{ item }">
+        <v-icon start :icon="item.icon || 'mdi-tag-outline'" />
+        {{ item.label }}
+      </template>
+
       <template #[`item.restricted`]="{ item }">
         <v-icon
           v-tooltip:top="$t(item.restricted ? 'roles.onlyAdmins' : 'roles.notOnlyAdmins')"
