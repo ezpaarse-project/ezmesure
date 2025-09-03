@@ -246,15 +246,6 @@ exports.removeInstitutionMemberRole = async (ctx) => {
   const { institutionId, username, roleId } = ctx.params;
 
   await MembershipRolesService.$transaction(async (membershipRolesService) => {
-    if (!user.isAdmin) {
-      const membershipService = new MembershipsService(membershipRolesService);
-      const membership = await membershipService.findByID(institutionId, username);
-
-      if (!membership?.permissions?.includes('membership:write')) {
-        ctx.throw(403, ctx.$t('errors.perms.feature'));
-      }
-    }
-
     const membershipRole = await membershipRolesService.findUnique({
       where: {
         username_institutionId_roleId: { roleId, username, institutionId },
@@ -291,14 +282,6 @@ exports.addInstitutionMemberRole = async (ctx) => {
   const { institutionId, username, roleId } = ctx.params;
 
   const updatedMembership = await MembershipsService.$transaction(async (membershipsService) => {
-    if (!user.isAdmin) {
-      const membership = await membershipsService.findByID(institutionId, username);
-
-      if (!membership?.permissions?.includes('membership:write')) {
-        ctx.throw(403, ctx.$t('errors.perms.feature'));
-      }
-    }
-
     const memberRoleService = new RolesService(membershipsService);
     const role = await memberRoleService.findUnique({ where: { id: roleId } });
 

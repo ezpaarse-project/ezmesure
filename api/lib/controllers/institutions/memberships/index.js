@@ -107,7 +107,11 @@ router.route({
 router.route({
   method: 'DELETE',
   path: '/memberships/:username/roles/:roleId',
-  handler: removeInstitutionMemberRole,
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.write),
+    removeInstitutionMemberRole,
+  ],
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
@@ -120,7 +124,11 @@ router.route({
 router.route({
   method: 'PUT',
   path: '/memberships/:username/roles/:roleId',
-  handler: addInstitutionMemberRole,
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.write),
+    addInstitutionMemberRole,
+  ],
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
