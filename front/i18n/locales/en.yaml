@@ -1106,6 +1106,7 @@ status: Status
 date: Date
 duration: Duration
 label: Label
+icon: Icon
 properties: Properties
 description: Description
 initials: Initials
@@ -1171,6 +1172,7 @@ reason: "Reason: {reason}"
 groupBy: Group by
 indeterminate: indeterminate
 noMatchFor: No results matching "{search}". Press {key} to add it.
+noMatch: No results
 enterKey: enter
 general: General
 enterValidUrl: Please enter a valid URL

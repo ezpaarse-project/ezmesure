@@ -1124,7 +1124,7 @@ value: Valeur
 status: Statut
 date: Date
 duration: Durée
-label: Label
+icon: Icône
 properties: Propriétés
 description: Description
 initials: Initiales
@@ -1190,6 +1190,7 @@ reason: 'Raison : {reason}'
 groupBy: Regrouper par
 indeterminate: indéterminée
 noMatchFor: Aucune correspondance pour "{search}". Appuyez sur {key} pour l'ajouter.
+noMatch: Aucune correspondance
 enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide

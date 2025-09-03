@@ -24,6 +24,30 @@
 
           <v-col cols="12" sm="6">
             <v-text-field
+              :model-value="role.icon"
+              :label="$t('icon')"
+              :prepend-icon="role.icon || 'mdi-tag-outline'"
+              variant="underlined"
+              hide-details="auto"
+              clearable
+              readonly
+              @click:clear="role.icon = null"
+            >
+              <v-menu
+                v-model="showIconMenu"
+                activator="parent"
+                :close-on-content-click="false"
+              >
+                <IconPicker
+                  v-model="role.icon"
+                  @update:model-value="showIconMenu = false"
+                />
+              </v-menu>
+            </v-text-field>
+          </v-col>
+
+          <v-col cols="12">
+            <v-text-field
               v-model="role.label"
               :label="$t('label')"
               prepend-icon="mdi-label-outline"
@@ -128,6 +152,7 @@ const idRules = [
   (v) => (!v || ID_PATTERN.test(v)) || t('fieldMustMatch', { pattern: ID_PATTERN.toString() }),
 ];
 
+const showIconMenu = shallowRef(false);
 const saving = shallowRef(false);
 const valid = shallowRef(false);
 const role = ref({
