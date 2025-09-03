@@ -264,7 +264,7 @@ exports.removeInstitutionMemberRole = async (ctx) => {
     }
 
     if (membershipRole.role.restricted && !user.isAdmin) {
-      ctx.throw(403, ctx.$t('errors.role.restricted'));
+      ctx.throw(403, ctx.$t('errors.role.restricted', roleId));
     }
 
     await membershipRolesService.delete({
@@ -286,11 +286,11 @@ exports.addInstitutionMemberRole = async (ctx) => {
     const role = await memberRoleService.findUnique({ where: { id: roleId } });
 
     if (!role) {
-      ctx.throw(404, ctx.$t('errors.role.notFound'));
+      ctx.throw(404, ctx.$t('errors.role.notFound', role.id));
     }
 
     if (role.restricted && !user.isAdmin) {
-      ctx.throw(403, ctx.$t('errors.role.restricted'));
+      ctx.throw(403, ctx.$t('errors.role.restricted', role.id));
     }
 
     return membershipsService.update({
