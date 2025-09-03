@@ -1095,8 +1095,8 @@ customFields:
   multivalued: Multivalué
   helpUrl: URL d'aide
   itemUrl: URL de la page de l'établissement
-  labelFr: Label en français
-  labelEn: Label en anglais
+  labelFr: Libellé en français
+  labelEn: Libellé en anglais
   descriptionFr: Description en français
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
@@ -1124,6 +1124,7 @@ value: Valeur
 status: Statut
 date: Date
 duration: Durée
+label: Libellé
 icon: Icône
 properties: Propriétés
 description: Description
