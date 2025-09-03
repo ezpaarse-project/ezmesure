@@ -2426,6 +2426,7 @@
           "id": { "type": "string" },
           "createdAt": { "$ref": "#/components/schemas/ItemCreationDate" },
           "updatedAt": { "$ref": "#/components/schemas/ItemUpdateDate" },
+          "icon": { "type": "string" },
           "label": { "type": "string" },
           "description": { "type": "string" },
           "restricted": { "type": "boolean" },

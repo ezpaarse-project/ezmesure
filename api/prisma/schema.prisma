@@ -368,6 +368,8 @@ model Role {
   label             String
   /// Description of the role
   description       String?
+  /// ID of the material design icon
+  icon              String?
   /// Whether the role can be attributed by regular users or only by admins
   restricted        Boolean          @default(true)
   /// Permissions preset

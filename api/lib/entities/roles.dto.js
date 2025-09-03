@@ -21,6 +21,7 @@ const schema = {
   id: Joi.string().trim().min(1).pattern(roleIdPattern),
   label: Joi.string().trim().min(1),
   description: Joi.string().trim().allow('').empty(null),
+  icon: Joi.string().trim().allow('').empty(null),
   restricted: Joi.boolean(),
 
   permissionsPreset: Joi.object().allow(null),
