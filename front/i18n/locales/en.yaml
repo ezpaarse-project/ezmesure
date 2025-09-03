@@ -430,10 +430,7 @@ institutions:
     accessRights: Access rights
     institutionManagement: Institution management
     roles: Roles
-    roleNames:
-      contact:doc: Documentary contact
-      contact:tech: Technical contact
-      guest: Guest
+    memberHasNoRole: This member has no role assigned
     featureLabels:
       institution: Institution card
       memberships: Members

@@ -432,10 +432,7 @@ institutions:
     accessRights: Droits d'accès
     institutionManagement: Gestion de l'établissement
     roles: Rôles
-    roleNames:
-      contact:doc: Contact documentaire
-      contact:tech: Contact technique
-      guest: Invité
+    memberHasNoRole: Ce membre n'a pas de rôle assigné
     featureLabels:
       institution: Fiche établissement
       memberships: Membres
