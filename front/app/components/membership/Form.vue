@@ -609,7 +609,9 @@ async function save(actions) {
  * @param {string} role The role name
  */
 function applyRolePreset(role) {
-  const preset = role.permissionsPreset ?? {};
+  const preset = role.permissionsPreset;
+  if (!preset) { return; }
+
   const actions = [];
 
   permissions.value = new Map([
