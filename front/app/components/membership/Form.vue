@@ -624,8 +624,10 @@ function applyRolePreset(role) {
       (repositories.value ?? []).map((r) => [r.pattern, preset.repositories ?? 'none']),
     );
 
+    const aliasLevel = preset.repositories === 'write' ? 'read' : preset.repositories;
+
     repositoryAliasPermissions.value = new Map(
-      (repositoryAliases.value ?? []).map((a) => [a.pattern, preset.repositoryAliases ?? 'none']),
+      (repositoryAliases.value ?? []).map((a) => [a.pattern, aliasLevel ?? 'none']),
     );
 
     actions.push(saveRepoPermissions);
