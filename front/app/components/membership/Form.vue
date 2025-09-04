@@ -612,7 +612,7 @@ function applyRolePreset(role) {
   const preset = role.permissionsPreset;
   if (!preset) { return; }
 
-  const actions = [];
+  const actions = [saveMembership];
 
   permissions.value = new Map([
     ['institution', preset.institution ?? 'none'],
