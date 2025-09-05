@@ -169,7 +169,7 @@
       </template>
 
       <template #[`item.institution.name`]="{ item }">
-        <nuxt-link :href="`/admin/institutions/${item.institution.id}`">
+        <nuxt-link v-if="item.institution" :href="`/admin/institutions/${item.institution.id}`">
           {{ item.institution.name }}
         </nuxt-link>
       </template>
