@@ -370,6 +370,8 @@ model Role {
   description       String?
   /// ID of the material design icon
   icon              String?
+  /// The HEX display color of the role
+  color             String?
   /// Whether the role can be attributed by regular users or only by admins
   restricted        Boolean          @default(true)
   /// Permissions preset

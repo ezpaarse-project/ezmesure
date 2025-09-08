@@ -22,6 +22,7 @@ const schema = {
   label: Joi.string().trim().min(1),
   description: Joi.string().trim().allow('').empty(null),
   icon: Joi.string().trim().allow('').empty(null),
+  color: Joi.string().pattern(/^#([A-F0-9]{6})$/i).allow('').empty(null),
   restricted: Joi.boolean(),
 
   permissionsPreset: Joi.object().allow(null),
