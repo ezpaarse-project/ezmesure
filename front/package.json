@@ -29,7 +29,7 @@
     "pinia": "^3.0.3",
     "pretty-bytes": "^7.0.0",
     "sass": "^1.89.2",
-    "vuetify": "^3.9.2",
+    "vuetify": "^3.9.7",
     "vuetify-nuxt-module": "^0.18.7"
   },
   "overrides": {
