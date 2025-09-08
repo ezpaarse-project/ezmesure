@@ -2426,8 +2426,14 @@
           "id": { "type": "string" },
           "createdAt": { "$ref": "#/components/schemas/ItemCreationDate" },
           "updatedAt": { "$ref": "#/components/schemas/ItemUpdateDate" },
-          "icon": { "type": "string" },
-          "label": { "type": "string" },
+          "icon": {
+            "type": "string",
+            "example": "mdi-account"
+          },
+          "label": {
+            "type": "string",
+            "example": "Technical contact"
+          },
           "description": { "type": "string" },
           "restricted": { "type": "boolean" },
           "color": {
@@ -6188,7 +6194,13 @@
                             "roles": {
                               "type": "array",
                               "items": {
-                                "type": "string"
+                                "type": "object",
+                                "properties": {
+                                  "id": { "$ref": "#/components/schemas/Role/properties/id" },
+                                  "label": { "$ref": "#/components/schemas/Role/properties/label" },
+                                  "icon": { "$ref": "#/components/schemas/Role/properties/icon" },
+                                  "color": { "$ref": "#/components/schemas/Role/properties/color" }
+                                }
                               }
                             }
                           }
