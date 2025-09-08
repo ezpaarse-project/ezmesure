@@ -17,7 +17,7 @@ function sendValidateInstitution(receivers) {
     to: receivers,
     cc: supportRecipients,
     subject: 'Votre établissement a été validé',
-    ...generateMail('validated-institution'),
+    ...generateMail('validate-institution'),
   });
 }
 
