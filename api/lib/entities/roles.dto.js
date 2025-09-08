@@ -65,6 +65,7 @@ const adminUpsertSchema = withModifiers(
   ignoreFields(immutableFields),
   withDefaults({
     restricted: true,
+    exposed: false,
     permissionsPreset: [],
   }),
   nullMissing(Object.keys(schema)),
