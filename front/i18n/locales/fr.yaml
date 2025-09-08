@@ -1024,6 +1024,7 @@ roles:
   restricted: Restreint
   onlyAdmins: Assignable uniquement par les administrateurs
   notOnlyAdmins: Assignable par les utilisateurs
+  exposeMembers: Exposer sur la page des partenaires
   assignments: Assignations
   definePermissionsPreset: Définir des permissions par défaut
 elasticRoles:

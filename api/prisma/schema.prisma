@@ -374,6 +374,8 @@ model Role {
   color             String?
   /// Whether the role can be attributed by regular users or only by admins
   restricted        Boolean          @default(true)
+  /// Whether assigned members should be publicly exposed
+  exposed           Boolean          @default(false)
   /// Permissions preset
   permissionsPreset Json?
   /// ID of the institution, if the role is scoped to an institution

@@ -2435,6 +2435,7 @@
             "example": "#458df9",
             "type": "string"
           },
+          "exposed": { "type": "boolean" },
           "permissionsPreset": {
             "type": "object",
             "nullable": true,

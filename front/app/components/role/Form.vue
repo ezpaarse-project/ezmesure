@@ -91,6 +91,14 @@
               hide-details
             />
             <v-checkbox
+              v-model="role.exposed"
+              :label="$t('roles.exposeMembers')"
+              density="compact"
+              color="primary"
+              prepend-icon="mdi-earth"
+              hide-details
+            />
+            <v-checkbox
               :model-value="hasPresets"
               :label="$t('roles.definePermissionsPreset')"
               density="compact"
