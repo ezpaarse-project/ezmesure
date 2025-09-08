@@ -2430,6 +2430,11 @@
           "label": { "type": "string" },
           "description": { "type": "string" },
           "restricted": { "type": "boolean" },
+          "color": {
+            "description": "Role color",
+            "example": "#458df9",
+            "type": "string"
+          },
           "permissionsPreset": {
             "type": "object",
             "nullable": true,

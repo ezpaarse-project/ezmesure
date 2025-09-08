@@ -24,6 +24,31 @@
 
           <v-col cols="12" sm="6">
             <v-text-field
+              v-model="role.label"
+              :label="$t('label')"
+              prepend-icon="mdi-label-outline"
+              variant="underlined"
+              hide-details="auto"
+            />
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-color-input
+              v-model="role.color"
+              :label="$t('color')"
+              :modes="['hex']"
+              :swatches="genericColorPalette"
+              hide-details="auto"
+              color-pip
+              clearable
+              mode="hex"
+              show-swatches
+              variant="underlined"
+            />
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-text-field
               :model-value="role.icon"
               :label="$t('icon')"
               :prepend-icon="role.icon || 'mdi-tag-outline'"
@@ -44,16 +69,6 @@
                 />
               </v-menu>
             </v-text-field>
-          </v-col>
-
-          <v-col cols="12">
-            <v-text-field
-              v-model="role.label"
-              :label="$t('label')"
-              prepend-icon="mdi-label-outline"
-              variant="underlined"
-              hide-details="auto"
-            />
           </v-col>
 
           <v-col cols="12">

@@ -52,3 +52,10 @@ export const httpStatusColors = {
     return undefined;
   },
 };
+
+export const genericColorPalette = [
+  ['#E6194B', '#3CB44B', '#FFE119', '#4363D8', '#F58231'],
+  ['#911EB4', '#42D4F4', '#F032E6', '#BFEF45', '#FABED4'],
+  ['#469990', '#DCBEFF', '#9A6324', '#FFFAC8', '#800000'],
+  ['#AAFFC3', '#808000', '#FFD8B1', '#000075', '#A9A9A9'],
+];

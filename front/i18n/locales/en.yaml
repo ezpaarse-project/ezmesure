@@ -1104,6 +1104,7 @@ date: Date
 duration: Duration
 label: Label
 icon: Icon
+color: Color
 properties: Properties
 description: Description
 initials: Initials
