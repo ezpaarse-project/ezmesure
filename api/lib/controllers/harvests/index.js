@@ -13,6 +13,9 @@ const {
   standardQueryParams,
   getHarvests,
   deleteHarvestsByQuery,
+
+  getInstitutionsMatrix,
+  getEndpointsMatrix,
 } = require('./actions');
 
 router.use(
@@ -57,6 +60,36 @@ router.route({
       }).required(),
       status: Joi.string().trim(),
     }),
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/_institutions-matrix',
+  handler: [
+    getInstitutionsMatrix,
+  ],
+  validate: {
+    query: {
+      retryCode: Joi.number(),
+      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/_endpoints-matrix',
+  handler: [
+    getEndpointsMatrix,
+  ],
+  validate: {
+    query: {
+      retryCode: Joi.number().integer(),
+      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+    },
   },
 });
 
