@@ -1,6 +1,9 @@
 const HTTPError = require('../../models/HTTPError');
 
 const HarvestSessionService = require('../../entities/harvest-session.service');
+const HarvestService = require('../../entities/harvest.service');
+const InstitutionsService = require('../../entities/institutions.service');
+const EndpointsService = require('../../entities/sushi-endpoints.service');
 
 const { harvestQueue } = require('../../services/jobs');
 
@@ -10,6 +13,7 @@ const { appLogger } = require('../../services/logger');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 
+const MATRIX_CACHE_DURATION = 5 * 60 * 1000;
 const JOBS_CACHE_DURATION = 5 * 60 * 1000;
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -441,4 +445,113 @@ exports.stopOne = async (ctx) => {
     ...session,
     status: 'stopping',
   };
+};
+
+const cache = new Map();
+
+async function computeMatrix(id, query) {
+  const data = { requestedAt: new Date() };
+
+  try {
+    cache.set(id, data);
+
+    const { sessionId } = query;
+
+    const harvests = new HarvestService();
+    const institutions = new InstitutionsService();
+    const endpoints = new EndpointsService();
+
+    // Generate matrix
+    const matrix = await harvests.getMatrix(
+      (harvest) => harvest.credentials.endpointId,
+      (harvest) => harvest.credentials.institutionId,
+      {
+        where: {
+          harvestedBy: {
+            sessionId,
+          },
+        },
+        include: {
+          credentials: {
+            select: { endpointId: true, institutionId: true },
+          },
+        },
+      },
+    );
+
+    // Resolve headers
+    const [columns, rows] = await Promise.all([
+      institutions.findMany({ where: { id: { in: matrix.headers.columns } } }),
+      endpoints.findMany({ where: { id: { in: matrix.headers.rows } } }),
+    ]);
+
+    const institutionMap = new Map(rows.map((institution) => [institution.id, institution]));
+    const endpointMap = new Map(rows.map((endpoint) => [endpoint.id, endpoint]));
+
+    // Cache matrix
+    data.generatedAt = new Date();
+    data.matrix = {
+      ...matrix,
+      headers: {
+        columns,
+        rows,
+      },
+      rows: matrix.rows
+        // Sort cells by institution
+        .map((row) => ({
+          ...row,
+          cells: row.cells.toSorted((cellA, cellB) => {
+            const institutionA = institutionMap.get(cellA.columnId) ?? { name: '' };
+            const institutionB = institutionMap.get(cellB.columnId) ?? { name: '' };
+            return institutionA.name.localeCompare(institutionB.name);
+          }),
+        }))
+        // Sort rows by vendor
+        .sort((rowA, rowB) => {
+          const endpointA = endpointMap.get(rowA.id) ?? { vendor: '' };
+          const endpointB = endpointMap.get(rowB.id) ?? { vendor: '' };
+          return endpointA.vendor.localeCompare(endpointB.vendor);
+        }),
+    };
+
+    cache.set(id, data);
+  } catch (error) {
+    // Cache error
+    data.error = error;
+    cache.set(id, data);
+  } finally {
+    // Delete cache when it expires
+    setTimeout(() => {
+      cache.delete(id);
+    }, MATRIX_CACHE_DURATION);
+  }
+}
+
+exports.getMatrix = async (ctx) => {
+  const { harvestId } = ctx.params;
+  const { retryCode = 202 } = ctx.request.query;
+
+  const query = { sessionId: harvestId };
+
+  const requestId = JSON.stringify(query);
+  const cached = cache.get(requestId);
+
+  if (!cached) {
+    // Don't await promise so it runs in the background
+    computeMatrix(requestId, query);
+
+    ctx.type = 'json';
+    ctx.status = retryCode;
+    ctx.body = { requestedAt: new Date() };
+    return;
+  }
+
+  if (cached.error) {
+    ctx.throw(500, cached.error);
+    return;
+  }
+
+  ctx.type = 'json';
+  ctx.status = cached.matrix ? 200 : retryCode;
+  ctx.body = cached;
 };
