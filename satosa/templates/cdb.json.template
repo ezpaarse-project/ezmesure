@@ -1,0 +1,8 @@
+{
+  "dex": {
+    "response_types": ["code"],
+    "client_id": "dex",
+    "client_secret": "dex-secret",
+    "redirect_uris": ["${EZMESURE_PUBLIC_URL}/auth/callback"]
+  }
+}

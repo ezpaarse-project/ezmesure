@@ -1,0 +1,4 @@
+upstream satosa_server {
+  zone upstream_dynamic 64k;
+  server ${SATOSA_HOST} max_fails=0  resolve;
+}

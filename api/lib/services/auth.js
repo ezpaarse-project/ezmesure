@@ -1,5 +1,8 @@
 const { auth } = require('config');
-const jwt = require('koa-jwt');
+const jwt = require('jsonwebtoken');
+
+const openid = require('../utils/openid');
+
 const InstitutionsService = require('../entities/institutions.service');
 const SushiEndpointService = require('../entities/sushi-endpoints.service');
 const SushiCredentialsService = require('../entities/sushi-credentials.service');
@@ -8,18 +11,164 @@ const RepositoriesService = require('../entities/repositories.service');
 const RepositoryAliasesService = require('../entities/repository-aliases.service');
 const SpacesService = require('../entities/spaces.service');
 
+const { triggerHooks } = require('../hooks/hookEmitter');
+
 const { MEMBER_ROLES } = require('../entities/memberships.dto');
 
 const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
 
-const requireJwt = jwt({
-  secret: auth.secret,
-  cookie: auth.cookie,
-  key: 'jwtdata',
-});
+/**
+ * Get JWT data of cookie using OpenID provider
+ *
+ * @param {string} cookie - The cookie found in request
+ *
+ * @returns {Promise<{ type: 'oauth', token: string, data: unknown }>}
+ */
+async function getJWTDataFromCookie(cookie) {
+  let data;
 
+  try {
+    data = await openid.getTokenInfo(cookie);
+  } catch {
+    throw new Error("Can't get token");
+  }
+
+  if (!data.active) {
+    throw new Error('Token is revoked');
+  }
+
+  return {
+    type: 'oauth',
+    token: cookie,
+    data,
+  };
+}
+
+/**
+ * Get JWT data of header using JWT methods
+ *
+ * @param {string} header - The header found in request
+ *
+ * @returns {Promise<{ type: 'old_jwt', token: string, data: unknown }>}
+ */
+function getJWTDataFromAuthHeader(header) {
+  const matches = /Bearer (?<token>.+)/i.exec(header);
+  const { token } = matches.groups ?? {};
+  if (!token) {
+    throw new Error("Can't get token");
+  }
+
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, auth.secret, {}, (err, data) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve({
+        type: 'old_jwt',
+        token,
+        data,
+      });
+    });
+  });
+}
+
+/**
+ * Check if request have a valid JWT, and decode it's cotent
+ *
+ * @param {import('koa').Context} ctx - Koa context
+ * @param {import('koa').Next} next - Next handler
+ */
+const requireJwt = async (ctx, next) => {
+  let jwtData = {};
+
+  try {
+    const cookie = ctx.cookies.get(auth.cookie);
+    if (cookie) {
+      jwtData = await getJWTDataFromCookie(cookie);
+    }
+
+    const authHeader = ctx.get('authorization');
+    if (authHeader) {
+      jwtData = await getJWTDataFromAuthHeader(authHeader);
+    }
+  } catch {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+
+  if (!jwtData.token || !jwtData.data) {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+
+  ctx.state.jwtData = jwtData;
+  await next();
+};
+
+/**
+ * Get username from OAuth (using OpenID provider)
+ *
+ * @param {string} token - The token found in request
+ * @param {unknown} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data
+ */
+async function getUsernameFromOAuth(token, data) {
+  const userProps = openid.getUserFromInfo(
+    await openid.getUserInfo(token, data.sub),
+  );
+
+  return userProps.username;
+}
+
+/**
+ * Get username from old jwt
+ *
+ * @param {string} token - The token found in request
+ * @param {unknown} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
+ */
+function getUsernameFromOldJWT(token, data) {
+  return Promise.resolve(data.username);
+}
+
+/**
+ * Check if request have a valid user
+ *
+ * Needs `requireJWT`
+ *
+ * @param {import('koa').Context} ctx - Koa context
+ * @param {import('koa').Next} next - Next handler
+ */
 const requireUser = async (ctx, next) => {
-  const username = ctx.state?.jwtdata?.username;
+  const { jwtData } = ctx.state ?? {};
+
+  if (!jwtData?.token || !jwtData?.data) {
+    ctx.throw(401, ctx.$t('errors.auth.noUsername'));
+    return;
+  }
+
+  let username;
+
+  try {
+    switch (jwtData.type) {
+      case 'oauth':
+        username = await getUsernameFromOAuth(jwtData.token, jwtData.data);
+        break;
+      case 'old_jwt':
+        username = await getUsernameFromOldJWT(jwtData.token, jwtData.data);
+        break;
+
+      default:
+        throw new Error('JWT type unsupported');
+    }
+  } catch {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
 
   if (!username) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
@@ -27,7 +176,6 @@ const requireUser = async (ctx, next) => {
   }
 
   const usersService = new UsersService();
-
   const user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
@@ -37,6 +185,7 @@ const requireUser = async (ctx, next) => {
 
   ctx.state.user = user;
   ctx.state.userIsAdmin = user.isAdmin;
+  triggerHooks('user:action', user);
 
   await next();
 };
