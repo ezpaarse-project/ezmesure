@@ -2442,6 +2442,12 @@
             "type": "string"
           },
           "exposed": { "type": "boolean" },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "permissionsPreset": {
             "type": "object",
             "nullable": true,

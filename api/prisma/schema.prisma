@@ -374,6 +374,8 @@ model Role {
   color             String?
   /// Whether the role can be attributed by regular users or only by admins
   restricted        Boolean          @default(true)
+  /// A list of notification types that come with the role
+  notifications     String[]
   /// Whether assigned members should be publicly exposed
   exposed           Boolean          @default(false)
   /// Permissions preset

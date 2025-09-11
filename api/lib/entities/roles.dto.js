@@ -26,6 +26,8 @@ const schema = {
   restricted: Joi.boolean(),
   exposed: Joi.boolean(),
 
+  notifications: Joi.array().items(Joi.string().trim().min(1)),
+
   permissionsPreset: Joi.object().allow(null),
 
   institutionId: Joi.string().allow(null),
@@ -66,6 +68,7 @@ const adminUpsertSchema = withModifiers(
   withDefaults({
     restricted: true,
     exposed: false,
+    notifications: [],
     permissionsPreset: [],
   }),
   nullMissing(Object.keys(schema)),
