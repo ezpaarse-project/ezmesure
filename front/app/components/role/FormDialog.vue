@@ -30,20 +30,19 @@
       </v-empty-state>
     </v-card>
 
-    <MembershipForm
+    <RoleForm
       v-else
-      :model-value="membershipData"
-      @update:model-value="onSave()"
+      :model-value="roleData"
+      @submit="onSave($event)"
     >
-      <template #actions="{ loading: formLoading }">
+      <template #actions>
         <v-btn
-          :text="$t('close')"
-          :disabled="formLoading"
+          :text="$t('cancel')"
           variant="text"
           @click="isOpen = false"
         />
       </template>
-    </MembershipForm>
+    </RoleForm>
   </v-dialog>
 </template>
 
@@ -51,16 +50,15 @@
 import { getErrorMessage } from '@/lib/errors';
 
 const emit = defineEmits({
-  'update:modelValue': (item) => !!item,
+  submit: (item) => !!item,
 });
 
 const { t } = useI18n();
 
 const isOpen = shallowRef(false);
-const username = shallowRef(null);
-const institutionId = shallowRef(null);
+const roleId = shallowRef(null);
 
-const membershipData = ref(null);
+const roleData = ref(null);
 const loading = shallowRef(false);
 const errorMessage = shallowRef('');
 const errorIcon = shallowRef('');
@@ -71,18 +69,14 @@ const dialogMaxWidth = computed(() => {
 });
 
 async function refreshForm() {
-  if (!institutionId.value || !username.value) {
+  if (!roleId.value) {
     return;
   }
 
   loading.value = true;
 
   try {
-    membershipData.value = await $fetch(`/api/institutions/${institutionId.value}/memberships/${username.value}`, {
-      query: {
-        include: ['institution', 'user', 'roles.role'],
-      },
-    });
+    roleData.value = await $fetch(`/api/roles/${roleId.value}`);
   } catch (err) {
     errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
     errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
@@ -91,20 +85,20 @@ async function refreshForm() {
   loading.value = false;
 }
 
-async function open(membership) {
-  membershipData.value = null;
+async function open(role) {
+  roleData.value = null;
   loading.value = false;
   errorMessage.value = '';
   errorIcon.value = '';
 
-  institutionId.value = membership?.institutionId;
-  username.value = membership?.username;
+  roleId.value = role?.id;
   isOpen.value = true;
   await refreshForm();
 }
 
-function onSave() {
-  emit('update:modelValue', membershipData.value);
+function onSave(role) {
+  emit('submit', role);
+  isOpen.value = false;
 }
 
 defineExpose({

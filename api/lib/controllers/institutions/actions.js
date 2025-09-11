@@ -6,6 +6,8 @@ const InstitutionsService = require('../../entities/institutions.service');
 const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
@@ -242,7 +244,11 @@ exports.updateInstitution = async (ctx) => {
       where: {
         institutionId: ctx.state.institution.id,
         roles: {
-          hasSome: [DOC_CONTACT, TECH_CONTACT],
+          some: {
+            role: {
+              notifications: { has: NOTIFICATION_TYPES.institutionValidated },
+            },
+          },
         },
       },
       include: { user: true },

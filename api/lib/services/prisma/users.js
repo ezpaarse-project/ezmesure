@@ -4,12 +4,7 @@ const { client: prisma } = require('./index');
 
 const adminUsername = config.get('admin.username');
 
-const {
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('../../entities/memberships.dto');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
 /**
@@ -108,7 +103,13 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
       memberships: {
         some: {
           roles: {
-            hasSome: [DOC_CONTACT, TECH_CONTACT],
+            some: {
+              role: {
+                notifications: {
+                  has: NOTIFICATION_TYPES.newUserMatchingInstitution,
+                },
+              },
+            },
           },
         },
       },

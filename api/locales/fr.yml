@@ -118,6 +118,7 @@ errors:
   role:
     notFound: Rôle [%s] introuvable
     alreadyExists: Le rôle [%s] existe déjà
+    restricted: Le rôle [%s] n'est assignable que par les administrateurs
 
   space:
     notFound: Espace [%s] introuvable

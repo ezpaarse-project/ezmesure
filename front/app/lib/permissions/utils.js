@@ -13,3 +13,9 @@ export const featureScopes = [
   'sushi',
   'reporting',
 ];
+
+export const presetScopes = [
+  ...featureScopes,
+  'repositories',
+  'spaces',
+];

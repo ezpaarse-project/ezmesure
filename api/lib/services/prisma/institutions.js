@@ -3,11 +3,9 @@ const { client: prisma, Prisma } = require('./index');
 
 const {
   PERMISSIONS,
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
 } = require('../../entities/memberships.dto');
+
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
 /**
@@ -62,7 +60,6 @@ function createAsUser(institution, username, tx = prisma) {
             },
           },
           permissions: [...PERMISSIONS],
-          roles: [DOC_CONTACT, TECH_CONTACT],
           locked: true,
         }],
       },
@@ -276,11 +273,16 @@ function getContacts(institutionId, tx = prisma) {
     where: {
       institutionId,
       roles: {
-        hasSome: [DOC_CONTACT, TECH_CONTACT],
+        some: {
+          role: {
+            notifications: { has: NOTIFICATION_TYPES.generalCommunication },
+          },
+        },
       },
     },
     include: {
       user: true,
+      roles: true,
     },
   });
 }

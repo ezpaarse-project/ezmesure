@@ -7,6 +7,7 @@ const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
 
 const { client: prisma } = require('../../services/prisma');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 const sender = config.get('notifications.sender');
 const recipients = config.get('notifications.recipients');
@@ -50,7 +51,13 @@ async function sendEndMail(session) {
       // Get current contacts
       memberships: {
         where: {
-          roles: { hasSome: ['contact:doc', 'contact:tech'] },
+          roles: {
+            some: {
+              role: {
+                notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
+              },
+            },
+          },
         },
         include: {
           user: true,
