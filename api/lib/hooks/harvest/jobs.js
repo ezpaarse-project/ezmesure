@@ -7,6 +7,7 @@ const { appLogger } = require('../../services/logger');
 const { SUSHI_CODES } = require('../../services/sushi');
 
 const HarvestService = require('../../entities/harvest.service');
+const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestSessionService = require('../../entities/harvest-session.service');
 
 /* eslint-disable max-len */
@@ -91,8 +92,17 @@ const onHarvestJobUpdate = async (harvestJob) => {
       }),
     );
 
-    // Check if session is still active, if not: trigger hook as session ended
-    if (!HarvestSessionService.isActive(session)) {
+    // Check if a job is still active, if not: trigger hook as session ended
+    const harvestJobsService = new HarvestJobsService(harvestService);
+    const activeJob = await harvestJobsService.findFirst({
+      where: {
+        sessionId: session.id,
+        status: {
+          notIn: HarvestJobsService.endStatuses,
+        },
+      },
+    });
+    if (!activeJob) {
       triggerHooks('harvest-session:end', session);
     }
   });
