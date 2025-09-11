@@ -82,6 +82,23 @@
           </v-col>
 
           <v-col cols="12">
+            <v-autocomplete
+              v-model="role.notifications"
+              :label="$t('roles.notifiateUserWhen')"
+              :items="availableNotifications"
+              prepend-icon="mdi-bell"
+              variant="underlined"
+              item-value="id"
+              item-title="text"
+              multiple
+              chips
+              small-chips
+              hide-details
+              closable-chips
+            />
+          </v-col>
+
+          <v-col cols="12">
             <v-checkbox
               v-model="role.restricted"
               :label="$t('roles.onlyAdmins')"
@@ -188,6 +205,17 @@ const originalId = computed(() => props.modelValue?.id);
 const isEditing = computed(() => !!originalId.value);
 
 const hasPresets = computed(() => !!role.value.permissionsPreset);
+
+const getNotificationItem = (id) => ({ id, text: t(`roles.notificationTypes.${id}`) });
+
+const availableNotifications = ref([
+  getNotificationItem('institution:general_communication'),
+  getNotificationItem('institution:validated'),
+  getNotificationItem('institution:role_assigned'),
+  getNotificationItem('institution:new_user_matching_institution'),
+  getNotificationItem('institution:membership_request'),
+  getNotificationItem('counter:new_data_available'),
+]);
 
 /**
  * Available features

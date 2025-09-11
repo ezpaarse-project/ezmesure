@@ -1005,8 +1005,16 @@ roles:
   onlyAdmins: Only assignable by administrators
   notOnlyAdmins: Assignable by users
   exposeMembers: Expose on the partner page
+  notifiateUserWhen: Notifications received by the user
   assignments: Assignments
   definePermissionsPreset: Define permissions presets
+  notificationTypes:
+    'institution:general_communication': General communication addressed to institutions
+    'institution:validated': His institution has been validated
+    'institution:role_assigned': The role has been assigned to him
+    'institution:new_user_matching_institution': A user who is part of the institution has signed up
+    'institution:membership_request': A user has requested to join the institution
+    'counter:new_data_available': New COUNTER data is available
 elasticRoles:
   toolbarTitle: Elastic Roles ({count})
   newRole: New role
