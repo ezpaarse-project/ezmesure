@@ -1009,7 +1009,6 @@ roles:
   assignments: Assignments
   definePermissionsPreset: Define permissions presets
   notificationTypes:
-    'institution:general_communication': General communication addressed to institutions
     'institution:validated': His institution has been validated
     'institution:role_assigned': The role has been assigned to him
     'institution:new_user_matching_institution': A user who is part of the institution has signed up

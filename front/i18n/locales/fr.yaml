@@ -1029,7 +1029,6 @@ roles:
   assignments: Assignations
   definePermissionsPreset: Définir des permissions par défaut
   notificationTypes:
-    'institution:general_communication': Communication générale à destination des établissements
     'institution:validated': Son établissement a été validé
     'institution:role_assigned': Le rôle lui a été assigné
     'institution:new_user_matching_institution': Un utilisateur faisant partie de l'établissement s'est inscrit

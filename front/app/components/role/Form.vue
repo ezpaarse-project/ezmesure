@@ -209,7 +209,6 @@ const hasPresets = computed(() => !!role.value.permissionsPreset);
 const getNotificationItem = (id) => ({ id, text: t(`roles.notificationTypes.${id}`) });
 
 const availableNotifications = ref([
-  getNotificationItem('institution:general_communication'),
   getNotificationItem('institution:validated'),
   getNotificationItem('institution:role_assigned'),
   getNotificationItem('institution:new_user_matching_institution'),
