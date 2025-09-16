@@ -30,9 +30,6 @@ const schema = {
 
   permissionsPreset: Joi.object().allow(null),
 
-  institutionId: Joi.string().allow(null),
-  institution: Joi.object(),
-
   membershipRoles: Joi.array().items(Joi.object()),
 };
 
@@ -42,7 +39,6 @@ const schema = {
 const immutableFields = [
   'updatedAt',
   'createdAt',
-  'institution',
   'membershipRoles',
 ];
 
@@ -50,8 +46,6 @@ const immutableFields = [
  * Fields that can be populated with related items
  */
 const includableFields = [
-  'institution',
-  'institution.memberships',
   'membershipRoles',
   'membershipRoles.membership',
   'membershipRoles.membership.user',

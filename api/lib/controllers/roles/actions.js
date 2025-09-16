@@ -17,17 +17,15 @@ exports.standardQueryParams = standardQueryParams;
 exports.getAll = async (ctx) => {
   const {
     endpointId,
-    institutionId,
     tags,
     packages,
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
-  if (institutionId || endpointId || tags || packages) {
+  if (endpointId || tags || packages) {
     prismaQuery.where.credentials = {
       endpointId: queryToPrismaFilter(endpointId),
-      institutionId: queryToPrismaFilter(institutionId),
       tags: tags && { hasSome: stringOrArray(tags) },
       packages: packages && { hasSome: stringOrArray(packages) },
     };
@@ -74,19 +72,10 @@ exports.upsertOne = async (ctx) => {
       where: { id: roleId },
     });
 
-    const createData = { ...body, institutionId: undefined };
-    const updateData = { ...body, institutionId: undefined };
-
-    if (!body.institutionId) {
-      updateData.institution = { disconnect: true };
-    } else if (body.institutionId !== existingRole?.institutionId) {
-      updateData.institution = { connect: { id: body.institutionId } };
-    }
-
     const upsertedRole = await service.upsert({
       where: { id: roleId },
-      create: createData,
-      update: updateData,
+      create: { ...body },
+      update: { ...body },
     });
 
     return {

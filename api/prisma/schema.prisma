@@ -66,8 +66,6 @@ model Institution {
   repositoryAliases   RepositoryAlias[]
   /// Custom properties
   customProps         InstitutionProperty[]
-  /// Custom roles
-  roles               Role[]
 }
 
 model InstitutionProperty {
@@ -380,10 +378,6 @@ model Role {
   exposed           Boolean          @default(false)
   /// Permissions preset
   permissionsPreset Json?
-  /// ID of the institution, if the role is scoped to an institution
-  institutionId     String?
-  /// Institution that owns that role, if the role is scoped to an institution
-  institution       Institution?     @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// Creation date
   createdAt         DateTime         @default(now())
   /// Latest update date

@@ -2472,11 +2472,6 @@
               }
             }
           },
-          "institutionId": { "type": "string" },
-          "institution": {
-            "$ref": "#/components/schemas/Institution",
-            "readOnly": true
-          },
           "membershipRoles": {
             "type": "array",
             "readOnly": true,
