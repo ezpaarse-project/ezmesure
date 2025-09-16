@@ -263,30 +263,6 @@ async function removeAll(tx = prisma) {
   return prisma.$transaction(transaction);
 }
 
-/**
- * @param {string} institutionId
- * @param {TransactionClient} [tx]
- * @returns {Promise<Membership[]>}
- */
-function getContacts(institutionId, tx = prisma) {
-  return tx.membership.findMany({
-    where: {
-      institutionId,
-      roles: {
-        some: {
-          role: {
-            notifications: { has: NOTIFICATION_TYPES.generalCommunication },
-          },
-        },
-      },
-    },
-    include: {
-      user: true,
-      roles: true,
-    },
-  });
-}
-
 module.exports = {
   create,
   createAsUser,
@@ -300,5 +276,4 @@ module.exports = {
   validate,
   remove,
   removeAll,
-  getContacts,
 };
