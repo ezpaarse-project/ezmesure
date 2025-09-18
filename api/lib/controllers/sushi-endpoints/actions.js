@@ -231,36 +231,15 @@ async function computeMatrix(id, query) {
     // Resolve headers
     const rows = await institutions.findMany({ where: { id: { in: matrix.headers.rows } } });
 
-    const institutionMap = new Map(rows.map((institution) => [institution.id, institution]));
-
-    // Get count of jobs by status
-    const countsPerStatus = await harvests.groupBy({
-      where,
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-    });
-    const statusCounts = Object.fromEntries(
-      // @ts-ignore
-      // eslint-disable-next-line no-underscore-dangle
-      countsPerStatus.map(({ status, _count }) => [status, _count?._all ?? 0]),
-    );
-
     // Cache matrix
     data.generatedAt = new Date();
+    data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
     data.matrix = {
       ...matrix,
       headers: {
         columns: matrix.headers.columns,
         rows,
       },
-      rows: matrix.rows.sort((rowA, rowB) => {
-        const institutionA = institutionMap.get(rowA.id) ?? { name: '' };
-        const institutionB = institutionMap.get(rowB.id) ?? { name: '' };
-        return institutionA.name.localeCompare(institutionB.name);
-      }),
-      statusCounts,
     };
 
     cache.set(id, data);

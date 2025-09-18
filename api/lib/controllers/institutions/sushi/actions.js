@@ -141,8 +141,6 @@ async function computeMatrix(id, query) {
     // Resolve headers
     const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
 
-    const endpointMap = new Map(rows.map((endpoint) => [endpoint.id, endpoint]));
-
     // Get count of jobs by status
     const countsPerStatus = await harvests.groupBy({
       where,
@@ -159,28 +157,14 @@ async function computeMatrix(id, query) {
 
     // Cache matrix
     data.generatedAt = new Date();
+    data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+    data.statusCounts = statusCounts;
     data.matrix = {
       ...matrix,
       headers: {
-        // Sort periods
-        columns: matrix.headers.columns.sort(),
+        columns: matrix.headers.columns,
         rows,
       },
-      rows: matrix.rows
-        // Sort cells by period
-        .map((row) => ({
-          ...row,
-          cells: row.cells.toSorted(
-            (cellA, cellB) => (cellA.period?.beginDate ?? '').localeCompare(cellB.period?.beginDate ?? ''),
-          ),
-        }))
-        // Sort rows by vendor
-        .sort((rowA, rowB) => {
-          const endpointA = endpointMap.get(rowA.id) ?? { vendor: '' };
-          const endpointB = endpointMap.get(rowB.id) ?? { vendor: '' };
-          return endpointA.vendor.localeCompare(endpointB.vendor);
-        }),
-      statusCounts,
     };
 
     cache.set(id, data);
