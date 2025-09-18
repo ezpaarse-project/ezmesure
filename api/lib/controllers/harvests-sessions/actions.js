@@ -481,15 +481,94 @@ async function computeMatrix(id, query) {
 
     // Resolve headers
     const [columns, rows] = await Promise.all([
-      institutions.findMany({ where: { id: { in: matrix.headers.columns } } }),
+      institutions.findMany({
+        where: { id: { in: matrix.headers.columns } },
+        orderBy: { name: 'asc' },
+      }),
       endpoints.findMany({ where: { id: { in: matrix.headers.rows } } }),
     ]);
 
-    const institutionMap = new Map(rows.map((institution) => [institution.id, institution]));
-    const endpointMap = new Map(rows.map((endpoint) => [endpoint.id, endpoint]));
+    // Aggregate institutions into a one line matrix
+    // cause we use cells instead of harvest (for performance reasons)
+    // we need to aggregate manually
+    const summary = new Map();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const row of matrix.rows) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const cell of row.cells) {
+        if (cell.total <= 0) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        const entry = summary.get(cell.columnId) ?? {};
+
+        entry.id = cell.columnId;
+
+        // Keep last harvestedAt
+        if ((entry.harvestedAt ?? 0) <= (cell.harvestedAt ?? 0)) {
+          entry.harvestedAt = cell.harvestedAt;
+        }
+
+        // Aggregate counter versions
+        entry.counterVersions = new Set([
+          ...(entry.counterVersions ?? []),
+          ...(cell.counterVersions ?? []),
+        ]);
+        // Aggregate errors
+        entry.errors = new Set([
+          ...(entry.errors ?? []),
+          ...(cell.errors ?? []),
+        ]);
+        // Aggregate report ids
+        entry.reportIds = new Set([
+          ...(entry.reportIds ?? []),
+          ...(cell.reportIds ?? []),
+        ]);
+
+        // Aggregate period
+        entry.period = entry.period ?? cell.period ?? {};
+        if ((entry.period?.beginDate ?? 0) >= (cell.period?.beginDate ?? 0)) {
+          entry.period.beginDate = cell.period?.beginDate ?? 0;
+        }
+        if ((entry.period?.endDate ?? 0) <= (cell.period?.endDate ?? 0)) {
+          entry.period.endDate = cell.period?.endDate ?? 0;
+        }
+
+        // Aggregate counts into one cell
+        entry.total = (entry.total ?? 0) + cell.total;
+        entry.counts = entry.counts ?? {};
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [status, count] of Object.entries(cell.counts ?? {})) {
+          entry.counts[status] = (entry.counts[status] ?? 0) + count;
+        }
+
+        entry.items = {
+          inserted: (entry.items?.inserted ?? 0) + (cell.items?.inserted ?? 0),
+          updated: (entry.items?.updated ?? 0) + (cell.items?.updated ?? 0),
+          failed: (entry.items?.failed ?? 0) + (cell.items?.failed ?? 0),
+        };
+
+        summary.set(cell.columnId, entry);
+      }
+    }
+    // Get status of each summary cell
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [, entry] of summary) {
+      // Define status based on counts
+      ([[entry.status] = []] = Object.entries(entry.counts)
+        .sort(([, aValue], [, bValue]) => bValue - aValue));
+
+      // Array-ify errors and counter versions
+      entry.counterVersions = Array.from(entry.counterVersions).sort();
+      entry.errors = Array.from(entry.errors).sort();
+      entry.reportIds = Array.from(entry.reportIds).sort();
+    }
 
     // Cache matrix
     data.generatedAt = new Date();
+    data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+    data.summary = Array.from(summary.values());
     data.matrix = {
       ...matrix,
       headers: {
@@ -501,17 +580,11 @@ async function computeMatrix(id, query) {
         .map((row) => ({
           ...row,
           cells: row.cells.toSorted((cellA, cellB) => {
-            const institutionA = institutionMap.get(cellA.columnId) ?? { name: '' };
-            const institutionB = institutionMap.get(cellB.columnId) ?? { name: '' };
-            return institutionA.name.localeCompare(institutionB.name);
+            const indexA = columns.findIndex((inst) => inst.id === cellA.columnId);
+            const indexB = columns.findIndex((inst) => inst.id === cellB.columnId);
+            return indexA - indexB;
           }),
-        }))
-        // Sort rows by vendor
-        .sort((rowA, rowB) => {
-          const endpointA = endpointMap.get(rowA.id) ?? { vendor: '' };
-          const endpointB = endpointMap.get(rowB.id) ?? { vendor: '' };
-          return endpointA.vendor.localeCompare(endpointB.vendor);
-        }),
+        })),
     };
 
     cache.set(id, data);
