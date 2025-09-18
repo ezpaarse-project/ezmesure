@@ -7,7 +7,18 @@
       search
       icons
       @update:model-value="debouncedRefresh()"
-    />
+    >
+      <v-btn
+        v-if="globalHarvestMatrixRef"
+        v-tooltip="$t('sushi.globalHarvestState.title')"
+        icon="mdi-table-headers-eye"
+        variant="tonal"
+        density="comfortable"
+        color="primary"
+        class="mr-2"
+        @click="globalHarvestMatrixRef.open()"
+      />
+    </SkeletonPageBar>
 
     <v-data-iterator :items="sessionsWithStatus" items-per-page="0">
       <template #default="{ items }">
@@ -49,6 +60,8 @@
         </div>
       </template>
     </v-data-iterator>
+
+    <SushiHarvestGlobalMatrixDialog ref="globalHarvestMatrixRef" />
   </div>
 </template>
 
@@ -60,6 +73,8 @@ definePageMeta({
 
 const { t } = useI18n();
 const snacks = useSnacksStore();
+
+const globalHarvestMatrixRef = useTemplateRef('globalHarvestMatrixRef');
 
 const {
   data: sessions,

@@ -540,6 +540,8 @@ tasks:
     cancelled: The harvest has been cancelled.
     delayed: The harvest has been initiated, but the report was not ready yet. A new attempt will be made soon.
     missing: The harvest is terminated, but the requested period is missing.
+    harvested: The harvest has been initiated.
+    unharvested: The harvest hasn't initiated.
   status:
     notLaunchedYet: Not launched yet
     waiting: Waiting
@@ -551,6 +553,8 @@ tasks:
     cancelled: Cancelled
     delayed: Delayed
     missing: Empty report
+    harvested: Harvested
+    unharvested: Unharvested
     exceptions:
       network_error: Unreachable service
       unreadable_report: Unreadable report
@@ -655,6 +659,19 @@ sushi:
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
   harvestStateDescription: This matrix shows the different results of the harvesting of those credentials. Each result can be hovered to get more information, including any errors that may have occurred while retrieving the data.
+  globalHarvestState:
+    institution:
+      title: Harvest state
+      description: This matrix shows the different results of the harvesting of endpoints. Each result can be hovered to get more information, including any errors that may have occurred while retrieving the data.
+    endpoint:
+      title: Harvest state
+    harvest-session:
+      title: Harvest state
+      description: This matrix shows the different results of the harvesting of institutions. Each result can be hovered to get more information, including any errors that may have occurred while retrieving the data.
+    title: Global harvest state
+    loading: Global harvest state is beign generated, it can take a few seconds
+    periodShortcut: 1 month|{n} months
+    showUnharvested: Show unharvested institutions
   harvestedAt: Harvested on {date}
   inactive: Inactive credentials
   inactiveDescription: Institution made theses credentials inactive and will not be harvested.
@@ -954,6 +971,7 @@ spaces:
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
+    title: Harvest session
     pendingSession: Pending harvest...
     startedAt: Harvest started {date}
     metrics:
@@ -974,6 +992,7 @@ harvest:
   jobs:
     title: Harvesting Tasks
     filtersTitle: Filter Tasks
+    versions: Versions
     harvestId: Harvesting ID
     reportType: Report Type
     errorCode: Error Code
@@ -1176,3 +1195,4 @@ deletedSince: Deleted since {date}
 cantCancel: This operation cannot be undone.
 version: Version
 back: Back
+pleaseWait: Please wait...

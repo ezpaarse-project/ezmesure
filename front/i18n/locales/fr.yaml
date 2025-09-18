@@ -544,6 +544,8 @@ tasks:
     cancelled: Le moissonnage a été annulé.
     delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu.
     missing: Le moissonnage est terminé, mais la période demandée est manquante.
+    harvested: Le moissonnage a été lancé.
+    unharvested: Le moissonnage n'a pas été lancé.
   status:
     notLaunchedYet: Pas encore lancé
     waiting: En attente
@@ -555,6 +557,8 @@ tasks:
     cancelled: Annulé
     delayed: Reporté
     missing: Rapport vide
+    harvested: Moissonné
+    unharvested: Non moissonné
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible
@@ -673,6 +677,19 @@ sushi:
   inactiveDescription: L'établissement à rendu cet identifiant inactif et ne sera donc pas moissonné.
   harvestState: État du moissonnage
   harvestStateDescription: Cette matrice présente les différents résultats du moissonnage de ces identifiants. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
+  globalHarvestState:
+    institution:
+      title: État du moissonnage
+      description: Cette matrice présente les différents résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
+    endpoint:
+      title: État du moissonnage
+    harvest-session:
+      title: État du moissonnage
+      description: Cette matrice présente les différents résultats du moissonnage des différents établissement. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
+    title: État global du moissonnage
+    loading: L'état global du moissonnage est entrain d'être généré, cela peut prendre quelques secondes
+    periodShortcut: '{n} mois'
+    showUnharvested: Afficher les établissements non moissonnés
   harvestedAt: Moissonné le {date}
   checking: Vérification de la connexion de {vendor} pour {name}
   report: Rapport
@@ -972,6 +989,7 @@ spaces:
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
+    title: Session de moissonnage
     pendingSession: Moissonnage en attente...
     startedAt: Moissonnage lancé le {date}
     metrics:
@@ -994,6 +1012,7 @@ harvest:
   jobs:
     title: Tâches de moissonnage
     filtersTitle: Filtrer les tâches
+    versions: Versions
     harvestId: Identifiant de moissonnage
     reportType: Type de rapport
     errorCode: Code d'erreur
@@ -1195,3 +1214,4 @@ deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
 version: Version
 back: Retour
+pleaseWait: Veuillez patienter...
