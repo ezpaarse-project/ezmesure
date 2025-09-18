@@ -99,14 +99,16 @@ async function computeInstitutionsMatrix(id, query) {
     const harvests = new HarvestsService();
     const institutions = new InstitutionsService();
 
+    const where = {
+      period: { gte: from, lte: to },
+    };
+
     // Generate matrix
     const matrix = await harvests.getMatrix(
       (harvest) => harvest.credentials.institutionId,
       (harvest) => harvest.period,
       {
-        where: {
-          period: { gte: from, lte: to },
-        },
+        where,
         include: {
           credentials: {
             select: { endpointId: true, institutionId: true },
@@ -118,21 +120,33 @@ async function computeInstitutionsMatrix(id, query) {
     // Resolve headers
     const rows = await institutions.findMany({ where: { id: { in: matrix.headers.rows } } });
 
-    const institutionMap = new Map(rows.map((institution) => [institution.id, institution]));
+    // Resolve unharvested
+    const unharvested = await institutions.findMany({
+      where: {
+        // Not in matrix (so not harvested for period)
+        id: { notIn: matrix.headers.rows },
+        // And have at least harvestable one credentials
+        sushiCredentials: {
+          some: {
+            active: true,
+            archived: false,
+            endpoint: { active: true },
+          },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
 
     // Cache matrix
     data.generatedAt = new Date();
+    data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+    data.unharvested = unharvested;
     data.matrix = {
       ...matrix,
       headers: {
         columns: matrix.headers.columns,
         rows,
       },
-      rows: matrix.rows.sort((rowA, rowB) => {
-        const institutionA = institutionMap.get(rowA.id) ?? { name: '' };
-        const institutionB = institutionMap.get(rowB.id) ?? { name: '' };
-        return institutionA.name.localeCompare(institutionB.name);
-      }),
     };
 
     cache.set(id, data);
@@ -207,30 +221,15 @@ async function computeEndpointsMatrix(id, query) {
     // Resolve headers
     const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
 
-    const endpointMap = new Map(rows.map((endpoint) => [endpoint.id, endpoint]));
-
     // Cache matrix
     data.generatedAt = new Date();
+    data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
     data.matrix = {
       ...matrix,
       headers: {
         columns: matrix.headers.columns,
         rows,
       },
-      rows: matrix.rows
-        // Sort cells by period
-        .map((row) => ({
-          ...row,
-          cells: row.cells.toSorted(
-            (cellA, cellB) => (cellA.period?.beginDate ?? '').localeCompare(cellB.period?.beginDate ?? ''),
-          ),
-        }))
-        // Sort rows by vendor
-        .sort((rowA, rowB) => {
-          const endpointA = endpointMap.get(rowA.id) ?? { vendor: '' };
-          const endpointB = endpointMap.get(rowB.id) ?? { vendor: '' };
-          return endpointA.vendor.localeCompare(endpointB.vendor);
-        }),
     };
 
     cache.set(id, data);
