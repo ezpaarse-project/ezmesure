@@ -27,6 +27,7 @@ const BasePrismaService = require('./base-prisma.service');
  * @property {Date} harvestedAt
  * @property {string[]} counterVersions
  * @property {string[]} reportIds
+ * @property {string[]} errors
  * @property {number} total
  * @property {Record<string, number>} counts
  *
