@@ -527,6 +527,7 @@ group:
 tasks:
   failedToFetchTasks: Failed to fetch tasks list
   logs: Logs
+  counterVersion: Harvested with COUNTER {version}
   history: Tasks history
   oneHistory: Task history
   parameters: Parameters

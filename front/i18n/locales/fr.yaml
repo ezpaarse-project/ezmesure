@@ -531,6 +531,7 @@ group:
 tasks:
   failedToFetchTasks: Impossible de récupérer la liste des tâches
   logs: Logs
+  counterVersion: Moissonné avec COUNTER {version}
   history: Historique des tâches
   oneHistory: Historique de la tâche
   parameters: Paramètres
