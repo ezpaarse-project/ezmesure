@@ -6,7 +6,6 @@
     <template #text>
       <v-form
         id="fieldForm"
-        ref="formRef"
         v-model="valid"
         @submit.prevent="save()"
       >
@@ -172,9 +171,6 @@ const customField = ref({
   editable: props.modelValue?.editable,
   visible: props.modelValue?.visible,
 });
-
-/** @type {Ref<Object | null>} */
-const formRef = useTemplateRef('formRef');
 
 const originalId = computed(() => props.modelValue?.id);
 const isEditing = computed(() => !!originalId.value);
