@@ -358,6 +358,9 @@ institutions:
     validated: Validated
     notValidated: Not validated
     hidePartner: Do not show as partner
+    onboarding:
+      title: '"Onboarding" institution'
+      description: This institution will be added to any new user of ezMESURE, and will be removed once this user will join any other institution.
     failedToUpdateValidation: Failed to update validation
     attachedDomains: Attached domains
     noAttachedDomains: There's no domain attached to this institution yet.
