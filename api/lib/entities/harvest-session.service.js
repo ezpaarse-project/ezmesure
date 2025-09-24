@@ -232,6 +232,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         institutionId: queryToPrismaFilter(session.credentialsQuery.institutionIds?.toString()),
         endpointId: queryToPrismaFilter(session.credentialsQuery.endpointIds?.toString()),
         active: true,
+        archived: false,
         endpoint: {
           active: true,
         },
