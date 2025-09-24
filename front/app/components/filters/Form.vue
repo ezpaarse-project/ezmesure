@@ -32,9 +32,9 @@
           @click:close="removeFilter(filter)"
         />
       </template>
-      <template v-else>
-        <span class="text-medium-emphasis">{{ $t('repositoryAliases.filtersForm.empty') }}</span>
-      </template>
+      <span v-else class="text-medium-emphasis">
+        {{ $t('repositoryAliases.filtersForm.empty') }}
+      </span>
 
       <v-menu v-model="isFormOpen" :close-on-content-click="false" target="parent">
         <v-card
