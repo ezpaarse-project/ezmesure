@@ -1061,7 +1061,7 @@ sync:
 permissions:
   none: Aucun
   read: Lecture
-  write: Lecture / Écriture
+  write: Écriture
 social:
   website: Site web
   twitter: Twitter
