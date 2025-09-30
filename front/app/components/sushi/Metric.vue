@@ -1,13 +1,14 @@
 <template>
   <SimpleMetric
-    :text="$t(titleKey, modelValue)"
+    :title="title"
+    :value="`${value}`"
     :icon="icon"
     :color="color"
   >
     <template v-if="actionText" #actions>
       <v-btn
         :text="actionText"
-        :disabled="modelValue <= 0"
+        :disabled="value <= 0"
         :loading="loading"
         size="small"
         variant="outlined"
@@ -19,11 +20,11 @@
 
 <script setup>
 defineProps({
-  modelValue: {
+  value: {
     type: Number,
     required: true,
   },
-  titleKey: {
+  title: {
     type: String,
     required: true,
   },

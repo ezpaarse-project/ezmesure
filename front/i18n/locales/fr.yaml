@@ -641,21 +641,11 @@ sushi:
   deletingWaiting: En attente de suppression
   deletingError: "Impossible de supprimer l'identifiant: {error}"
   deletionTask: État de suppression
-  nInstitutions: >
-    1 établissement utilise cet endpoint
-    |{count} établissements utilisent cet endpoint
-  nUntestedCredentials: >
-    1 identifiant non testé
-    |{count} identifiants non testés
-  nInvalidCredentials: >
-    1 identifiant invalide
-    |{count} identifiants invalides
-  nOperationalCredentials: >
-    1 identifiant valide
-    |{count} identifiants valides
-  nProblematicEndpoints: >
-    1 point d'accès problématique
-    |{count} points d'accès problématiques
+  institutions: Établissement|Établissements
+  untestedCredentials: Identifiants non testés
+  invalidCredentials: Identifiants invalides
+  operationalCredentials: Identifiants valides
+  problematicEndpoints: Point d'accès problématique|Points d'accès problématiques
   nErrsCredentials: >
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
@@ -721,6 +711,16 @@ sushi:
     mistake: J'ai entré(e) ces identifiants par erreur
     neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
     duplicate: Cet identifiant est en doublon avec un autre
+  isHarvestable:
+    title: Votre établissement est éligible au moissonnage
+    text: Votre établissement sera inclus dans la prochaine vague de moissonnage, aucune action n'est nécéssaire de votre part.
+  isNotHarvestable:
+    title: Votre établissement n'est actuellement pas éligible au moissonnage
+    text: "Vous devez corriger les problèmes suivants afin d'être moissonné :"
+    reasons:
+      institutionIsNotReady: Votre saisie n'est pas terminée
+      institutionHasNoCredentials: Aucun identifiant COUNTER n'a été déclaré
+      institutionHasFaultyCredentials: Certains de vos identifiants n'ont pas été testés ou sont invalides
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
