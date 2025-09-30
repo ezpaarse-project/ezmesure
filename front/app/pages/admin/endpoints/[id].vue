@@ -98,7 +98,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.success || 0"
+              :model-value="sushiMetrics.success || { total: 0 }"
               :title="$t('sushi.operationalCredentials')"
               icon="mdi-check"
               color="success"
@@ -107,7 +107,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.untested || 0"
+              :model-value="sushiMetrics.untested || { total: 0 }"
               :title="$t('sushi.untestedCredentials')"
               :action-text="$t('show')"
               icon="mdi-bell-alert"
@@ -118,7 +118,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.unauthorized || 0"
+              :model-value="sushiMetrics.unauthorized || { total: 0 }"
               :title="$t('sushi.invalidCredentials')"
               :action-text="$t('show')"
               icon="mdi-key-alert-outline"
