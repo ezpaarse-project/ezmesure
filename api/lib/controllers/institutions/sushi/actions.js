@@ -75,12 +75,21 @@ exports.getMetrics = async (ctx) => {
     success,
   ] = await Promise.all(
     [UNTESTED_FILTER, UNAUTHORIZED_FILTER, FAILED_FILTER, SUCCESS_FILTER].map(
-      (connection) => sushiCredentialsService.count({
-        where: {
-          connection,
-          institutionId: ctx.state.institution.id,
-          archived: false,
-        },
+      async (connection) => ({
+        total: await sushiCredentialsService.count({
+          where: {
+            connection,
+            institutionId: ctx.state.institution.id,
+            archived: false,
+          },
+        }),
+        enabled: await sushiCredentialsService.count({
+          where: {
+            connection,
+            institutionId: ctx.state.institution.id,
+            ...SushiCredentialsService.enabledCredentialsQuery,
+          },
+        }),
       }),
     ),
   );
