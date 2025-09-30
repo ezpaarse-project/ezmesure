@@ -74,7 +74,7 @@
         <v-row v-if="sushiMetrics?.statuses">
           <v-col cols="3">
             <SushiMetric
-              :value="sushiMetrics.statuses.success"
+              :model-value="sushiMetrics.statuses.success"
               :title="$t('sushi.operationalCredentials')"
               icon="mdi-check"
               color="success"
@@ -83,7 +83,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :value="sushiMetrics.statuses.untested"
+              :model-value="sushiMetrics.statuses.untested"
               :title="$t('sushi.untestedCredentials')"
               :action-text="$t('show')"
               icon="mdi-bell-alert"
@@ -94,7 +94,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :value="sushiMetrics.statuses.unauthorized"
+              :model-value="sushiMetrics.statuses.unauthorized"
               :title="$t('sushi.invalidCredentials')"
               :action-text="$t('show')"
               icon="mdi-key-alert-outline"
@@ -105,7 +105,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :value="sushiMetrics.statuses.failed"
+              :model-value="sushiMetrics.statuses.failed"
               :title="$t('sushi.problematicEndpoints', sushiMetrics.statuses.failed)"
               :action-text="$t('show')"
               icon="mdi-alert-circle"

@@ -641,6 +641,7 @@ sushi:
   deletingWaiting: En attente de suppression
   deletingError: "Impossible de supprimer l'identifiant: {error}"
   deletionTask: État de suppression
+  nEnabled: (1 actif)|({n} actifs)
   institutions: Établissement|Établissements
   untestedCredentials: Identifiants non testés
   invalidCredentials: Identifiants invalides

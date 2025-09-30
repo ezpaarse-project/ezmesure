@@ -635,6 +635,7 @@ sushi:
   deletingWaiting: Waiting for deletion
   deletingError: "Unable to delete credentials: {error}"
   deletionTask: Deletion state
+  nEnabled: ({n} enabled)
   institutions: Institution|Institutions
   untestedCredentials: Untested credentials
   invalidCredentials: Invalid credentials

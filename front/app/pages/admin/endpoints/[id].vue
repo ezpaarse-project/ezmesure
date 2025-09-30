@@ -98,7 +98,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :value="sushiMetrics.success || 0"
+              :model-value="sushiMetrics.success || 0"
               :title="$t('sushi.operationalCredentials')"
               icon="mdi-check"
               color="success"
@@ -107,7 +107,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :value="sushiMetrics.untested || 0"
+              :model-value="sushiMetrics.untested || 0"
               :title="$t('sushi.untestedCredentials')"
               :action-text="$t('show')"
               icon="mdi-bell-alert"
@@ -118,7 +118,7 @@
 
           <v-col cols="3">
             <SushiMetric
-              :value="sushiMetrics.unauthorized || 0"
+              :model-value="sushiMetrics.unauthorized || 0"
               :title="$t('sushi.invalidCredentials')"
               :action-text="$t('show')"
               icon="mdi-key-alert-outline"
@@ -486,7 +486,7 @@ function calcSushiMetrics() {
   const value = Object.fromEntries(
     Object.entries(
       Object.groupBy(sushis.value, (s) => s.connection?.status ?? 'untested') || {},
-    ).map(([k, s]) => [k, s.length]),
+    ).map(([k, s]) => [k, { total: s.length }]),
   );
   value.institutions = institutionsMap.value.size;
 

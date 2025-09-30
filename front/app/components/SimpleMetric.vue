@@ -1,6 +1,5 @@
 <template>
   <v-card
-    :title="value"
     :subtitle="title"
     variant="flat"
     density="compact"
@@ -12,6 +11,12 @@
           :class="[`bg-${color}`, 'mr-2']"
           style="border-radius: 10%;"
         />
+      </slot>
+    </template>
+
+    <template #title>
+      <slot name="value">
+        {{ value }}
       </slot>
     </template>
 
