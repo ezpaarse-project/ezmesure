@@ -6,6 +6,7 @@ const {
   schema,
   includableFields,
 } = require('../../../entities/sushi-credentials.dto');
+const InstitutionsService = require('../../../entities/institutions.service');
 
 /* eslint-disable max-len */
 /**
@@ -66,6 +67,7 @@ exports.getAll = async (ctx) => {
 exports.getMetrics = async (ctx) => {
   const sushiCredentialsService = new SushiCredentialsService();
 
+  // Get counts of credentials
   const [
     untested,
     unauthorized,
@@ -83,9 +85,16 @@ exports.getMetrics = async (ctx) => {
     ),
   );
 
+  // Get if institution is harvestable
+  const institutionService = new InstitutionsService();
+
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = {
+    harvestable: await institutionService.isHarvestable(
+      ctx.state.institution.id,
+      { allowHarvested: true },
+    ),
     statuses: {
       untested,
       unauthorized,

@@ -4,15 +4,18 @@ const harvestPrisma = require('../services/prisma/harvest');
 const BasePrismaService = require('./base-prisma.service');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Harvest} Harvest */
-/** @typedef {import('@prisma/client').Prisma.HarvestUpdateArgs} HarvestUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestInclude} HarvestInclude */
+/**
+ * @typedef {import('@prisma/client').Harvest} Harvest
+ * @typedef {import('@prisma/client').Prisma.HarvestUpdateArgs} HarvestUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestInclude} HarvestInclude
+ */
 /* eslint-enable max-len */
 
 module.exports = class HarvestsService extends BasePrismaService {
@@ -41,6 +44,14 @@ module.exports = class HarvestsService extends BasePrismaService {
    */
   findUnique(params) {
     return harvestPrisma.findUnique(params, this.prisma);
+  }
+
+  /**
+   * @param {HarvestFindFirstArgs} params
+   * @returns {Promise<Harvest | null>}
+   */
+  findFirst(params) {
+    return harvestPrisma.findFirst(params, this.prisma);
   }
 
   /**
