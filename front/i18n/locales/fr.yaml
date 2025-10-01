@@ -516,6 +516,21 @@ institutions:
     readyPopup:
       inProgress: Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.
       completed: Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous.
+  harvestable:
+    title: Établissements moissonnables
+    harvestableInstitutions: Moissonnables
+    status:
+      harvestable: Moissonnable
+      non-harvestable: Non moissonable
+      selectable: Sélectionnable
+      harvested: Déjà moissonné
+    settings: Paramètres de recherche
+    allowNotReady: Inclure les établissements non prêts
+    allowFaulty: Inclure les identifiants invalides
+    allowHarvested: Inclure les établissements déjà moissonnés
+    harvestedMonth: Période cible
+    nSelectable: (1 sélectionnable)|({n} sélectionnables)
+    institutions: Établissement|Établissements
   unableToRetriveInformations: Impossible de récupérer les informations d'établissement
   unableToRetrivePlatforms: Impossible de récupérer les informations d'établissement
   notAttachedToAnyInstitution: Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.
@@ -1195,3 +1210,4 @@ deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
 version: Version
 back: Retour
+select: Sélectionner
