@@ -3858,6 +3858,61 @@
         ]
       }
     },
+    "/institutions/_harvestable": {
+      "get": {
+        "summary": "Get harvestable status of all institutions",
+        "operationId": "get-institutions-harvestable",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "institution": {
+                        "$ref": "#/components/schemas/Institution"
+                      },
+                      "harvestable": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "boolean",
+                            "description": "Is the institution harvestable"
+                          },
+                          "reasons": {
+                            "type": "array",
+                            "description": "Reasons why the institution IS NOT harvestable",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Get harvestable status of all institutions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Institutions"]
+      }
+    },
     "/institutions/{id}/validated": {
       "parameters": [
         {
@@ -4171,20 +4226,68 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "harvestable": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "boolean",
+                          "description": "Is the institution harvestable"
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "description": "Reasons why the institution IS NOT harvestable",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
                     "statuses": {
                       "type": "object",
                       "properties": {
                         "success": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         },
                         "unauthorized": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         },
                         "failed": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         },
                         "untested": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         }
                       }
                     }
