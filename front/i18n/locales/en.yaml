@@ -36,6 +36,7 @@ menu:
   spaces: Spaces
   harvest:
     group: Harvest
+    institutions: Établissements
     sessions: Sessions
     alerts: Alertes
   sync: Synchronisation

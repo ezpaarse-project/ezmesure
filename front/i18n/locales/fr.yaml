@@ -36,6 +36,7 @@ menu:
   spaces: Espaces
   harvest:
     group: Moissonnage
+    institutions: Établissements
     sessions: Sessions
     alerts: Alertes
   sync: Synchronisation

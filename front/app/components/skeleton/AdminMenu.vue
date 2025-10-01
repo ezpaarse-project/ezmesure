@@ -81,6 +81,13 @@
         </template>
 
         <v-list-item
+          :title="$t('menu.harvest.institutions')"
+          to="/admin/harvests/institutions"
+          prepend-icon="mdi-domain"
+          exact
+        />
+
+        <v-list-item
           :title="$t('menu.harvest.sessions')"
           to="/admin/harvests"
           prepend-icon="mdi-file-tree"
