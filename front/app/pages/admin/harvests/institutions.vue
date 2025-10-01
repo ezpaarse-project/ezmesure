@@ -184,21 +184,23 @@
         />
       </template>
 
-      <template #[`item.institution._count.repositories`]="{ value }">
+      <template #[`item.institution._count.repositories`]="{ value, item }">
         <v-chip
           :text="`${value}`"
           :color="!value ? 'red' : undefined"
           prepend-icon="mdi-database-outline"
           size="small"
+          @click="institutionRepositoriesDialogRef?.open(item.institution)"
         />
       </template>
 
-      <template #[`item.institution._count.spaces`]="{ value }">
+      <template #[`item.institution._count.spaces`]="{ value, item }">
         <v-chip
           :text="`${value}`"
           :color="!value ? 'orange' : undefined"
           prepend-icon="mdi-tab"
           size="small"
+          @click="institutionSpacesDialogRef?.open(item.institution)"
         />
       </template>
 
@@ -276,6 +278,16 @@
         <!--  -->
       </template>
     </SelectionMenu>
+
+    <InstitutionRepositoriesDialog
+      ref="institutionRepositoriesDialogRef"
+      @update:model-value="refresh()"
+    />
+
+    <InstitutionSpacesDialog
+      ref="institutionSpacesDialogRef"
+      @update:model-value="refresh()"
+    />
   </div>
 </template>
 
@@ -298,6 +310,9 @@ const allowFaulty = shallowRef(false);
 const allowHarvested = shallowRef(false);
 const allEndpointsMustBeUnharvested = shallowRef(false);
 const harvestedMonth = shallowRef(undefined);
+
+const institutionRepositoriesDialogRef = useTemplateRef('institutionRepositoriesDialogRef');
+const institutionSpacesDialogRef = useTemplateRef('institutionSpacesDialogRef');
 
 const headers = computed(() => [
   {
