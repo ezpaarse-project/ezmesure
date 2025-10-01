@@ -993,6 +993,18 @@ harvest:
     sendEndMail: A mail will be sent on harvest end
     notStarted: Not started
     unableToRetrive: Unable to retrieve harvests
+    add: Create an harvest session
+    update: Update an harvest session
+    start: Start the session
+    stop: Stop the session
+    credentials: COUNTER credentials to harvest
+    reports: COUNTER reports to harvest
+    settings: Harvest settings
+    downloadUnsupported: Download reports even if unsupported by endpoint
+    allowFaulty: Include invalid credentials
+    useCache: Use report cache
+    useValidation: Respect report validation
+    timeout: Délai de complétion des tâches
   jobs:
     title: Harvesting Tasks
     filtersTitle: Filter Tasks
@@ -1199,3 +1211,4 @@ cantCancel: This operation cannot be undone.
 version: Version
 back: Back
 select: Select
+all: All

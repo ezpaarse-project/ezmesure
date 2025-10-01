@@ -7,7 +7,18 @@
       search
       icons
       @update:model-value="debouncedRefresh()"
-    />
+    >
+      <v-btn
+        v-if="harvestSessionFormDialogRef"
+        v-tooltip="$t('harvest.sessions.add')"
+        icon="mdi-plus"
+        variant="tonal"
+        density="comfortable"
+        color="green"
+        class="mr-2"
+        @click="harvestSessionFormDialogRef.open()"
+      />
+    </SkeletonPageBar>
 
     <v-data-iterator :items="sessionsWithStatus" items-per-page="0">
       <template #default="{ items }">
@@ -19,7 +30,11 @@
             :expand-icon="!item.startedAt ? '' : undefined"
           >
             <template #title>
-              <SushiHarvestSessionHeader :model-value="item" />
+              <SushiHarvestSessionHeader
+                :model-value="item"
+                @click:update="harvestSessionFormDialogRef?.open(item)"
+                @update:model-value="refresh()"
+              />
             </template>
 
             <template #text>
@@ -49,6 +64,11 @@
         </div>
       </template>
     </v-data-iterator>
+
+    <SushiHarvestSessionFormDialog
+      ref="harvestSessionFormDialogRef"
+      @submit="refresh()"
+    />
   </div>
 </template>
 
@@ -60,6 +80,8 @@ definePageMeta({
 
 const { t } = useI18n();
 const snacks = useSnacksStore();
+
+const harvestSessionFormDialogRef = useTemplateRef('harvestSessionFormDialogRef');
 
 const {
   data: sessions,

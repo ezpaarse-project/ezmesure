@@ -110,10 +110,39 @@
 
         <v-list>
           <v-list-item
+            :title="$t('modify')"
+            :disabled="modelValue.status !== 'prepared'"
+            prepend-icon="mdi-pencil"
+            @click="emit('click:update', modelValue)"
+          />
+
+          <v-list-item
+            :title="$t('delete')"
+            prepend-icon="mdi-delete"
+            @click="deleteSession()"
+          />
+
+          <v-divider />
+
+          <v-list-item
+            :title="$t('harvest.sessions.start')"
+            :disabled="modelValue.status !== 'prepared'"
+            prepend-icon="mdi-play"
+            @click="startSession()"
+          />
+
+          <v-list-item
+            :title="$t('harvest.sessions.stop')"
+            :disabled="modelValue.status !== 'running'"
+            prepend-icon="mdi-stop"
+            @click="stopSession()"
+          />
+
+          <v-list-item
             v-if="clipboard"
             :title="$t('copyId')"
             prepend-icon="mdi-identifier"
-            @click="copyId(item)"
+            @click="copyId()"
           />
         </v-list>
       </v-menu>
@@ -129,9 +158,15 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits({
+  'update:model-value': (value) => value === null || !!value,
+  'click:update': (value) => !!value,
+});
+
 const { t, locale } = useI18n();
 const snacks = useSnacksStore();
 const { isSupported: clipboard, copy } = useClipboard();
+const { openConfirm } = useDialogStore();
 
 const isCredentialsMenuOpen = shallowRef(false);
 const isReportsMenuOpen = shallowRef(false);
@@ -151,5 +186,49 @@ async function copyId() {
     return;
   }
   snacks.info(t('clipboard.textCopied'));
+}
+
+async function startSession() {
+  try {
+    await $fetch(`/api/harvests-sessions/${props.modelValue.id}/_start`, {
+      method: 'POST',
+    });
+
+    emit('update:model-value', props.modelValue);
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+  }
+}
+
+function stopSession() {
+  openConfirm({
+    onAgree: async () => {
+      try {
+        await $fetch(`/api/harvests-sessions/${props.modelValue.id}/_stop`, {
+          method: 'POST',
+        });
+
+        emit('update:model-value', props.modelValue);
+      } catch (err) {
+        snacks.error(t('anErrorOccurred'), err);
+      }
+    },
+  });
+}
+
+function deleteSession() {
+  openConfirm({
+    onAgree: async () => {
+      try {
+        await $fetch(`/api/harvests-sessions/${props.modelValue.id}`, {
+          method: 'DELETE',
+        });
+
+        emit('update:model-value', null);
+      } catch (err) {
+        snacks.error(t('anErrorOccurred'), err);
+      }
+    },
+  });
 }
 </script>

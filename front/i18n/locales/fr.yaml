@@ -1007,6 +1007,18 @@ harvest:
     sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
+    add: Créer une session de moissonnage
+    update: Éditer une session de moissonnage
+    start: Démarrer la session
+    stop: Arrêter la session
+    credentials: Identifiants COUNTER à moissonner
+    reports: Rapports COUNTER à moissonner
+    settings: Paramètres de moissonnage
+    downloadUnsupported: Télécharger les rapports même si non supportés par le point d'accès
+    allowFaulty: Inclure les identifiants invalides
+    useCache: Utiliser le cache des rapports
+    useValidation: Respecter la validation des rapports
+    timeout: Délai de complétion des tâches
   jobs:
     title: Tâches de moissonnage
     filtersTitle: Filtrer les tâches
@@ -1212,3 +1224,4 @@ cantCancel: Cette action est irreversible
 version: Version
 back: Retour
 select: Sélectionner
+all: Tous

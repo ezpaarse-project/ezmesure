@@ -275,7 +275,14 @@
       :text="$t('institutions.manageN', selected.length)"
     >
       <template #actions>
-        <!--  -->
+        <v-list-item
+          v-if="harvestSessionFormDialogRef"
+          :title="$t('harvest.sessions.add')"
+          prepend-icon="mdi-tractor"
+          @click="harvestSessionFormDialogRef.open({
+            credentialsQuery: { institutionIds: selected },
+          })"
+        />
       </template>
     </SelectionMenu>
 
@@ -287,6 +294,11 @@
     <InstitutionSpacesDialog
       ref="institutionSpacesDialogRef"
       @update:model-value="refresh()"
+    />
+
+    <SushiHarvestSessionFormDialog
+      ref="harvestSessionFormDialogRef"
+      @submit="navigateTo('/admin/harvests')"
     />
   </div>
 </template>
@@ -313,6 +325,7 @@ const harvestedMonth = shallowRef(undefined);
 
 const institutionRepositoriesDialogRef = useTemplateRef('institutionRepositoriesDialogRef');
 const institutionSpacesDialogRef = useTemplateRef('institutionSpacesDialogRef');
+const harvestSessionFormDialogRef = useTemplateRef('harvestSessionFormDialogRef');
 
 const headers = computed(() => [
   {

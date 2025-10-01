@@ -17,14 +17,6 @@
             variant="text"
             @click="isOpen = false"
           />
-
-          <v-btn
-            :text="$t('retry')"
-            :loading="loading"
-            variant="elevated"
-            color="secondary"
-            @click="refreshForm"
-          />
         </template>
       </v-empty-state>
     </v-card>
