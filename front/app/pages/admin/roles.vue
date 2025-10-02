@@ -36,12 +36,7 @@
       v-bind="vDataTableOptions"
     >
       <template #[`item.label`]="{ item }">
-        <v-chip
-          :color="item.color"
-          :prepend-icon="item.icon || 'mdi-tag-outline'"
-        >
-          {{ item.label }}
-        </v-chip>
+        <RoleChip :role="item" />
       </template>
 
       <template #[`item.restricted`]="{ item }">
