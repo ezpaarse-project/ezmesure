@@ -80,7 +80,14 @@ async function refreshForm() {
   try {
     membershipData.value = await $fetch(`/api/institutions/${institutionId.value}/memberships/${username.value}`, {
       query: {
-        include: ['institution', 'user', 'roles.role'],
+        include: [
+          'institution',
+          'user',
+          'roles.role',
+          'spacePermissions',
+          'repositoryPermissions',
+          'repositoryAliasPermissions',
+        ],
       },
     });
   } catch (err) {
