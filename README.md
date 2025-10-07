@@ -30,6 +30,7 @@ Create an environment file named `ezmesure.local.env.sh` and export the followin
 |------|-------------|
 | EZMESURE_DOMAIN | the ezmesure domain |
 | SATOSA_DOMAIN | the satosa domain |
+| SATOSA_ENCRYPTION_KEY | the satosa encryption key |
 | NGINX_PROTOCOL | The protocol used by the reverse proxy to serve ezMESURE |
 | EZMESURE_SMTP_HOST | host of the SMTP server |
 | ELASTIC_REQUIRED_STATUS | status of elastic cluster needed from ezmesure to connect |

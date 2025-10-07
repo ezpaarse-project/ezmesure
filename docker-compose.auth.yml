@@ -38,6 +38,8 @@ services:
       - EZMESURE_PUBLIC_URL
       - SATOSA_PUBLIC_URL
 
+      - SATOSA_ENCRYPTION_KEY
+
       - SAML_ORG_DISPLAY_NAME
       - SAML_ORG_URL
 
