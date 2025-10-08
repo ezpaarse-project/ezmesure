@@ -25,8 +25,6 @@ exports.login = async (ctx) => {
 };
 
 exports.loginCallback = async (ctx) => {
-  // TODO: Better errors
-
   const stateKey = ctx.query.nonce ? `nonce:${ctx.query.nonce}` : `state:${ctx.query.state}`;
 
   const state = loginState.get(stateKey);
