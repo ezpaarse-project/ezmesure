@@ -73,6 +73,7 @@ services:
     environment:
       - NODE_ENV
       - NUXT_PUBLIC_CURRENT_INSTANCE
+      - NUXT_PUBLIC_OIDC_PROFILE_URI
       - NUXT_PUBLIC_SUPPORT_MAIL
     tmpfs: /tmp
     command: npm run dev -- --host 0.0.0.0

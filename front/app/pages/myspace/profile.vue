@@ -7,12 +7,25 @@
         <v-col>
           <v-card :title="$t('myspace.title')">
             <template #append>
-              <v-btn :href="refreshProfileURL" variant="text">
-                <v-icon left>
-                  mdi-refresh
-                </v-icon>
-                {{ $t('refreshShib') }}
-              </v-btn>
+              <v-btn
+                v-if="oidcProfileUri"
+                :text="$t('myspace.iamAccount')"
+                :href="oidcProfileUri"
+                target="_blank"
+                rel="noopener noreferrer"
+                prepend-icon="mdi-key"
+                append-icon="mdi-open-in-new"
+                color="primary"
+                variant="tonal"
+                class="mr-2"
+              />
+
+              <v-btn
+                :text="$t('refreshShib')"
+                :href="refreshProfileURL"
+                prepend-icon="mdi-refresh"
+                variant="text"
+              />
             </template>
 
             <template #text>
@@ -41,6 +54,7 @@ definePageMeta({
 });
 
 const { data: user } = useAuthState();
+const { oidcProfileUri } = useRuntimeConfig().public;
 
 const refreshProfileURL = computed(() => {
   const currentLocation = encodeURIComponent(window.location.href);

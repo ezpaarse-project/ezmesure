@@ -54,6 +54,7 @@ myspace:
   title: Mon profil
   noMemberships: Vous ne faites partie d'aucun établissement.
   determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'{team} ou le correspondant ezMESURE de votre établissement, ou a utiliser le menu à gauche pour demander à {join}.
+  iamAccount: Accéder aux paramètres du profil
   ezmesureTeam: équipe
   name: Nom
   mail: Mail

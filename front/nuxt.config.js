@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     public: {
       supportMail: 'ezteam@couperin.org',
       currentInstance: '',
+      oidcProfileUri: '',
     },
   },
 
