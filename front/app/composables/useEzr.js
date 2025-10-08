@@ -11,7 +11,7 @@ export default async function useEzr() {
   const {
     data: ezrProfile,
     error,
-  } = await useFetch('/api/profile/reporting_token', {
+  } = await useFetch('/api/auth/reporting_token', {
     deep: true,
   });
 

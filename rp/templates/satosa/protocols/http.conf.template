@@ -1,0 +1,10 @@
+server {
+  server_name ${SATOSA_DOMAIN};
+
+  listen 80;
+  listen [::]:80;
+
+  include /etc/nginx/conf.d/utils/http-proxy.conf;
+
+  include /etc/nginx/conf.d/satosa/routes.conf;
+}

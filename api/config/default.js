@@ -64,12 +64,28 @@ module.exports = {
   auth: {
     secret: 'some-secret',
     cookie: 'eztoken',
+    oidc: {
+      client: {
+        id: 'changeme',
+        secret: 'changeme',
+      },
+      uris: {
+        discovery: '',
+        // or
+        issuer: '',
+        authorization: '',
+        token: '',
+        introspection: '',
+        userinfo: '',
+      },
+      scopes: ['openid', 'profile', 'email', 'groups'],
+    },
   },
   admin: {
     username: 'ezmesure-admin',
     fullName: 'ezMESURE Administrator',
     password: 'changeme',
-    email: 'admin@admin.com',
+    email: 'ezmesure-admin@admin.com',
   },
   storage: {
     path: path.resolve(__dirname, '../storage'),

@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
+const crypto = require('node:crypto');
 const config = require('config');
 const elastic = require('.');
-const { randomString } = require('../../controllers/auth/password');
 
 const adminUsername = config.get('admin.username');
 
@@ -10,6 +10,18 @@ const adminUsername = config.get('admin.username');
  * @typedef {import('@elastic/elasticsearch').estypes.SecurityPutUserResponse} ElasticUserCreated
  * @typedef {import('@elastic/elasticsearch').estypes.SecurityDeleteUserResponse} ElasticUserDeleted
  */
+
+function randomString() {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(5, (err, buffer) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(buffer.toString('hex'));
+      }
+    });
+  });
+}
 
 /**
  * Create user admin in elastic.
@@ -181,6 +193,29 @@ exports.updatePassword = function updatePassword(username, password) {
       password,
     },
   });
+};
+
+/**
+ * Set a random password for a user in elastic
+ *
+ * @param {string} username - Username of user.
+ *
+ * @returns {Promise<{ username: string, password: string }>} Updated user.
+ */
+exports.setRandomPasswordForUser = async function updatePassword(username) {
+  const password = await randomString();
+
+  await elastic.security.changePassword({
+    username,
+    body: {
+      password,
+    },
+  });
+
+  return {
+    username,
+    password,
+  };
 };
 
 /**
