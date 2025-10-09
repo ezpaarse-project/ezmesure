@@ -201,6 +201,11 @@
             "description": "Institution name",
             "example": "University of Foobar"
           },
+          "onboarding": {
+            "type": "boolean",
+            "description": "True when the institution should be added to new users",
+            "default": false
+          },
           "validated": {
             "type": "boolean",
             "description": "True when the institution has been validated",

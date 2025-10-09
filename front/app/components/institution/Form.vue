@@ -391,6 +391,28 @@
                       hide-details
                     />
                   </v-col>
+
+                  <v-col cols="12" sm="6">
+                    <v-checkbox
+                      v-model="institution.onboarding"
+                      density="compact"
+                      color="primary"
+                      hide-details
+                    >
+                      <template #label>
+                        {{ $t('institutions.institution.onboarding.title') }}
+
+                        <v-icon
+                          v-tooltip:right="$t('institutions.institution.onboarding.description')"
+                          icon="mdi-information-outline"
+                          size="x-small"
+                          color="info"
+                          end
+                          style="vertical-align: baseline;"
+                        />
+                      </template>
+                    </v-checkbox>
+                  </v-col>
                 </v-row>
               </template>
             </v-card>

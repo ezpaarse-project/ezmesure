@@ -360,6 +360,9 @@ institutions:
     validated: Validé
     notValidated: Non validé
     hidePartner: Ne pas afficher comme partenaire
+    onboarding:
+      title: Établissement "bienvenue"
+      description: Cet établissement sera ajouté à tout nouvel utilisateur d'ezMESURE, et sera retiré dès que cet utilisateur rejoindra un autre établissement.
     failedToUpdateValidation: Impossible de mettre à jour la validation
     attachedDomains: Domaines rattachés
     noAttachedDomains: Il n'y a pas de domaine rattaché à cet établissement pour le moment.
