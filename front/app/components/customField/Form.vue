@@ -6,7 +6,6 @@
     <template #text>
       <v-form
         id="fieldForm"
-        ref="formRef"
         v-model="valid"
         @submit.prevent="save()"
       >
@@ -160,10 +159,18 @@ const idRules = [
 
 const saving = shallowRef(false);
 const valid = shallowRef(false);
-const customField = ref({ ...(props.modelValue ?? {}) });
-
-/** @type {Ref<Object | null>} */
-const formRef = useTemplateRef('formRef');
+const customField = ref({
+  id: props.modelValue?.id,
+  labelFr: props.modelValue?.labelFr,
+  labelEn: props.modelValue?.labelEn,
+  descriptionFr: props.modelValue?.descriptionFr,
+  descriptionEn: props.modelValue?.descriptionEn,
+  helpUrl: props.modelValue?.helpUrl,
+  itemUrl: props.modelValue?.itemUrl,
+  multiple: props.modelValue?.multiple,
+  editable: props.modelValue?.editable,
+  visible: props.modelValue?.visible,
+});
 
 const originalId = computed(() => props.modelValue?.id);
 const isEditing = computed(() => !!originalId.value);

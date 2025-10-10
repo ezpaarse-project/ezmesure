@@ -343,6 +343,20 @@ router.route({
   },
 });
 
+router.route({
+  method: 'GET',
+  path: '/:sushiId/_sushiUrls',
+  handler: [
+    commonHandlers(FEATURES.sushi.read),
+    getSushiUrls,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
 router.use(requireAdmin);
 
 router.route({
@@ -391,20 +405,6 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
       filePath: Joi.string().trim().regex(/^[a-z0-9/_.-]+$/).required(),
-    },
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/:sushiId/_sushiUrls',
-  handler: [
-    fetchSushi({ include: { endpoint: true } }),
-    getSushiUrls,
-  ],
-  validate: {
-    params: {
-      sushiId: Joi.string().trim().required(),
     },
   },
 });

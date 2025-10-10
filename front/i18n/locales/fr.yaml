@@ -53,7 +53,7 @@ home:
 myspace:
   title: Mon profil
   noMemberships: Vous ne faites partie d'aucun établissement.
-  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'{team} ou le correspondant ezMESURE de votre établissement, ou a utiliser le menu à gauche pour demander à {join}.
+  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'{team} ou le contact ezMESURE de votre établissement, ou a utiliser le menu à gauche pour demander à {join}.
   ezmesureTeam: équipe
   name: Nom
   mail: Mail
@@ -302,12 +302,12 @@ institutions:
   noLogo: Pas de logo
   noInstitutions: Vous n'êtes pas attaché à un établissement.
   institutionFoundDeclareNewInstitution: Votre établissement n'est pas déclaré, déclarez un nouvel établissement.
-  sendMailToJoin: Un message sera envoyé aux correspondant de l'établissement pour les prévenir.
+  sendMailToJoin: Un message sera envoyé aux contact de l'établissement pour les prévenir.
   askToJoinAnInstitution: Rejoindre un établissement
   searchForInstitution: Rechercher votre établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
-  joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.
-  createMailContactList: Copier les adresses mails des correspondants
+  joinInstitutionEmail: Un email sera envoyé aux contacts de cet établissement afin qu'ils puissent vous ajouter.
+  createMailContactList: Copier les adresses mails des contacts
   modify: Modifier mon établissement
   reports:
     reports: Rapports
@@ -397,7 +397,7 @@ institutions:
     deleteN: Vous allez révoquer l'accès de {count} membre.|Vous allez révoquer l'accès de {count} membres.
     technical: Technique
     documentary: Documentaire
-    noCorrespondent: Aucun correspondant
+    noCorrespondent: Aucun contact
     technicalCorrespondent: Correspondant technique
     documentaryCorrespondent: Correspondant documentaire
     creator: Créateur
@@ -412,7 +412,7 @@ institutions:
     updated: Membre mis à jour
     email: Adresse email *
     emailExample: "ex: john{'@'}doe.fr"
-    thisMemberIs: 'Ce membre est un correspondant :'
+    thisMemberIs: 'Ce membre est un contact :'
     enterValidEmail: Veuillez saisir un email valide.
     members: Membres
     addMember: Ajouter un membre
@@ -1061,7 +1061,7 @@ sync:
 permissions:
   none: Aucun
   read: Lecture
-  write: Lecture / Écriture
+  write: Écriture
 social:
   website: Site web
   twitter: Twitter
