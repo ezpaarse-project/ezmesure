@@ -153,13 +153,6 @@
               prepend-icon="mdi-archive"
               @click="archiveSushis([item])"
             />
-            <v-list-item
-              v-if="currentTab === 'archived'"
-              :title="$t('delete')"
-              :disabled="!canEdit"
-              prepend-icon="mdi-delete"
-              @click="deleteSushis([item])"
-            />
 
             <v-divider />
 
