@@ -192,6 +192,7 @@ async function startSession() {
   try {
     await $fetch(`/api/harvests-sessions/${props.modelValue.id}/_start`, {
       method: 'POST',
+      body: {},
     });
 
     emit('update:model-value', props.modelValue);
