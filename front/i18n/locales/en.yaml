@@ -53,7 +53,7 @@ home:
 myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
-  determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE correspondent in your institution, or use the menu to your left to {join}.
+  determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE contact in your institution, or use the menu to your left to {join}.
   ezmesureTeam: ezMESURE team
   name: Name
   mail: Mail
@@ -298,12 +298,12 @@ institutions:
   noLogo: No logo
   noInstitutions: You're not attached to a institution.
   institutionFoundDeclareNewInstitution: Your institution is not declared, declare a new institution.
-  sendMailToJoin: An email has been sent to the institution's correspondents
+  sendMailToJoin: An email has been sent to the institution's contacts
   askToJoinAnInstitution: Join an institution
   searchForInstitution: Look for your institution
   joinInstitution: Would you join {institution} ?
-  joinInstitutionEmail: A message will be sent to the correspondents of this institution to let them know.
-  createMailContactList: Copy the emails of the correspondents
+  joinInstitutionEmail: A message will be sent to the contacts of this institution to let them know.
+  createMailContactList: Copy the emails of the contacts
   modify: Modify my institution
   reports:
     reports: Reports
@@ -358,6 +358,9 @@ institutions:
     validated: Validated
     notValidated: Not validated
     hidePartner: Do not show as partner
+    onboarding:
+      title: '"Onboarding" institution'
+      description: This institution will be added to any new user of ezMESURE, and will be removed once this user will join any other institution.
     failedToUpdateValidation: Failed to update validation
     attachedDomains: Attached domains
     noAttachedDomains: There's no domain attached to this institution yet.
@@ -395,15 +398,15 @@ institutions:
     deleteN: You are about to revoke {count} member's access.|You are about to revoke {count} members' access.
     technical: Technical
     documentary: Documentary
-    noCorrespondent: No correspondent
-    technicalCorrespondent: Technical correspondent
-    documentaryCorrespondent: Documentary correspondent
+    noCorrespondent: No contact
+    technicalCorrespondent: Technical contact
+    documentaryCorrespondent: Documentary contact
     creator: Creator
     unableToRetriveMembers: Unable to retrieve members
     cannotAddMember: Unable to add member
     name: Name
     username: Identifier
-    correspondent: Correspondent
+    correspondent: Contact
     permissions: Permissions
     read: Read
     write: Write
@@ -1062,7 +1065,7 @@ sync:
 permissions:
   none: None
   read: Read
-  write: Read / Write
+  write: Write
 social:
   website: Website
   twitter: Twitter

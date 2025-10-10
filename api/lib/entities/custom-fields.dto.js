@@ -27,8 +27,8 @@ const schema = {
   descriptionFr: Joi.string().allow('').empty(null),
   descriptionEn: Joi.string().allow('').empty(null),
 
-  helpUrl: Joi.string().trim().empty(null),
-  itemUrl: Joi.string().trim().empty(null),
+  helpUrl: Joi.string().trim().allow('').empty(null),
+  itemUrl: Joi.string().trim().allow('').empty(null),
 
   autocomplete: Joi.object().empty(null),
   institutionProperties: Joi.array().items(Joi.object()),

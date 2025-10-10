@@ -69,6 +69,10 @@ const props = defineProps({
 
 const { t, locale } = useI18n();
 
+const enabledSushis = computed(() => props.modelValue.filter(
+  (sushi) => !sushi.archived && sushi.active && (sushi.endpoint?.active ?? true),
+));
+
 const bars = computed(() => {
   const formatter = new Intl.NumberFormat(locale.value, { style: 'percent' });
 
@@ -96,8 +100,8 @@ const bars = computed(() => {
           break;
       }
 
-      const count = props.modelValue.filter((sushi) => key === sushi.connection?.status).length;
-      const value = count / props.modelValue.length;
+      const count = enabledSushis.value.filter((sushi) => key === sushi.connection?.status).length;
+      const value = count / enabledSushis.value.length;
 
       return {
         key,

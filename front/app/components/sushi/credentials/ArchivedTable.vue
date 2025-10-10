@@ -3,7 +3,7 @@
     <v-data-table-server
       v-model="selectedSushi"
       :headers="headers"
-      :row-props="({ item }) => ({ class: !(item.active && item.endpoint.active) && 'bg-grey-lighten-4 text-grey' })"
+      :row-props="({ item }) => ({ class: !item.endpoint.active && 'bg-grey-lighten-4 text-grey' })"
       :item-selectable="(item) => !item.deletedAt"
       density="comfortable"
       show-select

@@ -72,7 +72,7 @@ module.exports = {
 
       Item_Parent: {
         properties: {
-          Item: { type: 'keyword' },
+          Item_Name: { type: 'keyword' },
           Data_Type: { type: 'keyword' },
           Item_ID: itemId,
           Publication_Date: { type: 'keyword' },
