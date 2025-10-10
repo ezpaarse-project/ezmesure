@@ -113,19 +113,29 @@
 
       <v-row class="mt-4">
         <v-col>
+          <v-btn
+            v-if="harvestMatrixRef"
+            :text="$t('sushi.globalHarvestState.title')"
+            prepend-icon="mdi-table-headers-eye"
+            size="small"
+            variant="outlined"
+            @click="harvestMatrixRef.open()"
+          />
+        </v-col>
+
+        <v-col class="text-end">
           <v-chip
             :text="sushiReadyLabels.status.text"
             :color="sushiReadyLabels.status.color"
             size="small"
             variant="outlined"
+            class="mr-2"
           >
             <template v-if="!!sushiReadyLabels.status.icon" #prepend>
               <v-icon :icon="sushiReadyLabels.status.icon" start />
             </template>
           </v-chip>
-        </v-col>
 
-        <v-col class="text-end">
           <ConfirmPopover
             v-if="canEdit"
             :title="sushiReadyLabels.confirm.title"
@@ -191,6 +201,11 @@
       @submit="refresh()"
       @update:model-value="refresh()"
     />
+
+    <InstitutionHarvestGlobalMatrixDialog
+      ref="harvestMatrixRef"
+      :institution="institution"
+    />
   </div>
 </template>
 
@@ -219,6 +234,7 @@ const tabsData = ref(new Map());
 const currentTabId = shallowRef('');
 
 const sushiFormRef = useTemplateRef('sushiFormRef');
+const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
 
 const {
   error,

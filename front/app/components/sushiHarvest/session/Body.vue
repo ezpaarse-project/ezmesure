@@ -8,6 +8,17 @@
         <v-toolbar :title="$t('harvest.jobs.title')" color="transparent">
           <template #append>
             <v-btn
+              v-if="globalHarvestMatrixRef"
+              v-tooltip="$t('sushi.globalHarvestState.title')"
+              icon="mdi-table-headers-eye"
+              variant="tonal"
+              density="comfortable"
+              color="primary"
+              class="mr-2"
+              @click="globalHarvestMatrixRef.open()"
+            />
+
+            <v-btn
               v-tooltip="$t('refresh')"
               :loading="status === 'pending'"
               icon="mdi-reload"
@@ -130,7 +141,15 @@
       </template>
     </v-data-table-server>
 
-    <SushiHarvestTaskHistoryDialog ref="historyRef" :session="modelValue" />
+    <SushiHarvestTaskHistoryDialog
+      ref="historyRef"
+      :session="modelValue"
+    />
+
+    <SushiHarvestSessionGlobalMatrixDialog
+      ref="globalHarvestMatrixRef"
+      :session="modelValue"
+    />
   </div>
 </template>
 
@@ -151,6 +170,7 @@ const snacks = useSnacksStore();
 const { openConfirm } = useDialogStore();
 
 const historyRef = useTemplateRef('historyRef');
+const globalHarvestMatrixRef = useTemplateRef('globalHarvestMatrixRef');
 
 const {
   status,
