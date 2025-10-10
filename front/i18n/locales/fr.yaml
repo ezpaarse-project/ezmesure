@@ -680,14 +680,14 @@ sushi:
   globalHarvestState:
     institution:
       title: État du moissonnage
-      description: Cette matrice présente les différents résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
+      description: Cette matrice présente les résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu pu survenir lors de la récupération des données.
     endpoint:
       title: État du moissonnage
     harvest-session:
       title: État du moissonnage
-      description: Cette matrice présente les différents résultats du moissonnage des différents établissement. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
+      description: Cette matrice présente les résultats du moissonnage des différents établissement. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
     title: État global du moissonnage
-    loading: L'état global du moissonnage est entrain d'être généré, cela peut prendre quelques secondes
+    loading: L'état global du moissonnage est en cours de génération, cela peut prendre quelques secondes
     periodShortcut: '{n} mois'
     showUnharvested: Afficher les établissements non moissonnés
   harvestedAt: Moissonné le {date}
@@ -707,7 +707,7 @@ sushi:
     ignored: Rapport non supporté (constat ezMESURE)
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
-    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
+    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez valider vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
   paramScopes:
     all: Toutes les requêtes au point d'accès
     report_list: Listing des rapports

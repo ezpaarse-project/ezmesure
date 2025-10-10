@@ -541,7 +541,7 @@ tasks:
     delayed: The harvest has been initiated, but the report was not ready yet. A new attempt will be made soon.
     missing: The harvest is terminated, but the requested period is missing.
     harvested: The harvest has been initiated.
-    unharvested: The harvest hasn't initiated.
+    unharvested: The harvest hasn't been initiated.
   status:
     notLaunchedYet: Not launched yet
     waiting: Waiting
@@ -662,14 +662,14 @@ sushi:
   globalHarvestState:
     institution:
       title: Harvest state
-      description: This matrix shows the different results of the harvesting of endpoints. Each result can be hovered to get more information, including any errors that may have occurred while retrieving the data.
+      description: This matrix shows the different results of the harvesting of endpoints. Each result can be hovered to get more information, including any error that may have occurred while retrieving the data.
     endpoint:
       title: Harvest state
     harvest-session:
       title: Harvest state
-      description: This matrix shows the different results of the harvesting of institutions. Each result can be hovered to get more information, including any errors that may have occurred while retrieving the data.
+      description: This matrix shows the different results of the harvesting of institutions. Each result can be hovered to get more information, including any error that may have occurred while retrieving the data.
     title: Global harvest state
-    loading: Global harvest state is beign generated, it can take a few seconds
+    loading: Global harvest state is being generated, it can take a few seconds
     periodShortcut: 1 month|{n} months
     showUnharvested: Show unharvested institutions
   harvestedAt: Harvested on {date}
