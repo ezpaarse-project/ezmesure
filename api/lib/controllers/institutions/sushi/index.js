@@ -15,6 +15,7 @@ const {
 
   getAll,
   getMetrics,
+  getMatrix,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
@@ -46,6 +47,26 @@ router.route({
     requireMemberPermissions(FEATURES.sushi.read),
     getMetrics,
   ],
+});
+
+router.route({
+  method: 'GET',
+  path: '/_matrix',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.sushi.read),
+    getMatrix,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    query: {
+      retryCode: Joi.number().integer(),
+      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+    },
+  },
 });
 
 module.exports = router;

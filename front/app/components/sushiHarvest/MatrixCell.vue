@@ -19,13 +19,28 @@
       min-width="350"
       max-width="500"
     >
-      <template v-if="user?.isAdmin" #append>
+      <template #prepend>
+        <v-icon :icon="icon.icon" :color="icon.color" />
+      </template>
+
+      <template v-if="props.modelValue.harvestedBy" #append>
+        <v-chip
+          v-tooltip:top="$t('tasks.counterVersion', { version: counterVersion })"
+          :text="counterVersion"
+          :color="counterVersionsColors.get(counterVersion) || 'secondary'"
+          density="comfortable"
+          variant="flat"
+          label
+        />
+
         <v-btn
+          v-if="user?.isAdmin"
           v-tooltip:top="$t('tasks.history')"
           icon="mdi-history"
           color="primary"
           variant="text"
           density="comfortable"
+          class="ml-1"
           @click="openTaskHistoryFromHarvest()"
         />
       </template>
@@ -37,7 +52,7 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="counts.length > 0">
+        <v-row v-if="counts.length > 0 && modelValue.harvestedBy">
           <v-col>
             <i18n-t v-for="item in counts" :key="item.path" :keypath="item.path">
               <template #count>
@@ -45,11 +60,11 @@
               </template>
 
               <template #beignDate>
-                <span class="font-weight-bold">{{ modelValue.harvestedBy?.beginDate ?? '???' }}</span>
+                <span class="font-weight-bold">{{ modelValue.harvestedBy.beginDate }}</span>
               </template>
 
               <template #endDate>
-                <span class="font-weight-bold">{{ modelValue.harvestedBy?.endDate ?? '???' }}</span>
+                <span class="font-weight-bold">{{ modelValue.harvestedBy.endDate }}</span>
               </template>
             </i18n-t>
           </v-col>
@@ -117,9 +132,10 @@ const statusText = computed(() => {
     text: te(textKey) ? t(textKey) : '',
   };
 });
+const counterVersion = computed(() => props.modelValue.harvestedBy?.counterVersion);
 
 async function openTaskHistoryFromHarvest() {
-  if (!user.value?.isAdmin) {
+  if (!user.value?.isAdmin || !props.modelValue.harvestedBy) {
     return;
   }
 

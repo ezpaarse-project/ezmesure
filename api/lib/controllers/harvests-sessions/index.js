@@ -26,6 +26,7 @@ const {
   stopOne,
   getOneCredentials,
   upsertOne,
+  getMatrix,
 } = require('./actions');
 
 router.use(
@@ -184,6 +185,22 @@ router.route({
       type: Joi.string().valid('harvestable', 'all'),
       include: Joi.array().single().items(Joi.string().valid('endpoint', 'institution')),
     }).rename('include[]', 'include'),
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:harvestId/_matrix',
+  handler: [
+    getMatrix,
+  ],
+  validate: {
+    params: {
+      harvestId: Joi.string().trim().required(),
+    },
+    query: {
+      retryCode: Joi.number().integer(),
+    },
   },
 });
 

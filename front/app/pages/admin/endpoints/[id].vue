@@ -128,6 +128,19 @@
           </v-col>
         </v-row>
       </v-slide-y-transition>
+
+      <v-row class="mt-4">
+        <v-col>
+          <v-btn
+            v-if="globalHarvestMatrixRef"
+            :text="$t('sushi.globalHarvestState.title')"
+            prepend-icon="mdi-table-headers-eye"
+            size="small"
+            variant="outlined"
+            @click="globalHarvestMatrixRef.open()"
+          />
+        </v-col>
+      </v-row>
     </v-container>
 
     <v-data-table
@@ -217,7 +230,7 @@
           </span>
 
           <v-btn
-            :disabled="status === 'pending' || currentHarvestYear >= maxHarvestYear"
+            :disabled="status === 'pending' || currentHarvestYear >= MAX_HARVEST_YEAR"
             color="primary"
             variant="text"
             density="comfortable"
@@ -364,6 +377,11 @@
     <SushiHarvestHistoryDialog ref="historyRef" />
 
     <SushiReportsDialog ref="reportsRef" />
+
+    <SushiEndpointHarvestGlobalMatrixDialog
+      ref="globalHarvestMatrixRef"
+      :endpoint="endpoint"
+    />
   </div>
 </template>
 
@@ -373,7 +391,7 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
-const maxHarvestYear = new Date().getFullYear();
+const MAX_HARVEST_YEAR = new Date().getFullYear();
 
 const { params } = useRoute();
 const { t, locale } = useI18n();
@@ -387,10 +405,11 @@ const filters = ref({});
 const sushiMetrics = ref(undefined);
 const loading = shallowRef(false);
 const selectedInstitutions = ref([]);
-const currentHarvestYear = ref(maxHarvestYear);
+const currentHarvestYear = ref(MAX_HARVEST_YEAR);
 
 const endpointFormDialogRef = useTemplateRef('endpointFormDialogRef');
 const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
+const globalHarvestMatrixRef = useTemplateRef('globalHarvestMatrixRef');
 const reportsRef = useTemplateRef('reportsRef');
 const filesRef = useTemplateRef('filesRef');
 const historyRef = useTemplateRef('historyRef');

@@ -22,6 +22,7 @@ const {
   updateEndpoint,
   addEndpoint,
   importEndpoints,
+  getMatrix,
 } = require('./actions');
 
 const registry = require('./_registry');
@@ -114,6 +115,24 @@ router.route({
   validate: {
     params: {
       endpointId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:endpointId/_matrix',
+  handler: [
+    getMatrix,
+  ],
+  validate: {
+    params: {
+      endpointId: Joi.string().trim().required(),
+    },
+    query: {
+      retryCode: Joi.number().integer(),
+      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
     },
   },
 });

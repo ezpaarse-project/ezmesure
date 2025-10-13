@@ -183,6 +183,19 @@
           </v-col>
         </v-slide-x-reverse-transition>
       </v-row>
+      
+      <v-row>
+        <v-col>
+          <v-btn
+            v-if="harvestMatrixRef"
+            :text="$t('sushi.globalHarvestState.title')"
+            prepend-icon="mdi-table-headers-eye"
+            size="small"
+            variant="outlined"
+            @click="harvestMatrixRef.open()"
+          />
+        </v-col>
+      </v-row>
     </v-container>
 
     <v-divider />
@@ -227,6 +240,11 @@
       @submit="refresh()"
       @update:model-value="refresh()"
     />
+
+    <InstitutionHarvestGlobalMatrixDialog
+      ref="harvestMatrixRef"
+      :institution="institution"
+    />
   </div>
 </template>
 
@@ -257,6 +275,7 @@ const currentTabId = shallowRef('');
 const sushiReadyLoading = shallowRef(false);
 
 const sushiFormRef = useTemplateRef('sushiFormRef');
+const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
 
 const {
   error,

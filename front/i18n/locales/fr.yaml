@@ -361,6 +361,9 @@ institutions:
     validated: Validé
     notValidated: Non validé
     hidePartner: Ne pas afficher comme partenaire
+    onboarding:
+      title: Établissement "bienvenue"
+      description: Cet établissement sera ajouté à tout nouvel utilisateur d'ezMESURE, et sera retiré dès que cet utilisateur rejoindra un autre établissement.
     failedToUpdateValidation: Impossible de mettre à jour la validation
     attachedDomains: Domaines rattachés
     noAttachedDomains: Il n'y a pas de domaine rattaché à cet établissement pour le moment.
@@ -547,6 +550,7 @@ group:
 tasks:
   failedToFetchTasks: Impossible de récupérer la liste des tâches
   logs: Logs
+  counterVersion: Moissonné avec COUNTER {version}
   history: Historique des tâches
   oneHistory: Historique de la tâche
   parameters: Paramètres
@@ -559,6 +563,8 @@ tasks:
     cancelled: Le moissonnage a été annulé.
     delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu.
     missing: Le moissonnage est terminé, mais la période demandée est manquante.
+    harvested: Le moissonnage a été lancé.
+    unharvested: Le moissonnage n'a pas été lancé.
   status:
     notLaunchedYet: Pas encore lancé
     waiting: En attente
@@ -570,6 +576,8 @@ tasks:
     cancelled: Annulé
     delayed: Reporté
     missing: Rapport vide
+    harvested: Moissonné
+    unharvested: Non moissonné
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible
@@ -679,6 +687,19 @@ sushi:
   inactiveDescription: L'établissement à rendu cet identifiant inactif et ne sera donc pas moissonné.
   harvestState: État du moissonnage
   harvestStateDescription: Cette matrice présente les différents résultats du moissonnage de ces identifiants. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
+  globalHarvestState:
+    institution:
+      title: État du moissonnage
+      description: Cette matrice présente les résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu pu survenir lors de la récupération des données.
+    endpoint:
+      title: État du moissonnage
+    harvest-session:
+      title: État du moissonnage
+      description: Cette matrice présente les résultats du moissonnage des différents établissement. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
+    title: État global du moissonnage
+    loading: L'état global du moissonnage est en cours de génération, cela peut prendre quelques secondes
+    periodShortcut: '{n} mois'
+    showUnharvested: Afficher les établissements non moissonnés
   harvestedAt: Moissonné le {date}
   checking: Vérification de la connexion de {vendor} pour {name}
   report: Rapport
@@ -696,7 +717,7 @@ sushi:
     ignored: Rapport non supporté (constat ezMESURE)
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
-    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
+    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez valider vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
   paramScopes:
     all: Toutes les requêtes au point d'accès
     report_list: Listing des rapports
@@ -988,6 +1009,7 @@ spaces:
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
+    title: Session de moissonnage
     pendingSession: Moissonnage en attente...
     startedAt: Moissonnage lancé le {date}
     metrics:
@@ -1022,6 +1044,7 @@ harvest:
   jobs:
     title: Tâches de moissonnage
     filtersTitle: Filtrer les tâches
+    versions: Versions
     harvestId: Identifiant de moissonnage
     reportType: Type de rapport
     errorCode: Code d'erreur
@@ -1225,3 +1248,4 @@ version: Version
 back: Retour
 select: Sélectionner
 all: Tous
+pleaseWait: Veuillez patienter...
