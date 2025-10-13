@@ -32,6 +32,7 @@ const { schema, includableFields } = require('../../entities/sushi-credentials.d
 
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 const { prepareStandardQueryParams } = require('../../services/std-query');
+const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -117,45 +118,119 @@ exports.getTasks = async (ctx) => {
 };
 
 exports.addSushi = async (ctx) => {
-  ctx.action = 'sushi/create';
-  const { body: sushiData } = ctx.request;
-  const { institution } = ctx.state;
+  const { institution, endpoint } = ctx.state;
+  const { update, force } = ctx.query;
+  const { body: data } = ctx.request;
 
-  ctx.metadata = {
-    vendor: sushiData.vendor,
-    institutionId: institution.id,
-    institutionName: institution.name,
-  };
+  const credentialsService = new SushiCredentialsService();
 
-  const sushiCredentialsService = new SushiCredentialsService();
-  const sushiItem = await sushiCredentialsService.create({
-    data: {
-      ...sushiData,
-      endpoint: { connect: { id: sushiData?.endpointId } },
-      institution: { connect: { id: sushiData?.institutionId } },
-      endpointId: undefined,
-      institutionId: undefined,
-    },
-  });
+  // Don't check for similar credentials if there's custom params
+  if (!Array.isArray(data.params) || data.params.length <= 0) {
+    const similar = await credentialsService.findSimilar(
+      { ...data, endpoint },
+      { institutionId: institution.id },
+    );
 
-  ctx.metadata.sushiId = sushiItem?.id;
+    if (similar && !force) {
+      // If similar and we shouldn't do the update, throw an error
+      if (!update) {
+        ctx.status = 409;
+        // Makes it look like an error, but add sushi found
+        // (somehow attaching it with ctx.throw didn't work)
+        ctx.body = {
+          status: 409,
+          error: ctx.$t('errors.sushi.similar'),
+          similar,
+        };
+        return;
+      }
+
+      // Update the credentials found with new data
+      ctx.status = 200;
+      ctx.body = await SushiCredentialsService.$transaction(async (service) => {
+        const actionService = new ActionsService(service);
+
+        // Force active and archived state to be reset
+        data.active = true;
+        data.archived = false;
+
+        if (similar.active !== data.active) {
+          data.activeUpdatedAt = new Date();
+        }
+        if (similar.archived !== data.archived) {
+          data.archivedUpdatedAt = new Date();
+        }
+
+        const sushi = await service.update({
+          where: { id: similar.id },
+          data: {
+            ...data,
+            endpoint: { connect: { id: endpoint.id } },
+            endpointId: undefined,
+            // Avoid changing institution
+            institutionId: undefined,
+          },
+          include: { endpoint: true },
+        });
+
+        await actionService.create({
+          data: {
+            type: 'sushi/update',
+            institution: { connect: { id: institution.id } },
+            author: { connect: { username: ctx.state.user.username } },
+            data: {
+              vendor: endpoint.vendor,
+              state: sushi,
+              oldState: similar,
+            },
+          },
+        });
+
+        return { ...sushi, endpoint: undefined };
+      });
+      return;
+    }
+  }
+
+  // Create new credentials
   ctx.status = 201;
-  ctx.body = sushiItem;
+  ctx.body = await SushiCredentialsService.$transaction(async (service) => {
+    const actionService = new ActionsService(service);
+
+    const sushi = await service.create({
+      data: {
+        ...data,
+        endpoint: { connect: { id: endpoint.id } },
+        endpointId: undefined,
+        institution: { connect: { id: institution.id } },
+        institutionId: undefined,
+      },
+      include: { endpoint: true },
+    });
+
+    await actionService.create({
+      data: {
+        type: 'sushi/create',
+        institution: { connect: { id: institution.id } },
+        author: { connect: { username: ctx.state.user.username } },
+        data: {
+          vendor: endpoint.vendor,
+          state: sushi,
+        },
+      },
+    });
+
+    return { ...sushi, endpoint: undefined };
+  });
 };
 
 exports.updateSushi = async (ctx) => {
-  ctx.action = 'sushi/update';
   const { sushi, institution } = ctx.state;
+  const { force } = ctx.query;
   const { body } = ctx.request;
+
+  // Apply transformations
   const data = { ...body, connection: {} };
-
-  ctx.metadata = {
-    sushiId: sushi.id,
-    vendor: sushi.endpoint?.vendor,
-    institutionId: institution.id,
-    institutionName: institution.name,
-  };
-
   if (typeof body.active === 'boolean' || typeof body.archived === 'boolean') {
     if (Object.keys(body).length === 1) {
       // If only the active state is toggled, no need to change update date
@@ -170,14 +245,69 @@ exports.updateSushi = async (ctx) => {
     }
   }
 
-  const sushiCredentialsService = new SushiCredentialsService();
-  const updatedSushiCredentials = await sushiCredentialsService.update({
-    where: { id: sushi.id },
-    data,
+  const endpointsService = new SushiEndpointsService();
+
+  const targetEndpoint = await endpointsService.findUnique({
+    where: { id: data?.endpointId ?? sushi.endpointId },
   });
 
+  let similar;
+
+  const credentialsService = new SushiCredentialsService();
+
+  // Don't check for similar credentials if there's custom params
+  if (!Array.isArray(data.params) || data.params.length <= 0) {
+    similar = await credentialsService.findSimilar(
+      { ...sushi, ...data, endpoint: targetEndpoint },
+      { institutionId: institution.id },
+    );
+
+    if (similar && !force) {
+      // If similar throw an error
+      ctx.status = 409;
+      // Makes it look like an error, but add sushi found
+      // (somehow attaching it with ctx.throw didn't work)
+      ctx.body = {
+        status: 409,
+        error: ctx.$t('errors.sushi.similar'),
+        similar,
+      };
+      return;
+    }
+  }
+
+  // Update credentials
   ctx.status = 200;
-  ctx.body = updatedSushiCredentials;
+  ctx.body = await SushiCredentialsService.$transaction(async (service) => {
+    const actionService = new ActionsService(service);
+
+    const newSushi = await service.update({
+      where: { id: similar?.id ?? sushi.id },
+      data: {
+        ...data,
+        endpoint: { connect: { id: targetEndpoint.id } },
+        endpointId: undefined,
+        // Avoid changing institution
+        institutionId: undefined,
+      },
+      include: { endpoint: true },
+    });
+
+    await actionService.create({
+      data: {
+        type: 'sushi/update',
+        institution: { connect: { id: institution.id } },
+        author: { connect: { username: ctx.state.user.username } },
+        data: {
+          vendor: targetEndpoint.vendor,
+          state: newSushi,
+          oldState: similar,
+        },
+      },
+    });
+
+    return { ...newSushi, endpoint: undefined };
+  });
 };
 
 exports.deleteOne = async (ctx) => {
@@ -195,13 +325,15 @@ exports.deleteOne = async (ctx) => {
     endpointVendor: sushi.endpoint?.vendor,
   };
 
-  await SushiCredentialsService.$transaction(async (sushiCredentialsService) => {
-    const actionService = new ActionsService();
+  await SushiCredentialsService.$transaction(async (credentialsService) => {
+    const actionService = new ActionsService(credentialsService);
 
-    await sushiCredentialsService.delete({ where: { id: sushi.id } });
+    await credentialsService.delete({ where: { id: sushi.id } });
     await actionService.create({
       data: {
         type: 'sushi/delete',
+        institution: { connect: { id: sushi.institutionId } },
+        author: { connect: { username: ctx.state.user.username } },
         data: {
           reason,
           vendor: sushi.endpoint?.vendor,
@@ -226,14 +358,6 @@ exports.deleteOne = async (ctx) => {
               harvestDateFormat: sushi.endpoint.harvestDateFormat,
             } : undefined,
           },
-        },
-
-        institution: {
-          connect: { id: sushi.institutionId },
-        },
-
-        author: {
-          connect: { username: ctx.state.user.username },
         },
       },
     });
