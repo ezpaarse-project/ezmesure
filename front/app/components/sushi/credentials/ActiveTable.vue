@@ -458,7 +458,10 @@ async function toggleActiveStates(items) {
   if (!user.value.isAdmin && isSushiReady.value) {
     const shouldUnready = await openConfirm({
       title: t('institutions.sushi.resumeEntryQuestion'),
-      text: t('institutions.sushi.resumeEntryDesc'),
+      text: t(
+        'institutions.sushi.resumeEntryDesc',
+        { date: dateFormat(isSushiReady.value, locale.value) },
+      ),
     });
 
     if (!shouldUnready) {
