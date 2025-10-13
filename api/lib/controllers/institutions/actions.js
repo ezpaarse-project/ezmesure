@@ -542,7 +542,7 @@ exports.harvestableInstitutions = async (ctx) => {
     where: {
       sushiCredentials: {
         some: {
-          active: true,
+          ...SushiCredentialsService.enabledCredentialsQuery,
         },
       },
     },
