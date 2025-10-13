@@ -36,7 +36,7 @@ menu:
   spaces: Spaces
   harvest:
     group: Harvest
-    institutions: Établissements
+    institutions: Institutions
     sessions: Sessions
     alerts: Alertes
   sync: Synchronisation
@@ -518,7 +518,7 @@ institutions:
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
     harvestable:
       title: Harvestable institutions
-      harvestableInstitutions: Harvestables
+      harvestableInstitutions: Harvestable
       status:
         harvestable: Harvestable
         non-harvestable: Non harvestable
@@ -1026,7 +1026,7 @@ harvest:
     allowFaulty: Include invalid credentials
     useCache: Use report cache
     useValidation: Respect report validation
-    timeout: Délai de complétion des tâches
+    timeout: Completion time of tasks
   jobs:
     title: Harvesting Tasks
     filtersTitle: Filter Tasks
