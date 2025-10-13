@@ -268,7 +268,7 @@ const maxHarvestYear = new Date().getFullYear();
 
 const { params } = useRoute();
 const { data: user } = useAuthState();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const { addToCheck } = useSushiCheckQueueStore();
@@ -429,7 +429,10 @@ async function unarchiveSushis(items) {
   if (!user.value.isAdmin && isSushiReady.value) {
     const shouldUnready = await openConfirm({
       title: t('institutions.sushi.resumeEntryQuestion'),
-      text: t('institutions.sushi.resumeEntryDesc'),
+      text: t(
+        'institutions.sushi.resumeEntryDesc',
+        { date: dateFormat(isSushiReady.value, locale.value) },
+      ),
     });
 
     if (!shouldUnready) {
