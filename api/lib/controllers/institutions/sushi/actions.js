@@ -8,6 +8,7 @@ const {
   schema,
   includableFields,
 } = require('../../../entities/sushi-credentials.dto');
+const InstitutionsService = require('../../../entities/institutions.service');
 
 /* eslint-disable max-len */
 /**
@@ -71,6 +72,7 @@ exports.getAll = async (ctx) => {
 exports.getMetrics = async (ctx) => {
   const sushiCredentialsService = new SushiCredentialsService();
 
+  // Get counts of credentials
   const [
     untested,
     unauthorized,
@@ -78,19 +80,35 @@ exports.getMetrics = async (ctx) => {
     success,
   ] = await Promise.all(
     [UNTESTED_FILTER, UNAUTHORIZED_FILTER, FAILED_FILTER, SUCCESS_FILTER].map(
-      (connection) => sushiCredentialsService.count({
-        where: {
-          connection,
-          institutionId: ctx.state.institution.id,
-          archived: false,
-        },
+      async (connection) => ({
+        total: await sushiCredentialsService.count({
+          where: {
+            connection,
+            institutionId: ctx.state.institution.id,
+            archived: false,
+          },
+        }),
+        enabled: await sushiCredentialsService.count({
+          where: {
+            connection,
+            institutionId: ctx.state.institution.id,
+            ...SushiCredentialsService.enabledCredentialsQuery,
+          },
+        }),
       }),
     ),
   );
 
+  // Get if institution is harvestable
+  const institutionService = new InstitutionsService();
+
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = {
+    harvestable: await institutionService.isHarvestable(
+      ctx.state.institution.id,
+      { allowHarvested: true },
+    ),
     statuses: {
       untested,
       unauthorized,

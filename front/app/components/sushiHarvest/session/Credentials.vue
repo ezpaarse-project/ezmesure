@@ -26,7 +26,11 @@
               append-icon="mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
-            />
+            >
+              <template #prepend>
+                <InstitutionAvatar :institution="item" />
+              </template>
+            </v-list-item>
           </v-list>
         </v-col>
 
