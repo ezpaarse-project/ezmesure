@@ -26,6 +26,7 @@
           <v-expansion-panel
             v-for="({ raw: item }) in items"
             :key="item.id"
+            :value="item.id"
             :readonly="!item.startedAt"
             :expand-icon="!item.startedAt ? '' : undefined"
           >
