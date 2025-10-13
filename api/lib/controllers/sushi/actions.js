@@ -20,6 +20,7 @@ const SushiCredentialsService = require('../../entities/sushi-credentials.servic
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
 const HarvestSessionService = require('../../entities/harvest-session.service');
+const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
 const { schema, includableFields } = require('../../entities/sushi-credentials.dto');
 
@@ -32,7 +33,6 @@ const { schema, includableFields } = require('../../entities/sushi-credentials.d
 
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 const { prepareStandardQueryParams } = require('../../services/std-query');
-const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
