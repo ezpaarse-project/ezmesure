@@ -726,6 +726,21 @@ sushi:
     mistake: I entered the identifiers by mistake
     neverWorked: The access point has never worked for our institution
     duplicate: This identifier is a duplicate of another one
+  duplicateDialog:
+    title: Similar credentials have been found!
+    text:
+      start: "The credentials for your institution below {reason}:"
+      content:
+        title: Credentials found
+        state: State
+      end:create: Do you want to edit this credentials (which will make them active), or continue creating new credentials?
+      end:update: To avoid duplicate in ussage report harvests, please modify the credentials shown above or cancel the editing operation.
+    reasons:
+      samePackage: concern the same endpoint and package
+      sameParameters: have exactly the same parameters
+    actions:
+      main:archived: Update and unarchive
+      main:update: I understand
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials

@@ -742,6 +742,21 @@ sushi:
     mistake: J'ai entré(e) ces identifiants par erreur
     neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
     duplicate: Cet identifiant est en doublon avec un autre
+  duplicateDialog:
+    title: Des identifiants similaires ont été trouvés !
+    text:
+      start: "Les identifiants ci-dessous déclarés pour votre établissement {reason} :"
+      content:
+        title: Identifiants trouvés
+        state: État
+      end:create: Voulez-vous mettre à jour ces identifiants (ce qui les rendera actifs), ou continuer la création de nouveaux identifiants ?
+      end:update: Pour évitez les doublons dans les moissons de rapports d'usages, veuillez modifier les identifiants présentés ci-dessus ou annuler l'opération d'édition.
+    reasons:
+      samePackage: concernent le même point d'accès et le même package
+      sameParameters: possèdent exactement les mêmes paramètres
+    actions:
+      main:archived: Mettre à jour et désarchiver
+      main:update: J'ai compris
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
