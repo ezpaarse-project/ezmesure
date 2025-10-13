@@ -30,18 +30,21 @@
                 <v-switch
                   v-model="allowNotReady"
                   :label="$t('institutions.harvestable.allowNotReady')"
+                  color="primary"
                 />
               </v-col>
               <v-col cols="6">
                 <v-switch
                   v-model="allowFaulty"
                   :label="$t('institutions.harvestable.allowFaulty')"
+                  color="primary"
                 />
               </v-col>
               <v-col cols="6">
                 <v-switch
                   v-model="allowHarvested"
                   :label="$t('institutions.harvestable.allowHarvested')"
+                  color="primary"
                 />
               </v-col>
               <v-col cols="6">
