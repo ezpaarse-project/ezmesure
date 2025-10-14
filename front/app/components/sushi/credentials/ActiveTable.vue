@@ -138,14 +138,14 @@
               :title="$t('modify')"
               :disabled="!canEdit"
               prepend-icon="mdi-pencil"
-              @click="sushiFormRef?.open(item, { institution })"
+              @click="openForm(item)"
             />
             <v-list-item
               v-if="sushiFormRef"
               :title="$t('duplicate')"
               :disabled="!canEdit"
               prepend-icon="mdi-content-copy"
-              @click="sushiFormRef?.open({ ...item, id: null }, { institution })"
+              @click="openForm({ ...item, id })"
             />
             <v-list-item
               :title="$t('archive')"
@@ -246,7 +246,7 @@
 
     <SushiFormDialog
       ref="sushiFormRef"
-      @submit="refresh()"
+      @submit="debouncedRefresh()"
       @update:model-value="onSushiUpdate($event)"
     />
 
@@ -274,10 +274,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  defineTab: {
-    type: Function,
-    default: (tab) => tab,
-  },
+});
+
+const emit = defineEmits({
+  mounted: (tab) => !!tab,
+  'update:institution.sushiReadySince': (value) => value === null || !!value,
+  refresh: () => true,
 });
 
 const maxHarvestYear = new Date().getFullYear();
@@ -324,7 +326,7 @@ const {
 });
 
 onMounted(() => {
-  props.defineTab?.({
+  emit('mounted', {
     refresh,
     itemLength,
     query,
@@ -373,11 +375,18 @@ const headers = computed(() => [
     align: 'center',
   },
 ]);
+/**
+ * Sushi ready formatted date
+ */
+const isSushiReady = computed(() => props.institution?.sushiReadySince || false);
 
 /**
  * Debounced refresh
  */
-const debouncedRefresh = useDebounceFn(refresh, 250);
+const debouncedRefresh = useDebounceFn(async () => {
+  await refresh();
+  emit('refresh');
+}, 250);
 
 function onSushiUpdate(item) {
   const index = sushis.value.findIndex((sushi) => sushi.id === item.id);
@@ -445,6 +454,23 @@ async function toggleActiveStates(items) {
     return;
   }
 
+  // Show confirm if already ready
+  if (!user.value.isAdmin && isSushiReady.value) {
+    const shouldUnready = await openConfirm({
+      title: t('institutions.sushi.resumeEntryQuestion'),
+      text: t(
+        'institutions.sushi.resumeEntryDesc',
+        { date: dateFormat(isSushiReady.value, locale.value) },
+      ),
+    });
+
+    if (!shouldUnready) {
+      return;
+    }
+
+    emit('update:institution.sushiReadySince', null);
+  }
+
   await Promise.all(
     toToggle.map(async (item) => {
       activeLoadingMap.value.set(item.id, true);
@@ -484,6 +510,23 @@ async function archiveSushis(items) {
     return;
   }
 
+  // Show confirm if already ready
+  if (!user.value.isAdmin && isSushiReady.value) {
+    const shouldUnready = await openConfirm({
+      title: t('institutions.sushi.resumeEntryQuestion'),
+      text: t(
+        'institutions.sushi.resumeEntryDesc',
+        { date: dateFormat(isSushiReady.value, locale.value) },
+      ),
+    });
+
+    if (!shouldUnready) {
+      return;
+    }
+
+    emit('update:institution.sushiReadySince', null);
+  }
+
   openConfirm({
     text: t(
       'sushi.archiveNbCredentials',
@@ -520,6 +563,7 @@ async function archiveSushis(items) {
       }
 
       await refresh();
+      emit('refresh');
     },
   });
 }
@@ -534,6 +578,8 @@ async function resetConnections(items) {
   if (toReset.length <= 0) {
     return;
   }
+
+  // Action is admin only, we can skip the confirm for making institution unready
 
   toReset = toReset.filter((item) => !!item?.connection?.status);
   // No reset needed, simulate like we just did
@@ -565,8 +611,30 @@ async function resetConnections(items) {
       }
 
       await refresh();
+      emit('refresh');
     },
   });
+}
+
+async function openForm(item) {
+  // Show confirm if already ready
+  if (!user.value.isAdmin && isSushiReady.value) {
+    const shouldUnready = await openConfirm({
+      title: t('institutions.sushi.resumeEntryQuestion'),
+      text: t(
+        'institutions.sushi.resumeEntryDesc',
+        { date: dateFormat(isSushiReady.value, locale.value) },
+      ),
+    });
+
+    if (!shouldUnready) {
+      return;
+    }
+
+    emit('update:institution.sushiReadySince', null);
+  }
+
+  sushiFormRef?.open(item, { institution: props.institution });
 }
 
 watchOnce(

@@ -1,23 +1,40 @@
 <template>
-  <v-sheet
-    class="d-flex flex-column justify-start align-center"
-    style="gap: 10px"
+  <v-card
+    :subtitle="title"
+    variant="flat"
+    density="compact"
   >
-    <v-icon :icon="icon" :color="color" size="x-large" />
+    <template #prepend>
+      <slot name="icon">
+        <v-avatar
+          :icon="icon"
+          :class="[`bg-${color}`, 'mr-2']"
+          style="border-radius: 10%;"
+        />
+      </slot>
+    </template>
 
-    <div class="text-center">
-      {{ text }}
-    </div>
+    <template #title>
+      <slot name="value">
+        {{ value }}
+      </slot>
+    </template>
 
-    <div>
-      <slot name="actions" />
-    </div>
-  </v-sheet>
+    <template v-if="$slots.actions" #text>
+      <div class="text-end">
+        <slot name="actions" />
+      </div>
+    </template>
+  </v-card>
 </template>
 
 <script setup>
 defineProps({
-  text: {
+  title: {
+    type: String,
+    default: '',
+  },
+  value: {
     type: String,
     default: '',
   },

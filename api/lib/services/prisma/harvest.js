@@ -8,6 +8,7 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.HarvestUpdateArgs} HarvestUpdateArgs
  * @typedef {import('@prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
  * @typedef {import('@prisma/client').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
  * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
  * @typedef {import('@prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs
  * @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs
@@ -41,6 +42,15 @@ function findMany(params, tx = prisma) {
  */
 function findUnique(params, tx = prisma) {
   return tx.harvest.findUnique(params);
+}
+
+/**
+ * @param {HarvestFindFirstArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Harvest | null>}
+ */
+function findFirst(params, tx = prisma) {
+  return tx.harvest.findFirst(params);
 }
 
 /**
@@ -93,6 +103,7 @@ async function removeMany(params, tx = prisma) {
 module.exports = {
   create,
   findMany,
+  findFirst,
   findUnique,
   count,
   update,

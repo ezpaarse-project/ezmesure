@@ -44,16 +44,20 @@
     </SkeletonPageBar>
 
     <v-container fluid>
-      <v-row>
-        <v-col cols="6">
-          <template v-if="!sushiMetrics">
-            <v-skeleton-loader
-              height="100"
-              type="avatar, paragraph"
+      <v-row v-if="endpoint">
+        <v-slide-x-transition>
+          <v-col v-if="!endpoint.active" cols="6">
+            <v-alert
+              :title="$t('endpoints.inactive')"
+              :text="$t('endpoints.inactiveDescription')"
+              type="warning"
+              prominent
             />
-          </template>
+          </v-col>
+        </v-slide-x-transition>
 
-          <template v-else-if="sushiMetrics.failed > 0">
+        <v-slide-x-reverse-transition>
+          <v-col v-if="(sushiMetrics?.failed ?? 0) > 0" cols="6">
             <v-alert
               :title="$t('sushi.problematicEndpoint')"
               :text="$t('sushi.nErrsCredentials', sushiMetrics.failed)"
@@ -69,69 +73,61 @@
                 />
               </template>
             </v-alert>
-          </template>
-        </v-col>
+          </v-col>
+        </v-slide-x-reverse-transition>
+      </v-row>
 
-        <v-col v-if="!endpoint.active" cols="6">
-          <v-alert
-            :title="$t('endpoints.inactive')"
-            :text="$t('endpoints.inactiveDescription')"
-            type="warning"
-            prominent
+      <v-row v-if="!sushiMetrics">
+        <v-col v-for="i in 4" :key="i" cols="3">
+          <v-skeleton-loader
+            height="64"
+            type="list-item-avatar"
           />
         </v-col>
       </v-row>
 
-      <v-row class="justify-space-evenly">
-        <template v-if="!sushiMetrics">
-          <v-col v-for="n in 4" :key="n" cols="2">
-            <v-skeleton-loader
-              height="100"
-              type="paragraph"
-            />
-          </v-col>
-        </template>
-
-        <template v-else>
-          <v-col cols="2">
+      <v-slide-y-transition>
+        <v-row v-if="sushiMetrics">
+          <v-col cols="3">
             <SimpleMetric
-              :text="$t('sushi.nInstitutions', sushiMetrics.institutions)"
+              :title="$t('sushi.institutions', sushiMetrics.institutions)"
+              :value="`${sushiMetrics.institutions}`"
               icon="mdi-domain"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.success || 0"
-              title-key="sushi.nOperationalCredentials"
+              :model-value="sushiMetrics.success || { total: 0 }"
+              :title="$t('sushi.operationalCredentials')"
               icon="mdi-check"
               color="success"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.untested || 0"
+              :model-value="sushiMetrics.untested || { total: 0 }"
+              :title="$t('sushi.untestedCredentials')"
               :action-text="$t('show')"
-              title-key="sushi.nUntestedCredentials"
               icon="mdi-bell-alert"
               color="info"
               @click="filters.connection = 'untested'"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.unauthorized || 0"
+              :model-value="sushiMetrics.unauthorized || { total: 0 }"
+              :title="$t('sushi.invalidCredentials')"
               :action-text="$t('show')"
-              title-key="sushi.nInvalidCredentials"
               icon="mdi-key-alert-outline"
               color="warning"
               @click="filters.connection = 'unauthorized'"
             />
           </v-col>
-        </template>
-      </v-row>
+        </v-row>
+      </v-slide-y-transition>
 
       <v-row class="mt-4">
         <v-col>
@@ -509,7 +505,7 @@ function calcSushiMetrics() {
   const value = Object.fromEntries(
     Object.entries(
       Object.groupBy(sushis.value, (s) => s.connection?.status ?? 'untested') || {},
-    ).map(([k, s]) => [k, s.length]),
+    ).map(([k, s]) => [k, { total: s.length }]),
   );
   value.institutions = institutionsMap.value.size;
 

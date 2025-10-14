@@ -22,6 +22,19 @@ module.exports = class SushiCredentialsService extends BasePrismaService {
   static $transaction = super.$transaction;
 
   /**
+   * Prisma query to find enabled credentials
+   *
+   * @type {import('@prisma/client').Prisma.SushiCredentialsWhereInput}
+   */
+  static enabledCredentialsQuery = {
+    active: true,
+    archived: false,
+    endpoint: {
+      active: true,
+    },
+  };
+
+  /**
    * @param {SushiCredentialsCreateArgs} params
    * @returns {Promise<SushiCredentials>}
    */

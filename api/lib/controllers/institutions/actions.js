@@ -3,6 +3,7 @@ const config = require('config');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
+const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 
@@ -532,4 +533,45 @@ exports.deleteInstitution = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = data;
+};
+
+exports.harvestableInstitutions = async (ctx) => {
+  const institutionsService = new InstitutionsService();
+
+  const institutions = await institutionsService.findMany({
+    where: {
+      sushiCredentials: {
+        some: {
+          ...SushiCredentialsService.enabledCredentialsQuery,
+        },
+      },
+    },
+    orderBy: {
+      name: 'asc',
+    },
+    include: {
+      _count: {
+        select: {
+          spaces: { where: { type: 'counter5' } },
+          repositories: { where: { type: 'counter5' } },
+          memberships: { where: { roles: { has: 'contact:doc' } } },
+          sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
+        },
+      },
+    },
+  });
+
+  const response = [];
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const institution of institutions) {
+    response.push({
+      institution,
+      // eslint-disable-next-line no-await-in-loop
+      harvestable: await institutionsService.isHarvestable(institution.id, ctx.query),
+    });
+  }
+
+  ctx.status = 200;
+  ctx.body = response;
 };

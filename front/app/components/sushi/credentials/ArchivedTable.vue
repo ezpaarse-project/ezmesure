@@ -258,11 +258,17 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits({
+  mounted: (tab) => !!tab,
+  'update:institution.sushiReadySince': (value) => value === null || !!value,
+  refresh: () => true,
+});
+
 const maxHarvestYear = new Date().getFullYear();
 
 const { params } = useRoute();
 const { data: user } = useAuthState();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const { addToCheck } = useSushiCheckQueueStore();
@@ -303,7 +309,7 @@ const {
 });
 
 onMounted(() => {
-  props.defineTab?.({
+  emit('mounted', {
     refresh,
     itemLength,
     query,
@@ -351,9 +357,16 @@ const headers = computed(() => [
   },
 ]);
 /**
+ * Sushi ready formatted date
+ */
+const isSushiReady = computed(() => props.institution?.sushiReadySince || false);
+/**
  * Debounced refresh
  */
-const debouncedRefresh = useDebounceFn(refresh, 250);
+const debouncedRefresh = useDebounceFn(async () => {
+  await refresh();
+  emit('refresh');
+}, 250);
 
 /**
  * Put sushi ID into clipboard
@@ -412,6 +425,23 @@ async function unarchiveSushis(items) {
     return;
   }
 
+  // Show confirm if already ready
+  if (!user.value.isAdmin && isSushiReady.value) {
+    const shouldUnready = await openConfirm({
+      title: t('institutions.sushi.resumeEntryQuestion'),
+      text: t(
+        'institutions.sushi.resumeEntryDesc',
+        { date: dateFormat(isSushiReady.value, locale.value) },
+      ),
+    });
+
+    if (!shouldUnready) {
+      return;
+    }
+
+    emit('update:institution.sushiReadySince', null);
+  }
+
   const results = await Promise.all(
     toArchive.map(async (item) => {
       activeLoadingMap.value.set(item.id, true);
@@ -440,6 +470,7 @@ async function unarchiveSushis(items) {
   }
 
   await refresh();
+  emit('refresh');
 }
 
 /**
@@ -483,6 +514,7 @@ async function resetConnections(items) {
       }
 
       await refresh();
+      emit('refresh');
     },
   });
 }
@@ -505,6 +537,7 @@ async function deleteSushis(items) {
       }
 
       await refresh();
+      emit('refresh');
     },
   });
 }

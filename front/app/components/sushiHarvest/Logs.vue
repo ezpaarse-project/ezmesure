@@ -66,7 +66,7 @@ const entries = computed(
         text,
         color: logColors.get(value) || 'white',
         // Ensure the help URL is a full URL
-        helpUrl: item.Help_URL ? new URL(item.Help_URL, props.endpointUrl) : undefined,
+        helpUrl: item.Help_URL ? new URL(item.Help_URL, props.endpointUrl).href : undefined,
       };
     })
     .sort((a, b) => (a.date < b.date ? -1 : 1)),
