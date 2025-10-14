@@ -634,7 +634,7 @@ async function openForm(item) {
     emit('update:institution.sushiReadySince', null);
   }
 
-  sushiFormRef?.open(item, { institution: props.institution });
+  sushiFormRef.value?.open(item, { institution: props.institution });
 }
 
 watchOnce(
