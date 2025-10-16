@@ -143,7 +143,11 @@ exports.applyOne = async (ctx) => {
       customProps: Object.fromEntries(institution.customProps.map((p) => [p.fieldId, p.value])),
     };
     const aliasPattern = interpolateString(templatePattern, interpolateContext);
-    const aliasFilters = interpolateObject(templateFilters, interpolateContext);
+    const aliasFilters = interpolateObject(
+      templateFilters,
+      interpolateContext,
+      { toArray: new Set(['value']) },
+    );
 
     let alias = aliases.get(aliasPattern);
 
