@@ -180,7 +180,7 @@ const emit = defineEmits({
   submit: (value) => !!value,
 });
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const snacks = useSnacksStore();
 
 const loadingForce = shallowRef(false);
