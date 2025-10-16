@@ -125,13 +125,13 @@ exports.addSushi = async (ctx) => {
   const credentialsService = new SushiCredentialsService();
 
   // Don't check for similar credentials if there's custom params
-  if (!Array.isArray(data.params) || data.params.length <= 0) {
+  if (!force && (!Array.isArray(data.params) || data.params.length <= 0)) {
     const similar = await credentialsService.findSimilar(
       { ...data, endpoint },
       { institutionId: institution.id },
     );
 
-    if (similar && !force) {
+    if (similar) {
       // If similar and we shouldn't do the update, throw an error
       if (!update) {
         ctx.status = 409;
@@ -256,13 +256,13 @@ exports.updateSushi = async (ctx) => {
   const credentialsService = new SushiCredentialsService();
 
   // Don't check for similar credentials if there's custom params
-  if (!Array.isArray(data.params) || data.params.length <= 0) {
+  if (!force && (!Array.isArray(data.params) || data.params.length <= 0)) {
     similar = await credentialsService.findSimilar(
       { ...sushi, ...data, endpoint: targetEndpoint },
       { institutionId: institution.id },
     );
 
-    if (similar && !force) {
+    if (similar) {
       // If similar throw an error
       ctx.status = 409;
       // Makes it look like an error, but add sushi found
