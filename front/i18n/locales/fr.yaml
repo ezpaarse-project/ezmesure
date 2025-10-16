@@ -749,6 +749,25 @@ sushi:
     mistake: J'ai entré(e) ces identifiants par erreur
     neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
     duplicate: Cet identifiant est en doublon avec un autre
+  duplicateDialog:
+    title: Des identifiants similaires ont été trouvés !
+    text:
+      alert: Créer des identifiants COUNTER identiques à des identifiants déjà existants déclenchera des moissons de rapports d'usages en double pour votre établissement
+      start: "Les identifiants ci-dessous déclarés pour votre établissement {reason} :"
+      content:
+        title: Identifiants déjà déclarés
+        state: État
+      end:create: Voulez-vous modifier les identifiants déjà déclarés, ou procéder à la création de nouveaux identifiants ?
+      end:update: Voulez-vous modifier les identifiants déjà déclarés (en annulant l'édition actuelle), ou continuer avec votre édition actuelle ?
+    reasons:
+      samePackage: concernent le même point d'accès et le même package
+      sameParameters: possèdent exactement les mêmes paramètres
+    actions:
+      main:create: '@:update'
+      main:create.archived: '@:update et désarchiver'
+      main:update: Je modifie les identifiants déjà déclarés
+      secondary:create: Créer de nouveaux identifiants
+      secondary:update: Poursuivre l'édition
   isHarvestable:
     title: Votre établissement est éligible au moissonnage
     text: Votre établissement sera inclus dans la prochaine vague de moissonnage, aucune action n'est nécessaire de votre part.

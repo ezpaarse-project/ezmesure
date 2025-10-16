@@ -739,6 +739,25 @@ sushi:
     mistake: I entered the identifiers by mistake
     neverWorked: The access point has never worked for our institution
     duplicate: This identifier is a duplicate of another one
+  duplicateDialog:
+    title: Similar credentials have been found!
+    text:
+      alert: Creating COUNTER credentials that are identical to existing credentials will trigger duplicates in report harvests for your institution
+      start: "The credentials for your institution below {reason}:"
+      content:
+        title: Credentials already registered
+        state: State
+      end:create: Do you want to edit the already registered credentials, or continue creating new credentials?
+      end:update: Do you want to edit the already registered credentials (by canceling the current edition), or continue your current edition ?
+    reasons:
+      samePackage: concern the same endpoint and package
+      sameParameters: have exactly the same parameters
+    actions:
+      main:create: '@:update'
+      main:create.archived: '@:update and unarchive'
+      main:update: I will edit the already registered credentials
+      secondary:create: Create new credentials
+      secondary:update: Continue editing
   isHarvestable:
     title: Your institution is eligible for harvesting
     text: Your institution will be included in next harvest session, no action is need from your end.

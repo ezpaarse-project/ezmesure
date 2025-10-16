@@ -13,6 +13,7 @@ const sushiCredentialsPrisma = require('../services/prisma/sushi-credentials');
  * @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs
  * @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs
  * @typedef {import('@prisma/client').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs
+ * @typedef {import('@prisma/client').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput
  */
 /* eslint-enable max-len */
 
@@ -136,5 +137,62 @@ module.exports = class SushiCredentialsService extends BasePrismaService {
       return transaction(this);
     }
     return SushiCredentialsService.$transaction(transaction);
+  }
+
+  /**
+   * Find credentials that looks like another
+   *
+   * @param {SushiCredentials & { endpoint?: SushiEndpoint }} credentials - The credentials
+   * used as reference
+   * @param {SushiCredentialsWhereInput} [query] - Prisma query that will be added to conditions
+   *
+   * @returns {Promise<SushiCredentials | null>} - The first credentials that is similar,
+   * null if no similar credentials are found
+   */
+  async findSimilar(credentials, query) {
+    const [similar] = await this.findMany({
+      where: {
+        AND: [
+          query ?? {},
+          // Is similar cause :
+          {
+            // Not the same
+            id: credentials.id ? { not: credentials.id } : undefined,
+            // Not deleted
+            deletedAt: null,
+            // And one of the following :
+            OR: [
+              // Same endpoint and same packages
+              {
+                endpointId: credentials.endpointId,
+                packages: { equals: credentials.packages },
+              },
+              // Same parameters
+              {
+                customerId: credentials.customerId,
+                requestorId: credentials.requestorId,
+                apiKey: credentials.apiKey,
+                endpoint: {
+                  sushiUrl: credentials.endpoint?.sushiUrl,
+                  // Ignore if custom params are present
+                  params: { isEmpty: true },
+                },
+                // Ignore if custom params are present
+                OR: [
+                  { params: { equals: null } },
+                  { params: { isEmpty: true } },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      include: {
+        endpoint: true,
+      },
+      take: 1, // is the same as using this.findFirst()
+    });
+
+    return similar || null;
   }
 };

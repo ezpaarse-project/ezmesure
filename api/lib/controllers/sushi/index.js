@@ -123,6 +123,10 @@ router.route({
   ],
   validate: {
     type: 'json',
+    query: {
+      update: Joi.boolean(),
+      force: Joi.boolean(),
+    },
     body: createSchema,
   },
 });
@@ -320,6 +324,9 @@ router.route({
     type: 'json',
     params: {
       sushiId: Joi.string().trim().required(),
+    },
+    query: {
+      force: Joi.boolean(),
     },
     body: updateSchema,
   },
