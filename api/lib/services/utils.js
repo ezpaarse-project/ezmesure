@@ -104,9 +104,9 @@ const interpolateObject = (obj, context, opts, currentPath = []) => {
       ));
     }, [{}]);
 
-    return combinations.map((combination) => {
-      const ctx = JSON.parse(JSON.stringify(context));
+    const ctx = JSON.parse(JSON.stringify(context));
 
+    return combinations.map((combination) => {
       Object.entries(combination).forEach(([key, value]) => {
         set(ctx, key, value);
       });
