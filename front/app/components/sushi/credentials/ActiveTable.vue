@@ -317,7 +317,11 @@ const {
     },
   },
   data: {
-    sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
+    sortBy: [
+      { key: 'endpoint.vendor', order: 'asc' },
+      { key: 'packages', order: 'asc' },
+      { key: 'createdAt', order: 'desc' },
+    ],
   },
   async: {
     key: 'active-sushi-table',
