@@ -209,7 +209,7 @@
 
     <v-dialog
       :model-value="duplicateConfirm.show"
-      max-width="600"
+      max-width="700"
       v-bind="$attrs"
       @update:model-value="duplicateConfirm.show = false"
     >
@@ -218,6 +218,14 @@
         :text="duplicateConfirm.text"
       >
         <template #text>
+          <v-alert
+            :text="$t('sushi.duplicateDialog.text.alert')"
+            type="warning"
+            icon="mdi-alert"
+            variant="tonal"
+            class="mb-2"
+          />
+
           <i18n-t keypath="sushi.duplicateDialog.text.start" tag="p">
             <template #reason>
               <span class="font-weight-bold">
@@ -307,10 +315,19 @@
           <v-spacer />
 
           <v-btn
+            :text="$t('sushi.duplicateDialog.actions.secondary:update')"
+            :disabled="duplicateConfirm.loading.update"
+            :loading="duplicateConfirm.loading.force"
+            prepend-icon="mdi-pencil"
+            size="small"
+            @click="duplicateSave(true)"
+          />
+
+          <v-btn
             :text="$t('sushi.duplicateDialog.actions.main:update')"
             prepend-icon="mdi-check"
             size="small"
-            color="primary"
+            color="green"
             variant="elevated"
             @click="duplicateConfirm.show = false"
           />
@@ -326,17 +343,16 @@
           <v-spacer />
 
           <v-btn
-            :text="$t('create')"
+            :text="$t('sushi.duplicateDialog.actions.secondary:create')"
             :disabled="duplicateConfirm.loading.update"
             :loading="duplicateConfirm.loading.force"
             prepend-icon="mdi-plus"
             size="small"
-            color="green"
             @click="duplicateSave(true)"
           />
 
           <v-btn
-            :text="duplicateConfirm.similar.archived ? $t('sushi.duplicateDialog.actions.main:archived') : $t('update')"
+            :text="duplicateConfirm.similar.archived ? $t('sushi.duplicateDialog.actions.main:create.archived') : $t('sushi.duplicateDialog.actions.main:create')"
             :prepend-icon="duplicateConfirm.similar.archived ? 'mdi-archive-off' : 'mdi-pencil'"
             :disabled="duplicateConfirm.loading.force"
             :loading="duplicateConfirm.loading.update"
@@ -510,20 +526,36 @@ async function duplicateSave(force = false) {
   duplicateConfirm.value.loading[force ? 'force' : 'update'] = true;
 
   try {
-    const newSushi = await $fetch('/api/sushi', {
-      method: 'POST',
-      query: {
-        force,
-        update: true,
-      },
-      body: {
-        ...sushi.value,
-        endpoint: undefined,
-        institution: undefined,
-        endpointId: sushi.value.endpoint?.id,
-        institutionId: props.institution.id,
-      },
-    });
+    let newSushi;
+
+    if (isEditing.value) {
+      newSushi = await $fetch(`/api/sushi/${sushi.value.id}`, {
+        method: 'PATCH',
+        query: {
+          force,
+        },
+        body: {
+          ...sushi.value,
+          endpoint: undefined,
+          endpointId: sushi.value.endpoint?.id,
+        },
+      });
+    } else {
+      newSushi = await $fetch('/api/sushi', {
+        method: 'POST',
+        query: {
+          force,
+          update: true,
+        },
+        body: {
+          ...sushi.value,
+          endpoint: undefined,
+          institution: undefined,
+          endpointId: sushi.value.endpoint?.id,
+          institutionId: props.institution.id,
+        },
+      });
+    }
 
     duplicateConfirm.value.show = false;
     emit('submit', newSushi);
