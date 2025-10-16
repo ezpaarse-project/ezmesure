@@ -207,163 +207,13 @@
       </div>
     </template>
 
-    <v-dialog
-      :model-value="duplicateConfirm.show"
-      max-width="700"
-      v-bind="$attrs"
-      @update:model-value="duplicateConfirm.show = false"
-    >
-      <v-card
-        :title="$t('sushi.duplicateDialog.title')"
-        :text="duplicateConfirm.text"
-      >
-        <template #text>
-          <v-alert
-            :text="$t('sushi.duplicateDialog.text.alert')"
-            type="warning"
-            icon="mdi-alert"
-            variant="tonal"
-            class="mb-2"
-          />
-
-          <i18n-t keypath="sushi.duplicateDialog.text.start" tag="p">
-            <template #reason>
-              <span class="font-weight-bold">
-                {{ $t(`sushi.duplicateDialog.reasons.${duplicateConfirm.reason}`) }}
-              </span>
-            </template>
-          </i18n-t>
-
-          <v-card
-            :title="$t('sushi.duplicateDialog.text.content.title')"
-            prepend-icon="mdi-key"
-            variant="outlined"
-            class="my-3"
-          >
-            <template #subtitle>
-              <SushiSubtitle :model-value="duplicateConfirm.similar" />
-            </template>
-
-            <template #text>
-              <v-divider class="mb-2" />
-
-              <v-row>
-                <DetailsField
-                  v-if="duplicateConfirm.similar.customerId"
-                  :value="duplicateConfirm.similar.customerId"
-                  :label="t('institutions.sushi.customerId')"
-                  :cols="4"
-                  style="word-wrap: anywhere;"
-                />
-
-                <DetailsField
-                  v-if="duplicateConfirm.similar.requestorId"
-                  :value="duplicateConfirm.similar.requestorId"
-                  :label="t('institutions.sushi.requestorId')"
-                  :cols="4"
-                  style="word-wrap: anywhere;"
-                />
-
-                <DetailsField
-                  v-if="duplicateConfirm.similar.apiKey"
-                  :value="duplicateConfirm.similar.apiKey"
-                  :label="t('institutions.sushi.apiKey')"
-                  :cols="4"
-                  style="word-wrap: anywhere;"
-                />
-              </v-row>
-
-              <v-row>
-                <DetailsField
-                  :value="duplicateConfirm.similar.endpoint.sushiUrl"
-                  :label="t('institutions.sushi.sushiUrl')"
-                  style="word-wrap: anywhere;"
-                />
-              </v-row>
-
-              <v-divider class="my-2" />
-
-              <v-row>
-                <DetailsField
-                  :label="t('sushi.duplicateDialog.text.content.state')"
-                  :cols="4"
-                  style="word-wrap: anywhere;"
-                >
-                  <SushiStateText :model-value="duplicateConfirm.similar" />
-                </DetailsField>
-
-                <DetailsField
-                  :label="t('status')"
-                  :cols="4"
-                  style="word-wrap: anywhere;"
-                >
-                  <SushiConnectionChip
-                    :sushi="duplicateConfirm.similar"
-                    readonly
-                  />
-                </DetailsField>
-              </v-row>
-            </template>
-          </v-card>
-
-          <p>
-            {{ isEditing ? $t('sushi.duplicateDialog.text.end:update') : $t('sushi.duplicateDialog.text.end:create') }}
-          </p>
-        </template>
-
-        <template v-if="isEditing" #actions>
-          <v-spacer />
-
-          <v-btn
-            :text="$t('sushi.duplicateDialog.actions.secondary:update')"
-            :disabled="duplicateConfirm.loading.update"
-            :loading="duplicateConfirm.loading.force"
-            prepend-icon="mdi-pencil"
-            size="small"
-            @click="duplicateSave(true)"
-          />
-
-          <v-btn
-            :text="$t('sushi.duplicateDialog.actions.main:update')"
-            prepend-icon="mdi-check"
-            size="small"
-            color="green"
-            variant="elevated"
-            @click="duplicateConfirm.show = false"
-          />
-        </template>
-        <template v-else #actions>
-          <v-btn
-            :text="$t('cancel')"
-            :disabled="duplicateConfirm.loading.update || duplicateConfirm.loading.force"
-            size="small"
-            @click="duplicateConfirm.show = false"
-          />
-
-          <v-spacer />
-
-          <v-btn
-            :text="$t('sushi.duplicateDialog.actions.secondary:create')"
-            :disabled="duplicateConfirm.loading.update"
-            :loading="duplicateConfirm.loading.force"
-            prepend-icon="mdi-plus"
-            size="small"
-            @click="duplicateSave(true)"
-          />
-
-          <v-btn
-            :text="duplicateConfirm.similar.archived ? $t('sushi.duplicateDialog.actions.main:create.archived') : $t('sushi.duplicateDialog.actions.main:create')"
-            :prepend-icon="duplicateConfirm.similar.archived ? 'mdi-archive-off' : 'mdi-pencil'"
-            :disabled="duplicateConfirm.loading.force"
-            :loading="duplicateConfirm.loading.update"
-            size="small"
-            color="blue"
-            variant="elevated"
-            @click="duplicateSave()"
-          />
-        </template>
-      </v-card>
-    </v-dialog>
+    <SushiDuplicateFormDialog
+      v-model="duplicateConfirmShown"
+      :sushi="sushi"
+      :similar="similar"
+      :institution="institution"
+      @submit="$emit('submit', $event)"
+    />
   </v-card>
 </template>
 
@@ -398,15 +248,9 @@ const isAdvancedOpen = shallowRef(false);
 const loadingPackages = shallowRef(false);
 const packageSearch = shallowRef('');
 const sushi = ref({ ...props.modelValue });
-const duplicateConfirm = ref({
-  show: false,
-  similar: {},
-  reason: '',
-  loading: {
-    update: false,
-    force: false,
-  },
-});
+
+const duplicateConfirmShown = shallowRef(false);
+const similar = ref({});
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -522,51 +366,6 @@ async function checkConnection() {
   loading.value = false;
 }
 
-async function duplicateSave(force = false) {
-  duplicateConfirm.value.loading[force ? 'force' : 'update'] = true;
-
-  try {
-    let newSushi;
-
-    if (isEditing.value) {
-      newSushi = await $fetch(`/api/sushi/${sushi.value.id}`, {
-        method: 'PATCH',
-        query: {
-          force,
-        },
-        body: {
-          ...sushi.value,
-          endpoint: undefined,
-          endpointId: sushi.value.endpoint?.id,
-        },
-      });
-    } else {
-      newSushi = await $fetch('/api/sushi', {
-        method: 'POST',
-        query: {
-          force,
-          update: true,
-        },
-        body: {
-          ...sushi.value,
-          endpoint: undefined,
-          institution: undefined,
-          endpointId: sushi.value.endpoint?.id,
-          institutionId: props.institution.id,
-        },
-      });
-    }
-
-    duplicateConfirm.value.show = false;
-    emit('submit', newSushi);
-  } catch (err) {
-    snacks.error(t('anErrorOccurred'), err);
-  }
-
-  duplicateConfirm.value.loading.upsert = false;
-  duplicateConfirm.value.loading.force = false;
-}
-
 async function save() {
   saving.value = true;
 
@@ -603,19 +402,8 @@ async function save() {
     }
 
     // Similar credentials were found
-    const { similar } = err.data;
-    duplicateConfirm.value.similar = similar;
-
-    if (
-      similar.endpointId === sushi.value.endpoint?.id
-        && similar.packages[0] === sushi.value.packages[0]
-    ) {
-      duplicateConfirm.value.reason = 'samePackage';
-    } else {
-      duplicateConfirm.value.reason = 'sameParameters';
-    }
-
-    duplicateConfirm.value.show = true;
+    similar.value = err.data.similar;
+    duplicateConfirmShown.value = true;
   } finally {
     saving.value = false;
   }
