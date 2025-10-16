@@ -22,7 +22,7 @@ menu:
   profile: Profile
   members: Members
   users: Users
-  elasticRoles: Elastic Roles
+  shares: Shares
   logout: Logout
   contact: Contact
   report: Reports
@@ -1070,22 +1070,22 @@ harvest:
     unableToDelete: Unable to delete the harvesting task
     counterVersionTooltip: Harvest a COUNTER {version} report
     noData: No data in the harvested report
-elasticRoles:
-  toolbarTitle: Elastic Roles ({count})
-  newRole: New role
-  filtersForm.title: Filters of the role
+shares:
+  toolbarTitle: Shares ({count})
+  newShare: New share
+  filtersForm.title: Filters of the share
   institutions: Institutions
   addInstitution: Add institution
-  noInstitutions: No institutions is using this role
+  noInstitutions: No institutions is associated to this share
   readonly: Readonly
   users: Users
   addUser: Add user
-  noUsers: No users is using this role
-  manageElasticRoles: >
-    Manage roles
-    |Manage {count} roles
-  deleteNbRoles: You are about to delete {n} roles
-  grantedBy: Rights granted by a role
+  noUsers: No users is associated to this share
+  manageShares: >
+    Manage shares
+    |Manage {count} shares
+  deleteNbShares: You are about to delete {n} shares
+  grantedBy: Rights granted by a share
 sync:
   status:
     notSynced: Not yet synchronized
@@ -1111,7 +1111,7 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
-  elasticRoles: Elastic Roles
+  shares: Partages
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization

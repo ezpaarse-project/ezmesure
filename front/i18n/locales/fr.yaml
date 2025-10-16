@@ -22,7 +22,7 @@ menu:
   profile: Profil
   members: Membres
   users: Utilisateurs
-  elasticRoles: Rôles Elastic
+  shares: Partages
   logout: Déconnexion
   contact: Contact
   report: Rapports
@@ -1084,24 +1084,24 @@ harvest:
     unableToDelete: Impossible de supprimer la tâche de moissonnage
     counterVersionTooltip: Moissonne un rapport COUNTER {version}
     noData: Aucune donnée dans le rapport moissonné
-elasticRoles:
-  toolbarTitle: Rôles Elastic ({count})
-  newRole: Nouveau rôle
-  filtersForm.title: Filtres du rôle
+shares:
+  toolbarTitle: Partages ({count})
+  newShare: Nouveau partage
+  filtersForm.title: Filtres du partage
   institutions: Établissements
   addInstitution: Ajouter un établissement
-  noInstitutions: Aucun établissement n'utilise ce rôle
+  noInstitutions: Aucun établissement n'est associé à ce partage
   readonly: Lecture seule
   users: Utilisateurs
   addUser: Ajouter un utilisateur
-  noUsers: Aucun utilisateur n'utilise ce rôle
-  manageElasticRoles: >
-    Gérer les rôles
-    |Gérer {count} rôles
-  deleteNbRoles: >
-    Vous êtes sur le point de supprimer {n} rôle
-    |Vous êtes sur le point de supprimer {n} rôles
-  grantedBy: Droits accordés par un rôle
+  noUsers: Aucun utilisateur n'est associé à ce partage
+  manageShares: >
+    Gérer les partages
+    |Gérer {count} partages
+  deleteNbShares: >
+    Vous êtes sur le point de supprimer {n} partage
+    |Vous êtes sur le point de supprimer {n} partages
+  grantedBy: Droits accordés par un partage
 sync:
   status:
     notSynced: Pas encore synchronisé

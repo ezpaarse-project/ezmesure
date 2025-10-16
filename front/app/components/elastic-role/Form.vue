@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :title="$t('elasticRoles.newRole')"
+    :title="$t('shares.newShare')"
     prepend-icon="mdi-account-tag"
   >
     <template #text>
