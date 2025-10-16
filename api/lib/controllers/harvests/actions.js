@@ -1,11 +1,16 @@
+const { createHash } = require('node:crypto');
+
+const InMemoryQueue = require('../../utils/memory-queue');
+
+const { prepareStandardQueryParams } = require('../../services/std-query');
+const { queryToPrismaFilter } = require('../../services/std-query/prisma-query');
+const { appLogger } = require('../../services/logger');
+
 const HarvestsService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
 
 const { schema, includableFields } = require('../../entities/harvest.dto');
-
-const { prepareStandardQueryParams } = require('../../services/std-query');
-const { queryToPrismaFilter } = require('../../services/std-query/prisma-query');
 
 const MATRIX_CACHE_DURATION = 5 * 60 * 1000;
 
@@ -18,6 +23,7 @@ exports.standardQueryParams = standardQueryParams;
 
 /**
   * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+  * @typedef {import('@prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
  */
 
 exports.getHarvests = async (ctx) => {
@@ -83,98 +89,193 @@ exports.deleteHarvestsByQuery = async (ctx) => {
   ctx.body = { deleted };
 };
 
-const cache = new Map();
+const institutionsMatrixManager = {
+  createId: (query) => createHash('md5').update(JSON.stringify(query)).digest('hex'),
+  cache: new Map(),
+  queue: new InMemoryQueue(
+    /**
+     * Generate harvest matrix and cache it
+     *
+     * @param {string} id - Id in the cache
+     * @param {*} query - query parameters
+     */
+    async (id, query) => {
+      let data = {};
 
-async function computeInstitutionsMatrix(id, query) {
-  const data = { requestedAt: new Date() };
+      try {
+        data = institutionsMatrixManager.cache.get(id) ?? {};
 
-  try {
-    cache.set(id, data);
+        appLogger.verbose(`[harvest-matrix][institutions][${id}] Generating matrix...`);
 
-    const {
-      'period:from': from,
-      'period:to': to,
-    } = query;
+        const {
+          'period:from': from,
+          'period:to': to,
+        } = query;
 
-    const harvests = new HarvestsService();
-    const institutions = new InstitutionsService();
+        const harvests = new HarvestsService();
+        const institutions = new InstitutionsService();
 
-    const where = {
-      period: { gte: from, lte: to },
-    };
+        /** @type {HarvestWhereInput} */
+        const where = {
+          period: { gte: from, lte: to },
+        };
 
-    // Generate matrix
-    const matrix = await harvests.getMatrix(
-      (harvest) => harvest.credentials.institutionId,
-      (harvest) => harvest.period,
-      {
-        where,
-        include: {
-          credentials: {
-            select: { endpointId: true, institutionId: true },
+        // Generate matrix
+        const matrix = await harvests.getMatrix(
+          (harvest) => harvest.credentials.institutionId,
+          (harvest) => harvest.period,
+          {
+            where,
+            include: {
+              credentials: {
+                select: { endpointId: true, institutionId: true },
+              },
+            },
           },
-        },
-      },
-    );
+        );
 
-    // Resolve headers
-    const rows = await institutions.findMany({ where: { id: { in: matrix.headers.rows } } });
+        // Resolve headers
+        appLogger.verbose(`[harvest-matrix][institutions][${id}] Resolving headers...`);
+        const rows = await institutions.findMany({ where: { id: { in: matrix.headers.rows } } });
 
-    // Resolve unharvested
-    const unharvested = await institutions.findMany({
-      where: {
-        // Not in matrix (so not harvested for period)
-        id: { notIn: matrix.headers.rows },
-        // And have at least harvestable one credentials
-        sushiCredentials: {
-          some: {
-            active: true,
-            archived: false,
-            endpoint: { active: true },
+        // Resolve unharvested
+        appLogger.verbose(`[harvest-matrix][institutions][${id}] Resolving unharvested...`);
+        const unharvested = await institutions.findMany({
+          where: {
+            // Not in matrix (so not harvested for period)
+            id: { notIn: matrix.headers.rows },
+            // And have at least harvestable one credentials
+            sushiCredentials: {
+              some: {
+                active: true,
+                archived: false,
+                endpoint: { active: true },
+              },
+            },
           },
-        },
-      },
-      orderBy: { name: 'asc' },
-    });
+          orderBy: { name: 'asc' },
+        });
 
-    // Cache matrix
-    data.generatedAt = new Date();
-    data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
-    data.unharvested = unharvested;
-    data.matrix = {
-      ...matrix,
-      headers: {
-        columns: matrix.headers.columns,
-        rows,
-      },
-    };
+        // Cache matrix
+        appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+        data.generatedAt = new Date();
+        data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+        data.unharvested = unharvested;
+        data.matrix = {
+          ...matrix,
+          headers: {
+            columns: matrix.headers.columns,
+            rows,
+          },
+        };
 
-    cache.set(id, data);
-  } catch (error) {
-    // Cache error
-    data.error = error;
-    cache.set(id, data);
-  } finally {
-    // Delete cache when it expires
-    setTimeout(() => {
-      cache.delete(id);
-    }, MATRIX_CACHE_DURATION);
-  }
-}
+        institutionsMatrixManager.cache.set(id, data);
+      } catch (error) {
+        appLogger.error(`[harvest-matrix][institutions][${id}] Something happened while generating matrix: ${error}`);
+        // Cache error
+        data.error = error;
+        institutionsMatrixManager.cache.set(id, data);
+      } finally {
+        // Delete cache when it expires
+        setTimeout(() => {
+          appLogger.verbose(`[harvest-matrix][institutions][${id}] Clearing cache entry`);
+          institutionsMatrixManager.cache.delete(id);
+        }, MATRIX_CACHE_DURATION);
+      }
+    },
+  ),
+};
+
+const endpointsMatrixManager = {
+  createId: (query) => createHash('md5').update(JSON.stringify(query)).digest('hex'),
+  cache: new Map(),
+  queue: new InMemoryQueue(
+    /**
+     * Generate harvest matrix and cache it
+     *
+     * @param {string} id - Id in the cache
+     * @param {*} query - query parameters
+     */
+    async (id, query) => {
+      let data = {};
+
+      try {
+        data = endpointsMatrixManager.cache.get(id) ?? {};
+
+        appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Generating matrix...`);
+
+        const {
+          'period:from': from,
+          'period:to': to,
+        } = query;
+
+        const harvests = new HarvestsService();
+        const endpoints = new EndpointsService();
+
+        // Generate matrix
+        const matrix = await harvests.getMatrix(
+          (harvest) => harvest.credentials.endpointId,
+          (harvest) => harvest.period,
+          {
+            where: {
+              period: { gte: from, lte: to },
+            },
+            include: {
+              credentials: {
+                select: { endpointId: true },
+              },
+            },
+          },
+        );
+
+        // Resolve headers
+        appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Resolving headers...`);
+        const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
+
+        // Cache matrix
+        appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+        data.generatedAt = new Date();
+        data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+        data.matrix = {
+          ...matrix,
+          headers: {
+            columns: matrix.headers.columns,
+            rows,
+          },
+        };
+
+        endpointsMatrixManager.cache.set(id, data);
+      } catch (error) {
+        appLogger.error(`[harvest-matrix][sushi-endpoints][${id}] Something happened while generating matrix: ${error}`);
+        // Cache error
+        data.error = error;
+        endpointsMatrixManager.cache.set(id, data);
+      } finally {
+        // Delete cache when it expires
+        setTimeout(() => {
+          appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Clearing cache entry`);
+          endpointsMatrixManager.cache.delete(id);
+        }, MATRIX_CACHE_DURATION);
+      }
+    },
+  ),
+};
 
 exports.getInstitutionsMatrix = async (ctx) => {
   const { retryCode = 202, ...query } = ctx.request.query;
 
-  const requestId = `institutions:${JSON.stringify(query)}`;
-  const cached = cache.get(requestId);
+  const requestId = institutionsMatrixManager.createId(query);
+  const cached = institutionsMatrixManager.cache.get(requestId);
 
   if (!cached) {
-    // Don't await promise so it runs in the background
-    computeInstitutionsMatrix(requestId, query);
+    const data = { requestedAt: new Date() };
+
+    institutionsMatrixManager.cache.set(requestId, data);
+    institutionsMatrixManager.queue.add(requestId, query);
 
     ctx.type = 'json';
-    ctx.status = 425;
-    ctx.body = { requestedAt: new Date() };
+    ctx.status = retryCode;
+    ctx.body = data;
     return;
   }
 
@@ -188,76 +289,21 @@ exports.getInstitutionsMatrix = async (ctx) => {
   ctx.body = cached;
 };
 
-async function computeEndpointsMatrix(id, query) {
-  const data = { requestedAt: new Date() };
-
-  try {
-    cache.set(id, data);
-
-    const {
-      'period:from': from,
-      'period:to': to,
-    } = query;
-
-    const harvests = new HarvestsService();
-    const endpoints = new EndpointsService();
-
-    // Generate matrix
-    const matrix = await harvests.getMatrix(
-      (harvest) => harvest.credentials.endpointId,
-      (harvest) => harvest.reportId,
-      {
-        where: {
-          period: { gte: from, lte: to },
-        },
-        include: {
-          credentials: {
-            select: { endpointId: true },
-          },
-        },
-      },
-    );
-
-    // Resolve headers
-    const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
-
-    // Cache matrix
-    data.generatedAt = new Date();
-    data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
-    data.matrix = {
-      ...matrix,
-      headers: {
-        columns: matrix.headers.columns,
-        rows,
-      },
-    };
-
-    cache.set(id, data);
-  } catch (error) {
-    // Cache error
-    data.error = error;
-    cache.set(id, data);
-  } finally {
-    // Delete cache when it expires
-    setTimeout(() => {
-      cache.delete(id);
-    }, MATRIX_CACHE_DURATION);
-  }
-}
-
 exports.getEndpointsMatrix = async (ctx) => {
   const { retryCode = 202, ...query } = ctx.request.query;
 
-  const requestId = `endpoints:${JSON.stringify(query)}`;
-  const cached = cache.get(requestId);
+  const requestId = endpointsMatrixManager.createId(query);
+  const cached = endpointsMatrixManager.cache.get(requestId);
 
   if (!cached) {
-    // Don't await promise so it runs in the background
-    computeEndpointsMatrix(requestId, query);
+    const data = { requestedAt: new Date() };
+
+    endpointsMatrixManager.cache.set(requestId, data);
+    endpointsMatrixManager.queue.add(requestId, query);
 
     ctx.type = 'json';
     ctx.status = retryCode;
-    ctx.body = { requestedAt: new Date() };
+    ctx.body = data;
     return;
   }
 
