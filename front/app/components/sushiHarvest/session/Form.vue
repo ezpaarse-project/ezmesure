@@ -222,6 +222,67 @@
                         </template>
                       </v-list-item>
                     </v-list>
+
+                    <v-menu
+                      v-model="isAdditionalReportOpen"
+                      :close-on-content-click="false"
+                      min-width="200px"
+                      width="500px"
+                      @update:model-value="resetVersionForm()"
+                    >
+                      <template #activator="{ props: menu }">
+                        <v-btn
+                          :text="$t('endpoints.addCustomVersion')"
+                          color="secondary"
+                          prepend-icon="mdi-plus"
+                          block
+                          class="mt-2"
+                          v-bind="menu"
+                        />
+                      </template>
+
+                      <v-card>
+                        <template #text>
+                          <v-row>
+                            <v-col>
+                              <v-form
+                                id="additionalVersionForm"
+                                ref="additionalVersionForm"
+                                @submit.prevent="counterVersions.push(customVersion); isCustomVersionOpen = false"
+                              >
+                                <p>
+                                  {{ $t('endpoints.customVersionDesc') }}
+                                </p>
+
+                                <v-text-field
+                                  v-model="customVersion"
+                                  :label="$t('endpoints.customVersion')"
+                                  :rules="versionRules"
+                                  prepend-icon="mdi-numeric"
+                                  variant="underlined"
+                                  hide-details="auto"
+                                  autofocus
+                                />
+                              </v-form>
+                            </v-col>
+                          </v-row>
+                        </template>
+
+                        <template #actions>
+                          <v-spacer />
+
+                          <v-btn
+                            :text="$t('add')"
+                            :disabled="!customVersion"
+                            color="success"
+                            prepend-icon="mdi-plus"
+                            variant="text"
+                            type="submit"
+                            form="additionalVersionForm"
+                          />
+                        </template>
+                      </v-card>
+                    </v-menu>
                   </v-col>
 
                   <v-divider vertical />
@@ -257,6 +318,66 @@
                         </template>
                       </v-list-item>
                     </v-list>
+
+                    <v-menu
+                      v-model="isCustomVersionOpen"
+                      :close-on-content-click="false"
+                      min-width="200px"
+                      width="500px"
+                      @update:model-value="resetReportForm()"
+                    >
+                      <template #activator="{ props: menu }">
+                        <v-btn
+                          :text="$t('endpoints.addAdditionalReport')"
+                          color="secondary"
+                          prepend-icon="mdi-plus"
+                          block
+                          class="mt-2"
+                          v-bind="menu"
+                        />
+                      </template>
+
+                      <v-card>
+                        <template #text>
+                          <v-row>
+                            <v-col>
+                              <v-form
+                                id="additionalReportForm"
+                                ref="additionalReportForm"
+                                @submit.prevent="reportsList.push(additionalReport); isCustomVersionOpen = false"
+                              >
+                                <p>
+                                  {{ $t('endpoints.addAdditionalReportDesc') }}
+                                </p>
+
+                                <v-text-field
+                                  v-model="additionalReport"
+                                  :label="$t('harvest.jobs.reportType')"
+                                  prepend-icon="mdi-file"
+                                  variant="underlined"
+                                  hide-details="auto"
+                                  autofocus
+                                />
+                              </v-form>
+                            </v-col>
+                          </v-row>
+                        </template>
+
+                        <template #actions>
+                          <v-spacer />
+
+                          <v-btn
+                            :text="$t('add')"
+                            :disabled="!additionalReport"
+                            color="success"
+                            prepend-icon="mdi-plus"
+                            variant="text"
+                            type="submit"
+                            form="additionalReportForm"
+                          />
+                        </template>
+                      </v-card>
+                    </v-menu>
                   </v-col>
                 </v-row>
               </template>
@@ -273,12 +394,13 @@
                   <v-col cols="12">
                     <v-text-field
                       v-model="id"
-                      :label="`${$t('name')} *`"
+                      :label="`${$t('identifier')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
                       :disabled="isEditing"
                       prepend-icon="mdi-rename"
                       variant="underlined"
                       hide-details="auto"
+                      @update:model-value="hasIdChanged = true"
                     />
                   </v-col>
 
@@ -373,6 +495,8 @@
 </template>
 
 <script setup>
+import { differenceInYears, parse as parseDate } from 'date-fns';
+
 import { getErrorMessage } from '@/lib/errors';
 import { DEFAULT_REPORTS_IDS, SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
 
@@ -388,13 +512,14 @@ const emit = defineEmits({
 });
 
 const snacks = useSnacksStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const institutionsSearch = shallowRef('');
 const endpointsSearch = shallowRef('');
 const initialLoading = shallowRef(true);
 const saving = shallowRef(false);
 const valid = shallowRef(false);
+const hasIdChanged = shallowRef(false);
 
 const id = shallowRef(props.modelValue?.id ?? '');
 const timeout = shallowRef(props.modelValue?.timeout ?? 600);
@@ -414,8 +539,15 @@ const useValidation = shallowRef(!props.modelValue?.ignoreValidation);
 const institutionIds = ref([...(props.modelValue?.credentialsQuery?.institutionIds ?? [])]);
 const endpointIds = ref([...(props.modelValue?.credentialsQuery?.endpointIds ?? [])]);
 
+const isAdditionalReportOpen = shallowRef(false);
+const additionalReport = shallowRef('');
+const isCustomVersionOpen = shallowRef(false);
+const customVersion = shallowRef('');
+
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
+const additionalReportForm = useTemplateRef('additionalReportForm');
+const additionalVersionForm = useTemplateRef('additionalVersionForm');
 
 const {
   data: institutions,
@@ -447,7 +579,6 @@ const {
 
 const isEditing = computed(() => !!props.modelValue?.id);
 const institutionsCount = computed(() => {
-  // institutionIds.length || $t('all')
   if (institutionIds.value.length > 0) {
     return institutionIds.value.length;
   }
@@ -457,7 +588,6 @@ const institutionsCount = computed(() => {
   return 0;
 });
 const endpointsCount = computed(() => {
-  // endpointIds.length || $t('all')
   if (endpointIds.value.length > 0) {
     return endpointIds.value.length;
   }
@@ -474,7 +604,16 @@ const versionsList = computed(() => Array.from(new Set([
   ...SUPPORTED_COUNTER_VERSIONS,
   ...counterVersions.value,
 ])));
+const versionRules = computed(() => [
+  (v) => {
+    const pattern = /^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/;
 
+    if (!v || pattern.test(v)) {
+      return true;
+    }
+    return t('fieldMustMatch', { pattern: pattern.toString() });
+  },
+]);
 const isValid = computed(() => {
   if (!valid.value) {
     return false;
@@ -484,6 +623,14 @@ const isValid = computed(() => {
     && reportTypes.value.length > 0
     && counterVersions.value.length > 0;
 });
+
+function resetVersionForm() {
+  additionalReportForm.value?.reset();
+}
+
+function resetReportForm() {
+  additionalReportForm.value?.reset();
+}
 
 async function save() {
   saving.value = true;
@@ -516,6 +663,46 @@ async function save() {
 
   saving.value = false;
 }
+
+function generateID() {
+  const now = new Date();
+
+  const parts = [];
+
+  // Add institution name in id
+  if (institutionIds.value.length === 1) {
+    const institution = institutions.value.find((i) => i.id === institutionIds.value[0]);
+    parts.push(institution?.name.toLocaleLowerCase(locale.value).replace(/\s/g, '-'));
+  }
+
+  // Add endpoint name in id
+  if (endpointIds.value.length === 1) {
+    const endpoint = endpoints.value.find((e) => e.id === endpointIds.value[0]);
+    parts.push(endpoint?.vendor.toLocaleLowerCase(locale.value).replace(/\s/g, '-'));
+  }
+
+  // Add dates in id
+  if (beginDate.value && endDate.value) {
+    const begin = parseDate(beginDate.value, 'yyyy-MM', now);
+    const end = parseDate(endDate.value, 'yyyy-MM', now);
+
+    const diff = differenceInYears(end, begin) + 1;
+    const years = Array.from({ length: diff }, (_, i) => begin.getFullYear() + i);
+
+    parts.push(years.join('-'));
+  }
+
+  return [
+    dateFormat(now, locale.value, 'yyyy-MM-dd'),
+    ...parts.filter((value) => !!value),
+  ].join('_');
+}
+
+watch([institutionIds, endpointIds, beginDate, endDate], () => {
+  if (!isEditing.value && !hasIdChanged.value) {
+    id.value = generateID();
+  }
+}, { immediate: true });
 
 watch(() => institutionsStatus.value === 'pending' && endpointsStatus.value === 'pending', (isLoading) => {
   if (!isLoading) {
