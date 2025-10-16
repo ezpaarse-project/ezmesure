@@ -195,7 +195,10 @@ async function startSession() {
       body: {},
     });
 
-    emit('update:model-value', props.modelValue);
+    // Waits for 250ms, in order to let API actually start the session
+    setTimeout(() => {
+      emit('update:model-value', props.modelValue);
+    }, 250);
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   }
@@ -209,7 +212,10 @@ function stopSession() {
           method: 'POST',
         });
 
-        emit('update:model-value', props.modelValue);
+        // Waits for 250ms, in order to let API actually start the session
+        setTimeout(() => {
+          emit('update:model-value', props.modelValue);
+        }, 250);
       } catch (err) {
         snacks.error(t('anErrorOccurred'), err);
       }

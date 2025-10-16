@@ -402,14 +402,14 @@ institutions:
     technical: Technique
     documentary: Documentaire
     noCorrespondent: Aucun contact
-    technicalCorrespondent: Correspondant technique
-    documentaryCorrespondent: Correspondant documentaire
+    technicalCorrespondent: Contact technique
+    documentaryCorrespondent: Contact documentaire
     creator: Créateur
     unableToRetriveMembers: Impossible de récupérer les membres
     cannotAddMember: Impossible d'ajouter le membre
     name: Nom
     username: Identifiant
-    correspondent: Correspondant
+    correspondent: Contact
     permissions: Permissions
     read: Lecture
     write: Écriture
@@ -525,7 +525,7 @@ institutions:
     harvestableInstitutions: Moissonnables
     status:
       harvestable: Moissonnable
-      non-harvestable: Non moissonable
+      non-harvestable: Non moissonnable
       selectable: Sélectionnable
       harvested: Déjà moissonné
     settings: Paramètres de recherche
@@ -766,7 +766,7 @@ sushi:
       main:update: J'ai compris
   isHarvestable:
     title: Votre établissement est éligible au moissonnage
-    text: Votre établissement sera inclus dans la prochaine vague de moissonnage, aucune action n'est nécéssaire de votre part.
+    text: Votre établissement sera inclus dans la prochaine vague de moissonnage, aucune action n'est nécessaire de votre part.
   isNotHarvestable:
     title: Votre établissement n'est actuellement pas éligible au moissonnage
     text: "Vous devez corriger les problèmes suivants afin d'être moissonné :"

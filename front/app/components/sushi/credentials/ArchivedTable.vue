@@ -3,7 +3,7 @@
     <v-data-table-server
       v-model="selectedSushi"
       :headers="headers"
-      :row-props="({ item }) => ({ class: !item.endpoint.active && 'bg-grey-lighten-4 text-grey' })"
+      :row-props="({ item }) => ({ class: 'bg-grey-lighten-4 text-grey' })"
       :item-selectable="(item) => !item.deletedAt"
       density="comfortable"
       show-select
@@ -44,7 +44,7 @@
       <template #[`item.endpoint.vendor`]="{ item }">
         <div class="my-2">
           <div>
-            <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`" :class="[!item.active ? 'text-grey' : '']">
+            <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`">
               {{ item.endpoint.vendor }}
             </nuxt-link>
             <span v-else>{{ item.endpoint.vendor }}</span>
