@@ -1087,6 +1087,7 @@ harvest:
     noData: Aucune donnée dans le rapport moissonné
 shares:
   toolbarTitle: Partages ({count})
+  pageDesc: Dans cette page, vous pouvez accorder des droits d'accès spécifiques à des utilisateurs ou des établissements. Les droits accordés ici ne sont pas modifiables par les membres des établissements.
   newShare: Nouveau partage
   filtersForm.title: Filtres du partage
   institutions: Établissements

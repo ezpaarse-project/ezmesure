@@ -1073,6 +1073,7 @@ harvest:
     noData: No data in the harvested report
 shares:
   toolbarTitle: Shares ({count})
+  pageDesc: In this page, you can grant specific rights to users or institutions. The rights granted here cannot be modified by institution members.
   newShare: New share
   filtersForm.title: Filters of the share
   institutions: Institutions
