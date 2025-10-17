@@ -151,7 +151,7 @@
 
     <SelectionMenu
       v-model="selectedRoles"
-      :text="$t('elasticRoles.manageElasticRoles', selectedRoles.length)"
+      :text="$t('shares.manageShares', selectedRoles.length)"
     >
       <template #actions>
         <v-list-item
@@ -284,7 +284,7 @@ const toolbarTitle = computed(() => {
   if (itemLength.value.current !== itemLength.value.total) {
     count = `${itemLength.value.current}/${itemLength.value.total}`;
   }
-  return t('elasticRoles.toolbarTitle', { count: count ?? '?' });
+  return t('shares.toolbarTitle', { count: count ?? '?' });
 });
 
 /**
@@ -305,7 +305,7 @@ function deleteRoles(items) {
 
   openConfirm({
     text: t(
-      'elasticRoles.deleteNbRoles',
+      'shares.deleteNbShares',
       toDelete.length,
     ),
     agreeText: t('delete'),

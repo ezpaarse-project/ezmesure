@@ -22,7 +22,7 @@ menu:
   profile: Profil
   members: Membres
   users: Utilisateurs
-  elasticRoles: Rôles Elastic
+  shares: Partages
   logout: Déconnexion
   contact: Contact
   report: Rapports
@@ -36,6 +36,7 @@ menu:
   spaces: Espaces
   harvest:
     group: Moissonnage
+    institutions: Établissements
     sessions: Sessions
     alerts: Alertes
   sync: Synchronisation
@@ -402,14 +403,14 @@ institutions:
     technical: Technique
     documentary: Documentaire
     noCorrespondent: Aucun contact
-    technicalCorrespondent: Correspondant technique
-    documentaryCorrespondent: Correspondant documentaire
+    technicalCorrespondent: Contact technique
+    documentaryCorrespondent: Contact documentaire
     creator: Créateur
     unableToRetriveMembers: Impossible de récupérer les membres
     cannotAddMember: Impossible d'ajouter le membre
     name: Nom
     username: Identifiant
-    correspondent: Correspondant
+    correspondent: Contact
     permissions: Permissions
     read: Lecture
     write: Écriture
@@ -520,6 +521,21 @@ institutions:
     readyPopup:
       inProgress: Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.
       completed: Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous.
+  harvestable:
+    title: Établissements moissonnables
+    harvestableInstitutions: Moissonnables
+    status:
+      harvestable: Moissonnable
+      non-harvestable: Non moissonnable
+      selectable: Sélectionnable
+      harvested: Déjà moissonné
+    settings: Paramètres de recherche
+    allowNotReady: Inclure les établissements non prêts
+    allowFaulty: Inclure les identifiants invalides
+    allowHarvested: Inclure les établissements déjà moissonnés
+    harvestedMonth: Période cible
+    nSelectable: (1 sélectionnable)|({n} sélectionnables)
+    institutions: Établissement|Établissements
   unableToRetriveInformations: Impossible de récupérer les informations d'établissement
   unableToRetrivePlatforms: Impossible de récupérer les informations d'établissement
   notAttachedToAnyInstitution: Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.
@@ -631,8 +647,8 @@ sushi:
     |{count} identifiants
   tabs:
     active:
-      title: Identifiants actifs
-      description: Cette liste contient les identifiants actifs qui seront utilisés pour le moissonnage.
+      title: Identifiants courants
+      description: Cette liste contient les identifiants courants qui seront utilisés pour le moissonnage.
     archived:
       title: Identifiants archivés
       description: Cette liste contient les identifiants archivés qui ne seront PAS utilisés pour le moissonnage.
@@ -650,21 +666,12 @@ sushi:
   deletingWaiting: En attente de suppression
   deletingError: "Impossible de supprimer l'identifiant: {error}"
   deletionTask: État de suppression
-  nInstitutions: >
-    1 établissement utilise cet endpoint
-    |{count} établissements utilisent cet endpoint
-  nUntestedCredentials: >
-    1 identifiant non testé
-    |{count} identifiants non testés
-  nInvalidCredentials: >
-    1 identifiant invalide
-    |{count} identifiants invalides
-  nOperationalCredentials: >
-    1 identifiant valide
-    |{count} identifiants valides
-  nProblematicEndpoints: >
-    1 point d'accès problématique
-    |{count} points d'accès problématiques
+  nEnabled: (1 actif)|({n} actifs)
+  institutions: Établissement|Établissements
+  untestedCredentials: Identifiants non testés
+  invalidCredentials: Identifiants invalides
+  operationalCredentials: Identifiants valides
+  problematicEndpoints: Point d'accès problématique|Points d'accès problématiques
   nErrsCredentials: >
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
@@ -740,9 +747,38 @@ sushi:
   deleteReason: Raison de la suppression
   deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
-    mistake: J'ai entré(e) ces identifiants par erreur
+    mistake: J'ai entré ces identifiants par erreur
     neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
     duplicate: Cet identifiant est en doublon avec un autre
+  duplicateDialog:
+    title: Des identifiants similaires ont été trouvés !
+    text:
+      alert: Créer des identifiants COUNTER identiques à des identifiants déjà existants déclenchera des moissons de rapports d'usages en double pour votre établissement
+      start: "Les identifiants ci-dessous déclarés pour votre établissement {reason} :"
+      content:
+        title: Identifiants déjà déclarés
+        state: État
+      end:create: Voulez-vous modifier les identifiants déjà déclarés, ou procéder à la création de nouveaux identifiants ?
+      end:update: Voulez-vous modifier les identifiants déjà déclarés (en annulant l'édition actuelle), ou continuer avec votre édition actuelle ?
+    reasons:
+      samePackage: concernent le même point d'accès et le même package
+      sameParameters: possèdent exactement les mêmes paramètres
+    actions:
+      main:create: '@:update'
+      main:create.archived: '@:update et désarchiver'
+      main:update: Je modifie les identifiants déjà déclarés
+      secondary:create: Créer de nouveaux identifiants
+      secondary:update: Poursuivre l'édition
+  isHarvestable:
+    title: Votre établissement est éligible au moissonnage
+    text: Votre établissement sera inclus dans la prochaine vague de moissonnage, aucune action n'est nécessaire de votre part.
+  isNotHarvestable:
+    title: Votre établissement n'est actuellement pas éligible au moissonnage
+    text: "Vous devez corriger les problèmes suivants afin d'être moissonné :"
+    reasons:
+      institutionIsNotReady: Votre saisie n'est pas terminée
+      institutionHasNoCredentials: Aucun identifiant COUNTER n'a été déclaré
+      institutionHasFaultyCredentials: Certains de vos identifiants n'ont pas été testés ou sont invalides
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
@@ -1013,6 +1049,18 @@ harvest:
     sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
+    add: Créer une session de moissonnage
+    update: Éditer une session de moissonnage
+    start: Démarrer la session
+    stop: Arrêter la session
+    credentials: Identifiants COUNTER à moissonner
+    reports: Rapports COUNTER à moissonner
+    settings: Paramètres de moissonnage
+    downloadUnsupported: Télécharger les rapports même si non supportés par le point d'accès
+    allowFaulty: Inclure les identifiants invalides
+    useCache: Utiliser le cache des rapports
+    useValidation: Respecter la validation des rapports
+    timeout: Délai de complétion des tâches
   jobs:
     title: Tâches de moissonnage
     filtersTitle: Filtrer les tâches
@@ -1037,24 +1085,24 @@ harvest:
     unableToDelete: Impossible de supprimer la tâche de moissonnage
     counterVersionTooltip: Moissonne un rapport COUNTER {version}
     noData: Aucune donnée dans le rapport moissonné
-elasticRoles:
-  toolbarTitle: Rôles Elastic ({count})
-  newRole: Nouveau rôle
-  filtersForm.title: Filtres du rôle
+shares:
+  toolbarTitle: Partages ({count})
+  newShare: Nouveau partage
+  filtersForm.title: Filtres du partage
   institutions: Établissements
   addInstitution: Ajouter un établissement
-  noInstitutions: Aucun établissement n'utilise ce rôle
+  noInstitutions: Aucun établissement n'est associé à ce partage
   readonly: Lecture seule
   users: Utilisateurs
   addUser: Ajouter un utilisateur
-  noUsers: Aucun utilisateur n'utilise ce rôle
-  manageElasticRoles: >
-    Gérer les rôles
-    |Gérer {count} rôles
-  deleteNbRoles: >
-    Vous êtes sur le point de supprimer {n} rôle
-    |Vous êtes sur le point de supprimer {n} rôles
-  grantedBy: Droits accordés par un rôle
+  noUsers: Aucun utilisateur n'est associé à ce partage
+  manageShares: >
+    Gérer les partages
+    |Gérer {count} partages
+  deleteNbShares: >
+    Vous êtes sur le point de supprimer {n} partage
+    |Vous êtes sur le point de supprimer {n} partages
+  grantedBy: Droits accordés par un partage
 sync:
   status:
     notSynced: Pas encore synchronisé
@@ -1218,4 +1266,6 @@ deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
 version: Version
 back: Retour
+select: Sélectionner
+all: Tous
 pleaseWait: Veuillez patienter...

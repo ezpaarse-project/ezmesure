@@ -1,9 +1,13 @@
 // @ts-check
+const { isAfter } = require('date-fns');
+
 const BasePrismaService = require('./base-prisma.service');
 const institutionsPrisma = require('../services/prisma/institutions');
 const elasticRolesPrisma = require('../services/prisma/elastic-roles');
 
 const { isFilter, customPropFilter } = require('../services/filters');
+
+const SushiCredentialsService = require('./sushi-credentials.service');
 
 /* eslint-disable max-len */
 /**
@@ -296,5 +300,134 @@ module.exports = class InstitutionsService extends BasePrismaService {
     this.triggerHooks('institution:disconnect:elastic_role', { institution, role: elasticRoles.find((r) => r.name === roleName) });
 
     return institution;
+  }
+
+  /**
+   * Check if an institution is harvestable
+   *
+   * @param {string} institutionId - The id of institution to check
+   * @param {Object} [opts] - Options to custom behaviour
+   * @param {boolean} [opts.allowNotReady] - Allow not ready institutions
+   * @param {boolean} [opts.allowFaulty] - Allow faulty credentials
+   * @param {boolean} [opts.allowHarvested] - Allow already harvested institutions
+   * @param {boolean} [opts.allEndpointsMustBeUnharvested] - All endpoints must be unharvested to
+   * consider the institution harvestable
+   * @param {string} [opts.harvestedMonth] - Allow institutions harvested after
+   * ready date, but still not harvested for given month
+   *
+   * @returns {Promise<{ value: boolean, reasons: string[] }>}
+   */
+  async isHarvestable(institutionId, opts = {}) {
+    const now = new Date();
+
+    /** @type {string[]} */
+    const reasons = [];
+
+    const { sushiReadySince } = await this.findUnique({
+      where: { id: institutionId },
+      select: { sushiReadySince: true },
+    }) ?? {};
+
+    // /!\ null IS VALID - undefined means institution was not found
+    if (sushiReadySince === undefined) {
+      throw new Error(`Institution ${institutionId} was not found`);
+    }
+
+    // Check if institution is ready
+    if (!opts.allowNotReady) {
+      if (!sushiReadySince || isAfter(sushiReadySince, now)) {
+        reasons.push('institutionIsNotReady');
+      }
+    }
+
+    const credentialsService = new SushiCredentialsService(this);
+    const enabledCredentials = await credentialsService.count({
+      where: {
+        ...SushiCredentialsService.enabledCredentialsQuery,
+        institutionId,
+      },
+    });
+
+    // Check if have enabled credentials
+    if (enabledCredentials <= 0) {
+      reasons.push('institutionHasNoCredentials');
+    }
+
+    // Count credentials by status
+    const countCredentialsByStatus = (status) => credentialsService.count({
+      where: {
+        ...SushiCredentialsService.enabledCredentialsQuery,
+        institutionId,
+        connection: { path: ['status'], equals: status },
+      },
+    });
+
+    const credentialsCount = {
+      success: await countCredentialsByStatus('success'),
+      failed: await countCredentialsByStatus('failed'),
+    };
+
+    if (!opts.allowFaulty) {
+      // Failed credentials will not be harvested, but still counted as valid credentials when
+      // checking if institution is harvestable
+      if ((credentialsCount.success + credentialsCount.failed) < enabledCredentials) {
+        reasons.push('institutionHasFaultyCredentials');
+      }
+    }
+
+    // Check if any credentials are harvested
+    if (!opts.allowHarvested) {
+      const conditions = [];
+      // If provided, check if a harvested period is after given period
+      if (opts.harvestedMonth) {
+        conditions.push({
+          harvests: {
+            some: {
+              period: { gte: opts.harvestedMonth },
+            },
+          },
+        });
+      }
+      // If was ready, check if institution was harvested after last ready date
+      if (sushiReadySince) {
+        conditions.push({
+          harvests: {
+            some: {
+              harvestedAt: { gte: sushiReadySince },
+            },
+          },
+        });
+      }
+
+      const query = [];
+      // Failed credentials will not be harvested, so we ignore them by counting them as harvested
+      if (!opts.allEndpointsMustBeUnharvested) {
+        query.push({ connection: { path: ['status'], equals: 'failed' } });
+      }
+      if (conditions.length > 0) {
+        query.push({ AND: conditions });
+      }
+
+      const harvestedCredentialsCount = await credentialsService.count({
+        where: {
+          ...SushiCredentialsService.enabledCredentialsQuery,
+          institutionId,
+          OR: query.length > 0 ? query : undefined,
+        },
+      });
+
+      const isHarvested = opts.allEndpointsMustBeUnharvested
+        ? harvestedCredentialsCount > 0
+        : harvestedCredentialsCount === enabledCredentials;
+
+      if (isHarvested) {
+        reasons.push('institutionIsHarvested');
+      }
+    }
+
+    return {
+      value: reasons.length <= 0,
+      reasons,
+    };
   }
 };

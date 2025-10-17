@@ -12,6 +12,7 @@ const BasePrismaService = require('./base-prisma.service');
  * @typedef {import('@prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
  * @typedef {import('@prisma/client').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
  * @typedef {import('@prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs
  * @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs
  * @typedef {import('@prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs
@@ -93,6 +94,14 @@ module.exports = class HarvestsService extends BasePrismaService {
    */
   findUnique(params) {
     return harvestPrisma.findUnique(params, this.prisma);
+  }
+
+  /**
+   * @param {HarvestFindFirstArgs} params
+   * @returns {Promise<Harvest | null>}
+   */
+  findFirst(params) {
+    return harvestPrisma.findFirst(params, this.prisma);
   }
 
   /**

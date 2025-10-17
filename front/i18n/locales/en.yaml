@@ -22,7 +22,7 @@ menu:
   profile: Profile
   members: Members
   users: Users
-  elasticRoles: Elastic Roles
+  shares: Shares
   logout: Logout
   contact: Contact
   report: Reports
@@ -36,6 +36,7 @@ menu:
   spaces: Spaces
   harvest:
     group: Harvest
+    institutions: Institutions
     sessions: Sessions
     alerts: Alertes
   sync: Synchronisation
@@ -516,6 +517,21 @@ institutions:
     readyPopup:
       inProgress: Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
+    harvestable:
+      title: Harvestable institutions
+      harvestableInstitutions: Harvestable
+      status:
+        harvestable: Harvestable
+        non-harvestable: Non harvestable
+        selectable: Selectable
+        harvested: Already harvested
+      settings: Search settings
+      allowNotReady: Include non ready institutions
+      allowFaulty: Include invalid credentials
+      allowHarvested: Include harvested institutions
+      harvestedMonth: Target period
+      nSelectable: ({n} selectable)
+      institutions: Institutions
   unableToRetriveInformations: Unable to retrieve institution information
   unableToRetrivePlatforms: Unable to retrieve plateform information
   notAttachedToAnyInstitution: You are not attached to any institution, where you have not declared any information about your institution.
@@ -625,8 +641,8 @@ sushi:
   credentialsCount: "{count} credentials"
   tabs:
     active:
-      title: Active credentials
-      description: This list contains the active credentials that will be used for harvesting.
+      title: Current credentials
+      description: This list contains the current credentials that will be used for harvesting.
     archived:
       title: Archived credentials
       description: This list contains the archived credentials that will be NOT used for harvesting.
@@ -644,15 +660,12 @@ sushi:
   deletingWaiting: Waiting for deletion
   deletingError: "Unable to delete credentials: {error}"
   deletionTask: Deletion state
-  nInstitutions: >
-    1 institution use this endpoint
-    |{count} institutions use this endpoint
-  nUntestedCredentials: "{count} untested credentials"
-  nInvalidCredentials: "{count} invalid credentials"
-  nOperationalCredentials: "{count} valid credentials"
-  nProblematicEndpoints: >
-    1 problematic endpoint
-    |{count} problematic endpoints
+  nEnabled: ({n} enabled)
+  institutions: Institution|Institutions
+  untestedCredentials: Untested credentials
+  invalidCredentials: Invalid credentials
+  operationalCredentials: Valid credentials
+  problematicEndpoints: Problematic endpoint
   nErrsCredentials: >
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
@@ -727,6 +740,35 @@ sushi:
     mistake: I entered the identifiers by mistake
     neverWorked: The access point has never worked for our institution
     duplicate: This identifier is a duplicate of another one
+  duplicateDialog:
+    title: Similar credentials have been found!
+    text:
+      alert: Creating COUNTER credentials that are identical to existing credentials will trigger duplicates in report harvests for your institution
+      start: "The credentials for your institution below {reason}:"
+      content:
+        title: Credentials already registered
+        state: State
+      end:create: Do you want to edit the already registered credentials, or continue creating new credentials?
+      end:update: Do you want to edit the already registered credentials (by canceling the current edition), or continue your current edition ?
+    reasons:
+      samePackage: concern the same endpoint and package
+      sameParameters: have exactly the same parameters
+    actions:
+      main:create: '@:update'
+      main:create.archived: '@:update and unarchive'
+      main:update: I will edit the already registered credentials
+      secondary:create: Create new credentials
+      secondary:update: Continue editing
+  isHarvestable:
+    title: Your institution is eligible for harvesting
+    text: Your institution will be included in next harvest session, no action is need from your end.
+  isNotHarvestable:
+    title: Your institution is currently not eligible for harvesting
+    text: 'You need to address the following issues in order to be harvested :'
+    reasons:
+      institutionIsNotReady: Your entry is not complete
+      institutionHasNoCredentials: No COUNTER credentials has been declared
+      institutionHasFaultyCredentials: Some of your credentials have not been tested or are invalid
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
@@ -993,6 +1035,18 @@ harvest:
     sendEndMail: A mail will be sent on harvest end
     notStarted: Not started
     unableToRetrive: Unable to retrieve harvests
+    add: Create an harvest session
+    update: Update an harvest session
+    start: Start the session
+    stop: Stop the session
+    credentials: COUNTER credentials to harvest
+    reports: COUNTER reports to harvest
+    settings: Harvest settings
+    downloadUnsupported: Download reports even if unsupported by endpoint
+    allowFaulty: Include invalid credentials
+    useCache: Use report cache
+    useValidation: Respect report validation
+    timeout: Completion time of tasks
   jobs:
     title: Harvesting Tasks
     filtersTitle: Filter Tasks
@@ -1017,22 +1071,22 @@ harvest:
     unableToDelete: Unable to delete the harvesting task
     counterVersionTooltip: Harvest a COUNTER {version} report
     noData: No data in the harvested report
-elasticRoles:
-  toolbarTitle: Elastic Roles ({count})
-  newRole: New role
-  filtersForm.title: Filters of the role
+shares:
+  toolbarTitle: Shares ({count})
+  newShare: New share
+  filtersForm.title: Filters of the share
   institutions: Institutions
   addInstitution: Add institution
-  noInstitutions: No institutions is using this role
+  noInstitutions: No institutions is associated to this share
   readonly: Readonly
   users: Users
   addUser: Add user
-  noUsers: No users is using this role
-  manageElasticRoles: >
-    Manage roles
-    |Manage {count} roles
-  deleteNbRoles: You are about to delete {n} roles
-  grantedBy: Rights granted by a role
+  noUsers: No users is associated to this share
+  manageShares: >
+    Manage shares
+    |Manage {count} shares
+  deleteNbShares: You are about to delete {n} shares
+  grantedBy: Rights granted by a share
 sync:
   status:
     notSynced: Not yet synchronized
@@ -1058,7 +1112,7 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
-  elasticRoles: Elastic Roles
+  shares: Partages
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization
@@ -1199,4 +1253,6 @@ deletedSince: Deleted since {date}
 cantCancel: This operation cannot be undone.
 version: Version
 back: Back
+select: Select
+all: All
 pleaseWait: Please wait...

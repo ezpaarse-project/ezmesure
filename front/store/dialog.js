@@ -1,4 +1,4 @@
-import { defineStore, ref } from '#imports';
+import { defineStore, shallowRef, ref } from '#imports';
 
 /**
  * @typedef {Object} DialogData

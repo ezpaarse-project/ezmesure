@@ -198,7 +198,10 @@ const {
     credentials: 'credentials._count',
   },
   data: {
-    sortBy: [{ key: 'vendor', order: 'asc' }],
+    sortBy: [
+      { key: 'vendor', order: 'asc' },
+      { key: 'createdAt', order: 'desc' },
+    ],
   },
   async: {
     deep: true,

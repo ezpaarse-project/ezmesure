@@ -142,7 +142,8 @@ const {
     'period:to': computed(() => period.value.endDate),
   },
 
-  retry: 10,
+  // Try for 1 minute
+  retry: 60,
   retryDelay: 1000,
   retryStatusCodes: [425],
 

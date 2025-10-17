@@ -1,13 +1,13 @@
 <template>
   <v-card
-    :title="$t('elasticRoles.users')"
+    :title="$t('shares.users')"
     :subtitle="showRole ? role.name : undefined"
     prepend-icon="mdi-account-multiple"
   >
     <template #append>
       <UserAddMenu
         :model-value="users"
-        :title="$t('elasticRoles.addUser')"
+        :title="$t('shares.addUser')"
         @user-add="addUser($event)"
       >
         <template #activator="{ props: menu }">
@@ -25,7 +25,7 @@
 
     <template #text>
       <div v-if="users.length <= 0" class="text-center text-grey pt-5">
-        {{ $t('elasticRoles.noUsers') }}
+        {{ $t('shares.noUsers') }}
       </div>
 
       <v-list v-else density="compact" lines="two">

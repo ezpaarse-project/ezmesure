@@ -20,7 +20,7 @@
       <InstitutionAddMenu
         v-if="!hasConditions"
         :model-value="institutions"
-        :title="$t('elasticRoles.addInstitution')"
+        :title="$t('shares.addInstitution')"
         @institution-add="addInstitution($event)"
       >
         <template #activator="{ props: menu }">
@@ -86,7 +86,7 @@
       </v-expansion-panels>
 
       <div v-if="institutions.length <= 0" class="text-center text-grey pt-5">
-        {{ $t('elasticRoles.noInstitutions') }}
+        {{ $t('shares.noInstitutions') }}
       </div>
 
       <v-data-table

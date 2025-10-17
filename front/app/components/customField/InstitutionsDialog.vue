@@ -64,6 +64,10 @@
               {{ item.institution.name }}
             </nuxt-link>
           </template>
+
+          <template #[`item.value`]="{ item }">
+            {{ Array.isArray(item.value) ? item.value.join(', ') : item.value }}
+          </template>
         </v-data-table>
       </template>
     </v-card>
