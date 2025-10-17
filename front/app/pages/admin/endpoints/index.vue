@@ -109,6 +109,15 @@
             <v-divider />
 
             <v-list-item
+              v-if="item.registryId"
+              :title="$t('endpoints.goToRegistry')"
+              :href="generateRegistryURL(item).href"
+              prepend-icon="mdi-open-in-new"
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+
+            <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
               prepend-icon="mdi-identifier"
@@ -162,6 +171,7 @@ definePageMeta({
 });
 
 const { t, locale } = useI18n();
+const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
@@ -255,6 +265,11 @@ const toolbarTitle = computed(() => {
  * Debounced refresh
  */
 const debouncedRefresh = useDebounceFn(refresh, 250);
+
+/**
+ * Generate COUNTER registry URL
+ */
+const generateRegistryURL = (item) => new URL(`/platform/${item.registryId}`, counterRegistryUrl);
 
 /**
  * Toggle active states for selected endpoints

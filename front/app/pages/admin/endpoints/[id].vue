@@ -26,7 +26,7 @@
         density="compact"
         color="primary"
         hide-details
-        class="mt-0 mr-4"
+        class="mt-0 mr-2"
         style="transform: scale(0.9);"
         @update:model-value="toggleActiveStates()"
       />
@@ -38,8 +38,21 @@
         variant="tonal"
         density="comfortable"
         color="blue"
-        class="mr-4"
+        class="mr-2"
         @click="endpointFormDialogRef.open(endpoint)"
+      />
+
+      <v-btn
+        v-if="endpoint.registryId"
+        v-tooltip="$t('endpoints.goToRegistry')"
+        :href="registryUrl.href"
+        icon="mdi-open-in-new"
+        variant="tonal"
+        density="comfortable"
+        color="secondary"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mr-6"
       />
     </SkeletonPageBar>
 
@@ -399,6 +412,7 @@ const MAX_HARVEST_YEAR = new Date().getFullYear();
 
 const { params } = useRoute();
 const { t, locale } = useI18n();
+const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { addToCheck } = useSushiCheckQueueStore();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
@@ -494,6 +508,14 @@ const institutionsSelectionStatus = computed(() => {
     return 'full';
   }
   return 'partial';
+});
+
+const registryUrl = computed(() => {
+  if (!endpoint.value.registryId) {
+    return undefined;
+  }
+
+  return new URL(`/platform/${endpoint.value.registryId}`, counterRegistryUrl);
 });
 
 function shouldGreyRow(item) {

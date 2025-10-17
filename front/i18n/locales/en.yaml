@@ -278,6 +278,7 @@ endpoints:
   registryId: Platform ID in the COUNTER registry
   registryIdHint: You can directly paste the URL of the COUNTER registry
   registryUrl: Link to the COUNTER registry
+  goToRegistry: COUNTER registry
 institutions:
   toolbarTitle: Institutions ({count})
   title: Institution

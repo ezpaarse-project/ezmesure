@@ -278,6 +278,7 @@ endpoints:
   registryId: ID de la plateforme dans le registre COUNTER
   registryIdHint: Vous pouvez directement coller l'URL du registre COUNTER
   registryUrl: Lien vers le registre COUNTER
+  goToRegistry: Registre COUNTER
   filters:
     title: Filtrer les points d'accès
 institutions:
