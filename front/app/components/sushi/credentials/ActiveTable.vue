@@ -192,6 +192,14 @@
               @click="historyRef?.open(item)"
             />
             <v-list-item
+              v-if="item.endpoint.registryId"
+              :title="$t('endpoints.goToRegistry')"
+              :href="generateRegistryURL(item).href"
+              prepend-icon="mdi-open-in-new"
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+            <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
               prepend-icon="mdi-identifier"
@@ -286,6 +294,7 @@ const maxHarvestYear = new Date().getFullYear();
 
 const { data: user } = useAuthState();
 const { t, locale } = useI18n();
+const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const { addToCheck } = useSushiCheckQueueStore();
@@ -391,6 +400,11 @@ const debouncedRefresh = useDebounceFn(async () => {
   await refresh();
   emit('refresh');
 }, 250);
+
+/**
+ * Generate COUNTER registry URL
+ */
+const generateRegistryURL = (item) => new URL(`/platform/${item.endpoint.registryId}`, counterRegistryUrl);
 
 function onSushiUpdate(item) {
   const index = sushis.value.findIndex((sushi) => sushi.id === item.id);

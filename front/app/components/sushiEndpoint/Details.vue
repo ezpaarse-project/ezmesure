@@ -10,6 +10,23 @@
       />
 
       <DetailsField
+        v-if="registryUrl"
+        :label="$t('endpoints.registryUrl')"
+        cols="12"
+      >
+        <a :href="registryUrl.href" target="_blank" rel="noopener noreferrer">
+          {{ registryUrl.href }}
+        </a>
+
+        <v-icon
+          icon="mdi-open-in-new"
+          size="small"
+          color="secondary"
+          end
+        />
+      </DetailsField>
+
+      <DetailsField
         v-if="modelValue?.params?.length > 0"
         :label="$t('advancedSettings')"
         cols="12"
@@ -49,6 +66,7 @@ const props = defineProps({
 });
 
 const { t, locale } = useI18n();
+const { public: { counterRegistryUrl } } = useRuntimeConfig();
 
 function formatDate(date) {
   return dateFormat(date, locale.value, 'PPPpp');
@@ -64,12 +82,13 @@ const fields = computed(() => [
   { value: props.modelValue.requireCustomerId ? t('yes') : t('no'), label: t('endpoints.requireCustomerId'), cols: 4 },
   { value: props.modelValue.requireRequestorId ? t('yes') : t('no'), label: t('endpoints.requireRequestorId'), cols: 4 },
   { value: props.modelValue.requireApiKey ? t('yes') : t('no'), label: t('endpoints.requireApiKey'), cols: 4 },
+]);
 
-  {
-    value: `https://registry.countermetrics.org/platform/${props.modelValue.registryId}`,
-    label: t('endpoints.registryUrl'),
-    cols: 12,
-    hide: !props.modelValue.registryId,
-  },
-].filter((v) => v.hide !== true));
+const registryUrl = computed(() => {
+  if (!props.modelValue.registryId) {
+    return undefined;
+  }
+
+  return new URL(`/platform/${props.modelValue.registryId}`, counterRegistryUrl);
+});
 </script>
