@@ -640,8 +640,8 @@ sushi:
   credentialsCount: "{count} credentials"
   tabs:
     active:
-      title: Active credentials
-      description: This list contains the active credentials that will be used for harvesting.
+      title: Current credentials
+      description: This list contains the current credentials that will be used for harvesting.
     archived:
       title: Archived credentials
       description: This list contains the archived credentials that will be NOT used for harvesting.

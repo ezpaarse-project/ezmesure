@@ -646,8 +646,8 @@ sushi:
     |{count} identifiants
   tabs:
     active:
-      title: Identifiants actifs
-      description: Cette liste contient les identifiants actifs qui seront utilisés pour le moissonnage.
+      title: Identifiants courants
+      description: Cette liste contient les identifiants courants qui seront utilisés pour le moissonnage.
     archived:
       title: Identifiants archivés
       description: Cette liste contient les identifiants archivés qui ne seront PAS utilisés pour le moissonnage.
