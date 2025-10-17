@@ -746,7 +746,7 @@ sushi:
   deleteReason: Raison de la suppression
   deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
-    mistake: J'ai entré(e) ces identifiants par erreur
+    mistake: J'ai entré ces identifiants par erreur
     neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
     duplicate: Cet identifiant est en doublon avec un autre
   duplicateDialog:
