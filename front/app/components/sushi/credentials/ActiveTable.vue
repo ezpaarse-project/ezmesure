@@ -497,6 +497,7 @@ async function toggleActiveStates(items) {
         // eslint-disable-next-line no-await-in-loop
         await $fetch(`/api/sushi/${item.id}`, {
           method: 'PATCH',
+          query: { force: true },
           body: { active },
         });
 
@@ -559,6 +560,7 @@ async function archiveSushis(items) {
           try {
             await $fetch(`/api/sushi/${item.id}`, {
               method: 'PATCH',
+              query: { force: true },
               body: { archived: true },
             });
 
