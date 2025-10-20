@@ -303,7 +303,7 @@ const {
     sortBy: [
       { key: 'endpoint.vendor', order: 'asc' },
       { key: 'packages', order: 'asc' },
-      { key: 'archivedAt', order: 'desc' },
+      { key: 'archivedUpdatedAt', order: 'desc' },
     ],
   },
   async: {
