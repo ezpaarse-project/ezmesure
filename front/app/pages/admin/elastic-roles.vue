@@ -20,6 +20,14 @@
       />
     </SkeletonPageBar>
 
+    <v-container fluid>
+      <v-row>
+        <v-col>
+          <p>{{ $t('shares.pageDesc') }}</p>
+        </v-col>
+      </v-row>
+    </v-container>
+
     <v-data-table-server
       v-model="selectedRoles"
       :headers="headers"
