@@ -183,7 +183,7 @@
           </v-col>
         </v-slide-x-reverse-transition>
       </v-row>
-      
+
       <v-row>
         <v-col>
           <v-btn

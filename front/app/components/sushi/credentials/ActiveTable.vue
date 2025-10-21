@@ -413,6 +413,7 @@ function onSushiUpdate(item) {
   }
 
   sushis.value[index] = item;
+  emit('refresh');
 }
 
 /**
@@ -487,6 +488,7 @@ async function toggleActiveStates(items) {
     }
 
     emit('update:institution.sushiReadySince', null);
+    emit('refresh');
   }
 
   await Promise.all(
@@ -516,6 +518,8 @@ async function toggleActiveStates(items) {
   if (!items) {
     selectedSushi.value = [];
   }
+
+  emit('refresh');
 }
 
 /**
@@ -544,6 +548,7 @@ async function archiveSushis(items) {
     }
 
     emit('update:institution.sushiReadySince', null);
+    emit('refresh');
   }
 
   openConfirm({
@@ -652,6 +657,7 @@ async function openForm(item) {
     }
 
     emit('update:institution.sushiReadySince', null);
+    emit('refresh');
   }
 
   sushiFormRef.value?.open(item, { institution: props.institution });

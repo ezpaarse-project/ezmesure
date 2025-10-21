@@ -444,6 +444,7 @@ async function unarchiveSushis(items) {
     }
 
     emit('update:institution.sushiReadySince', null);
+    emit('refresh');
   }
 
   const results = await Promise.all(
