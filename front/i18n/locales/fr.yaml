@@ -765,7 +765,7 @@ sushi:
       sameParameters: possèdent exactement les mêmes paramètres
     actions:
       main:create: '@:update'
-      main:create.archived: '@:update et désarchiver'
+      main:createArchived: '@:update et désarchiver'
       main:update: Je modifie les identifiants déjà déclarés
       secondary:create: Créer de nouveaux identifiants
       secondary:update: Poursuivre l'édition
