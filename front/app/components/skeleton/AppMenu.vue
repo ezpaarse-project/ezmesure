@@ -78,6 +78,9 @@ const { data: user } = useAuthState();
 const items = computed(() => [
   { text: t('menu.partners'), to: '/partners', exact: true },
   { text: t('menu.api'), to: '/api-reference', exact: true },
+  // TODO : update URL of documentation with local when it will be available
+  // with https://docs.readmetrics.org/s/en-ezmesure-user
+  { text: t('menu.documentation'), href: 'https://docs.readmetrics.org/s/fr-ezmesure-user', target: '_blank', exact: true },
   { text: t('menu.contact'), to: '/contact-us', exact: true },
 
   { separator: true, key: 'menu-separator' },
