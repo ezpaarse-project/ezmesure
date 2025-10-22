@@ -755,7 +755,7 @@ sushi:
       sameParameters: have exactly the same parameters
     actions:
       main:create: '@:update'
-      main:create.archived: '@:update and unarchive'
+      main:createArchived: '@:update and unarchive'
       main:update: I will edit the already registered credentials
       secondary:create: Create new credentials
       secondary:update: Continue editing
