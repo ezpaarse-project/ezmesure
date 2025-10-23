@@ -17,8 +17,8 @@ const {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasCreateInput} RepositoryAliasCreateInput
- * @typedef {import(../../../.prisma/client').Prisma.RepositoryAliasWhereInput} RepositoryAliasWhereInput
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasCreateInput} RepositoryAliasCreateInput
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasWhereInput} RepositoryAliasWhereInput
 */
 /* eslint-enable max-len */
 
