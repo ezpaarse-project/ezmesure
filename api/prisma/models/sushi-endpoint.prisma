@@ -1,0 +1,67 @@
+/// A SUSHI endpoint
+model SushiEndpoint {
+  /// ID of the endpoint
+  id                          String             @id @default(cuid())
+  /// Creation date
+  createdAt                   DateTime           @default(now())
+  /// Latest update date
+  updatedAt                   DateTime           @updatedAt
+  /// Base URL of the SUSHI service
+  sushiUrl                    String
+  /// Vendor name of the endpoint
+  vendor                      String
+  /// Abritrary tag list associated to the endpoint
+  tags                        String[]
+  /// Description of the endpoint
+  description                 String?
+  /// Counter versions of the SUSHI service
+  counterVersions             String[]           @default(["5"])
+  /// Minimum period where a COUNTER version can be used. If not provided, version can be used for every period. Format: { [version: string]: string }
+  counterVersionsAvailability Json               @default("{}")
+  /// Technical provider of the endpoint (ex: Atypon)
+  technicalProvider           String?
+  /// Whether the endpoint is active and can be harvested
+  active                      Boolean            @default(true)
+  /// Date on which the active status was last modified
+  activeUpdatedAt             DateTime           @default(now())
+  /// Whether the endpoint requires a customer ID
+  requireCustomerId           Boolean            @default(false)
+  /// Whether the endpoint requires a requestor ID
+  requireRequestorId          Boolean            @default(false)
+  /// Whether the endpoint requires an API key
+  requireApiKey               Boolean            @default(false)
+  /// Whether report validation errors should be ignored
+  ignoreReportValidation      Boolean            @default(false)
+  /// Date until which the endpoint is disabled (no harvest allowed)
+  disabledUntil               DateTime?
+  /// Default value for the customer_id parameter
+  defaultCustomerId           String?
+  /// Default value for the requestor_id parameter
+  defaultRequestorId          String?
+  /// Default value for the api_key parameter
+  defaultApiKey               String?
+  /// Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")
+  paramSeparator              String?
+  /// [Deprecated] List report IDs that are supported by the endpoint
+  supportedReports            String[]
+  /// [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported
+  ignoredReports              String[]
+  /// [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint
+  additionalReports           String[]
+  /// [Deprecated] Date on which the list of supported reports was last updated
+  supportedReportsUpdatedAt   DateTime?
+  /// List of reports that are supported (or unsupported) by the endpoint, with periods available
+  supportedData               Json               @default("{}")
+  /// Date on which the list of supported data was last updated
+  supportedDataUpdatedAt      DateTime?
+  /// Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")
+  harvestDateFormat           String?
+  /// Report used when testing endpoint
+  testedReport                String?
+  /// Id of platform in https://registry.countermetrics.org
+  registryId                  String?
+  /// SUSHI credentials associated with the endpoint
+  credentials                 SushiCredentials[]
+  /// Additionnal default parameters. Each param has a name, a value, and a scope.
+  params                      Json[]
+}

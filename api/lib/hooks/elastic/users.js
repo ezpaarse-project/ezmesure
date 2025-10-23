@@ -7,8 +7,8 @@ const elasticUsers = require('../../services/elastic/users');
 const { syncUser } = require('../../services/sync/elastic');
 
 /**
- * @typedef {import('@prisma/client').User} User
- * @typedef {import('@prisma/client').ElasticRole} ElasticRole
+ * @typedef {import('../../.prisma/client').User} User
+ * @typedef {import('../../.prisma/client').ElasticRole} ElasticRole
  */
 
 /**

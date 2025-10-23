@@ -1,0 +1,81 @@
+/// A repository alias template (used to generate repository aliases)
+model RepositoryAliasTemplate {
+  /// ID
+  id         String            @id
+  /// Creation date
+  createdAt  DateTime          @default(now())
+  /// Latest update date
+  updatedAt  DateTime          @updatedAt
+  /// The alias pattern (ex: x-alias-istex-{id}-ezpaarse)
+  pattern    String
+  /// The repository's pattern targeted by alias
+  target     String
+  /// Whether the template is active or not
+  active     Boolean           @default(true)
+  /// The repository
+  repository Repository        @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
+  filters    Json[]
+  /// Conditions for creating a new alias (format: [{ "field": "foo", "value": "bar" }])
+  conditions Json[]
+  /// The aliases that were generated with this template
+  aliases    RepositoryAlias[]
+}
+
+/// A repository alias (alias for a section of elasticsearch)
+model RepositoryAlias {
+  /// ID of the template
+  templateId             String?
+  /// The template of the alias
+  template               RepositoryAliasTemplate?               @relation(fields: [templateId], onUpdate: Cascade, onDelete: Cascade, references: [id])
+  /// The institution this repository is associated to
+  institutions           Institution[]
+  /// Creation date
+  createdAt              DateTime                               @default(now())
+  /// Latest update date
+  updatedAt              DateTime                               @updatedAt
+  /// The alias pattern (ex: b-bibcnrs)
+  pattern                String                                 @id
+  /// The repository's pattern targeted by alias
+  target                 String
+  /// The repository
+  repository             Repository                             @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
+  filters                Json?
+  /// Member permissions associated to this alias
+  permissions            RepositoryAliasPermission[]
+  /// Permissions granted by role for this alias
+  elasticRolePermissions ElasticRoleRepositoryAliasPermission[]
+}
+
+/// A alias permission (access rights of a member for a specific alias)
+model RepositoryAliasPermission {
+  /// Username of the member
+  username      String
+  /// Institution of the member
+  institutionId String
+  /// The member
+  membership    Membership      @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  /// Pattern of the alias
+  aliasPattern  String
+  /// The alias
+  alias         RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+  /// Whether the permission can be modified or not
+  locked        Boolean         @default(false)
+
+  @@id([username, institutionId, aliasPattern])
+}
+
+/// Permission on repository alias granted by a role
+model ElasticRoleRepositoryAliasPermission {
+  /// Name of the concerned role
+  elasticRoleName String
+  /// The concerned role
+  elasticRole     ElasticRole     @relation(fields: [elasticRoleName], references: [name], onDelete: Cascade)
+  /// Pattern of the concerned alias
+  aliasPattern    String
+  /// The concerned alias
+  alias           RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+
+  @@id([elasticRoleName, aliasPattern])
+}
