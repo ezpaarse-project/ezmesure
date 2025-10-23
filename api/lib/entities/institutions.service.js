@@ -11,18 +11,18 @@ const SushiCredentialsService = require('./sushi-credentials.service');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.JsonValue} JsonValue
- * @typedef {import('@prisma/client').Institution} Institution
- * @typedef {import('@prisma/client').Prisma.InstitutionWhereInput} InstitutionWhereInput
- * @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionCountArgs} InstitutionCountArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
- * @typedef {import('@prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
+ * @typedef {import('../.prisma/client').Prisma.JsonValue} JsonValue
+ * @typedef {import('../.prisma/client').Institution} Institution
+ * @typedef {import('../.prisma/client').Prisma.InstitutionWhereInput} InstitutionWhereInput
+ * @typedef {import('../.prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
+ * @typedef {import('../.prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
+ * @typedef {import('../.prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
+ * @typedef {import('../.prisma/client').Prisma.InstitutionCountArgs} InstitutionCountArgs
+ * @typedef {import('../.prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
+ * @typedef {import('../.prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
+ * @typedef {import('../.prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
+ * @typedef {import('../.prisma/client').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
+ * @typedef {import('../.prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
  * @typedef {import('koa').Context['query']} KoaQuery
  * @typedef {import('../services/filters').Filter} Filter
 */

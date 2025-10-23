@@ -17,8 +17,8 @@ const InstitutionsService = require('../../../entities/institutions.service');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.RepositoryPermissionCreateInput} RepositoryPermissionCreateInput
- * @typedef {import('@prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
+ * @typedef {import('../../../.prisma/client').Prisma.RepositoryPermissionCreateInput} RepositoryPermissionCreateInput
+ * @typedef {import('../../../.prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
 */
 /* eslint-enable max-len */
 

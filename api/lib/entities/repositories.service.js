@@ -3,15 +3,15 @@ const BasePrismaService = require('./base-prisma.service');
 const repositoriesPrisma = require('../services/prisma/repositories');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Repository} Repository */
-/** @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryCountArgs} RepositoryCountArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
+/** @typedef {import('../.prisma/client').Repository} Repository */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryCountArgs} RepositoryCountArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositoriesService extends BasePrismaService {

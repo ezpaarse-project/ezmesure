@@ -25,25 +25,25 @@ const { appLogger } = require('../services/logger');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').HarvestSession} HarvestSession
- * @typedef {import('@prisma/client').Prisma.HarvestSessionUpdateArgs} HarvestSessionUpdateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionUpsertArgs} HarvestSessionUpsertArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionDeleteArgs} HarvestSessionDeleteArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindUniqueArgs} HarvestSessionFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindFirstArgs} HarvestSessionFindFirstArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindManyArgs} HarvestSessionFindManyArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionAggregateArgs} HarvestSessionAggregateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionCountArgs} HarvestSessionCountArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs
- * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('@prisma/client').Prisma.SushiCredentialsInclude} SushiCredentialsInclude
- * @typedef {import('@prisma/client').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput
- * @typedef {import('@prisma/client').HarvestJobStatus} HarvestJobStatus
- * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
- * @typedef {import('@prisma/client').Institution} Institution
- * @typedef {import('@prisma/client').HarvestJob} HarvestJob
+ * @typedef {import('../.prisma/client').HarvestSession} HarvestSession
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionUpdateArgs} HarvestSessionUpdateArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionUpsertArgs} HarvestSessionUpsertArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionDeleteArgs} HarvestSessionDeleteArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionFindUniqueArgs} HarvestSessionFindUniqueArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionFindFirstArgs} HarvestSessionFindFirstArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionFindManyArgs} HarvestSessionFindManyArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionAggregateArgs} HarvestSessionAggregateArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionCountArgs} HarvestSessionCountArgs
+ * @typedef {import('../.prisma/client').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs
+ * @typedef {import('../.prisma/client').SushiCredentials} SushiCredentials
+ * @typedef {import('../.prisma/client').Prisma.SushiCredentialsInclude} SushiCredentialsInclude
+ * @typedef {import('../.prisma/client').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput
+ * @typedef {import('../.prisma/client').HarvestJobStatus} HarvestJobStatus
+ * @typedef {import('../.prisma/client').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../.prisma/client').Institution} Institution
+ * @typedef {import('../.prisma/client').HarvestJob} HarvestJob
  * @typedef {{ credentials: { include: { endpoint: true, institution: true } } }} HarvestJobCredentialsInclude
- * @typedef {import('@prisma/client').Prisma.HarvestJobGetPayload<{ include: HarvestJobCredentialsInclude }>} HarvestJobCredentials
+ * @typedef {import('../.prisma/client').Prisma.HarvestJobGetPayload<{ include: HarvestJobCredentialsInclude }>} HarvestJobCredentials
  * @typedef {import('./sushi-endpoints.service').VersionSupportedData} VersionSupportedData
  *
  * @typedef {Record<'beginDate' | 'endDate', string>} HarvestPeriod
@@ -372,7 +372,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
   /* eslint-disable max-len */
   /**
-   * @typedef {import('@prisma/client').Prisma.SushiCredentialsGetPayload<{ include: { endpoint: true, institution: true } }>} CredentialsToHarvest
+   * @typedef {import('../.prisma/client').Prisma.SushiCredentialsGetPayload<{ include: { endpoint: true, institution: true } }>} CredentialsToHarvest
    * @typedef {Partial<HarvestJob> & { credentials: { id: string }, session: { id: string }, repository: { pattern: string } }} BaseHarvestJob
    */
   /* eslint-enable max-len */
@@ -771,7 +771,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
      *
      * @param {object[]} jobs Jobs to create
      *
-     * @returns {Promise<import('@prisma/client').HarvestJob[]>} Created jobs
+     * @returns {Promise<import('../.prisma/client').HarvestJob[]>} Created jobs
      */
     const createJobs = async (jobs) => HarvestJobsService.$transaction(
       async (service) => Promise.all(
@@ -884,9 +884,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     /**
      * Cancel jobs in bulk
      *
-     * @param {import('@prisma/client').HarvestJob[]} jobs Jobs to cancel
+     * @param {import('../.prisma/client').HarvestJob[]} jobs Jobs to cancel
      *
-     * @returns {Promise<import('@prisma/client').HarvestJob[]>} Canceled jobs
+     * @returns {Promise<import('../.prisma/client').HarvestJob[]>} Canceled jobs
      */
     const cancelJobs = async (jobs) => HarvestJobsService.$transaction(
       async (service) => Promise.all(

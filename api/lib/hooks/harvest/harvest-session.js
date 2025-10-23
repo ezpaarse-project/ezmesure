@@ -126,7 +126,7 @@ async function sendEndMail(session) {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').HarvestSession} HarvestSession
+ * @typedef {import('../../.prisma/client').HarvestSession} HarvestSession
 */
 /* eslint-enable max-len */
 

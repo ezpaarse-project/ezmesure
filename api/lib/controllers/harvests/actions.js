@@ -22,8 +22,8 @@ const standardQueryParams = prepareStandardQueryParams({
 exports.standardQueryParams = standardQueryParams;
 
 /**
-  * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
-  * @typedef {import('@prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
+  * @typedef {import('../../.prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+  * @typedef {import('../../.prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
  */
 
 exports.getHarvests = async (ctx) => {

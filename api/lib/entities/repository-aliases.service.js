@@ -3,15 +3,15 @@ const BasePrismaService = require('./base-prisma.service');
 const repositoryAliasesPrisma = require('../services/prisma/repository-aliases');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').RepositoryAlias} RepositoryAlias */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasUpdateArgs} RepositoryAliasUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasUpsertArgs} RepositoryAliasUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasCountArgs} RepositoryAliasCountArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasFindUniqueArgs} RepositoryAliasFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasFindFirstArgs} RepositoryAliasFindFirstArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasFindManyArgs} RepositoryAliasFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasCreateArgs} RepositoryAliasCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasDeleteArgs} RepositoryAliasDeleteArgs */
+/** @typedef {import('../.prisma/client').RepositoryAlias} RepositoryAlias */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasUpdateArgs} RepositoryAliasUpdateArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasUpsertArgs} RepositoryAliasUpsertArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasCountArgs} RepositoryAliasCountArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasFindUniqueArgs} RepositoryAliasFindUniqueArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasFindFirstArgs} RepositoryAliasFindFirstArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasFindManyArgs} RepositoryAliasFindManyArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasCreateArgs} RepositoryAliasCreateArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasDeleteArgs} RepositoryAliasDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositoriesService extends BasePrismaService {

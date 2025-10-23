@@ -11,7 +11,7 @@ const ezrNamespaces = require('../../services/ezreeport/namespaces');
 const { onMembershipUpsert } = require('./memberships');
 
 /**
- * @typedef {import('@prisma/client').Institution} Institution
+ * @typedef {import('../../.prisma/client').Institution} Institution
  */
 
 /**
