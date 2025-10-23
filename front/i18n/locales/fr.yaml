@@ -696,7 +696,7 @@ sushi:
       title: État du moissonnage
     harvest-session:
       title: État du moissonnage
-      description: Cette matrice présente les résultats du moissonnage des différents établissement. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
+      description: Cette matrice présente les résultats du moissonnage des différents établissements. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
     title: État global du moissonnage
     loading: L'état global du moissonnage est en cours de génération, cela peut prendre quelques secondes
     periodShortcut: '{n} mois'
