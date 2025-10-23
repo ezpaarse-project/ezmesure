@@ -529,6 +529,9 @@ institutions:
       non-harvestable: Non moissonnable
       selectable: Sélectionnable
       harvested: Déjà moissonné
+    members: Contacts documentaire
+    repositories: '@:repositories.repositories COUNTER'
+    spaces: '@:spaces.spaces COUNTER'
     settings: Paramètres de recherche
     allowNotReady: Inclure les établissements non prêts
     allowFaulty: Inclure les identifiants invalides

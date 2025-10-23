@@ -343,19 +343,19 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('institutions.institution.members'),
+    title: t('institutions.harvestable.members'),
     value: 'institution._count.memberships',
     sortable: true,
     align: 'center',
   },
   {
-    title: t('repositories.repositories'),
+    title: t('institutions.harvestable.repositories'),
     value: 'institution._count.repositories',
     sortable: true,
     align: 'center',
   },
   {
-    title: t('spaces.spaces'),
+    title: t('institutions.harvestable.spaces'),
     value: 'institution._count.spaces',
     sortable: true,
     align: 'center',
