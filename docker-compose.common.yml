@@ -79,7 +79,7 @@ services:
       retries: 3
 
   postgres:
-    image: postgres:15.1-alpine3.16
+    image: postgres:17.6-alpine3.22
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${EZMESURE_POSTGRES_USER:-postgres}
