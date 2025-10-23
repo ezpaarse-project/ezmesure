@@ -241,6 +241,7 @@ const headers = computed(() => [
     title: t('users.user.email'),
     value: 'user.email',
     sortable: true,
+    hide: !user.value?.isAdmin && institution.value.onboarding,
   },
   {
     title: t('institutions.members.roles'),
@@ -277,7 +278,7 @@ const headers = computed(() => [
     value: 'actions',
     align: 'center',
   },
-]);
+].filter((h) => !h.hide));
 /**
  * Toolbar title
  */

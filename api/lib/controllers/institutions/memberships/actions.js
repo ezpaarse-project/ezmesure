@@ -3,10 +3,18 @@ const config = require('config');
 const { sendMail, generateMail } = require('../../../services/mail');
 const { appLogger } = require('../../../services/logger');
 const { prepareStandardQueryParams } = require('../../../services/std-query');
+const { client: prisma } = require('../../../services/prisma');
 
 const UsersService = require('../../../entities/users.service');
 const MembershipsService = require('../../../entities/memberships.service');
 const InstitutionsService = require('../../../entities/institutions.service');
+
+/* eslint-disable max-len */
+/**
+ * @typedef {import('@prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.UserSelect} UserSelect
+ */
+/* eslint-enable max-len */
 
 const {
   includableFields,
@@ -45,8 +53,25 @@ function sendNewContact(receiver, institutionName) {
 }
 
 exports.getInstitutionMembers = async (ctx) => {
+  /** @type {MembershipFindManyArgs} */
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   prismaQuery.where.institutionId = ctx.state.institution.id;
+
+  // Hide emails if not admin and institution is an onboarding one (if user is requested)
+  if (!ctx.state.user.isAdmin && prismaQuery.include?.user && ctx.state.institution.onboarding) {
+    prismaQuery.include.user = {
+      select: {
+        // Select everything by default
+        ...Object.fromEntries(
+          Object.keys(prisma.user.fields).map((key) => [key, true]),
+        ),
+        // Add requested (sub) includes
+        ...(typeof prismaQuery.include.user === 'object' ? prismaQuery.include.user.include : {}),
+        // Remove email
+        email: false,
+      },
+    };
+  }
 
   const membershipsService = new MembershipsService();
 
@@ -63,6 +88,22 @@ exports.getInstitutionMember = async (ctx) => {
     ctx,
     { username_institutionId: { institutionId, username } },
   );
+
+  // Hide emails if not admin and institution is an onboarding one (if user is requested)
+  if (!ctx.state.user.isAdmin && prismaQuery.include?.user && ctx.state.institution.onboarding) {
+    prismaQuery.include.user = {
+      select: {
+        // Select everything by default
+        ...Object.fromEntries(
+          Object.keys(prisma.user.fields).map((key) => [key, true]),
+        ),
+        // Add requested (sub) includes
+        ...(typeof prismaQuery.include.user === 'object' ? prismaQuery.include.user.include : {}),
+        // Remove email
+        email: false,
+      },
+    };
+  }
 
   const membershipsService = new MembershipsService();
   const membership = await membershipsService.findUnique(prismaQuery);
