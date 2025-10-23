@@ -45,6 +45,8 @@ const immutableFields = [
 const includableFields = [
   'memberships',
   'memberships.institution',
+  'memberships.roles',
+  'memberships.roles.role',
   'historyEntries',
   'elasticRoles',
 ];
