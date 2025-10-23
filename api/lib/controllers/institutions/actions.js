@@ -42,10 +42,6 @@ exports.standardQueryParams = standardQueryParams;
 
 const {
   PERMISSIONS,
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
 } = require('../../entities/memberships.dto');
 
 const sender = config.get('notifications.sender');
@@ -123,7 +119,7 @@ exports.createInstitution = async (ctx) => {
       create: [{
         username,
         permissions: [...PERMISSIONS],
-        roles: [DOC_CONTACT, TECH_CONTACT],
+        roles: [],
         locked: true,
       }],
     };
