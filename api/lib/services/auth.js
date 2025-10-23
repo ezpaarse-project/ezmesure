@@ -8,10 +8,6 @@ const RepositoriesService = require('../entities/repositories.service');
 const RepositoryAliasesService = require('../entities/repository-aliases.service');
 const SpacesService = require('../entities/spaces.service');
 
-const { MEMBER_ROLES } = require('../entities/memberships.dto');
-
-const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
-
 const requireJwt = jwt({
   secret: auth.secret,
   cookie: auth.cookie,
