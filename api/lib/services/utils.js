@@ -1,4 +1,8 @@
-const { template } = require('lodash');
+const { template, get, set } = require('lodash');
+
+/**
+ * @typedef {import('lodash').TemplateOptions} TemplateOptions
+ */
 
 /**
  * Transforms a string as an array of string if needed.
@@ -53,23 +57,62 @@ const interpolateString = (str, context, opts = {}) => (
  *
  * @param {Object} obj - The object to be interpolated
  * @param {Object} context - The context available for interpolation
- * @param {Object} [opts] - Options to be passed to lodash.template()
+ * @param {Object} [opts] - Options
+ * @param {TemplateOptions} [opts.templateOptions] - Options to be passed to lodash.template()
+ * @param {Set} [opts.toArray] - Paths that should be converted to array if
+ *                               they contain multivalued interpolations
  *
  * @returns {Object} The resulting object
  */
-const interpolateObject = (obj, context, opts) => {
+const interpolateObject = (obj, context, opts, currentPath = []) => {
   if (Array.isArray(obj)) {
-    return obj.map((item) => interpolateObject(item, context, opts));
+    return obj.map((item) => interpolateObject(item, context, opts, currentPath));
   }
 
   if (obj && typeof obj === 'object') {
     return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [k, interpolateObject(v, context, opts)]),
+      Object.entries(obj).map(
+        ([k, v]) => [k, interpolateObject(v, context, opts, [...currentPath, k])],
+      ),
     );
   }
 
   if (typeof obj === 'string') {
-    return interpolateString(obj, context, opts);
+    if (!opts?.toArray?.has(currentPath.join('.'))) {
+      return interpolateString(obj, context, opts?.templateOptions);
+    }
+
+    const interpolatePattern = new RegExp(opts?.templateOptions?.interpolate ?? /{{(.+?)}}/, 'g');
+
+    const multivaluedKeys = obj
+      .matchAll(interpolatePattern)
+      .map((match) => match[1].trim())
+      .filter((key) => Array.isArray(get(context, key)));
+
+    if (multivaluedKeys.length === 0) {
+      return interpolateString(obj, context, opts?.templateOptions);
+    }
+
+    // If there are multivalued interpolations, generate all possible combinations
+    const combinations = multivaluedKeys.reduce((acc, key) => {
+      const values = get(context, key);
+
+      if (values.length === 0) { return acc; }
+
+      return values.flatMap((value) => (
+        acc.map((combination) => ({ ...combination, [key]: value }))
+      ));
+    }, [{}]);
+
+    const ctx = JSON.parse(JSON.stringify(context));
+
+    return combinations.map((combination) => {
+      Object.entries(combination).forEach(([key, value]) => {
+        set(ctx, key, value);
+      });
+
+      return interpolateString(obj, ctx, opts?.templateOptions);
+    });
   }
 
   return obj;

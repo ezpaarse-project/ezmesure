@@ -109,7 +109,7 @@
                   class="mr-2"
                 />
 
-                {{ $t('elasticRoles.readonly') }}
+                {{ $t('shares.readonly') }}
               </template>
 
               <template #append>

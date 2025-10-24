@@ -7,7 +7,29 @@
       search
       icons
       @update:model-value="debouncedRefresh()"
-    />
+    >
+      <v-btn
+        v-if="harvestSessionFormDialogRef"
+        v-tooltip="$t('harvest.sessions.add')"
+        icon="mdi-plus"
+        variant="tonal"
+        density="comfortable"
+        color="green"
+        class="mr-2"
+        @click="harvestSessionFormDialogRef.open()"
+      />
+      
+      <v-btn
+        v-if="globalHarvestMatrixRef"
+        v-tooltip="$t('sushi.globalHarvestState.title')"
+        icon="mdi-table-headers-eye"
+        variant="tonal"
+        density="comfortable"
+        color="primary"
+        class="mr-2"
+        @click="globalHarvestMatrixRef.open()"
+      />
+    </SkeletonPageBar>
 
     <v-data-iterator :items="sessionsWithStatus" items-per-page="0">
       <template #default="{ items }">
@@ -15,11 +37,16 @@
           <v-expansion-panel
             v-for="({ raw: item }) in items"
             :key="item.id"
+            :value="item.id"
             :readonly="!item.startedAt"
             :expand-icon="!item.startedAt ? '' : undefined"
           >
             <template #title>
-              <SushiHarvestSessionHeader :model-value="item" />
+              <SushiHarvestSessionHeader
+                :model-value="item"
+                @click:update="harvestSessionFormDialogRef?.open(item)"
+                @update:model-value="refresh()"
+              />
             </template>
 
             <template #text>
@@ -49,6 +76,13 @@
         </div>
       </template>
     </v-data-iterator>
+
+    <SushiHarvestSessionFormDialog
+      ref="harvestSessionFormDialogRef"
+      @submit="refresh()"
+    />
+
+    <SushiHarvestGlobalMatrixDialog ref="globalHarvestMatrixRef" />
   </div>
 </template>
 
@@ -60,6 +94,9 @@ definePageMeta({
 
 const { t } = useI18n();
 const snacks = useSnacksStore();
+
+const harvestSessionFormDialogRef = useTemplateRef('harvestSessionFormDialogRef');
+const globalHarvestMatrixRef = useTemplateRef('globalHarvestMatrixRef');
 
 const {
   data: sessions,

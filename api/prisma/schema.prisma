@@ -48,6 +48,8 @@ model Institution {
   social              Json?
   /// Date when SUSHI credentials have been marked as ready for harvest
   sushiReadySince     DateTime?
+  /// Is a onboarding institution (will be added for new users and removed when a membership is created)
+  onboarding          Boolean               @default(false)
   /// Institution members
   memberships         Membership[]
   /// Additional roles to give to each member
@@ -459,9 +461,9 @@ model HarvestSession {
   /// Maximum execution time of a job
   timeout                Int                  @default(600)
   /// Whether the reports should be fetched even if credentials aren't verified or wrong
-  allowFaulty            Boolean      @default(false)
+  allowFaulty            Boolean              @default(false)
   /// Whether the reports should be downloaded even if not supported by the endpoint
-  downloadUnsupported    Boolean      @default(false)
+  downloadUnsupported    Boolean              @default(false)
   /// Whether the reports should be downloaded even if a local copy already exists
   forceDownload          Boolean              @default(false)
   /// Whether a mail should be sent when session ended

@@ -30,6 +30,7 @@ const schema = {
   logo: Joi.any().strip(),
   logoId: Joi.string().allow(null),
 
+  onboarding: Joi.boolean(),
   validated: Joi.boolean(),
   hidePartner: Joi.boolean(),
   tags: Joi.array().items(Joi.string()),

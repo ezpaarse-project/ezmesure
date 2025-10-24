@@ -71,8 +71,6 @@ const propsToPrismaSort = (props, orders, sortableFields) => {
     return undefined;
   }
 
-  // sorting props to avoid subfields begin overrode by parents
-  propsToMap.sort((a, b) => a.length - b.length);
   return propsToMap.map((prop, i) => {
     const order = orders[i] || 'asc';
     const [parent, ...children] = prop.split('.');

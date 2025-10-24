@@ -5,5 +5,6 @@ require('./ezreeport');
 require('./elastic');
 require('./kibana');
 require('./harvest');
+require('./onboarding');
 
 module.exports = hookEmitter;

@@ -128,7 +128,11 @@ const {
     institutions: 'institutions._count',
   },
   data: {
-    sortBy: [{ key: 'name', order: 'asc' }],
+    sortBy: [
+      { key: 'name', order: 'asc' },
+      { key: 'institution.name', order: 'asc' },
+      { key: 'createdAt', order: 'desc' },
+    ],
   },
 });
 

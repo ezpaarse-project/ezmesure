@@ -228,14 +228,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const sushiCredentialsService = new SushiCredentialsService(this);
     const credentials = await sushiCredentialsService.findMany({
       where: {
+        ...SushiCredentialsService.enabledCredentialsQuery,
         id: queryToPrismaFilter(session.credentialsQuery.sushiIds?.toString()),
         institutionId: queryToPrismaFilter(session.credentialsQuery.institutionIds?.toString()),
         endpointId: queryToPrismaFilter(session.credentialsQuery.endpointIds?.toString()),
-        active: true,
-        archived: false,
-        endpoint: {
-          active: true,
-        },
       },
       include: {
         endpoint: { select: { counterVersions: true } },
