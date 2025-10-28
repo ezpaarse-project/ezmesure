@@ -1129,6 +1129,7 @@ sync:
   repositories: Entrepôts
   repositoryAliases: Alias
   users: Utilisateurs
+  shares: Partages
   elasticRoles: Rôles Elastic
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements

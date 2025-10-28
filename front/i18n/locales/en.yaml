@@ -986,7 +986,6 @@ repoAliasTemplates:
   applyToSeeAliases: Apply the template to see the affected aliases
   noAliasCreated: No alias has been created
   applyHadNoEffect: The application of the template had no effect. No institution matched the conditions.
-
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
@@ -1034,7 +1033,9 @@ harvest:
       endpoints: "{n} endpoint|{n} endpoints"
       reportTypes: "{n} report type|{n} report types"
       credentials: "{n} credentials"
+      counterVersions: "{n} version of COUNTER|{n} versions of COUNTER"
     credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
+    reportsMenuTitle: COUNTER Reports
     sendEndMail: A mail will be sent on harvest end
     notStarted: Not started
     unableToRetrive: Unable to retrieve harvests
@@ -1116,7 +1117,8 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
-  shares: Partages
+  shares: Shares
+  elasticRoles: Elastic roles
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization
