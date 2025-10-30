@@ -39,7 +39,7 @@
         />
       </template>
 
-      <template #[`item.filters`]="{ value }">
+      <template #[`item.filters`]="{ value, item }">
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
