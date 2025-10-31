@@ -9,7 +9,7 @@
     "lint": "eslint --ext .js .",
     "test": "jest --runInBand --verbose",
     "db:migrate": "prisma migrate deploy",
-    "db:diff": "prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma"
+    "db:diff": "prisma migrate diff --from-schema-datasource prisma --to-schema-datamodel prisma"
   },
   "repository": {
     "type": "git",
