@@ -61,6 +61,7 @@
         "authorization": "EZMESURE_OIDC_AUTH_URI",
         "token": "EZMESURE_OIDC_TOKEN_URI",
         "introspection": "EZMESURE_OIDC_INTROSPECTION_URI",
+        "revocation": "EZMESURE_OIDC_REVOCATION_URI",
         "userinfo": "EZMESURE_OIDC_USERINFO_URI"
       },
       "scopes": { "__name": "EZMESURE_OIDC_SCOPES", "__format": "json" }

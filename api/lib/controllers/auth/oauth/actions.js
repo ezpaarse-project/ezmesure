@@ -100,8 +100,12 @@ exports.loginCallback = async (ctx) => {
 };
 
 exports.logout = async (ctx) => {
+  try {
+    await openid.revokeUserToken(ctx.state.jwtData.token);
+  } catch (err) {
+    appLogger.error(`Failed to revoke token for ${ctx.state.user.username}: ${err}`)
+  }
+
   ctx.cookies.set(cookie, '', { httpOnly: true });
   ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
-
-  // TODO: logout from OIDC provider
 };
