@@ -15,6 +15,8 @@ function fixRegistryRecord(...schemas) {
     if (schema?.properties?.Registry_Record) {
       const { Registry_Record: item } = schema.properties;
       item.pattern = undefined;
+
+      schema.required = schema.required.filter((property) => property !== 'Registry_Record');
     }
   }
 }
