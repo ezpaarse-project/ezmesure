@@ -67,6 +67,7 @@ module.exports = function prepareC5Transformer(report) {
 
   return {
     totalItems,
+    endpoint: {},
     * transform() {
       for (let i = 0; i < reportItems.length; i += 1) {
         const reportItem = reportItems[i];
