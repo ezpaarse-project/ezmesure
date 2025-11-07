@@ -694,7 +694,7 @@ sushi:
   globalHarvestState:
     institution:
       title: État du moissonnage
-      description: Cette matrice présente les résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu pu survenir lors de la récupération des données.
+      description: Cette matrice présente les résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
     endpoint:
       title: État du moissonnage
     harvest-session:
@@ -1129,6 +1129,7 @@ sync:
   repositories: Entrepôts
   repositoryAliases: Alias
   users: Utilisateurs
+  shares: Partages
   elasticRoles: Rôles Elastic
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements

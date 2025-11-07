@@ -1,0 +1,19 @@
+/// Represent the actions that are triggered
+model Action {
+  /// ID of the action
+  id            String       @id @default(cuid())
+  // ID of the institution concerned by the action
+  institutionId String?
+  // The institution concerned by the action
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+  /// ID of the user that triggered the action
+  authorId      String?
+  /// The user that triggered the action
+  author        User?        @relation(fields: [authorId], references: [username])
+  /// When the action occurred
+  date          DateTime     @default(now())
+  /// The action type (ex: commentInstitution, createSpace)
+  type          String       @db.VarChar(50)
+  /// Arbitrary data associated with the action (comment message, old/new state...)
+  data          Json         @default("{}")
+}

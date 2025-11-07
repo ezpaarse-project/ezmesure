@@ -7,7 +7,7 @@ const elasticUsers = require('../../services/elastic/users');
 const { syncUser } = require('../../services/sync/elastic');
 
 /**
- * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
+ * @typedef {import('../../.prisma/client').RepositoryPermission} RepositoryPermission
  */
 
 /**

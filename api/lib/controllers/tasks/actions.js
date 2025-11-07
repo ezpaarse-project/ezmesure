@@ -1,7 +1,7 @@
 const HarvestJobService = require('../../entities/harvest-job.service');
 const { harvestQueue } = require('../../services/jobs');
 
-/** @typedef {import('@prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
+/** @typedef {import(../../../.prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
 
 const { schema, includableFields } = require('../../entities/harvest-job.dto');
 const { stringOrArray } = require('../../services/utils');

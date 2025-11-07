@@ -4,13 +4,13 @@ const BasePrismaService = require('./base-prisma.service');
 const repositoryPermissionsPrisma = require('../services/prisma/repository-permissions');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission */
-/** @typedef {import('@prisma/client').Prisma.RepositoryPermissionUpdateArgs} RepositoryPermissionUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryPermissionUpsertArgs} RepositoryPermissionUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryPermissionFindUniqueArgs} RepositoryPermissionFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryPermissionFindManyArgs} RepositoryPermissionFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryPermissionCreateArgs} RepositoryPermissionCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryPermissionDeleteArgs} RepositoryPermissionDeleteArgs */
+/** @typedef {import('../.prisma/client').RepositoryPermission} RepositoryPermission */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryPermissionUpdateArgs} RepositoryPermissionUpdateArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryPermissionUpsertArgs} RepositoryPermissionUpsertArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryPermissionFindUniqueArgs} RepositoryPermissionFindUniqueArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryPermissionFindManyArgs} RepositoryPermissionFindManyArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryPermissionCreateArgs} RepositoryPermissionCreateArgs */
+/** @typedef {import('../.prisma/client').Prisma.RepositoryPermissionDeleteArgs} RepositoryPermissionDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositoryPermissionsService extends BasePrismaService {

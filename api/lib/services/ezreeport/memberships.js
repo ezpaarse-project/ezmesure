@@ -1,7 +1,7 @@
 // @ts-check
 const ezrAxios = require('./axios');
 
-/** @typedef {import('@prisma/client').Membership} Membership */
+/** @typedef {import('../../.prisma/client').Membership} Membership */
 
 /**
  * Updates (or create) a membership in ezREEPORT from an ezMESURE's membership

@@ -1,4 +1,4 @@
-const { Prisma } = require('@prisma/client');
+const { Prisma } = require('../../.prisma/client.ts');
 
 const elastic = require('../../services/elastic');
 const RepositoryAliasesService = require('../../entities/repository-aliases.service');
@@ -17,8 +17,8 @@ const {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasCreateInput} RepositoryAliasCreateInput
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasWhereInput} RepositoryAliasWhereInput
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasCreateInput} RepositoryAliasCreateInput
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasWhereInput} RepositoryAliasWhereInput
 */
 /* eslint-enable max-len */
 

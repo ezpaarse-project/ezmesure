@@ -13,7 +13,7 @@ const { schema, adminImportSchema, includableFields } = require('../../entities/
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
+ * @typedef {import(../../../.prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
 */
 /* eslint-enable max-len */
 

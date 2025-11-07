@@ -11,8 +11,8 @@ const InstitutionsService = require('../../../entities/institutions.service');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
- * @typedef {import('@prisma/client').Prisma.UserSelect} UserSelect
+ * @typedef {import('../../../.prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
+ * @typedef {import('../../../.prisma/client').Prisma.UserSelect} UserSelect
  */
 /* eslint-enable max-len */
 

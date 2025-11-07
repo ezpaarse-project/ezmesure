@@ -26,8 +26,8 @@ const { schema, includableFields } = require('../../entities/sushi-credentials.d
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
- * @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs
+ * @typedef {import(../../../.prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ * @typedef {import(../../../.prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs
  */
 /* eslint-enable max-len */
 

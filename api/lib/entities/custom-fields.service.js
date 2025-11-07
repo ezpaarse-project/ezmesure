@@ -4,14 +4,14 @@ const BasePrismaService = require('./base-prisma.service');
 const customFieldsPrisma = require('../services/prisma/custom-fields');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').CustomField} CustomField */
-/** @typedef {import('@prisma/client').Prisma.CustomFieldUpdateArgs} CustomFieldUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.CustomFieldUpsertArgs} CustomFieldUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.CustomFieldCountArgs} CustomFieldCountArgs */
-/** @typedef {import('@prisma/client').Prisma.CustomFieldFindUniqueArgs} CustomFieldFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.CustomFieldFindManyArgs} CustomFieldFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.CustomFieldCreateArgs} CustomFieldCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.CustomFieldDeleteArgs} CustomFieldDeleteArgs */
+/** @typedef {import('../.prisma/client').CustomField} CustomField */
+/** @typedef {import('../.prisma/client').Prisma.CustomFieldUpdateArgs} CustomFieldUpdateArgs */
+/** @typedef {import('../.prisma/client').Prisma.CustomFieldUpsertArgs} CustomFieldUpsertArgs */
+/** @typedef {import('../.prisma/client').Prisma.CustomFieldCountArgs} CustomFieldCountArgs */
+/** @typedef {import('../.prisma/client').Prisma.CustomFieldFindUniqueArgs} CustomFieldFindUniqueArgs */
+/** @typedef {import('../.prisma/client').Prisma.CustomFieldFindManyArgs} CustomFieldFindManyArgs */
+/** @typedef {import('../.prisma/client').Prisma.CustomFieldCreateArgs} CustomFieldCreateArgs */
+/** @typedef {import('../.prisma/client').Prisma.CustomFieldDeleteArgs} CustomFieldDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class CustomFieldsService extends BasePrismaService {

@@ -5,8 +5,8 @@ const { appLogger } = require('../../services/logger');
 const { client: prisma } = require('../../services/prisma');
 
 /**
- * @typedef {import('@prisma/client').User} User
- * @typedef {import('@prisma/client').Membership} Membership
+ * @typedef {import('../../.prisma/client').User} User
+ * @typedef {import('../../.prisma/client').Membership} Membership
  */
 
 /**

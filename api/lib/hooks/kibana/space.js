@@ -9,7 +9,7 @@ const {
 } = require('../../services/sync/kibana');
 
 /**
- * @typedef {import('@prisma/client').Space} Space
+ * @typedef {import('../../.prisma/client').Space} Space
  */
 
 /**

@@ -13,8 +13,8 @@ const UsersService = require('../../entities/users.service');
 const { syncSchedule } = config.get('ezreeport');
 
 /**
- * @typedef {import('@prisma/client').Institution} Institution
- * @typedef {import('@prisma/client').Membership} Membership
+ * @typedef {import('../../.prisma/client').Institution} Institution
+ * @typedef {import('../../.prisma/client').Membership} Membership
  */
 
 /**
