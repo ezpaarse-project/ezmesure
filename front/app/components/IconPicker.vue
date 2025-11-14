@@ -50,7 +50,7 @@ const emit = defineEmits({
 const props = defineProps({
   modelValue: {
     type: [String, null],
-    required: true,
+    default: null,
   },
   itemsPerLine: {
     type: Number,
