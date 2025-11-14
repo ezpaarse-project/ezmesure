@@ -7,13 +7,6 @@ const RepositoryAliasPermissionsService = require('../../entities/repository-ali
 const { appLogger } = require('../../services/logger');
 
 const {
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('../../entities/memberships.dto');
-
-const {
   syncRepositoryAlias,
   unmountAlias,
   syncRepositoryIndexTemplate,
@@ -24,17 +17,25 @@ const {
  */
 
 /**
- * Give permissions to the contacts of an institution that are connected to an alias
+ * Give alias permissions to the members of an institution
+ * that have a role with "repositories" permissions preset
  * @param {RepositoryAlias} alias
  */
-const givePermissionsToContacts = async (alias, institutionId) => {
+const givePermissionsToMembers = async (alias, institutionId) => {
   const membershipsService = new MembershipsService();
   const repositoryAliasPermissionsService = new RepositoryAliasPermissionsService();
 
-  const contacts = await membershipsService.findMany({
+  const memberships = await membershipsService.findMany({
     where: {
       roles: {
-        hasSome: [DOC_CONTACT, TECH_CONTACT],
+        some: {
+          role: {
+            OR: [
+              { permissionsPreset: { path: ['repositories'], equals: 'read' } },
+              { permissionsPreset: { path: ['repositories'], equals: 'write' } },
+            ],
+          },
+        },
       },
       institution: {
         id: institutionId,
@@ -47,31 +48,31 @@ const givePermissionsToContacts = async (alias, institutionId) => {
   });
 
   // eslint-disable-next-line no-restricted-syntax
-  for (const contact of contacts) {
+  for (const member of memberships) {
     try {
       // eslint-disable-next-line no-await-in-loop
       await repositoryAliasPermissionsService.upsert({
         where: {
           username_institutionId_aliasPattern: {
             aliasPattern: alias.pattern,
-            institutionId: contact.institutionId,
-            username: contact.username,
+            institutionId: member.institutionId,
+            username: member.username,
           },
         },
         update: {
           aliasPattern: alias.pattern,
         },
         create: {
-          username: contact.username,
-          institutionId: contact.institutionId,
+          username: member.username,
+          institutionId: member.institutionId,
           aliasPattern: alias.pattern,
         },
       });
     } catch (e) {
-      appLogger.error(`[elastic] Permissions for alias [${alias.pattern}] cannot be granted to [${contact.username}] in institution [${contact.institutionId}]:\n${e}`);
+      appLogger.error(`[elastic] Permissions for alias [${alias.pattern}] cannot be granted to [${member.username}] in institution [${member.institutionId}]:\n${e}`);
     }
 
-    appLogger.verbose(`[elastic] Permissions for alias [${alias.pattern}] has been granted to [${contact.username}] in institution [${contact.institutionId}]`);
+    appLogger.verbose(`[elastic] Permissions for alias [${alias.pattern}] has been granted to [${member.username}] in institution [${member.institutionId}]`);
   }
 };
 
@@ -93,7 +94,7 @@ const onRepositoryAliasUpsert = async (repositoryAlias) => {
  */
 const onRepositoryAliasConnected = async ({ alias, institutionId }) => {
   try {
-    await givePermissionsToContacts(alias, institutionId);
+    await givePermissionsToMembers(alias, institutionId);
   } catch (error) {
     appLogger.error(
       `[elastic][hooks] Permissions for RepositoryAlias [${alias?.pattern}] could not be granted:\n${error}`,

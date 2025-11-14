@@ -7,6 +7,8 @@ const SushiCredentialsService = require('../../entities/sushi-credentials.servic
 const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
 /* eslint-disable max-len */
 /**
  * @typedef {import('../../.prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
@@ -41,10 +43,6 @@ exports.standardQueryParams = standardQueryParams;
 
 const {
   PERMISSIONS,
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
 } = require('../../entities/memberships.dto');
 
 const sender = config.get('notifications.sender');
@@ -122,7 +120,7 @@ exports.createInstitution = async (ctx) => {
       create: [{
         username,
         permissions: [...PERMISSIONS],
-        roles: [DOC_CONTACT, TECH_CONTACT],
+        roles: [],
         locked: true,
       }],
     };
@@ -243,7 +241,11 @@ exports.updateInstitution = async (ctx) => {
       where: {
         institutionId: ctx.state.institution.id,
         roles: {
-          hasSome: [DOC_CONTACT, TECH_CONTACT],
+          some: {
+            role: {
+              notifications: { has: NOTIFICATION_TYPES.institutionValidated },
+            },
+          },
         },
       },
       include: { user: true },
@@ -451,6 +453,26 @@ exports.importInstitutions = async (ctx) => {
 
               user: {
                 connect: { username: membership?.username },
+              },
+
+              roles: {
+                connectOrCreate: membership?.roles?.map?.(
+                  (role) => ({
+                    where: {
+                      username_institutionId_roleId: {
+                        // For legacy roles, replace : by _ (ex: contact:doc => contact_doc)
+                        roleId: typeof role === 'string' ? role.replace(':', '_') : role?.roleId,
+                        username: membership?.username,
+                        institutionId: item.id,
+                      },
+                    },
+                    create: typeof role === 'string' ? { roleId: role.replace(':', '_') } : {
+                      ...role,
+                      username: undefined,
+                      institutionId: undefined,
+                    },
+                  }),
+                ),
               },
 
               spacePermissions: {

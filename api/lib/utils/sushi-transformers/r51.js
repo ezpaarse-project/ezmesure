@@ -1,6 +1,7 @@
 // @ts-check
 
 const { format } = require('date-fns');
+const { appLogger } = require('../../services/logger');
 
 /**
  * Check if value is an record
@@ -26,12 +27,28 @@ module.exports = function prepareC51Transformer(report) {
     Report_Attributes: report?.Report_Header?.Report_Attributes,
   };
 
+  // Notify of possible changes in endpoint
+  const endpoint = {};
+  // Extract RegistryID (if present)
+  if (report?.Report_Header?.Registry_Record) {
+    try {
+      const url = new URL(report.Report_Header.Registry_Record);
+      const matches = /^\/platform\/(?<id>[a-z0-9-]+)\/?/i.exec(url.pathname);
+      if (matches?.groups?.id) {
+        endpoint.registryId = matches.groups.id;
+      }
+    } catch (err) {
+      appLogger.warn(`[harvest] Couldn't get Registry_Record of report: ${err}`);
+    }
+  }
+
   // Extract report items
   const reportItems = Array.isArray(report?.Report_Items) ? report.Report_Items : [];
   const totalItems = reportItems.length;
 
   return {
     totalItems,
+    endpoint,
     * transform() {
       for (let i = 0; i < reportItems.length; i += 1) {
         const parent = reportItems[i];

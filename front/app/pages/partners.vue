@@ -68,14 +68,14 @@ const filteredPartners = computed(() => {
     const {
       name,
       acronym,
-      techContactName,
-      docContactName,
+      contacts,
     } = partner;
 
     if (name?.toLowerCase?.()?.includes(query)) { return true; }
     if (acronym?.toLowerCase?.()?.includes(query)) { return true; }
-    if (techContactName?.toLowerCase?.()?.includes(query)) { return true; }
-    if (docContactName?.toLowerCase?.()?.includes(query)) { return true; }
+    if (contacts?.some((contact) => contact.fullName?.toLowerCase?.()?.includes(query))) {
+      return true;
+    }
     return false;
   });
 

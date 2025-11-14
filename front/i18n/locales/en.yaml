@@ -22,6 +22,7 @@ menu:
   profile: Profile
   members: Members
   users: Users
+  roles: Roles
   shares: Shares
   logout: Logout
   contact: Contact
@@ -434,15 +435,14 @@ institutions:
     accessRights: Access rights
     institutionManagement: Institution management
     roles: Roles
-    roleNames:
-      contact:doc: Documentary contact
-      contact:tech: Technical contact
-      guest: Guest
+    memberHasNoRole: This member has no role assigned
     featureLabels:
       institution: Institution card
       memberships: Members
       sushi: COUNTER credentials
       reporting: ezREEPORT
+      repositories: Repositories
+      spaces: Kibana spaces
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
@@ -1075,6 +1075,27 @@ harvest:
     unableToDelete: Unable to delete the harvesting task
     counterVersionTooltip: Harvest a COUNTER {version} report
     noData: No data in the harvested report
+roles:
+  toolbarTitle: Roles ({count})
+  pageDesc: Enter here the roles that you want to be able to assign to institution members.
+  newRole: New role
+  editRole: Update role
+  manageRoles: >
+    Manage roles
+    |Manage {count} roles
+  restricted: Restricted
+  onlyAdmins: Only assignable by administrators
+  notOnlyAdmins: Assignable by users
+  exposeMembers: Expose on the partner page
+  notifiateUserWhen: Notifications received by the user
+  assignments: Assignments
+  definePermissionsPreset: Define permissions presets
+  notificationTypes:
+    'institution:validated': His institution has been validated
+    'institution:role_assigned': The role has been assigned to him
+    'institution:new_user_matching_institution': A user who is part of the institution has signed up
+    'institution:membership_request': A user has requested to join the institution
+    'counter:new_data_available': New COUNTER data is available
 shares:
   toolbarTitle: Shares ({count})
   pageDesc: In this page, you can grant specific rights to users or institutions. The rights granted here cannot be modified by institution members.
@@ -1174,6 +1195,8 @@ status: Status
 date: Date
 duration: Duration
 label: Label
+icon: Icon
+color: Color
 properties: Properties
 description: Description
 initials: Initials
@@ -1239,6 +1262,7 @@ reason: "Reason: {reason}"
 groupBy: Group by
 indeterminate: indeterminate
 noMatchFor: No results matching "{search}". Press {key} to add it.
+noMatch: No results
 enterKey: enter
 general: General
 enterValidUrl: Please enter a valid URL

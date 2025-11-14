@@ -54,6 +54,12 @@
       />
 
       <v-list-item
+        :title="$t('menu.roles')"
+        to="/admin/roles"
+        prepend-icon="mdi-account-group"
+      />
+
+      <v-list-item
         :title="$t('menu.shares')"
         to="/admin/elastic-roles"
         prepend-icon="mdi-account-tag"
