@@ -455,6 +455,26 @@ exports.importInstitutions = async (ctx) => {
                 connect: { username: membership?.username },
               },
 
+              roles: {
+                connectOrCreate: membership?.roles?.map?.(
+                  (role) => ({
+                    where: {
+                      username_institutionId_roleId: {
+                        // For legacy roles, replace : by _ (ex: contact:doc => contact_doc)
+                        roleId: typeof role === 'string' ? role.replace(':', '_') : role?.roleId,
+                        username: membership?.username,
+                        institutionId: item.id,
+                      },
+                    },
+                    create: typeof role === 'string' ? { roleId: role.replace(':', '_') } : {
+                      ...role,
+                      username: undefined,
+                      institutionId: undefined,
+                    },
+                  }),
+                ),
+              },
+
               spacePermissions: {
                 connectOrCreate: membership?.spacePermissions?.map?.(
                   /** @returns {SpacePermissionCreateOrConnectWithoutMembershipInput} */
