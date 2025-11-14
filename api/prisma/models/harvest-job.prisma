@@ -1,0 +1,107 @@
+/// Possible statuses of a harvest job
+enum HarvestJobStatus {
+  /// The job is waiting for processing
+  waiting
+  /// The job started processing
+  running
+  /// The job was delayed and scheduled for later processing
+  delayed
+  /// The job terminated successfuly
+  finished
+  /// The job failed
+  failed
+  /// The job was cancelled
+  cancelled
+  /// The job was interrupted (the API restarted while it was running)
+  interrupted
+}
+
+/// Represent the execution of a harvest job
+model HarvestJob {
+  /// ID of the job
+  id                String           @id @default(cuid())
+  /// ID of the SUSHI credentials
+  credentialsId     String
+  /// SUSHI credentials used to harvest
+  credentials       SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  /// Creation date
+  createdAt         DateTime         @default(now())
+  /// Latest update date
+  updatedAt         DateTime         @updatedAt
+  /// Start date (when the job moved from waiting to running)
+  startedAt         DateTime?
+  /// Job status
+  status            HarvestJobStatus
+  /// ID of the harvested report (ex: tr_j1)
+  reportType        String
+  /// Version of COUNTER to harvest (ex: 5.1)
+  counterVersion    String
+  /// ID of the harvest session
+  sessionId         String
+  /// Session that created the job
+  session           HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  /// Beginning of the requested period, may differ from session's cause of supported periods
+  beginDate         String
+  /// End of the requested period, may differ from session's cause of supported periods
+  endDate           String
+  /// Index where the harvested data should be inserted
+  index             String
+  /// Repository pattern including the index
+  repositoryPattern String?
+  /// Repository including the index
+  repository        Repository?      @relation(fields: [repositoryPattern], references: [pattern], onDelete: SetNull)
+  /// Job running time
+  runningTime       Int?
+  /// Job result
+  result            Json?
+  /// Error code, if a fatal exception was encountered
+  errorCode         String?
+  /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
+  sushiExceptions   Json[]
+  /// Job logs
+  logs              Log[]
+  /// Job steps
+  steps             Step[]
+  /// States affected by current job
+  harvests          Harvest[]
+}
+
+/// A job log
+model Log {
+  /// ID of the log
+  id      String     @id @default(cuid())
+  /// ID the job that produced the log
+  jobId   String
+  /// The job that produced the log
+  job     HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  /// Date of the log
+  date    DateTime   @default(now())
+  /// Level of the log
+  level   String     @db.VarChar(50)
+  /// Message of the log
+  message String
+}
+
+/// A job step
+model Step {
+  /// ID of the step
+  id          String     @id @default(cuid())
+  /// ID of the job that the step is part of
+  jobId       String
+  /// The job that the step is part of
+  job         HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  /// Creation date
+  createdAt   DateTime   @default(now())
+  /// Latest update date
+  updatedAt   DateTime   @updatedAt
+  /// Start date
+  startedAt   DateTime
+  /// Step label
+  label       String     @db.VarChar(50)
+  /// Step status
+  status      String     @db.VarChar(50)
+  /// Running time
+  runningTime Int
+  /// Arbitrary data produced by the step
+  data        Json
+}

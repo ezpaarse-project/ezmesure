@@ -11,6 +11,7 @@ export default defineNuxtConfig({
       shibbolethDisabled: false,
       supportMail: 'ezteam@couperin.org',
       currentInstance: '',
+      counterRegistryUrl: 'https://registry.countermetrics.org',
     },
   },
 

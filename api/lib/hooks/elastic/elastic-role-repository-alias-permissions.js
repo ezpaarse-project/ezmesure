@@ -9,7 +9,7 @@ const {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').ElasticRoleRepositoryAliasPermission} ElasticRoleRepositoryAliasPermission
+ * @typedef {import('../../.prisma/client').ElasticRoleRepositoryAliasPermission} ElasticRoleRepositoryAliasPermission
 */
 /* eslint-enable max-len */
 

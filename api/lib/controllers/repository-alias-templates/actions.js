@@ -16,15 +16,15 @@ const {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasGetPayload<{ include: { institutions: true } }>} RepoAliasWithInstitutions
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasGetPayload<{ select: { institutions: { select: { id: true } } } }>} RepoAliasWithOnlyInstitutionIds
- * @typedef {import('@prisma/client').RepositoryAliasTemplate} RepositoryAliasTemplate
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasUncheckedCreateInput} RepositoryAliasUncheckedCreateInput
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasTemplateCreateInput} RepositoryAliasTemplateCreateInput
- * @typedef {import('@prisma/client').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs
- * @typedef {import('@prisma/client').Prisma.InstitutionWhereInput} InstitutionWhereInput
- * @typedef {import('@prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
+ * @typedef {import('../../.prisma/client').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasGetPayload<{ include: { institutions: true } }>} RepoAliasWithInstitutions
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasGetPayload<{ select: { institutions: { select: { id: true } } } }>} RepoAliasWithOnlyInstitutionIds
+ * @typedef {import('../../.prisma/client').RepositoryAliasTemplate} RepositoryAliasTemplate
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasUncheckedCreateInput} RepositoryAliasUncheckedCreateInput
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateCreateInput} RepositoryAliasTemplateCreateInput
+ * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs
+ * @typedef {import('../../.prisma/client').Prisma.InstitutionWhereInput} InstitutionWhereInput
+ * @typedef {import('../../.prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
  * @typedef {import('koa').Context['query']} KoaQuery
  *
  * @typedef {object} ImportResponse
@@ -143,7 +143,11 @@ exports.applyOne = async (ctx) => {
       customProps: Object.fromEntries(institution.customProps.map((p) => [p.fieldId, p.value])),
     };
     const aliasPattern = interpolateString(templatePattern, interpolateContext);
-    const aliasFilters = interpolateObject(templateFilters, interpolateContext);
+    const aliasFilters = interpolateObject(
+      templateFilters,
+      interpolateContext,
+      { toArray: new Set(['value']) },
+    );
 
     let alias = aliases.get(aliasPattern);
 

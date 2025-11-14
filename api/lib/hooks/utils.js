@@ -1,9 +1,9 @@
 const { client: prisma } = require('../services/prisma');
 
 /**
- * @typedef {import('@prisma/client').Space} Space
- * @typedef {import('@prisma/client').Repository} Repository
- * @typedef {import('@prisma/client').RepositoryAlias} RepositoryAlias
+ * @typedef {import('../.prisma/client').Space} Space
+ * @typedef {import('../.prisma/client').Repository} Repository
+ * @typedef {import('../.prisma/client').RepositoryAlias} RepositoryAlias
  */
 
 /**

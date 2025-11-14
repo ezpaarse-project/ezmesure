@@ -23,7 +23,7 @@ menu:
   members: Membres
   users: Utilisateurs
   roles: Rôles
-  elasticRoles: Rôles Elastic
+  shares: Partages
   logout: Déconnexion
   contact: Contact
   report: Rapports
@@ -37,6 +37,7 @@ menu:
   spaces: Espaces
   harvest:
     group: Moissonnage
+    institutions: Établissements
     sessions: Sessions
     alerts: Alertes
   sync: Synchronisation
@@ -54,7 +55,7 @@ home:
 myspace:
   title: Mon profil
   noMemberships: Vous ne faites partie d'aucun établissement.
-  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'{team} ou le correspondant ezMESURE de votre établissement, ou a utiliser le menu à gauche pour demander à {join}.
+  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'{team} ou le contact ezMESURE de votre établissement, ou a utiliser le menu à gauche pour demander à {join}.
   ezmesureTeam: équipe
   name: Nom
   mail: Mail
@@ -279,6 +280,7 @@ endpoints:
   registryId: ID de la plateforme dans le registre COUNTER
   registryIdHint: Vous pouvez directement coller l'URL du registre COUNTER
   registryUrl: Lien vers le registre COUNTER
+  goToRegistry: Registre COUNTER
   filters:
     title: Filtrer les points d'accès
 institutions:
@@ -303,12 +305,12 @@ institutions:
   noLogo: Pas de logo
   noInstitutions: Vous n'êtes pas attaché à un établissement.
   institutionFoundDeclareNewInstitution: Votre établissement n'est pas déclaré, déclarez un nouvel établissement.
-  sendMailToJoin: Un message sera envoyé aux correspondant de l'établissement pour les prévenir.
+  sendMailToJoin: Un message sera envoyé aux contact de l'établissement pour les prévenir.
   askToJoinAnInstitution: Rejoindre un établissement
   searchForInstitution: Rechercher votre établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
-  joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.
-  createMailContactList: Copier les adresses mails des correspondants
+  joinInstitutionEmail: Un email sera envoyé aux contacts de cet établissement afin qu'ils puissent vous ajouter.
+  createMailContactList: Copier les adresses mails des contacts
   modify: Modifier mon établissement
   reports:
     reports: Rapports
@@ -361,6 +363,9 @@ institutions:
     validated: Validé
     notValidated: Non validé
     hidePartner: Ne pas afficher comme partenaire
+    onboarding:
+      title: Établissement "bienvenue"
+      description: Cet établissement sera ajouté à tout nouvel utilisateur d'ezMESURE, et sera retiré dès que cet utilisateur rejoindra un autre établissement.
     failedToUpdateValidation: Impossible de mettre à jour la validation
     attachedDomains: Domaines rattachés
     noAttachedDomains: Il n'y a pas de domaine rattaché à cet établissement pour le moment.
@@ -398,22 +403,22 @@ institutions:
     deleteN: Vous allez révoquer l'accès de {count} membre.|Vous allez révoquer l'accès de {count} membres.
     technical: Technique
     documentary: Documentaire
-    noCorrespondent: Aucun correspondant
-    technicalCorrespondent: Correspondant technique
-    documentaryCorrespondent: Correspondant documentaire
+    noCorrespondent: Aucun contact
+    technicalCorrespondent: Contact technique
+    documentaryCorrespondent: Contact documentaire
     creator: Créateur
     unableToRetriveMembers: Impossible de récupérer les membres
     cannotAddMember: Impossible d'ajouter le membre
     name: Nom
     username: Identifiant
-    correspondent: Correspondant
+    correspondent: Contact
     permissions: Permissions
     read: Lecture
     write: Écriture
     updated: Membre mis à jour
     email: Adresse email *
     emailExample: "ex: john{'@'}doe.fr"
-    thisMemberIs: 'Ce membre est un correspondant :'
+    thisMemberIs: 'Ce membre est un contact :'
     enterValidEmail: Veuillez saisir un email valide.
     members: Membres
     addMember: Ajouter un membre
@@ -516,6 +521,24 @@ institutions:
     readyPopup:
       inProgress: Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.
       completed: Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous.
+  harvestable:
+    title: Établissements moissonnables
+    harvestableInstitutions: Moissonnables
+    status:
+      harvestable: Moissonnable
+      non-harvestable: Non moissonnable
+      selectable: Sélectionnable
+      harvested: Déjà moissonné
+    members: Contacts documentaire
+    repositories: '@:repositories.repositories COUNTER'
+    spaces: '@:spaces.spaces COUNTER'
+    settings: Paramètres de recherche
+    allowNotReady: Inclure les établissements non prêts
+    allowFaulty: Inclure les identifiants invalides
+    allowHarvested: Inclure les établissements déjà moissonnés
+    harvestedMonth: Période cible
+    nSelectable: (1 sélectionnable)|({n} sélectionnables)
+    institutions: Établissement|Établissements
   unableToRetriveInformations: Impossible de récupérer les informations d'établissement
   unableToRetrivePlatforms: Impossible de récupérer les informations d'établissement
   notAttachedToAnyInstitution: Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.
@@ -531,6 +554,7 @@ group:
 tasks:
   failedToFetchTasks: Impossible de récupérer la liste des tâches
   logs: Logs
+  counterVersion: Moissonné avec COUNTER {version}
   history: Historique des tâches
   oneHistory: Historique de la tâche
   parameters: Paramètres
@@ -543,6 +567,8 @@ tasks:
     cancelled: Le moissonnage a été annulé.
     delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu.
     missing: Le moissonnage est terminé, mais la période demandée est manquante.
+    harvested: Le moissonnage a été lancé.
+    unharvested: Le moissonnage n'a pas été lancé.
   status:
     notLaunchedYet: Pas encore lancé
     waiting: En attente
@@ -554,6 +580,8 @@ tasks:
     cancelled: Annulé
     delayed: Reporté
     missing: Rapport vide
+    harvested: Moissonné
+    unharvested: Non moissonné
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible
@@ -622,8 +650,8 @@ sushi:
     |{count} identifiants
   tabs:
     active:
-      title: Identifiants actifs
-      description: Cette liste contient les identifiants actifs qui seront utilisés pour le moissonnage.
+      title: Identifiants courants
+      description: Cette liste contient les identifiants courants qui seront utilisés pour le moissonnage.
     archived:
       title: Identifiants archivés
       description: Cette liste contient les identifiants archivés qui ne seront PAS utilisés pour le moissonnage.
@@ -641,21 +669,12 @@ sushi:
   deletingWaiting: En attente de suppression
   deletingError: "Impossible de supprimer l'identifiant: {error}"
   deletionTask: État de suppression
-  nInstitutions: >
-    1 établissement utilise cet endpoint
-    |{count} établissements utilisent cet endpoint
-  nUntestedCredentials: >
-    1 identifiant non testé
-    |{count} identifiants non testés
-  nInvalidCredentials: >
-    1 identifiant invalide
-    |{count} identifiants invalides
-  nOperationalCredentials: >
-    1 identifiant valide
-    |{count} identifiants valides
-  nProblematicEndpoints: >
-    1 point d'accès problématique
-    |{count} points d'accès problématiques
+  nEnabled: (1 actif)|({n} actifs)
+  institutions: Établissement|Établissements
+  untestedCredentials: Identifiants non testés
+  invalidCredentials: Identifiants invalides
+  operationalCredentials: Identifiants valides
+  problematicEndpoints: Point d'accès problématique|Points d'accès problématiques
   nErrsCredentials: >
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
@@ -672,6 +691,19 @@ sushi:
   inactiveDescription: L'établissement à rendu cet identifiant inactif et ne sera donc pas moissonné.
   harvestState: État du moissonnage
   harvestStateDescription: Cette matrice présente les différents résultats du moissonnage de ces identifiants. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
+  globalHarvestState:
+    institution:
+      title: État du moissonnage
+      description: Cette matrice présente les résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
+    endpoint:
+      title: État du moissonnage
+    harvest-session:
+      title: État du moissonnage
+      description: Cette matrice présente les résultats du moissonnage des différents établissements. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
+    title: État global du moissonnage
+    loading: L'état global du moissonnage est en cours de génération, cela peut prendre quelques secondes
+    periodShortcut: '{n} mois'
+    showUnharvested: Afficher les établissements non moissonnés
   harvestedAt: Moissonné le {date}
   checking: Vérification de la connexion de {vendor} pour {name}
   report: Rapport
@@ -689,7 +721,7 @@ sushi:
     ignored: Rapport non supporté (constat ezMESURE)
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
-    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
+    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez valider vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
   paramScopes:
     all: Toutes les requêtes au point d'accès
     report_list: Listing des rapports
@@ -718,9 +750,38 @@ sushi:
   deleteReason: Raison de la suppression
   deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
-    mistake: J'ai entré(e) ces identifiants par erreur
+    mistake: J'ai entré ces identifiants par erreur
     neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
     duplicate: Cet identifiant est en doublon avec un autre
+  duplicateDialog:
+    title: Des identifiants similaires ont été trouvés !
+    text:
+      alert: Créer des identifiants COUNTER identiques à des identifiants déjà existants déclenchera des moissons de rapports d'usages en double pour votre établissement
+      start: "Les identifiants ci-dessous déclarés pour votre établissement {reason} :"
+      content:
+        title: Identifiants déjà déclarés
+        state: État
+      end:create: Voulez-vous modifier les identifiants déjà déclarés, ou procéder à la création de nouveaux identifiants ?
+      end:update: Voulez-vous modifier les identifiants déjà déclarés (en annulant l'édition actuelle), ou continuer avec votre édition actuelle ?
+    reasons:
+      samePackage: concernent le même point d'accès et le même package
+      sameParameters: possèdent exactement les mêmes paramètres
+    actions:
+      main:create: '@:update'
+      main:createArchived: '@:update et désarchiver'
+      main:update: Je modifie les identifiants déjà déclarés
+      secondary:create: Créer de nouveaux identifiants
+      secondary:update: Poursuivre l'édition
+  isHarvestable:
+    title: Votre établissement est éligible au moissonnage
+    text: Votre établissement sera inclus dans la prochaine vague de moissonnage, aucune action n'est nécessaire de votre part.
+  isNotHarvestable:
+    title: Votre établissement n'est actuellement pas éligible au moissonnage
+    text: "Vous devez corriger les problèmes suivants afin d'être moissonné :"
+    reasons:
+      institutionIsNotReady: Votre saisie n'est pas terminée
+      institutionHasNoCredentials: Aucun identifiant COUNTER n'a été déclaré
+      institutionHasFaultyCredentials: Certains de vos identifiants n'ont pas été testés ou sont invalides
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
@@ -971,6 +1032,7 @@ spaces:
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
+    title: Session de moissonnage
     pendingSession: Moissonnage en attente...
     startedAt: Moissonnage lancé le {date}
     metrics:
@@ -990,9 +1052,22 @@ harvest:
     sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
+    add: Créer une session de moissonnage
+    update: Éditer une session de moissonnage
+    start: Démarrer la session
+    stop: Arrêter la session
+    credentials: Identifiants COUNTER à moissonner
+    reports: Rapports COUNTER à moissonner
+    settings: Paramètres de moissonnage
+    downloadUnsupported: Télécharger les rapports même si non supportés par le point d'accès
+    allowFaulty: Inclure les identifiants invalides
+    useCache: Utiliser le cache des rapports
+    useValidation: Respecter la validation des rapports
+    timeout: Délai de complétion des tâches
   jobs:
     title: Tâches de moissonnage
     filtersTitle: Filtrer les tâches
+    versions: Versions
     harvestId: Identifiant de moissonnage
     reportType: Type de rapport
     errorCode: Code d'erreur
@@ -1034,24 +1109,25 @@ roles:
     'institution:new_user_matching_institution': Un utilisateur faisant partie de l'établissement s'est inscrit
     'institution:membership_request': Un utilisateur demande à rejoindre l'établissement
     'counter:new_data_available': De nouvelles données COUNTER sont disponibles
-elasticRoles:
-  toolbarTitle: Rôles Elastic ({count})
-  newRole: Nouveau rôle
-  filtersForm.title: Filtres du rôle
+shares:
+  toolbarTitle: Partages ({count})
+  pageDesc: Dans cette page, vous pouvez accorder des droits d'accès spécifiques à des utilisateurs ou des établissements. Les droits accordés ici ne sont pas modifiables par les membres des établissements.
+  newShare: Nouveau partage
+  filtersForm.title: Filtres du partage
   institutions: Établissements
   addInstitution: Ajouter un établissement
-  noInstitutions: Aucun établissement n'utilise ce rôle
+  noInstitutions: Aucun établissement n'est associé à ce partage
   readonly: Lecture seule
   users: Utilisateurs
   addUser: Ajouter un utilisateur
-  noUsers: Aucun utilisateur n'utilise ce rôle
-  manageElasticRoles: >
-    Gérer les rôles
-    |Gérer {count} rôles
-  deleteNbRoles: >
-    Vous êtes sur le point de supprimer {n} rôle
-    |Vous êtes sur le point de supprimer {n} rôles
-  grantedBy: Droits accordés par un rôle
+  noUsers: Aucun utilisateur n'est associé à ce partage
+  manageShares: >
+    Gérer les partages
+    |Gérer {count} partages
+  deleteNbShares: >
+    Vous êtes sur le point de supprimer {n} partage
+    |Vous êtes sur le point de supprimer {n} partages
+  grantedBy: Droits accordés par un partage
 sync:
   status:
     notSynced: Pas encore synchronisé
@@ -1074,6 +1150,7 @@ sync:
   repositories: Entrepôts
   repositoryAliases: Alias
   users: Utilisateurs
+  shares: Partages
   elasticRoles: Rôles Elastic
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements
@@ -1082,7 +1159,7 @@ sync:
 permissions:
   none: Aucun
   read: Lecture
-  write: Lecture / Écriture
+  write: Écriture
 social:
   website: Site web
   twitter: Twitter
@@ -1218,3 +1295,6 @@ deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
 version: Version
 back: Retour
+select: Sélectionner
+all: Tous
+pleaseWait: Veuillez patienter...

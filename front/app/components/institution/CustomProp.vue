@@ -7,6 +7,7 @@
     :readonly="readonly"
     multiple
     chips
+    closable-chips
     clearable
     @update:model-value="emit('update:modelValue', { ...modelValue, value: $event })"
   >

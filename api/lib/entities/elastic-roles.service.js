@@ -4,14 +4,14 @@ const BasePrismaService = require('./base-prisma.service');
 const elasticRolesPrisma = require('../services/prisma/elastic-roles');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').ElasticRole} ElasticRole */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleUpdateArgs} ElasticRoleUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleUpsertArgs} ElasticRoleUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleCountArgs} ElasticRoleCountArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleFindUniqueArgs} ElasticRoleFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleFindManyArgs} ElasticRoleFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleCreateArgs} ElasticRoleCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleDeleteArgs} ElasticRoleDeleteArgs */
+/** @typedef {import('../.prisma/client').ElasticRole} ElasticRole */
+/** @typedef {import('../.prisma/client').Prisma.ElasticRoleUpdateArgs} ElasticRoleUpdateArgs */
+/** @typedef {import('../.prisma/client').Prisma.ElasticRoleUpsertArgs} ElasticRoleUpsertArgs */
+/** @typedef {import('../.prisma/client').Prisma.ElasticRoleCountArgs} ElasticRoleCountArgs */
+/** @typedef {import('../.prisma/client').Prisma.ElasticRoleFindUniqueArgs} ElasticRoleFindUniqueArgs */
+/** @typedef {import('../.prisma/client').Prisma.ElasticRoleFindManyArgs} ElasticRoleFindManyArgs */
+/** @typedef {import('../.prisma/client').Prisma.ElasticRoleCreateArgs} ElasticRoleCreateArgs */
+/** @typedef {import('../.prisma/client').Prisma.ElasticRoleDeleteArgs} ElasticRoleDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class ElasticRoleService extends BasePrismaService {

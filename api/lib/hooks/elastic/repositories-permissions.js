@@ -4,11 +4,10 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 
 const elasticUsers = require('../../services/elastic/users');
-
-const { generateUserRoles } = require('../utils');
+const { syncUser } = require('../../services/sync/elastic');
 
 /**
- * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
+ * @typedef {import('../../.prisma/client').RepositoryPermission} RepositoryPermission
  */
 
 /**
@@ -26,14 +25,8 @@ const onRepositoryPermissionModified = async (permission) => {
     return;
   }
 
-  const roles = await generateUserRoles(permission.username);
   try {
-    await elasticUsers.updateUser({
-      username: permission.username,
-      email: user.email,
-      fullName: user.full_name,
-      roles,
-    });
+    await syncUser(user);
     appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
   } catch (error) {
     appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);

@@ -3,21 +3,21 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').HarvestSession} HarvestSession
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client').HarvestSession} HarvestSession
+ * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
  *
- * @typedef {import('@prisma/client').Prisma.HarvestSessionUpdateArgs} HarvestSessionUpdateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionUpsertArgs} HarvestSessionUpsertArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionDeleteArgs} HarvestSessionDeleteArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionDeleteManyArgs} HarvestSessionDeleteManyArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindUniqueArgs} HarvestSessionFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindFirstArgs} HarvestSessionFindFirstArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindManyArgs} HarvestSessionFindManyArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionAggregateArgs} HarvestSessionAggregateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionCountArgs} HarvestSessionCountArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionUpdateArgs} HarvestSessionUpdateArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionUpsertArgs} HarvestSessionUpsertArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionDeleteArgs} HarvestSessionDeleteArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionDeleteManyArgs} HarvestSessionDeleteManyArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionFindUniqueArgs} HarvestSessionFindUniqueArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionFindFirstArgs} HarvestSessionFindFirstArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionFindManyArgs} HarvestSessionFindManyArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionAggregateArgs} HarvestSessionAggregateArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionCountArgs} HarvestSessionCountArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs
  *
- * @typedef {import('@prisma/client').Prisma.HarvestSessionGetPayload<{ include: { jobs: true } }>} OldSession
+ * @typedef {import('../../.prisma/client').Prisma.HarvestSessionGetPayload<{ include: { jobs: true } }>} OldSession
  *
  * @typedef {{deleteResult: HarvestSession, deletedSession: OldSession }} SessionRemoved
  */

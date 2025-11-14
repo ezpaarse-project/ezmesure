@@ -1,0 +1,42 @@
+/// Custom role that can be associated to users
+model Role {
+  /// ID of the role
+  id                String           @id
+  /// Label of the role
+  label             String
+  /// Description of the role
+  description       String?
+  /// ID of the material design icon
+  icon              String?
+  /// The HEX display color of the role
+  color             String?
+  /// Whether the role can be attributed by regular users or only by admins
+  restricted        Boolean          @default(true)
+  /// A list of notification types that come with the role
+  notifications     String[]
+  /// Whether assigned members should be publicly exposed
+  exposed           Boolean          @default(false)
+  /// Permissions preset
+  permissionsPreset Json?
+  /// Creation date
+  createdAt         DateTime         @default(now())
+  /// Latest update date
+  updatedAt         DateTime         @updatedAt
+  /// Memberships using this role
+  membershipRoles   MembershipRole[]
+}
+
+/// Assignment of a role to a member
+model MembershipRole {
+  /// Username of the member
+  username      String
+  /// Institution of the member
+  institutionId String
+  /// The member
+  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  /// ID of the role
+  roleId        String
+  /// The role
+  role          Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@id([username, institutionId, roleId])
+}

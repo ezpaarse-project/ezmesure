@@ -42,34 +42,35 @@ Possible statuses of a harvest job
 
 An institution
 
-| Property          | Type                    | Description                                                       | Attributes | Default  |
-|-------------------|-------------------------|-------------------------------------------------------------------|------------|----------|
-| id                | `String`                | ID of the institution                                             | Id         | `cuid()` |
-| parentInstitution | `Institution?`          | The parent institution                                            |            |          |
-| createdAt         | `DateTime`              | Creation date                                                     |            | `now()`  |
-| updatedAt         | `DateTime`              | Latest update date                                                |            |          |
-| name              | `String`                | Institution name                                                  |            |          |
-| namespace         | `String?`               | Institution namespace (ex: b-bibcnrs)                             |            |          |
-| validated         | `Boolean`               | Whether the institution has been validated or not                 |            | `false`  |
-| hidePartner       | `Boolean`               | Whether the institution should appear in the partner list or not  |            | `false`  |
-| tags              | `String[]`              | A list of tags associated to the institution                      |            |          |
-| logoId            | `String?`               | ID of the institution logo                                        |            |          |
-| type              | `String?`               | Institution type (ex: university)                                 |            |          |
-| acronym           | `String?`               | Institution acronym                                               |            |          |
-| websiteUrl        | `String?`               | Institution website URL                                           |            |          |
-| city              | `String?`               | Institution city                                                  |            |          |
-| uai               | `String?`               | Institution UAI (Unité Administrative Immatriculée)               |            |          |
-| social            | `Json?`                 | Social links of the institution                                   |            |          |
-| sushiReadySince   | `DateTime?`             | Date when SUSHI credentials have been marked as ready for harvest |            |          |
-| memberships       | `Membership[]`          | Institution members                                               |            |          |
-| elasticRoles      | `ElasticRole[]`         | Additional roles to give to each member                           |            |          |
-| spaces            | `Space[]`               | Institution spaces                                                |            |          |
-| actions           | `Action[]`              | Actions that were triggered in the scope of the institution       |            |          |
-| sushiCredentials  | `SushiCredentials[]`    | Institution SUSHI credentials                                     |            |          |
-| childInstitutions | `Institution[]`         | Child institutions                                                |            |          |
-| repositories      | `Repository[]`          | Institution repositories                                          |            |          |
-| repositoryAliases | `RepositoryAlias[]`     | Institution aliases                                               |            |          |
-| customProps       | `InstitutionProperty[]` | Custom properties                                                 |            |          |
+| Property          | Type                    | Description                                                                                        | Attributes | Default  |
+|-------------------|-------------------------|----------------------------------------------------------------------------------------------------|------------|----------|
+| id                | `String`                | ID of the institution                                                                              | Id         | `cuid()` |
+| parentInstitution | `Institution?`          | The parent institution                                                                             |            |          |
+| createdAt         | `DateTime`              | Creation date                                                                                      |            | `now()`  |
+| updatedAt         | `DateTime`              | Latest update date                                                                                 |            |          |
+| name              | `String`                | Institution name                                                                                   |            |          |
+| namespace         | `String?`               | Institution namespace (ex: b-bibcnrs)                                                              |            |          |
+| validated         | `Boolean`               | Whether the institution has been validated or not                                                  |            | `false`  |
+| hidePartner       | `Boolean`               | Whether the institution should appear in the partner list or not                                   |            | `false`  |
+| tags              | `String[]`              | A list of tags associated to the institution                                                       |            |          |
+| logoId            | `String?`               | ID of the institution logo                                                                         |            |          |
+| type              | `String?`               | Institution type (ex: university)                                                                  |            |          |
+| acronym           | `String?`               | Institution acronym                                                                                |            |          |
+| websiteUrl        | `String?`               | Institution website URL                                                                            |            |          |
+| city              | `String?`               | Institution city                                                                                   |            |          |
+| uai               | `String?`               | Institution UAI (Unité Administrative Immatriculée)                                                |            |          |
+| social            | `Json?`                 | Social links of the institution                                                                    |            |          |
+| sushiReadySince   | `DateTime?`             | Date when SUSHI credentials have been marked as ready for harvest                                  |            |          |
+| onboarding        | `Boolean`               | Is a onboarding institution (will be added for new users and removed when a membership is created) |            | `false`  |
+| memberships       | `Membership[]`          | Institution members                                                                                |            |          |
+| elasticRoles      | `ElasticRole[]`         | Additional roles to give to each member                                                            |            |          |
+| spaces            | `Space[]`               | Institution spaces                                                                                 |            |          |
+| actions           | `Action[]`              | Actions that were triggered in the scope of the institution                                        |            |          |
+| sushiCredentials  | `SushiCredentials[]`    | Institution SUSHI credentials                                                                      |            |          |
+| childInstitutions | `Institution[]`         | Child institutions                                                                                 |            |          |
+| repositories      | `Repository[]`          | Institution repositories                                                                           |            |          |
+| repositoryAliases | `RepositoryAlias[]`     | Institution aliases                                                                                |            |          |
+| customProps       | `InstitutionProperty[]` | Custom properties                                                                                  |            |          |
 
 ### InstitutionProperty
 

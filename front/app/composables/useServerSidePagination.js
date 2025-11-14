@@ -57,10 +57,7 @@ export default async function useServerSidePagination(params = {}) {
    */
   const query = ref({
     page: 1,
-    sortBy: [{
-      key: 'createdAt',
-      order: 'asc',
-    }],
+    sortBy: [{ key: 'createdAt', order: 'desc' }],
     search: '',
     ...params.data,
   });

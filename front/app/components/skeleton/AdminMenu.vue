@@ -60,7 +60,7 @@
       />
 
       <v-list-item
-        :title="$t('menu.elasticRoles')"
+        :title="$t('menu.shares')"
         to="/admin/elastic-roles"
         prepend-icon="mdi-account-tag"
       />
@@ -85,6 +85,13 @@
             v-bind="props"
           />
         </template>
+
+        <v-list-item
+          :title="$t('menu.harvest.institutions')"
+          to="/admin/harvests/institutions"
+          prepend-icon="mdi-domain"
+          exact
+        />
 
         <v-list-item
           :title="$t('menu.harvest.sessions')"

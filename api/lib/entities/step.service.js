@@ -3,12 +3,12 @@ const BasePrismaService = require('./base-prisma.service');
 const stepPrisma = require('../services/prisma/step');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Step} Step */
-/** @typedef {import('@prisma/client').Prisma.StepUpdateArgs} StepUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.StepUpsertArgs} StepUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.StepFindUniqueArgs} StepFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.StepFindManyArgs} StepFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.StepCreateArgs} StepCreateArgs */
+/** @typedef {import('../.prisma/client').Step} Step */
+/** @typedef {import('../.prisma/client').Prisma.StepUpdateArgs} StepUpdateArgs */
+/** @typedef {import('../.prisma/client').Prisma.StepUpsertArgs} StepUpsertArgs */
+/** @typedef {import('../.prisma/client').Prisma.StepFindUniqueArgs} StepFindUniqueArgs */
+/** @typedef {import('../.prisma/client').Prisma.StepFindManyArgs} StepFindManyArgs */
+/** @typedef {import('../.prisma/client').Prisma.StepCreateArgs} StepCreateArgs */
 /* eslint-enable max-len */
 
 module.exports = class StepsService extends BasePrismaService {
