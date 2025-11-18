@@ -45,47 +45,14 @@
                       />
                     </template>
 
-                    <v-card min-width="400" :loading="loadingRoles || rolesBeingSaved.size > 0">
-                      <template #text>
-                        <v-text-field
-                          v-model="searchRole"
-                          :placeholder="$t('search')"
-                          prepend-inner-icon="mdi-magnify"
-                          variant="outlined"
-                          density="compact"
-                          hide-details
-                          autofocus
-                        />
-                      </template>
-
-                      <v-empty-state
-                        v-if="rolesError"
-                        icon="mdi-alert-circle"
-                        :title="rolesError"
-                      >
-                        <template #actions>
-                          <v-btn
-                            :text="$t('retry')"
-                            :loading="loadingRoles"
-                            variant="elevated"
-                            color="secondary"
-                            @click="refreshRoles"
-                          />
-                        </template>
-                      </v-empty-state>
-
-                      <v-list v-else three-line>
-                        <v-list-item
-                          v-for="role in filteredRoles"
-                          :key="role.id"
-                          :disabled="rolesBeingSaved.has(role.id)"
-                          :title="role.label"
-                          :subtitle="role.description"
-                          :prepend-icon="role.icon ?? 'mdi-tag-outline'"
-                          @click="addRole(role)"
-                        />
-                      </v-list>
-                    </v-card>
+                    <RolePicker
+                      :model-value="roleIds"
+                      :disabled-items="rolesBeingSaved"
+                      :hide-restricted="!user.value?.isAdmin"
+                      :loading="rolesBeingSaved.size > 0"
+                      min-width="400"
+                      @selected="onRoleSelected($event)"
+                    />
                   </v-menu>
                 </template>
 
@@ -101,8 +68,14 @@
                     :key="role.id"
                     :title="role.label"
                     :subtitle="role.description"
-                    :prepend-icon="role.icon ?? 'mdi-tag-outline'"
                   >
+                    <template #prepend>
+                      <v-icon
+                        :icon="role.icon ?? 'mdi-tag-outline'"
+                        :color="role.color"
+                      />
+                    </template>
+
                     <template v-if="canEdit" #append>
                       <v-btn
                         v-if="user.isAdmin || !role.restricted"
@@ -290,7 +263,6 @@
 
 <script setup>
 import { featureScopes, permissionLevelEnum } from '@/lib/permissions/utils';
-import { getErrorMessage } from '@/lib/errors';
 
 const props = defineProps({
   modelValue: {
@@ -324,28 +296,9 @@ const formRef = useTemplateRef('formRef');
 
 const institution = computed(() => props.modelValue.institution);
 const roles = ref((props.modelValue.roles ?? []).map((role) => role.role));
-const assignedRoleIds = computed(() => new Set(roles.value.map((role) => role.id)));
-const searchRole = ref('');
+const roleIds = computed(() => roles.value.map((r) => r.id));
 
-const {
-  data: availableRoles,
-  status: rolesFetchStatus,
-  error: rolesFetchError,
-  refresh: refreshRoles,
-} = await useFetch('/api/roles', { lazy: true });
-
-const loadingRoles = computed(() => rolesFetchStatus.value === 'pending');
-const rolesError = computed(() => rolesFetchError.value && getErrorMessage(rolesFetchError.value));
 const rolesBeingSaved = ref(new Set());
-
-const filteredRoles = computed(() => (availableRoles.value ?? []).filter((role) => {
-  if (assignedRoleIds.value.has(role.id)) { return false; }
-  if (role.restricted && !user.value?.isAdmin) { return false; }
-  if (!searchRole.value) { return true; }
-  if (role.label.toLowerCase().includes(searchRole.value.toLowerCase())) { return true; }
-  if (role.description?.toLowerCase().includes(searchRole.value.toLowerCase())) { return true; }
-  return false;
-}));
 
 /**
  * If current member is locked
@@ -689,6 +642,14 @@ const removeRole = async (role) => {
   }
 
   roles.value = roles.value.filter((r) => r.id !== role.id);
+};
+
+const onRoleSelected = (event) => {
+  if (event?.value) {
+    return addRole(event.role);
+  }
+
+  return removeRole(event.role);
 };
 
 /* eslint-disable vue/max-len */
