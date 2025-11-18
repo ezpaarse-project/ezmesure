@@ -284,6 +284,11 @@ endpoints:
 institutions:
   toolbarTitle: Institutions ({count})
   title: Institution
+  all: All institutions
+  count: >
+    no institution
+    |{count} institution
+    |{count} institutions
   validateSwitch: Validate/Invalidate
   validateNbInstitutions: You are about to validate or invalidate {count} institution.
   updateInstitution: Update institution

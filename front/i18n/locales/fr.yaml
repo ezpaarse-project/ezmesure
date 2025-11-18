@@ -286,6 +286,11 @@ endpoints:
 institutions:
   toolbarTitle: Établissements ({count})
   title: Établissement
+  all: Tous les établissements
+  count: >
+    aucun établissement
+    |{count} établissement
+    |{count} établissements
   updateInstitution: Mettre à jour l'établissement
   validateSwitch: Valider/Invalider
   validateNbInstitutions: Vous allez valider ou invalider {count} établissement.
