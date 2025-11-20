@@ -51,8 +51,11 @@
             v-model="filters.roles"
             v-model:loose="filters['roles:loose']"
             :empty-symbol="emptySymbol"
-            :items="rolesItems"
+            :items="roleItems"
             :label="$t('users.user.roles')"
+            :loading="loadingRoles"
+            item-title="label"
+            item-value="id"
             prepend-icon="mdi-tag"
             chips
             closable-chips
@@ -103,16 +106,13 @@ const permissionsItems = computed(() => {
     }),
   ));
 });
-const rolesItems = computed(() => {
-  const roles = Array.from(roleColors.entries());
-  return roles.map(([role, { icon }]) => ({
-    value: role,
-    title: t(`institutions.members.roleNames.${role}`),
-    props: {
-      appendIcon: icon,
-    },
-  }));
-});
+
+const {
+  data: roleItems,
+  status: rolesStatus,
+} = useFetch('/api/roles', { lazy: true });
+
+const loadingRoles = computed(() => rolesStatus.value === 'pending');
 
 function clearFilters() {
   resetFilters({ search: '', source: '*' });
