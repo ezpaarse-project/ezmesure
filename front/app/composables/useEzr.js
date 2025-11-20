@@ -1,5 +1,6 @@
 import { prepareClient } from '@ezpaarse-project/ezreeport-vue';
 import '@ezpaarse-project/ezreeport-vue/styles';
+
 import {
   useFetch,
   useLocalStorage,
