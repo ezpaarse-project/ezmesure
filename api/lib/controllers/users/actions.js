@@ -9,6 +9,7 @@ const { schema, adminImportSchema, includableFields } = require('../../entities/
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');
+const { stringToArray } = require('../../services/utils');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -51,7 +52,7 @@ exports.getUser = async (ctx) => {
 exports.list = async (ctx) => {
   const {
     source = 'fullName,username',
-    roles,
+    roles: rolesParam,
     'roles:loose': hasSomeRoles,
     permissions,
     'permissions:loose': hasSomePermissions,
@@ -59,13 +60,39 @@ exports.list = async (ctx) => {
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
-  if (roles != null || permissions != null) {
+  if (permissions != null) {
     prismaQuery.where.memberships = {
-      some: {
-        roles: arrayFilter(roles, hasSomeRoles),
-        permissions: arrayFilter(permissions, hasSomePermissions),
+      ...prismaQuery.where.memberships ?? {},
+      ...{
+        some: {
+          permissions: arrayFilter(permissions, hasSomePermissions),
+        },
       },
     };
+  }
+
+  if (rolesParam != null) {
+    const roles = stringToArray(rolesParam);
+
+    if (roles.length === 0) {
+      prismaQuery.where.memberships = {
+        ...prismaQuery.where.memberships ?? {},
+        ...{ every: { roles: { none: {} } } },
+      };
+    } else {
+      const operator = hasSomeRoles ? 'OR' : 'AND';
+
+      prismaQuery.where[operator] = [
+        ...prismaQuery.where[operator] ?? [],
+        ...roles.map((role) => ({
+          memberships: {
+            some: {
+              roles: { some: { roleId: role } },
+            },
+          },
+        })),
+      ];
+    }
   }
 
   prismaQuery.select = Object.assign(
