@@ -45,6 +45,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
           'repositoryPermissions.repository', // Used to show repositories in institution page
           'institution.elasticRoles.spacePermissions.space', // Used to show spaces in menu & institution page
           'institution.elasticRoles.repositoryPermissions.repository', // Used to show repositories in institution page
+          'roles.role', // Used to show roles in institution page
         ],
         size: 0,
       },
