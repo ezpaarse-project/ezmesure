@@ -5,15 +5,12 @@
       <v-menu>
         <template #activator="{ props }">
           <v-btn
+            :text="$t('menu.documentation')"
             v-bind="props"
             variant="text"
             append-icon="mdi-chevron-down"
             class="d-flex align-center"
-          >
-            <div class="d-flex align-center">
-              <p> {{ $t('menu.documentation') }} </p>
-            </div>
-          </v-btn>
+          />
         </template>
 
         <v-list>
@@ -26,7 +23,7 @@
           </v-list-item>
           <v-list-item
             :to="'/api-reference'"
-            title="API"
+            :title="$t('menu.api')"
           />
         </v-list>
       </v-menu>
@@ -91,7 +88,7 @@
           </v-list-item>
           <v-list-item
             :to="'/api-reference'"
-            title="API"
+            :title="$t('menu.api')"
           />
           <v-divider />
           <template v-for="item in items">
