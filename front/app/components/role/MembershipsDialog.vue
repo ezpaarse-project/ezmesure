@@ -1,16 +1,20 @@
 <template>
   <v-dialog
     v-model="isOpen"
-    :width="loading ? 200 : 900"
+    :width="loading ? 200 : 1200"
     scrollable
   >
     <LoaderCard v-if="loading" />
 
     <v-card
       v-else
-      :title="$t('institutions.members.title', { count: membershipRoles.length })"
-      :subtitle="roleData?.label"
     >
+      <template #prepend>
+        <RoleChip :role="roleData" />
+      </template>
+      <template #title>
+        {{ $t('institutions.members.title', { count: membershipRoles.length }) }}
+      </template>
       <template #append>
         <v-btn
           v-if="emails.length"
@@ -69,11 +73,25 @@
           density="comfortable"
         >
           <template #[`item.institution.name`]="{ item }">
-            <InstitutionAvatar :institution="item.membership.institution" size="x-small" class="mr-2" />
+            <v-list-item class="px-0">
+              <template #title>
+                <nuxt-link :to="`/admin/institutions/${item.institutionId}`" class="text-wrap">
+                  {{ item.membership.institution.name }}
+                </nuxt-link>
+              </template>
 
-            <nuxt-link :to="`/admin/institutions/${item.institutionId}`">
-              {{ item.membership.institution.name }}
-            </nuxt-link>
+              <template #prepend>
+                <InstitutionAvatar :institution="item.membership.institution" size="x-small" class="mr-2" />
+              </template>
+            </v-list-item>
+          </template>
+
+          <template #[`item.membership.user.fullName`]="{ item }">
+            <v-list-item
+              :title="item.membership.user.fullName"
+              :subtitle="item.membership.user.email"
+              class="px-0"
+            />
           </template>
         </v-data-table>
       </template>
@@ -107,12 +125,12 @@ const headers = computed(() => [
     title: t('institutions.title'),
     value: 'institution.name',
     sortable: true,
-    maxWidth: '700px',
+    width: '60%',
   },
   {
     title: t('users.user.username'),
     value: 'membership.user.fullName',
-    maxWidth: '200px',
+    width: '40%',
   },
 ]);
 
