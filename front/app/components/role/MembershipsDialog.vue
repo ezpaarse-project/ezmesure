@@ -155,6 +155,7 @@ async function open(customField) {
   loading.value = false;
   errorMessage.value = '';
   errorIcon.value = '';
+  search.value = '';
 
   roleId.value = customField?.id;
   isOpen.value = true;
