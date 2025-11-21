@@ -37,6 +37,7 @@ const onboardUser = async (user) => {
 
   // Get onboarding roles
   const onboardingRoles = await prisma.role.findMany({
+    select: { id: true },
     where: {
       autoAssign: { has: EVENT_TYPES.joinOnboardingInstitution },
     },
