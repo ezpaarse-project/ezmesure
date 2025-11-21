@@ -12,6 +12,17 @@
       :subtitle="roleData?.label"
     >
       <template #append>
+        <v-btn
+          v-if="emails.length"
+          v-tooltip:bottom="$t('users.createMailUserList', { count: emails.length })"
+          icon="mdi-email"
+          variant="tonal"
+          density="comfortable"
+          color="primary"
+          class="mr-2"
+          @click="copyEmails()"
+        />
+
         <v-text-field
           v-if="membershipRoles.length > 0"
           v-model="search"
@@ -74,6 +85,8 @@
 import { getErrorMessage } from '@/lib/errors';
 
 const { t } = useI18n();
+const { copy } = useClipboard();
+const snacks = useSnacksStore();
 
 const isOpen = shallowRef(false);
 const roleId = shallowRef(null);
@@ -85,6 +98,9 @@ const errorMessage = shallowRef('');
 const errorIcon = shallowRef('');
 
 const membershipRoles = computed(() => roleData.value?.membershipRoles ?? []);
+const emails = computed(() => Array.from(new Set(
+  membershipRoles.value.map((membershipRole) => membershipRole?.membership?.user?.email),
+)));
 
 const headers = computed(() => [
   {
@@ -122,6 +138,16 @@ async function refreshForm() {
   }
 
   loading.value = false;
+}
+
+async function copyEmails() {
+  try {
+    await copy(emails.value.join('; '));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
+    return;
+  }
+  snacks.info(t('emailsCopied'));
 }
 
 async function open(customField) {
