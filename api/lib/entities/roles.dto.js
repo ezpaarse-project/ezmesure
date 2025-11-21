@@ -27,6 +27,7 @@ const schema = {
   exposed: Joi.boolean(),
 
   notifications: Joi.array().items(Joi.string().trim().min(1)),
+  autoAssign: Joi.array().items(Joi.string().trim().min(1)),
 
   permissionsPreset: Joi.object().allow(null),
 

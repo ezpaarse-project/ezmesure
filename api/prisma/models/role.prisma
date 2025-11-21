@@ -14,6 +14,8 @@ model Role {
   restricted        Boolean          @default(true)
   /// A list of notification types that come with the role
   notifications     String[]
+  /// A list of events when the role should be automatically assigned
+  autoAssign        String[]
   /// Whether assigned members should be publicly exposed
   exposed           Boolean          @default(false)
   /// Permissions preset

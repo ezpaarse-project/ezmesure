@@ -5,3 +5,9 @@ module.exports.NOTIFICATION_TYPES = {
   roleAssigned: 'institution:role_assigned',
   newCounterDataAvailable: 'counter:new_data_available',
 };
+
+module.exports.EVENT_TYPES = {
+  selfJoinInstitution: 'institution:self_join',
+  joinOnboardingInstitution: 'institution:user_onboarded',
+  declareInstitution: 'institution:declared',
+};
