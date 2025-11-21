@@ -1093,6 +1093,7 @@ roles:
   notOnlyAdmins: Assignable by users
   exposeMembers: Expose on the partner page
   notifiateUserWhen: Notifications received by the user
+  autoAssignWhen: Assign automatically when
   assignments: Assignments
   definePermissionsPreset: Define permissions presets
   notificationTypes:
@@ -1101,6 +1102,10 @@ roles:
     'institution:new_user_matching_institution': A user who is part of the institution has signed up
     'institution:membership_request': A user has requested to join the institution
     'counter:new_data_available': New COUNTER data is available
+  eventTypes:
+    'institution:self_join': User joins an open institution by himself
+    'institution:user_onboarded': User is added to an onboarding institution
+    'institution:declared': User declares an institution
 shares:
   toolbarTitle: Shares ({count})
   pageDesc: In this page, you can grant specific rights to users or institutions. The rights granted here cannot be modified by institution members.

@@ -99,6 +99,23 @@
           </v-col>
 
           <v-col cols="12">
+            <v-autocomplete
+              v-model="role.autoAssign"
+              :label="$t('roles.autoAssignWhen')"
+              :items="availableEvents"
+              prepend-icon="mdi-refresh-auto"
+              variant="underlined"
+              item-value="id"
+              item-title="text"
+              multiple
+              chips
+              small-chips
+              hide-details
+              closable-chips
+            />
+          </v-col>
+
+          <v-col cols="12">
             <v-checkbox
               v-model="role.restricted"
               :label="$t('roles.onlyAdmins')"
@@ -207,6 +224,7 @@ const isEditing = computed(() => !!originalId.value);
 const hasPresets = computed(() => !!role.value.permissionsPreset);
 
 const getNotificationItem = (id) => ({ id, text: t(`roles.notificationTypes.${id}`) });
+const getEventItem = (id) => ({ id, text: t(`roles.eventTypes.${id}`) });
 
 const availableNotifications = ref([
   getNotificationItem('institution:validated'),
@@ -214,6 +232,12 @@ const availableNotifications = ref([
   getNotificationItem('institution:new_user_matching_institution'),
   getNotificationItem('institution:membership_request'),
   getNotificationItem('counter:new_data_available'),
+]);
+
+const availableEvents = ref([
+  getEventItem('institution:self_join'),
+  getEventItem('institution:user_onboarded'),
+  getEventItem('institution:declared'),
 ]);
 
 /**

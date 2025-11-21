@@ -1106,6 +1106,7 @@ roles:
   notOnlyAdmins: Assignable par les utilisateurs
   exposeMembers: Exposer sur la page des partenaires
   notifiateUserWhen: Notifications reçues par l'utilisateur
+  autoAssignWhen: Assigner automatiquement lorsque
   assignments: Assignations
   definePermissionsPreset: Définir des permissions par défaut
   notificationTypes:
@@ -1114,6 +1115,10 @@ roles:
     'institution:new_user_matching_institution': Un utilisateur faisant partie de l'établissement s'est inscrit
     'institution:membership_request': Un utilisateur demande à rejoindre l'établissement
     'counter:new_data_available': De nouvelles données COUNTER sont disponibles
+  eventTypes:
+    'institution:self_join': L'utilisateur rejoint par lui-même un établissement en accès ouvert
+    'institution:user_onboarded': L'utilisateur est ajouté dans un établissement de bienvenue
+    'institution:declared': L'utilisateur déclare un établissement
 shares:
   toolbarTitle: Partages ({count})
   pageDesc: Dans cette page, vous pouvez accorder des droits d'accès spécifiques à des utilisateurs ou des établissements. Les droits accordés ici ne sont pas modifiables par les membres des établissements.
