@@ -2,6 +2,35 @@
   <div class="mx-2">
     <!-- Desktop menu -->
     <div class="d-none d-md-flex align-center ga-2">
+      <v-menu>
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            variant="text"
+            append-icon="mdi-chevron-down"
+            class="d-flex align-center"
+          >
+            <div class="d-flex align-center">
+              <p> {{ $t('menu.documentation') }} </p>
+            </div>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item
+            href="https://docs.readmetrics.org/s/fr-ezmesure-user"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ $t('menu.users') }}
+          </v-list-item>
+          <v-list-item
+            :to="'/api-reference'"
+            title="API"
+          />
+        </v-list>
+      </v-menu>
+
       <template v-for="item in items">
         <v-spacer v-if="item.separator" :key="item.key" />
 
@@ -52,6 +81,19 @@
         </template>
 
         <v-list>
+          <v-list-subheader>{{ t('menu.documentation') }}</v-list-subheader>
+          <v-list-item
+            href="https://docs.readmetrics.org/s/fr-ezmesure-user"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ $t('menu.users') }}
+          </v-list-item>
+          <v-list-item
+            :to="'/api-reference'"
+            title="API"
+          />
+          <v-divider />
           <template v-for="item in items">
             <v-divider v-if="item.separator" :key="item.key" />
 
@@ -77,14 +119,8 @@ const { data: user } = useAuthState();
 
 const items = computed(() => [
   { text: t('menu.partners'), to: '/partners', exact: true },
-  { text: t('menu.api'), to: '/api-reference', exact: true },
-  // TODO : update URL of documentation with local when it will be available
-  // with https://docs.readmetrics.org/s/en-ezmesure-user
-  { text: t('menu.documentation'), href: 'https://docs.readmetrics.org/s/fr-ezmesure-user', target: '_blank', exact: true },
   { text: t('menu.contact'), to: '/contact-us', exact: true },
-
   { separator: true, key: 'menu-separator' },
-
   {
     text: t('menu.dashboard'),
     href: '/kibana/',
