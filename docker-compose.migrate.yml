@@ -19,7 +19,7 @@ services:
         condition: service_healthy
 
   migrate_reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-migrate:dev
+    image: ghcr.io/ezpaarse-project/ezreeport-migrate:rc
     environment:
       - http_proxy
       - https_proxy
