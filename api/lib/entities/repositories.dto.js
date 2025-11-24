@@ -6,6 +6,17 @@ const {
   requireFields,
 } = require('./schema.utils');
 
+const mappingSchema = Joi.object({
+  properties: Joi.object().pattern(
+    Joi.string(),
+    Joi.object({
+      type: Joi.string().required().valid('geo_point', 'geo_shape', 'ip', 'binary', 'keyword', 'text', 'date', 'date_nanos', 'boolean', 'integer', 'long', 'short', 'byte', 'float', 'double'),
+      ignoreMalformed: Joi.boolean().default(false),
+      subFields: Joi.array().items(Joi.string().valid('date')).default([]),
+    }),
+  ),
+});
+
 /**
  * Base schema
  * @type {Record<string, import('joi').AnySchema>}
@@ -18,6 +29,8 @@ const schema = {
 
   pattern: Joi.string().trim().min(1),
   type: Joi.string().trim().min(1),
+
+  mapping: mappingSchema,
 
   permissions: Joi.array().items(Joi.object()),
   elasticRolePermissions: Joi.array().items(Joi.object()),
@@ -92,6 +105,7 @@ const adminImportSchema = withModifiers(
 
 module.exports = {
   schema,
+  mappingSchema,
   includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminCreateOrConnectSchema: Joi.object(adminCreateOrConnectSchema).required(),
