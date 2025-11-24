@@ -530,7 +530,7 @@ institutions:
       non-harvestable: Non harvestable
       selectable: Selectable
       harvested: Already harvested
-    members: "@:institutions.members.roleNames.contact:doc{'s'}"
+    members: Contacts
     repositories: 'COUNTER @:repositories.repositories'
     spaces: 'COUNTER @:spaces.spaces'
     settings: Search settings

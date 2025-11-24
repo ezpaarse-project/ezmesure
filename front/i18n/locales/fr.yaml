@@ -534,7 +534,7 @@ institutions:
       non-harvestable: Non moissonnable
       selectable: Sélectionnable
       harvested: Déjà moissonné
-    members: Contacts documentaire
+    members: Contacts
     repositories: '@:repositories.repositories COUNTER'
     spaces: '@:spaces.spaces COUNTER'
     settings: Paramètres de recherche

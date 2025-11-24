@@ -590,6 +590,17 @@ exports.harvestableInstitutions = async (ctx) => {
           spaces: { where: { type: 'counter5' } },
           repositories: { where: { type: 'counter5' } },
           sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
+          memberships: {
+            where: {
+              roles: {
+                some: {
+                  role: {
+                    notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },
