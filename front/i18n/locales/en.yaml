@@ -916,7 +916,7 @@ repositories:
     mapping:
       properties:
         title: Additional properties
-        emptyText: No additional properties is defined, click on the "@:add" button to define one.
+        emptyText: No additional properties is defined, click on the {'"'}@:add{'"'} button to define one.
         form:
           label: Name of the property
           ignoreMalformed: Ignored malformed values

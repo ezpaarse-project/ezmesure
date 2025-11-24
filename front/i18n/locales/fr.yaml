@@ -929,7 +929,7 @@ repositories:
     mapping:
       properties:
         title: Propriétés additionnelles
-        emptyText: Aucune propriété additionnelle n'est définie, cliquez sur le bouton "@:add" pour en définir une.
+        emptyText: Aucune propriété additionnelle n'est définie, cliquez sur le bouton {'"'}@:add{'"'} pour en définir une.
         form:
           label: Nom de la propriété
           ignoreMalformed: Ignorer les valeurs malformées
