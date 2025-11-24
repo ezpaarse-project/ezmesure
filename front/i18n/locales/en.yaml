@@ -911,6 +911,33 @@ repositories:
     1 repository
     |{count} repositories
   newRepository: New repository
+  updateForm:
+    title: Update repository
+    mapping:
+      properties:
+        title: Additional properties
+        emptyText: No additional properties is defined, click on the "@:add" button to define one.
+        form:
+          label: Name of the property
+          ignoreMalformed: Ignored malformed values
+          type:
+            label: Type
+            options:
+              integer: Integer
+              float: Decimal number
+              keyword: Character string
+              boolean: Boolean
+              date: Date
+              ip: IP
+              text: Text
+              geo_point: Geographical point
+              geo_shape: Geographical shape
+          subFields:
+            label: Sub fields
+            options:
+              date:
+                title: Date
+                tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
   manageRepositories: >
     Manage repositories
     |Manage {count} repositories
