@@ -1037,7 +1037,11 @@ harvest:
     credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
     reportsMenuTitle: COUNTER Reports
     sendEndMail: A mail will be sent on harvest end
-    notStarted: Not started
+    status:
+      list:
+        prepared: Not yet started
+        starting: Starting in progress
+        stopped: Stopped
     unableToRetrive: Unable to retrieve harvests
     add: Create an harvest session
     update: Update an harvest session
