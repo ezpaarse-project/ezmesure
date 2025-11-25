@@ -6,7 +6,7 @@ WORKDIR /app
 
 FROM base AS prisma
 
-COPY package*.json ./
+COPY package*.json prisma.config.js ./
 COPY prisma ./prisma
 
 RUN npm ci && \
