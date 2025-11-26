@@ -40,29 +40,36 @@
                 />
               </template>
 
-              <div class="d-flex align-center">
-                <v-text-field
-                  v-model="property"
-                  :label="$t('repositories.updateForm.mapping.properties.form.label')"
-                  :rules="rules.property.label"
-                  variant="outlined"
-                  density="compact"
-                  class="flex-grow-1"
-                  return-object
-                  autofocus
-                  hide-details
-                  auto-select-first
-                />
+              <v-form
+                id="propertyForm"
+                v-model="propertyFormValid"
+                @submit.prevent="addProperty()"
+              >
+                <div class="d-flex align-center ga-2">
+                  <v-text-field
+                    v-model="property"
+                    :label="$t('repositories.updateForm.mapping.properties.form.label')"
+                    :rules="rules.property.label"
+                    variant="outlined"
+                    density="compact"
+                    class="flex-grow-1"
+                    return-object
+                    autofocus
+                    hide-details
+                    auto-select-first
+                  />
 
-                <v-btn
-                  icon="mdi-check"
-                  color="primary"
-                  density="comfortable"
-                  variant="tonal"
-                  class="ml-2"
-                  @click="addProperty()"
-                />
-              </div>
+                  <v-btn
+                    :disabled="!propertyFormValid"
+                    icon="mdi-check"
+                    color="primary"
+                    density="comfortable"
+                    variant="tonal"
+                    type="submit"
+                    form="propertyForm"
+                  />
+                </div>
+              </v-form>
             </v-menu>
           </template>
 
@@ -200,6 +207,7 @@ const saving = shallowRef(false);
 const showPropertyMenu = shallowRef(false);
 const property = shallowRef('');
 const valid = shallowRef(false);
+const propertyFormValid = shallowRef(false);
 const repository = ref({ ...modelValue });
 const properties = ref(Object.entries(modelValue.mapping.properties ?? {}));
 
