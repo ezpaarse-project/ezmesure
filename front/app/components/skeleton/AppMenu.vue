@@ -9,7 +9,6 @@
             v-bind="props"
             variant="text"
             append-icon="mdi-chevron-down"
-            class="d-flex align-center"
           />
         </template>
 
