@@ -22,7 +22,7 @@
             {{ $t('menu.users') }}
           </v-list-item>
           <v-list-item
-            :to="'/api-reference'"
+            to="/api-reference"
             :title="$t('menu.api')"
           />
         </v-list>
