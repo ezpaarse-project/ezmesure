@@ -1,7 +1,7 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Statut de saisie SUSHI modifié</mj-title>
+<mj-title>Statut de saisie COUNTER modifié</mj-title>
 {% endblock %}
 
 {% block content %}
@@ -17,9 +17,9 @@
 
     <mj-text>
       {% if sushiReadySince %}
-      <p>L'établissement <strong>{{ institutionName }}</strong> a terminé la saisie de ses identifiants SUSHI.</p>
+      <p>L'établissement <strong>{{ institutionName }}</strong> a terminé la saisie de ses identifiants COUNTER.</p>
       {% else %}
-      <p>L'établissement <strong>{{ institutionName }}</strong> a repris la saisie de ses identifiants SUSHI.</p>
+      <p>L'établissement <strong>{{ institutionName }}</strong> a repris la saisie de ses identifiants COUNTER.</p>
       {% endif %}
       <p>Vous pouvez visualiser ses identifiants à <a target="_blank" href="{{ institutionSushiLink }}">cette adresse</a>.</p>
     </mj-text>
