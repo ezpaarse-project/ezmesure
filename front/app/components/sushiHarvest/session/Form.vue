@@ -486,7 +486,7 @@
             </v-card>
 
             <v-card
-              :title="$t('harvest.sessions.settings.title')"
+              :title="$t('harvest.sessions.form.settings.title')"
               prepend-icon="mdi-cog"
               variant="outlined"
               class="mt-4"
@@ -509,7 +509,7 @@
                   <v-col cols="6">
                     <v-checkbox
                       v-model="sendEndMail"
-                      :label="$t('harvest.sessions.settings.sendEndMail')"
+                      :label="$t('harvest.sessions.form.settings.sendEndMail')"
                       density="compact"
                       color="primary"
                       hide-details
@@ -519,7 +519,7 @@
                   <v-col cols="6">
                     <v-text-field
                       :model-value="`${timeout}`"
-                      :label="$t('harvest.sessions.settings.timeout')"
+                      :label="$t('harvest.sessions.form.settings.timeout')"
                       :min="0"
                       :rules="[(v) => !Number.isNaN(Number.parseInt(v, 10)) || $t('invalidFormat')]"
                       type="number"
