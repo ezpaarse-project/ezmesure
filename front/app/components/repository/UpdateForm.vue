@@ -209,6 +209,7 @@ const formRef = useTemplateRef('formRef');
 const rules = computed(() => ({
   property: {
     label: [
+      (v) => !!v || $t('fieldIsRequired'),
       (v) => !properties.value.some(([key]) => key === v) || $t('exists'),
     ],
     type: [
