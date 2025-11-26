@@ -7,7 +7,7 @@ const { appLogger } = require('../../services/logger');
 const ezrReportingUsers = require('../../services/ezreeport/reportingUsers');
 
 /**
- * @typedef {import('@prisma/client').Repository} Repository
+ * @typedef {import('../../.prisma/client').Repository} Repository
  */
 
 /**

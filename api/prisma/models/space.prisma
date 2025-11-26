@@ -1,0 +1,69 @@
+/// A kibana space
+model Space {
+  /// ID of the space (as used in Kibana)
+  id                     String                       @id
+  /// ID of the institution this space is associated to
+  institutionId          String
+  /// The institution this space is associated to
+  institution            Institution                  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  /// Creation date (in the DB, not in Kibana)
+  createdAt              DateTime                     @default(now())
+  /// Latest update date (in the DB, not in Kibana)
+  updatedAt              DateTime                     @updatedAt
+  /// Space name
+  name                   String
+  /// Space description
+  description            String?
+  /// Space initials
+  initials               String?
+  /// Space color
+  color                  String?
+  /// Space type (ezpaarse, counter5)
+  type                   String                       @db.VarChar(50)
+  /// Space logo as a base64 data URL
+  imageUrl               String?
+  /// A list of index patterns that should be available in the space
+  indexPatterns          Json[]
+  /// The list of features that are turned off in the space
+  disabledFeatures       String[]
+  /// Member permissions associated to this space
+  permissions            SpacePermission[]
+  /// Permissions granted by role for this space
+  elasticRolePermissions ElasticRoleSpacePermission[]
+}
+
+/// A space permission (access rights of a member for a specific space)
+model SpacePermission {
+  /// Username of the member
+  username      String
+  /// Institution of the member
+  institutionId String
+  /// The member
+  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  /// ID of the space
+  spaceId       String
+  /// The space
+  space         Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  /// Whether the member has a readonly access to the space
+  readonly      Boolean    @default(false)
+  /// Whether the permission can be modified or not
+  locked        Boolean    @default(false)
+
+  @@id([username, spaceId])
+}
+
+/// Permission on space granted by a role
+model ElasticRoleSpacePermission {
+  /// Name of the concerned role
+  elasticRoleName String
+  /// The concerned role
+  elasticRole     ElasticRole @relation(fields: [elasticRoleName], references: [name], onDelete: Cascade)
+  /// Id of the concerned space
+  spaceId         String
+  /// The concerned space
+  space           Space       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  /// Whether the member has a readonly access to the space
+  readonly        Boolean     @default(false)
+
+  @@id([elasticRoleName, spaceId])
+}

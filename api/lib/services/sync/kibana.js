@@ -24,8 +24,8 @@ const { syncSchedule, dateFormat } = config.get('kibana');
 
 /**
  * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
- * @typedef {import('@prisma/client').Space} Space
- * @typedef {import('@prisma/client').Repository} Repository
+ * @typedef {import('../../.prisma/client').Space} Space
+ * @typedef {import('../../.prisma/client').Repository} Repository
  */
 
 /**

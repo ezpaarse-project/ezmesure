@@ -3,14 +3,14 @@ const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').ElasticRoleRepositoryPermission} ElasticRoleRepositoryPermission
- * @typedef {import('@prisma/client').Prisma.ElasticRoleRepositoryPermissionUpdateArgs} ElasticRoleRepositoryPermissionUpdateArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleRepositoryPermissionUpsertArgs} ElasticRoleRepositoryPermissionUpsertArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleRepositoryPermissionFindUniqueArgs} ElasticRoleRepositoryPermissionFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleRepositoryPermissionFindManyArgs} ElasticRoleRepositoryPermissionFindManyArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleRepositoryPermissionCreateArgs} ElasticRoleRepositoryPermissionCreateArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleRepositoryPermissionDeleteArgs} ElasticRoleRepositoryPermissionDeleteArgs
+ * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client').ElasticRoleRepositoryPermission} ElasticRoleRepositoryPermission
+ * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryPermissionUpdateArgs} ElasticRoleRepositoryPermissionUpdateArgs
+ * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryPermissionUpsertArgs} ElasticRoleRepositoryPermissionUpsertArgs
+ * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryPermissionFindUniqueArgs} ElasticRoleRepositoryPermissionFindUniqueArgs
+ * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryPermissionFindManyArgs} ElasticRoleRepositoryPermissionFindManyArgs
+ * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryPermissionCreateArgs} ElasticRoleRepositoryPermissionCreateArgs
+ * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryPermissionDeleteArgs} ElasticRoleRepositoryPermissionDeleteArgs
  */
 /* eslint-enable max-len */
 

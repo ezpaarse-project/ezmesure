@@ -7,7 +7,7 @@ const UsersService = require('../../entities/users.service');
 const { syncUser } = require('../../services/sync/elastic');
 
 /**
- * @typedef {import('@prisma/client').SpacePermission} SpacePermission
+ * @typedef {import('../../.prisma/client').SpacePermission} SpacePermission
  */
 
 /**

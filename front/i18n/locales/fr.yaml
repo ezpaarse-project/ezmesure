@@ -530,6 +530,9 @@ institutions:
       non-harvestable: Non moissonnable
       selectable: Sélectionnable
       harvested: Déjà moissonné
+    members: Contacts documentaire
+    repositories: '@:repositories.repositories COUNTER'
+    spaces: '@:spaces.spaces COUNTER'
     settings: Paramètres de recherche
     allowNotReady: Inclure les établissements non prêts
     allowFaulty: Inclure les identifiants invalides
@@ -692,12 +695,12 @@ sushi:
   globalHarvestState:
     institution:
       title: État du moissonnage
-      description: Cette matrice présente les résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu pu survenir lors de la récupération des données.
+      description: Cette matrice présente les résultats du moissonnage des différents points d'accès. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
     endpoint:
       title: État du moissonnage
     harvest-session:
       title: État du moissonnage
-      description: Cette matrice présente les résultats du moissonnage des différents établissement. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
+      description: Cette matrice présente les résultats du moissonnage des différents établissements. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment les erreurs ayant pu survenir lors de la récupération des données.
     title: État global du moissonnage
     loading: L'état global du moissonnage est en cours de génération, cela peut prendre quelques secondes
     periodShortcut: '{n} mois'
@@ -766,7 +769,7 @@ sushi:
       sameParameters: possèdent exactement les mêmes paramètres
     actions:
       main:create: '@:update'
-      main:create.archived: '@:update et désarchiver'
+      main:createArchived: '@:update et désarchiver'
       main:update: Je modifie les identifiants déjà déclarés
       secondary:create: Créer de nouveaux identifiants
       secondary:update: Poursuivre l'édition
@@ -1127,6 +1130,7 @@ sync:
   repositories: Entrepôts
   repositoryAliases: Alias
   users: Utilisateurs
+  shares: Partages
   elasticRoles: Rôles Elastic
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements

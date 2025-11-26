@@ -17,8 +17,8 @@ const { filtersToESQuery } = require('../../elastic/filters');
 /* eslint-disable max-len */
 /**
  * @typedef {import('../../promises').ThrottledPromisesResult} ThrottledPromisesResult
- * @typedef {import('@prisma/client').Repository} Repository
- * @typedef {import('@prisma/client').Prisma.RepositoryGetPayload<{ include: { aliases: true } }>} RepositoryWithAliases
+ * @typedef {import('../../../.prisma/client').Repository} Repository
+ * @typedef {import('../../../.prisma/client').Prisma.RepositoryGetPayload<{ include: { aliases: true } }>} RepositoryWithAliases
  */
 /* eslint-enable max-len */
 

@@ -3,17 +3,17 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').Harvest} Harvest
- * @typedef {import('@prisma/client').Prisma.HarvestUpdateArgs} HarvestUpdateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
- * @typedef {import('@prisma/client').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
- * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
- * @typedef {import('@prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs
- * @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs
- * @typedef {import('@prisma/client').Prisma.HarvestGroupByArgs} HarvestGroupByArgs
+ * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client').Harvest} Harvest
+ * @typedef {import('../../.prisma/client').Prisma.HarvestUpdateArgs} HarvestUpdateArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs
+ * @typedef {import('../../.prisma/client').Prisma.HarvestGroupByArgs} HarvestGroupByArgs
  */
 /* eslint-enable max-len */
 

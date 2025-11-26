@@ -141,7 +141,7 @@
         />
 
         <v-btn
-          :text="similar.archived ? $t('sushi.duplicateDialog.actions.main:create.archived') : $t('sushi.duplicateDialog.actions.main:create')"
+          :text="similar.archived ? $t('sushi.duplicateDialog.actions.main:createArchived') : $t('sushi.duplicateDialog.actions.main:create')"
           :prepend-icon="similar.archived ? 'mdi-archive-off' : 'mdi-pencil'"
           :disabled="loadingForce"
           :loading="loadingUpdate"

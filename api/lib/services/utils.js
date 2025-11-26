@@ -84,8 +84,7 @@ const interpolateObject = (obj, context, opts, currentPath = []) => {
 
     const interpolatePattern = new RegExp(opts?.templateOptions?.interpolate ?? /{{(.+?)}}/, 'g');
 
-    const multivaluedKeys = obj
-      .matchAll(interpolatePattern)
+    const multivaluedKeys = Array.from(obj.matchAll(interpolatePattern))
       .map((match) => match[1].trim())
       .filter((key) => Array.isArray(get(context, key)));
 

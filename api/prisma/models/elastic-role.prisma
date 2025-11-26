@@ -1,0 +1,21 @@
+/// Custom role to give to users
+model ElasticRole {
+  /// Name of the role
+  name                       String                                 @id
+  /// Users using this roles
+  users                      User[]
+  /// Institutions using this roles
+  institutions               Institution[]
+  /// Creation date
+  createdAt                  DateTime                               @default(now())
+  /// Latest update date
+  updatedAt                  DateTime                               @updatedAt
+  /// A list of conditions used to populate the institutions
+  conditions                 Json[]
+  /// Permissions that role give to repositories
+  repositoryPermissions      ElasticRoleRepositoryPermission[]
+  /// Permissions that role gives to repository aliases
+  repositoryAliasPermissions ElasticRoleRepositoryAliasPermission[]
+  /// Permissions that role gives to spaces
+  spacePermissions           ElasticRoleSpacePermission[]
+}

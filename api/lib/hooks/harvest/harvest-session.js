@@ -1,5 +1,6 @@
 // @ts-check
 const config = require('config');
+const { isAfter } = require('date-fns');
 
 const { registerHook } = require('../hookEmitter');
 
@@ -84,6 +85,7 @@ async function sendEndMail(session) {
       institutions.map(async (institution) => {
         const contacts = institution.memberships.map((m) => m.user.email);
 
+        // TODO: what if multiple spaces
         const spaceID = institution.spaces.at(0)?.id;
         const publicUrl = new URL(config.get('publicUrl'));
 
@@ -91,18 +93,25 @@ async function sendEndMail(session) {
           periodStart: session.beginDate,
           periodEnd: session.endDate,
           institution: institution.name,
-          credentials: institution.sushiCredentials.map((c) => {
-            let status;
-            if (isConnection(c.connection)) {
-              status = c.connection.status;
-            }
+          credentials: institution.sushiCredentials
+            .map((c) => {
+              let status;
+              if (isConnection(c.connection)) {
+                status = c.connection.status;
+              }
 
-            return ({
-              endpoint: c.endpoint.vendor,
-              packages: c.packages.join(', '),
-              expired: status === 'unauthorized',
-            });
-          }),
+              return ({
+                endpoint: c.endpoint.vendor,
+                packages: c.packages.sort().join(', '),
+                expired: status === 'unauthorized',
+                createdAt: c.createdAt,
+              });
+            })
+            .sort(
+              (a, b) => a.endpoint.localeCompare(b.endpoint)
+                || a.packages.localeCompare(b.packages)
+                || (isAfter(a.createdAt, b.createdAt) ? 1 : -1),
+            ),
           credentialsURL: new URL(`myspace/institutions/${institution.id}/sushi`, publicUrl).href,
           spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
           recipients,
@@ -126,7 +135,7 @@ async function sendEndMail(session) {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').HarvestSession} HarvestSession
+ * @typedef {import('../../.prisma/client').HarvestSession} HarvestSession
 */
 /* eslint-enable max-len */
 

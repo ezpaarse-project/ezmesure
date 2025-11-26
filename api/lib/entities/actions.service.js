@@ -3,13 +3,13 @@ const BasePrismaService = require('./base-prisma.service');
 const actionsPrisma = require('../services/prisma/actions');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Action} Action */
-/** @typedef {import('@prisma/client').Prisma.ActionUpdateArgs} ActionUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.ActionUpsertArgs} ActionUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.ActionFindUniqueArgs} ActionFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.ActionFindManyArgs} ActionFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.ActionCreateArgs} ActionCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.ActionCountArgs} ActionCountArgs */
+/** @typedef {import('../.prisma/client').Action} Action */
+/** @typedef {import('../.prisma/client').Prisma.ActionUpdateArgs} ActionUpdateArgs */
+/** @typedef {import('../.prisma/client').Prisma.ActionUpsertArgs} ActionUpsertArgs */
+/** @typedef {import('../.prisma/client').Prisma.ActionFindUniqueArgs} ActionFindUniqueArgs */
+/** @typedef {import('../.prisma/client').Prisma.ActionFindManyArgs} ActionFindManyArgs */
+/** @typedef {import('../.prisma/client').Prisma.ActionCreateArgs} ActionCreateArgs */
+/** @typedef {import('../.prisma/client').Prisma.ActionCountArgs} ActionCountArgs */
 /* eslint-enable max-len */
 
 module.exports = class ActionsService extends BasePrismaService {

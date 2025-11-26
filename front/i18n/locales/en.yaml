@@ -518,21 +518,24 @@ institutions:
     readyPopup:
       inProgress: Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
-    harvestable:
-      title: Harvestable institutions
-      harvestableInstitutions: Harvestable
-      status:
-        harvestable: Harvestable
-        non-harvestable: Non harvestable
-        selectable: Selectable
-        harvested: Already harvested
-      settings: Search settings
-      allowNotReady: Include non ready institutions
-      allowFaulty: Include invalid credentials
-      allowHarvested: Include harvested institutions
-      harvestedMonth: Target period
-      nSelectable: ({n} selectable)
-      institutions: Institutions
+  harvestable:
+    title: Harvestable institutions
+    harvestableInstitutions: Harvestable
+    status:
+      harvestable: Harvestable
+      non-harvestable: Non harvestable
+      selectable: Selectable
+      harvested: Already harvested
+    members: "@:institutions.members.roleNames.contact:doc{'s'}"
+    repositories: 'COUNTER @:repositories.repositories'
+    spaces: 'COUNTER @:spaces.spaces'
+    settings: Search settings
+    allowNotReady: Include non ready institutions
+    allowFaulty: Include invalid credentials
+    allowHarvested: Include harvested institutions
+    harvestedMonth: Target period
+    nSelectable: ({n} selectable)
+    institutions: Institutions
   unableToRetriveInformations: Unable to retrieve institution information
   unableToRetrivePlatforms: Unable to retrieve plateform information
   notAttachedToAnyInstitution: You are not attached to any institution, where you have not declared any information about your institution.
@@ -756,7 +759,7 @@ sushi:
       sameParameters: have exactly the same parameters
     actions:
       main:create: '@:update'
-      main:create.archived: '@:update and unarchive'
+      main:createArchived: '@:update and unarchive'
       main:update: I will edit the already registered credentials
       secondary:create: Create new credentials
       secondary:update: Continue editing
@@ -984,7 +987,6 @@ repoAliasTemplates:
   applyToSeeAliases: Apply the template to see the affected aliases
   noAliasCreated: No alias has been created
   applyHadNoEffect: The application of the template had no effect. No institution matched the conditions.
-
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
@@ -1032,7 +1034,9 @@ harvest:
       endpoints: "{n} endpoint|{n} endpoints"
       reportTypes: "{n} report type|{n} report types"
       credentials: "{n} credentials"
+      counterVersions: "{n} version of COUNTER|{n} versions of COUNTER"
     credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
+    reportsMenuTitle: COUNTER Reports
     sendEndMail: A mail will be sent on harvest end
     notStarted: Not started
     unableToRetrive: Unable to retrieve harvests
@@ -1114,7 +1118,8 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
-  shares: Partages
+  shares: Shares
+  elasticRoles: Elastic roles
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization

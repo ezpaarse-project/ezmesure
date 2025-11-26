@@ -1,20 +1,36 @@
-FROM node:24.4.1-alpine3.22 as dependencies
+FROM node:24.4.1-alpine3.22 AS base
 
 WORKDIR /app
+
+# ---
+
+FROM base AS prisma
 
 COPY package*.json ./
 COPY prisma ./prisma
 
-# "npm ci" is needed so that prisma can run "prisma generate"
-RUN npm ci && NODE_ENV=production npm ci --omit=dev
+RUN npm ci && \
+  npx prisma generate
 
+# ---
 
-FROM node:24.4.1-alpine3.22
+FROM base AS dependencies
+
+COPY package*.json ./
+
+RUN NODE_ENV=production npm ci --omit=dev
+
+# ---
+
+FROM base
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
 
 WORKDIR /usr/src/app
+
 COPY --chown=node:node . .
+COPY --chown=node:node --from=prisma /app/lib/.prisma ./lib/.prisma
 COPY --chown=node:node --from=dependencies /app/node_modules ./node_modules
+
 EXPOSE 3000
 
 ENTRYPOINT ["npm", "start"]

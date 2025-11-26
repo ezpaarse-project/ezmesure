@@ -1,5 +1,6 @@
-import { defineNuxtPlugin, useSnacksStore } from '#imports';
 import ezreeportVue from '@ezpaarse-project/ezreeport-vue';
+
+import { defineNuxtPlugin, useSnacksStore } from '#imports';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const snacks = useSnacksStore();

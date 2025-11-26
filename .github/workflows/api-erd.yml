@@ -13,9 +13,6 @@ env:
   OUT_ERD_PATH: api/prisma/doc/ERD.svg
   OUT_DIC_PATH: api/prisma/doc/DIC.md
   DIC_NAME: ezMESURE
-  COMMIT_NAME: 'doc(api): updated database documentation[skip ci]'
-  COMMIT_BODY: '${{ github.event.compare }}'
-  COMMIT_FOOTER: 'Co-authored-by: @${{ github.event.sender.login }}'
   ERD_WS: https://p-erd.oxypomme.fr
   ERD_WS_KEY: ${{ secrets.PRISMA_ERD_API_KEY }}
 
@@ -26,24 +23,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Generate ERD
-        run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_ERD_PATH }}" ${{ env.ERD_WS }}/erd/'
+      - name: Merge schema ⚙️
+        run: 'find ${{ env.PRISMA_FOLDER }} -type f -name "*.prisma" -exec cat {} + > ${{ runner.temp }}/schema.prisma'
 
-      - name: Generate Data dictionary
-        run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_DIC_PATH }}" ${{ env.ERD_WS }}/dict/\?name\=${{ env.DIC_NAME }}'
+      - name: Generate ERD 🔧
+        run: 'curl -X POST -d "$(cat ${{ runner.temp }}/schema.prisma)" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_ERD_PATH }}" ${{ env.ERD_WS }}/erd/'
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Generate Data dictionary 🔧
+        run: 'curl -X POST -d "$(cat ${{ runner.temp }}/schema.prisma)" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_DIC_PATH }}" ${{ env.ERD_WS }}/dict/\?name\=${{ env.DIC_NAME }}'
 
-      - name: Commit files
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          git commit -m "${{ env.COMMIT_NAME }}" -m "${{ env.COMMIT_BODY }}" -m "${{ env.COMMIT_FOOTER }}"
-
-          remote_repo="https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
-          git push ${remote_repo} HEAD:${{ github.ref }} --follow-tags
+      - name: Commit files 🚀
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'docs: updated database documentation[skip ci]'
+          default_author: github_actions

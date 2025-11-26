@@ -1,0 +1,32 @@
+/// Harvest state of a SUSHI item, for a specific month and report ID
+model Harvest {
+  /// Date of the harvest
+  harvestedAt     DateTime         @default(now())
+  /// Id of the job that harvested current state
+  harvestedById   String?
+  /// Identifier of the SUSHI credentials
+  credentialsId   String
+  /// SUSHI credentials
+  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  /// Report ID (TR, PR, DR...)
+  reportId        String
+  /// Report period (format: yyyy-MM)
+  period          String
+  /// Status of the harvest (waiting, running, finished, failed...)
+  status          String
+  /// Error code, if a fatal exception was encountered
+  errorCode       String?
+  /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
+  sushiExceptions Json[]
+  /// Number of report items that were successfuly inserted into Elasticsearch
+  insertedItems   Int              @default(0)
+  /// Number of report items that were updated in Elasticsearch
+  updatedItems    Int              @default(0)
+  /// Number of report items that failed to be inserted into Elasticsearch
+  failedItems     Int              @default(0)
+
+  /// Job that harvested current state
+  harvestedBy HarvestJob? @relation(fields: [harvestedById], references: [id])
+
+  @@id([credentialsId, reportId, period])
+}
