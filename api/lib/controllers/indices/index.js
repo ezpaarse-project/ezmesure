@@ -28,10 +28,6 @@ router.route({
   path: '/:index',
   handler: createIndex,
   validate: {
-    query: {
-      type: Joi.string().valid('ezpaarse', 'publisher'),
-      version: Joi.string(),
-    },
     params: {
       index: Joi.string().trim().regex(indexNamePattern).required(),
     },
