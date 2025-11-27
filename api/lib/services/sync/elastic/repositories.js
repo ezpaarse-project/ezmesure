@@ -143,6 +143,7 @@ const getIndexTemplateDefinitions = (repo) => {
  * @typedef {object} RepositoryPropertyMapping
  * @property {string} type
  * @property {boolean} ignoreMalformed
+ * @property {string | undefined} format
  * @property {('date')[]} subFields
  */
 /**
@@ -161,6 +162,7 @@ const repositoryPropertyMappingToIndexPropertyMapping = ({
   type,
   ignoreMalformed,
   subFields,
+  format,
 }) => {
   /** @type {esMappingProperty['fields'] | undefined} */
   let fields;
@@ -171,7 +173,8 @@ const repositoryPropertyMappingToIndexPropertyMapping = ({
           if (field === 'date') {
             return ['date', {
               type: 'date',
-              ignore_malformed: true,
+              ignore_malformed: ignoreMalformed,
+              format: format || undefined,
             }];
           }
           return [];
@@ -191,8 +194,6 @@ const repositoryPropertyMappingToIndexPropertyMapping = ({
     case 'short':
     case 'double':
     case 'byte':
-    case 'date_nanos':
-    case 'date':
     case 'geo_point':
     case 'geo_shape':
       // @ts-ignore
@@ -200,6 +201,16 @@ const repositoryPropertyMappingToIndexPropertyMapping = ({
         ...base,
         type,
         ignore_malformed: ignoreMalformed,
+      };
+
+    case 'date':
+    case 'date_nanos':
+      // @ts-ignore
+      return {
+        ...base,
+        type,
+        ignore_malformed: ignoreMalformed,
+        format: format || undefined,
       };
 
     case 'boolean':

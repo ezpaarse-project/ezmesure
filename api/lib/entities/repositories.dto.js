@@ -12,6 +12,7 @@ const mappingSchema = Joi.object({
     Joi.object({
       type: Joi.string().required().valid('geo_point', 'geo_shape', 'ip', 'binary', 'keyword', 'text', 'date', 'date_nanos', 'boolean', 'integer', 'long', 'short', 'byte', 'float', 'double'),
       ignoreMalformed: Joi.boolean().default(false),
+      format: Joi.string().default(() => undefined),
       subFields: Joi.array().items(Joi.string().valid('date')).default([]),
     }),
   ),
