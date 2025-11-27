@@ -20,7 +20,7 @@
             prepend-icon="mdi-book-open"
             slim
           >
-            {{ $t('menu.users') }}
+            {{ $t('menu.guide') }}
           </v-list-item>
           <v-list-item
             to="/api-reference"
