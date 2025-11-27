@@ -85,16 +85,28 @@
 
     <template #append>
       <template v-if="status">
-        <SushiHarvestSessionProgress
-          v-if="!!modelValue.startedAt"
-          :status="status"
-          :job-count="modelValue._count.jobs"
+        <v-chip
+          v-if="modelValue.status === 'prepared'"
+          :text="$t('harvest.sessions.status.list.prepared')"
+          color="orange"
+          class="mr-2"
         />
         <v-chip
-          v-else
-          :text="$t('harvest.sessions.notStarted')"
+          v-else-if="modelValue.status === 'starting'"
+          :text="$t('harvest.sessions.status.list.starting')"
+          color="blue"
+          class="mr-2"
+        />
+        <v-chip
+          v-else-if="modelValue.status === 'stopping' || modelValue.status === 'stopped'"
+          :text="$t('harvest.sessions.status.list.stopped')"
           color="red"
           class="mr-2"
+        />
+        <SushiHarvestSessionProgress
+          v-else
+          :status="status"
+          :job-count="modelValue._count.jobs"
         />
       </template>
 

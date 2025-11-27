@@ -13,6 +13,7 @@
           :clearable="clearable"
           :rules="[
             (v) => !v || checkInputValid(v).error || true,
+            (v) => !required || !!v || $t('fieldIsRequired'),
           ]"
           v-bind="menu"
           @update:model-value="updateModelValueOnType($event)"
@@ -135,6 +136,10 @@ const props = defineProps({
   max: {
     type: String,
     default: undefined,
+  },
+  required: {
+    type: Boolean,
+    default: false,
   },
 });
 

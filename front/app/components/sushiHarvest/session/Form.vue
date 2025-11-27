@@ -24,8 +24,8 @@
 
   <v-card
     v-else
-    :title="isEditing ? $t('harvest.sessions.update') : $t('harvest.sessions.add')"
-    :subtitle="props.modelValue?.id"
+    :title="isEditing ? $t('harvest.sessions.form.title:update') : $t('harvest.sessions.form.title:add')"
+    :subtitle="modelValue?.id"
     prepend-icon="mdi-tractor"
   >
     <template #text>
@@ -38,122 +38,189 @@
             @submit.prevent="save()"
           >
             <v-card
-              :title="$t('harvest.sessions.credentials')"
+              :title="$t('harvest.sessions.form.credentials.title')"
               prepend-icon="mdi-key"
               variant="outlined"
             >
               <template #text>
                 <v-row>
-                  <v-col cols="6">
+                  <v-col>
+                    <p>
+                      {{ $t('harvest.sessions.form.credentials.intro') }}
+                    </p>
+                  </v-col>
+                </v-row>
+
+                <v-row class="mb-2">
+                  <v-col cols="12" md="6" :class="mdAndUp ? ['border-e-thin', 'border-opacity'] : undefined">
                     <v-list
                       v-model:selected="institutionIds"
                       lines="two"
                       density="compact"
-                      height="450"
+                      height="490"
                       select-strategy="leaf"
                       class="credentials-list pa-0"
                     >
-                      <v-list-subheader sticky>
-                        <v-icon icon="mdi-domain" />
-                        {{ $t('institutions.toolbarTitle', { count: institutionsCount }) }}
+                      <div class="credentials-list-header">
+                        <v-list-subheader>
+                          <v-icon icon="mdi-domain" />
+                          {{ $t('harvest.sessions.form.credentials.institutions.title', { count: institutionsCount }) }}
 
-                        <v-spacer />
+                          <v-spacer />
 
-                        <div style="width: 150px">
-                          <v-text-field
-                            v-model="institutionsSearch"
-                            :placeholder="$t('search')"
-                            append-inner-icon="mdi-magnify"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                          />
-                        </div>
-                      </v-list-subheader>
-
-                      <v-list-item
-                        v-for="item in institutions"
-                        :key="item.id"
-                        :value="item.id"
-                        :title="item.name"
-                        :subtitle="item.acronym"
-                      >
-                        <template #prepend="{ isSelected, select }">
-                          <v-list-item-action start>
-                            <v-checkbox-btn
-                              :model-value="isSelected"
-                              color="primary"
-                              @update:model-value="select"
+                          <div style="width: 250px">
+                            <v-text-field
+                              v-model="institutionsSearch"
+                              :placeholder="$t('search')"
+                              append-inner-icon="mdi-magnify"
+                              variant="outlined"
+                              density="compact"
+                              hide-details
                             />
-                          </v-list-item-action>
+                          </div>
+                        </v-list-subheader>
 
-                          <InstitutionAvatar :institution="item" />
-                        </template>
-                      </v-list-item>
+                        <v-list-item
+                          :title="$t('harvest.sessions.form.credentials.institutions.all')"
+                          :active="isAllInstitutions"
+                          @click="isAllInstitutions = !isAllInstitutions"
+                        >
+                          <template #prepend>
+                            <v-list-item-action start>
+                              <v-switch
+                                :model-value="isAllInstitutions"
+                                color="primary"
+                                hide-details
+                                readonly
+                              />
+                            </v-list-item-action>
+                          </template>
+                        </v-list-item>
+
+                        <v-divider v-if="!isAllInstitutions" class="border-dashed border-opacity-25 py-1" />
+                      </div>
+
+                      <div v-show="!isAllInstitutions">
+                        <v-list-item
+                          v-for="item in institutions"
+                          :key="item.id"
+                          :value="item.id"
+                          :title="item.name"
+                          :subtitle="item.acronym"
+                        >
+                          <template #prepend="{ isSelected, select }">
+                            <v-list-item-action start>
+                              <v-checkbox-btn
+                                :model-value="isSelected"
+                                color="primary"
+                                @update:model-value="select"
+                              />
+                            </v-list-item-action>
+
+                            <InstitutionAvatar :institution="item" />
+                          </template>
+                        </v-list-item>
+                      </div>
                     </v-list>
                   </v-col>
 
-                  <v-divider vertical />
-
-                  <v-col cols="6">
+                  <v-col cols="12" md="6">
                     <v-list
                       v-model:selected="endpointIds"
                       lines="two"
                       density="compact"
-                      height="450"
+                      height="490"
                       select-strategy="leaf"
                       class="credentials-list pa-0"
                     >
-                      <v-list-subheader sticky>
-                        <v-icon icon="mdi-api" />
-                        {{ $t('endpoints.toolbarTitle', { count: endpointsCount }) }}
+                      <div class="credentials-list-header">
+                        <v-list-subheader>
+                          <v-icon icon="mdi-api" />
+                          {{ $t('harvest.sessions.form.credentials.endpoints.title', { count: endpointsCount }) }}
 
-                        <v-spacer />
+                          <v-spacer />
 
-                        <div style="width: 150px">
-                          <v-text-field
-                            v-model="endpointsSearch"
-                            :placeholder="$t('search')"
-                            append-inner-icon="mdi-magnify"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                          />
-                        </div>
-                      </v-list-subheader>
-
-                      <v-list-item
-                        v-for="item in endpoints"
-                        :key="item.id"
-                        :value="item.id"
-                        :title="item.vendor"
-                      >
-                        <template #prepend="{ isSelected, select }">
-                          <v-list-item-action start>
-                            <v-checkbox-btn
-                              :model-value="isSelected"
-                              color="primary"
-                              @update:model-value="select"
+                          <div style="width: 250px">
+                            <v-text-field
+                              v-model="endpointsSearch"
+                              :placeholder="$t('search')"
+                              append-inner-icon="mdi-magnify"
+                              variant="outlined"
+                              density="compact"
+                              hide-details
                             />
-                          </v-list-item-action>
-                        </template>
+                          </div>
+                        </v-list-subheader>
 
-                        <template #subtitle>
-                          <SushiEndpointVersionsChip
-                            :model-value="item"
-                            size="small"
-                            density="compact"
-                          />
-                        </template>
-                      </v-list-item>
+                        <v-list-item
+                          :title="$t('harvest.sessions.form.credentials.endpoints.all')"
+                          :active="isAllEndpoints"
+                          @click="isAllEndpoints = !isAllEndpoints"
+                        >
+                          <template #prepend>
+                            <v-list-item-action start>
+                              <v-switch
+                                :model-value="isAllEndpoints"
+                                color="primary"
+                                hide-details
+                                readonly
+                              />
+                            </v-list-item-action>
+                          </template>
+                        </v-list-item>
+
+                        <v-divider v-if="!isAllEndpoints" class="border-dashed border-opacity-25 py-1" />
+                      </div>
+
+                      <div v-show="!isAllEndpoints">
+                        <v-list-item
+                          v-for="item in endpoints"
+                          :key="item.id"
+                          :value="item.id"
+                          :title="item.vendor"
+                        >
+                          <template #prepend="{ isSelected, select }">
+                            <v-list-item-action start>
+                              <v-checkbox-btn
+                                :model-value="isSelected"
+                                color="primary"
+                                @update:model-value="select"
+                              />
+                            </v-list-item-action>
+                          </template>
+
+                          <template #subtitle>
+                            <SushiEndpointVersionsChip
+                              :model-value="item"
+                              size="small"
+                              density="compact"
+                            />
+                          </template>
+                        </v-list-item>
+                      </div>
                     </v-list>
+                  </v-col>
+                </v-row>
+
+                <v-row no-gutters>
+                  <v-col>
+                    <p>
+                      {{ $t('harvest.sessions.form.credentials.allowFaulty.description') }}
+                    </p>
+
+                    <v-checkbox
+                      v-model="allowFaulty"
+                      :label="$t('harvest.sessions.form.credentials.allowFaulty.title')"
+                      color="primary"
+                      hide-details
+                    />
                   </v-col>
                 </v-row>
               </template>
             </v-card>
 
             <v-card
-              :title="$t('harvest.sessions.reports')"
+              :title="$t('harvest.sessions.form.reports.title')"
               prepend-icon="mdi-download"
               variant="outlined"
               class="mt-4"
@@ -163,26 +230,28 @@
                   <v-col cols="6">
                     <MonthPickerField
                       v-model="beginDate"
-                      :label="`${$t('harvest.jobs.beginDate')} *`"
-                      :rules="[v => !!v || $t('fieldIsRequired')]"
+                      :label="`${$t('harvest.sessions.form.reports.beginDate')} *`"
                       :max="endDate"
                       variant="underlined"
                       prepend-icon="mdi-calendar-start"
+                      required
                     />
                   </v-col>
 
                   <v-col cols="6">
                     <MonthPickerField
                       v-model="endDate"
-                      :label="`${$t('harvest.jobs.endDate')} *`"
-                      :rules="[v => !!v || $t('fieldIsRequired')]"
+                      :label="`${$t('harvest.sessions.form.reports.endDate')} *`"
                       :min="beginDate"
                       variant="underlined"
                       prepend-icon="mdi-calendar-end"
+                      required
                     />
                   </v-col>
+                </v-row>
 
-                  <v-col cols="6">
+                <v-row class="mb-2">
+                  <v-col cols="12" md="6" :class="mdAndUp ? ['border-e-thin', 'border-opacity'] : undefined">
                     <v-list
                       v-model:selected="counterVersions"
                       lines="one"
@@ -248,7 +317,10 @@
                               <v-form
                                 id="additionalVersionForm"
                                 ref="additionalVersionForm"
-                                @submit.prevent="counterVersions.push(customVersion); isCustomVersionOpen = false"
+                                @submit.prevent="
+                                  counterVersions.push(customVersion);
+                                  isCustomVersionOpen = false
+                                "
                               >
                                 <p>
                                   {{ $t('endpoints.customVersionDesc') }}
@@ -285,9 +357,7 @@
                     </v-menu>
                   </v-col>
 
-                  <v-divider vertical />
-
-                  <v-col cols="6">
+                  <v-col cols="12" md="6">
                     <v-list
                       v-model:selected="reportTypes"
                       lines="one"
@@ -344,7 +414,10 @@
                               <v-form
                                 id="additionalReportForm"
                                 ref="additionalReportForm"
-                                @submit.prevent="reportsList.push(additionalReport); isCustomVersionOpen = false"
+                                @submit.prevent="
+                                  reportsList.push(additionalReport);
+                                  isCustomVersionOpen = false
+                                "
                               >
                                 <p>
                                   {{ $t('endpoints.addAdditionalReportDesc') }}
@@ -380,11 +453,40 @@
                     </v-menu>
                   </v-col>
                 </v-row>
+
+                <v-row no-gutters>
+                  <v-col cols="12">
+                    <v-checkbox
+                      v-model="downloadUnsupported"
+                      :label="$t('harvest.sessions.form.reports.downloadUnsupported')"
+                      color="primary"
+                      hide-details
+                    />
+                  </v-col>
+
+                  <v-col cols="6">
+                    <v-checkbox
+                      v-model="useValidation"
+                      :label="$t('harvest.sessions.form.reports.useValidation')"
+                      color="primary"
+                      hide-details
+                    />
+                  </v-col>
+
+                  <v-col cols="6">
+                    <v-checkbox
+                      v-model="useCache"
+                      :label="$t('harvest.sessions.form.reports.useCache')"
+                      color="primary"
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
               </template>
             </v-card>
 
             <v-card
-              :title="$t('harvest.sessions.settings')"
+              :title="$t('harvest.sessions.form.settings.title')"
               prepend-icon="mdi-cog"
               variant="outlined"
               class="mt-4"
@@ -407,7 +509,7 @@
                   <v-col cols="6">
                     <v-checkbox
                       v-model="sendEndMail"
-                      :label="$t('harvest.sessions.sendEndMail')"
+                      :label="$t('harvest.sessions.form.settings.sendEndMail')"
                       density="compact"
                       color="primary"
                       hide-details
@@ -415,49 +517,9 @@
                   </v-col>
 
                   <v-col cols="6">
-                    <v-checkbox
-                      v-model="downloadUnsupported"
-                      :label="$t('harvest.sessions.downloadUnsupported')"
-                      density="compact"
-                      color="primary"
-                      hide-details
-                    />
-                  </v-col>
-
-                  <v-col cols="3">
-                    <v-checkbox
-                      v-model="allowFaulty"
-                      :label="$t('harvest.sessions.allowFaulty')"
-                      density="compact"
-                      color="primary"
-                      hide-details
-                    />
-                  </v-col>
-
-                  <v-col cols="3">
-                    <v-checkbox
-                      v-model="useCache"
-                      :label="$t('harvest.sessions.useCache')"
-                      density="compact"
-                      color="primary"
-                      hide-details
-                    />
-                  </v-col>
-
-                  <v-col cols="3">
-                    <v-checkbox
-                      v-model="useValidation"
-                      :label="$t('harvest.sessions.useValidation')"
-                      density="compact"
-                      color="primary"
-                      hide-details
-                    />
-                  </v-col>
-
-                  <v-col cols="3">
                     <v-text-field
                       :model-value="`${timeout}`"
-                      :label="$t('harvest.sessions.timeout')"
+                      :label="$t('harvest.sessions.form.settings.timeout')"
                       :min="0"
                       :rules="[(v) => !Number.isNaN(Number.parseInt(v, 10)) || $t('invalidFormat')]"
                       type="number"
@@ -500,7 +562,7 @@ import { differenceInYears, parse as parseDate } from 'date-fns';
 import { getErrorMessage } from '@/lib/errors';
 import { DEFAULT_REPORTS_IDS, SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
 
-const props = defineProps({
+const { modelValue } = defineProps({
   modelValue: {
     type: Object,
     default: () => undefined,
@@ -513,6 +575,7 @@ const emit = defineEmits({
 
 const snacks = useSnacksStore();
 const { t, locale } = useI18n();
+const { mdAndUp } = useDisplay();
 
 const institutionsSearch = shallowRef('');
 const endpointsSearch = shallowRef('');
@@ -521,23 +584,29 @@ const saving = shallowRef(false);
 const valid = shallowRef(false);
 const hasIdChanged = shallowRef(false);
 
-const id = shallowRef(props.modelValue?.id ?? '');
-const timeout = shallowRef(props.modelValue?.timeout ?? 600);
-const beginDate = shallowRef(props.modelValue?.beginDate ?? '');
-const endDate = shallowRef(props.modelValue?.endDate ?? '');
+const id = shallowRef(modelValue?.id ?? '');
+const timeout = shallowRef(modelValue?.timeout ?? 600);
+const beginDate = shallowRef(modelValue?.beginDate ?? '');
+const endDate = shallowRef(modelValue?.endDate ?? '');
 const reportTypes = ref(
-  props.modelValue?.reportTypes?.map((report) => report.toUpperCase())
+  modelValue?.reportTypes?.map((report) => report.toUpperCase())
   ?? DEFAULT_REPORTS_IDS,
 );
-const counterVersions = ref(props.modelValue?.allowedCounterVersions ?? SUPPORTED_COUNTER_VERSIONS);
-const downloadUnsupported = shallowRef(props.modelValue?.downloadUnsupported ?? false);
-const allowFaulty = shallowRef(props.modelValue?.allowFaulty ?? false);
-const sendEndMail = shallowRef(props.modelValue?.sendEndMail ?? true);
-const useCache = shallowRef(!props.modelValue?.forceDownload);
-const useValidation = shallowRef(!props.modelValue?.ignoreValidation);
+const counterVersions = ref(modelValue?.allowedCounterVersions ?? SUPPORTED_COUNTER_VERSIONS);
+const downloadUnsupported = shallowRef(modelValue?.downloadUnsupported ?? false);
+const allowFaulty = shallowRef(modelValue?.allowFaulty ?? false);
+const sendEndMail = shallowRef(modelValue?.sendEndMail ?? true);
+const useCache = shallowRef(!modelValue?.forceDownload);
+const useValidation = shallowRef(!modelValue?.ignoreValidation);
 // TODO: credentials to institutions/endpoints (packages ?)
-const institutionIds = ref([...(props.modelValue?.credentialsQuery?.institutionIds ?? [])]);
-const endpointIds = ref([...(props.modelValue?.credentialsQuery?.endpointIds ?? [])]);
+const institutionIds = ref([...(modelValue?.credentialsQuery?.institutionIds ?? [])]);
+const isAllInstitutions = shallowRef(
+  modelValue?.credentialsQuery ? !modelValue.credentialsQuery.institutionIds?.length : false,
+);
+const endpointIds = ref([...(modelValue?.credentialsQuery?.endpointIds ?? [])]);
+const isAllEndpoints = shallowRef(
+  modelValue?.credentialsQuery ? !modelValue.credentialsQuery.endpointIds?.length : true,
+);
 
 const isAdditionalReportOpen = shallowRef(false);
 const additionalReport = shallowRef('');
@@ -577,24 +646,36 @@ const {
   },
 });
 
-const isEditing = computed(() => !!props.modelValue?.id);
+const isEditing = computed(() => !!modelValue?.id);
 const institutionsCount = computed(() => {
+  if (isAllInstitutions.value) {
+    return t('all');
+  }
   if (institutionIds.value.length > 0) {
     return institutionIds.value.length;
-  }
-  if (endpointIds.value.length > 0) {
-    return t('all');
   }
   return 0;
 });
 const endpointsCount = computed(() => {
+  if (isAllEndpoints.value) {
+    return t('all');
+  }
   if (endpointIds.value.length > 0) {
     return endpointIds.value.length;
   }
-  if (institutionIds.value.length > 0) {
-    return t('all');
-  }
   return 0;
+});
+const areInstitutionsValid = computed(() => {
+  if (isAllInstitutions.value) {
+    return !isAllEndpoints.value;
+  }
+  return institutionIds.value.length > 0;
+});
+const areEndpointsValid = computed(() => {
+  if (isAllEndpoints.value) {
+    return !isAllInstitutions.value;
+  }
+  return endpointIds.value.length > 0;
 });
 const reportsList = computed(() => Array.from(new Set([
   ...DEFAULT_REPORTS_IDS,
@@ -614,15 +695,13 @@ const versionRules = computed(() => [
     return t('fieldMustMatch', { pattern: pattern.toString() });
   },
 ]);
-const isValid = computed(() => {
-  if (!valid.value) {
-    return false;
-  }
-
-  return (institutionIds.value.length > 0 || endpointIds.value.length > 0)
+const isValid = computed(
+  () => valid.value
+    && areInstitutionsValid.value
+    && areEndpointsValid.value
     && reportTypes.value.length > 0
-    && counterVersions.value.length > 0;
-});
+    && counterVersions.value.length > 0,
+);
 
 function resetVersionForm() {
   additionalReportForm.value?.reset();
@@ -651,8 +730,8 @@ async function save() {
         reportTypes: reportTypes.value.map((report) => report.toLowerCase()),
         allowedCounterVersions: counterVersions.value,
         credentialsQuery: {
-          institutionIds: institutionIds.value,
-          endpointIds: endpointIds.value,
+          institutionIds: isAllInstitutions.value ? [] : institutionIds.value,
+          endpointIds: isAllEndpoints.value ? [] : endpointIds.value,
         },
       },
     });
@@ -704,6 +783,28 @@ watch([institutionIds, endpointIds, beginDate, endDate], () => {
   }
 }, { immediate: true });
 
+const watchLock = shallowRef(false);
+watch(isAllInstitutions, (val) => {
+  if (watchLock.value) {
+    // Call is from other watcher, free the lock
+    watchLock.value = false;
+    return;
+  }
+
+  isAllEndpoints.value = !val && false;
+  watchLock.value = true; // Prevent other watcher to trigger
+});
+watch(isAllEndpoints, (val) => {
+  if (watchLock.value) {
+    // Call is from other watcher, free the lock
+    watchLock.value = false;
+    return;
+  }
+
+  isAllInstitutions.value = !val && false;
+  watchLock.value = true; // Prevent other watcher to trigger
+});
+
 watch(() => institutionsStatus.value === 'pending' && endpointsStatus.value === 'pending', (isLoading) => {
   if (!isLoading) {
     initialLoading.value = false;
@@ -721,5 +822,13 @@ watch(() => institutionsStatus.value === 'pending' && endpointsStatus.value === 
 
   margin-top: 8px;
   margin-bottom: 8px;
+}
+
+.credentials-list-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: inherit;
 }
 </style>

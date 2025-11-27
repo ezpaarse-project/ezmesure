@@ -1049,21 +1049,44 @@ harvest:
       counterVersions: "{n} version de COUNTER|{n} versions de COUNTER"
     credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés"
     reportsMenuTitle: Rapports COUNTER
-    sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
-    notStarted: Pas encore lancé
+    status:
+      list:
+        prepared: Pas encore lancé
+        starting: Démarrage en cours
+        stopped: Arrété
+    form:
+      title:add: Créer une session de moissonnage
+      title:update: Éditer une session de moissonnage
+      credentials:
+        title: Identifiants COUNTER à moissonner
+        intro: >
+          Les identifiants moissonnés seront ceux qui répondent à tous les critères (s’ils concernent l’un
+          des point d’accès et l’un des établissements).
+        institutions:
+          title: "@:institutions.toolbarTitle"
+          all: Tous les établissements
+        endpoints:
+          title: "@:endpoints.toolbarTitle"
+          all: Tous les points d'accès
+        allowFaulty:
+          title: Inclure les identifiants invalides
+          description: >
+            Par défaut, seuls les identifiants déclarés par un établissement et valides seront moissonnés,
+            mais vous pouvez inclure les invalides en cochant la case ci-dessous.
+      reports:
+        title: Rapports COUNTER à moissonner
+        beginDate: "@:harvest.jobs.beginDate"
+        endDate: "@:harvest.jobs.endDate"
+        downloadUnsupported: Télécharger les rapports même si non supportés par le point d'accès
+        useCache: Utiliser le cache des rapports
+        useValidation: Respecter la validation des rapports
+      settings:
+        title: Paramètres de moissonnage
+        sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
+        timeout: Délai de complétion des tâches
     unableToRetrive: Impossible de récupérer les moissonnages
-    add: Créer une session de moissonnage
-    update: Éditer une session de moissonnage
     start: Démarrer la session
     stop: Arrêter la session
-    credentials: Identifiants COUNTER à moissonner
-    reports: Rapports COUNTER à moissonner
-    settings: Paramètres de moissonnage
-    downloadUnsupported: Télécharger les rapports même si non supportés par le point d'accès
-    allowFaulty: Inclure les identifiants invalides
-    useCache: Utiliser le cache des rapports
-    useValidation: Respecter la validation des rapports
-    timeout: Délai de complétion des tâches
   jobs:
     title: Tâches de moissonnage
     filtersTitle: Filtrer les tâches
