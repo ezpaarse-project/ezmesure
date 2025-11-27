@@ -932,7 +932,6 @@ repositories:
         emptyText: Aucune propriété additionnelle n'est définie, cliquez sur le bouton {'"'}@:add{'"'} pour en définir une.
         form:
           label: Nom de la propriété
-          ignoreMalformed: Ignorer les valeurs malformées
           type:
             label: Type
             options:
@@ -945,12 +944,17 @@ repositories:
               text: Texte
               geo_point: Point géographique
               geo_shape: Forme géographique
-          subFields:
-            label: Sous-champs
-            options:
-              date:
-                title: Date
-                tooltip: Ajoute un sous-champ ".date" transformant la valeur au type "Date"
+          settings:
+            title: Paramètres avancés
+            ignoreMalformed: Ignorer les valeurs malformées
+            format: Format de la date dans les données
+            format:hint: Basé sur {link}
+            subFields:
+              label: Sous-champs
+              options:
+                date:
+                  title: Date
+                  tooltip: Ajoute un sous-champ ".date" transformant la valeur au type "Date"
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type

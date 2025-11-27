@@ -919,7 +919,6 @@ repositories:
         emptyText: No additional properties is defined, click on the {'"'}@:add{'"'} button to define one.
         form:
           label: Name of the property
-          ignoreMalformed: Ignored malformed values
           type:
             label: Type
             options:
@@ -932,12 +931,17 @@ repositories:
               text: Text
               geo_point: Geographical point
               geo_shape: Geographical shape
-          subFields:
-            label: Sub fields
-            options:
-              date:
-                title: Date
-                tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
+          settings:
+            title: Advanced settings
+            ignoreMalformed: Ignored malformed values
+            format: Date format in data
+            format:hint: Based on {link}
+            subFields:
+              label: Sub fields
+              options:
+                date:
+                  title: Date
+                  tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
   manageRepositories: >
     Manage repositories
     |Manage {count} repositories

@@ -112,35 +112,67 @@
                     />
                   </div>
 
-                  <div class="text-secondary" style="font-size: 0.9em;">
-                    {{ $t('repositories.updateForm.mapping.properties.form.subFields.label') }}
-                  </div>
+                  <v-expansion-panels variant="accordion" color="secondary" static class="mb-2">
+                    <v-expansion-panel :title="$t('repositories.updateForm.mapping.properties.form.settings.title')">
+                      <template #text>
+                        <div class="text-secondary" style="font-size: 0.9em;">
+                          {{ $t('repositories.updateForm.mapping.properties.form.settings.subFields.label') }}
+                        </div>
 
-                  <v-chip-group
-                    v-model="definition.subFields"
-                    selected-class="text-primary"
-                    multiple
-                    class="ml-2"
-                  >
-                    <v-chip
-                      v-for="field in subfieldsOptions"
-                      :key="field"
-                      v-tooltip:bottom="{ text: field.tooltip, disabled: !field.tooltip }"
-                      :text="field.title"
-                      :value="field.value"
-                      density="compact"
-                      size="small"
-                    />
-                  </v-chip-group>
+                        <v-chip-group
+                          v-model="definition.subFields"
+                          selected-class="text-primary"
+                          multiple
+                          class="mb-3"
+                        >
+                          <v-chip
+                            v-for="field in subfieldsOptions"
+                            :key="field"
+                            v-tooltip:bottom="{ text: field.tooltip, disabled: !field.tooltip }"
+                            :text="field.title"
+                            :value="field.value"
+                            density="compact"
+                            size="small"
+                          />
+                        </v-chip-group>
 
-                  <v-checkbox
-                    v-if="AVAILABLE_TYPES[definition.type]?.canBeMalformed"
-                    v-model="definition.ignoreMalformed"
-                    :label="$t('repositories.updateForm.mapping.properties.form.ignoreMalformed')"
-                    density="compact"
-                    color="primary"
-                    hide-details
-                  />
+                        <v-text-field
+                          v-if="definition.type === 'date' || definition.subFields.includes('date')"
+                          v-model="definition.format"
+                          :label="$t('repositories.updateForm.mapping.properties.form.settings.format')"
+                          variant="underlined"
+                          density="compact"
+                        >
+                          <template #details>
+                            <div class="d-flex align-center">
+                              <i18n-t keypath="repositories.updateForm.mapping.properties.form.settings.format:hint">
+                                <template #link>
+                                  <a
+                                    href="https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="mx-1"
+                                  >
+                                    Unicode Technical Standard #35
+                                  </a>
+
+                                  <v-icon icon="mdi-open-in-new" x-small />
+                                </template>
+                              </i18n-t>
+                            </div>
+                          </template>
+                        </v-text-field>
+
+                        <v-checkbox
+                          v-model="definition.ignoreMalformed"
+                          :label="$t('repositories.updateForm.mapping.properties.form.settings.ignoreMalformed')"
+                          density="compact"
+                          color="primary"
+                          hide-details
+                        />
+                      </template>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
                 </v-sheet>
               </v-col>
             </v-row>
@@ -169,17 +201,17 @@
 </template>
 
 <script setup>
-const AVAILABLE_TYPES = {
-  integer: { canBeMalformed: true },
-  float: { canBeMalformed: true },
-  keyword: { },
-  boolean: { },
-  date: { canBeMalformed: true },
-  ip: { },
-  text: { },
-  geo_point: { canBeMalformed: true },
-  geo_shape: { canBeMalformed: true },
-};
+const AVAILABLE_TYPES = [
+  'integer',
+  'float',
+  'keyword',
+  'boolean',
+  'date',
+  'ip',
+  'text',
+  'geo_point',
+  'geo_shape',
+];
 
 const AVAILABLE_SUBFIELDS = [
   'date',
@@ -226,7 +258,7 @@ const rules = computed(() => ({
   },
 }));
 
-const typesOptions = computed(() => Object.keys(AVAILABLE_TYPES).map((value) => {
+const typesOptions = computed(() => AVAILABLE_TYPES.map((value) => {
   const i18nKey = `repositories.updateForm.mapping.properties.form.type.options.${value}`;
 
   return {
