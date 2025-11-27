@@ -14,14 +14,13 @@
 
         <v-list>
           <v-list-item
+            :title="$t('menu.guide')"
             href="https://docs.readmetrics.org/s/fr-ezmesure-user"
             target="_blank"
             rel="noopener noreferrer"
             prepend-icon="mdi-book-open"
             slim
-          >
-            {{ $t('menu.guide') }}
-          </v-list-item>
+          />
           <v-list-item
             to="/api-reference"
             :title="$t('menu.api')"
@@ -83,12 +82,11 @@
         <v-list>
           <v-list-subheader>{{ t('menu.documentation') }}</v-list-subheader>
           <v-list-item
+            :title="$t('menu.guide')"
             href="https://docs.readmetrics.org/s/fr-ezmesure-user"
             target="_blank"
             rel="noopener noreferrer"
-          >
-            {{ $t('menu.users') }}
-          </v-list-item>
+          />
           <v-list-item
             :to="'/api-reference'"
             :title="$t('menu.api')"
