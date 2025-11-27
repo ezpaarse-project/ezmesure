@@ -17,12 +17,16 @@
             href="https://docs.readmetrics.org/s/fr-ezmesure-user"
             target="_blank"
             rel="noopener noreferrer"
+            prepend-icon="mdi-book-open"
+            slim
           >
             {{ $t('menu.users') }}
           </v-list-item>
           <v-list-item
             to="/api-reference"
             :title="$t('menu.api')"
+            prepend-icon="mdi-code-tags"
+            slim
           />
         </v-list>
       </v-menu>
