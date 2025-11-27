@@ -96,38 +96,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   }
 
   /**
-   * Is given period is requesting data before the given limit.
-   *
-   * @param {HarvestPeriod} period - The period to check
-   * @param {Date | number | string | undefined} limit - The limit
-   *
-   * @returns {boolean}
-   */
-  static isBeginBeforeLimit(period, limit) {
-    if (!limit) {
-      return false;
-    }
-
-    return isBefore(period.beginDate, limit);
-  }
-
-  /**
-   * Is given period is requesting data after the given limit.
-   *
-   * @param {HarvestPeriod} period - The period to check
-   * @param {Date | number | string | undefined} limit - The limit
-   *
-   * @returns {boolean}
-   */
-  static isEndAfterLimit(period, limit) {
-    if (!limit) {
-      return false;
-    }
-
-    return isBefore(limit, period.endDate);
-  }
-
-  /**
    * Returns session status to harvest based on session params
    * @param {HarvestSession} session - The session to check
    * @returns
@@ -488,13 +456,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       if (firstMonthAvailable?.value) {
         // If session requests data before available data, skip the report
-        if (!HarvestSessionService.isEndAfterLimit(session, firstMonthAvailable.value)) {
+        if (endDate < firstMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Period is not compatible with [${reportType}] of [${endpoint.id}] availability`);
           // eslint-disable-next-line no-continue
           continue;
         }
 
-        if (HarvestSessionService.isBeginBeforeLimit(session, firstMonthAvailable.value)) {
+        if (beginDate < firstMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Restricting [${reportType}] of [${endpoint.id}] from [${firstMonthAvailable.value}]`);
           beginDate = firstMonthAvailable.value;
         }
@@ -502,11 +470,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       if (lastMonthAvailable?.value) {
         // If session requests data after available data, skip the report
-        if (!HarvestSessionService.isBeginBeforeLimit(session, lastMonthAvailable.value)) {
+        if (session.beginDate > lastMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Period is not compatible with [${reportType}] of [${endpoint.id}] availability`);
+          // eslint-disable-next-line no-continue
+          continue;
         }
 
-        if (HarvestSessionService.isEndAfterLimit(session, lastMonthAvailable.value)) {
+        if (endDate > lastMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Restricting [${reportType}] of [${endpoint.id}] to [${lastMonthAvailable.value}]`);
           endDate = lastMonthAvailable.value;
         }
@@ -580,7 +550,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         return;
       }
 
-      if (HarvestSessionService.isEndAfterLimit(remainingPeriod, firstMonthAvailable)) {
+      if (remainingPeriod.endDate > firstMonthAvailable) {
         const beginDate = formatDate(max([firstMonthAvailable, remainingPeriod.beginDate]), 'yyyy-MM');
 
         yield {
@@ -675,7 +645,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         const {
           pattern,
           index,
-        // eslint-disable-next-line no-await-in-loop
+          // eslint-disable-next-line no-await-in-loop
         } = await this.#getIndexForInstitution(
           institution,
           version,
