@@ -9,7 +9,7 @@ const { isValid: dateIsValid, format: formatDate } = require('date-fns');
 
 const validator = require('../../services/validator');
 const elastic = require('../../services/elastic');
-const indexTemplate = require('../../utils/index-template');
+const { ezpaarse: indexTemplate } = require('../../utils/index-templates');
 const { appLogger } = require('../../services/logger');
 
 const storagePath = config.get('storage.path');
