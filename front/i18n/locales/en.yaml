@@ -917,6 +917,7 @@ repositories:
       properties:
         title: Additional properties
         emptyText: No additional properties is defined, click on the {'"'}@:add{'"'} button to define one.
+        exists: Property already defined
         form:
           label: Name of the property
           type:

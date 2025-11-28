@@ -930,6 +930,7 @@ repositories:
       properties:
         title: Propriétés additionnelles
         emptyText: Aucune propriété additionnelle n'est définie, cliquez sur le bouton {'"'}@:add{'"'} pour en définir une.
+        exists: Propriété déjà définie
         form:
           label: Nom de la propriété
           type:
