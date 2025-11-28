@@ -137,7 +137,7 @@
                         </v-chip-group>
 
                         <v-text-field
-                          v-if="definition.type === 'date' || definition.subFields.includes('date')"
+                          v-if="definition.type === 'date' || definition.subFields?.includes('date')"
                           v-model="definition.format"
                           :label="$t('repositories.updateForm.mapping.properties.form.settings.format')"
                           variant="underlined"
