@@ -40,7 +40,7 @@ const indexTemplateMeta = {
   description: 'Created by the ezMESURE API to keep indices in sync',
 };
 // Namespace for index template components dedicated to repositories
-const indexTemplateComponentPrefix = `${indexTemplatePrefix}-cpmnt`;
+const indexTemplateComponentPrefix = `${indexTemplatePrefix}-cmpnt`;
 // Index templates components definitions
 const indexTemplateComponentDefinitions = {
   ezpaarse: [
