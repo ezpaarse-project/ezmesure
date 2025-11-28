@@ -926,6 +926,38 @@ repositories:
     Gérer les entrepôts
     |Gérer {count} entrepôts
   newRepository: Nouveau entrepôt
+  updateForm:
+    title: Mettre à jour l'entrepôt
+    mapping:
+      properties:
+        title: Propriétés additionnelles
+        emptyText: Aucune propriété additionnelle n'est définie, cliquez sur le bouton {'"'}@:add{'"'} pour en définir une.
+        exists: Propriété déjà définie
+        form:
+          label: Nom de la propriété
+          type:
+            label: Type
+            options:
+              integer: Nombre entier
+              float: Nombre décimal
+              keyword: Chaine de caractères
+              boolean: Booléen
+              date: Date
+              ip: IP
+              text: Texte
+              geo_point: Point géographique
+              geo_shape: Forme géographique
+          settings:
+            title: Paramètres avancés
+            ignoreMalformed: Ignorer les valeurs malformées
+            format: Format de la date dans les données
+            format:hint: Basé sur {link}
+            subFields:
+              label: Sous-champs
+              options:
+                date:
+                  title: Date
+                  tooltip: Ajoute un sous-champ ".date" transformant la valeur au type "Date"
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type

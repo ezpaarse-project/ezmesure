@@ -27,7 +27,6 @@ const customProperties = {
   X_Date_Month: { type: 'date', format: 'yyyy-MM' },
 };
 
-module.exports = new Map([
-  ['5', mergeMapping(r5Template, customProperties)],
-  ['5.1', mergeMapping(r51Template, customProperties)],
-]);
+module.exports.r5 = mergeMapping(r5Template, customProperties);
+
+module.exports.r51 = mergeMapping(r51Template, customProperties);

@@ -62,6 +62,12 @@
 
           <v-list>
             <v-list-item
+              v-if="repositoryUpdateFormDialogRef"
+              :title="$t('modify')"
+              prepend-icon="mdi-pencil"
+              @click="repositoryUpdateFormDialogRef.open(item)"
+            />
+            <v-list-item
               :title="$t('delete')"
               prepend-icon="mdi-delete"
               @click="deleteRepositories([item])"
@@ -98,6 +104,11 @@
       @submit="refresh()"
     />
 
+    <RepositoryUpdateFormDialog
+      ref="repositoryUpdateFormDialogRef"
+      @submit="refresh()"
+    />
+
     <RepositoryInstitutionsDialog
       ref="repoInstitutionsDialogRef"
       @update:model-value="refresh()"
@@ -119,6 +130,7 @@ const snacks = useSnacksStore();
 const selectedRepositories = ref([]);
 
 const repositoryFormDialogRef = useTemplateRef('repositoryFormDialogRef');
+const repositoryUpdateFormDialogRef = useTemplateRef('repositoryUpdateFormDialogRef');
 const repoInstitutionsDialogRef = useTemplateRef('repoInstitutionsDialogRef');
 
 const {

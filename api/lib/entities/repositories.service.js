@@ -168,4 +168,23 @@ module.exports = class RepositoriesService extends BasePrismaService {
     }
     return RepositoriesService.$transaction(transaction);
   }
+
+  /**
+   * Get index used to insert harvested data
+   *
+   * @param {string} pattern - The target repository pattern
+   * @param {string} counterVersion - The version of COUNTER used
+   */
+  static getCounterIndex(pattern, counterVersion) {
+    const prefix = pattern.replace(/[*]/g, '');
+
+    // Get index by COUNTER version
+    switch (counterVersion) {
+      case '5.1':
+        return `${prefix}-r51`;
+
+      default:
+        return prefix;
+    }
+  }
 };

@@ -601,18 +601,8 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       cache.set(institution.id, pattern);
     }
 
-    const prefix = pattern.replace(/[*]/g, '');
-    // Get index by COUNTER version
-    let index;
-    switch (counterVersion) {
-      case '5.1':
-        index = `${prefix}-r51`;
-        break;
+    const index = RepositoriesService.getCounterIndex(pattern, counterVersion);
 
-      default:
-        index = prefix;
-        break;
-    }
     return { pattern, index };
   }
 
