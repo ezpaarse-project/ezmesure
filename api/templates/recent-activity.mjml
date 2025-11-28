@@ -27,7 +27,7 @@
     <mj-text>
       {% if users.length %}<div><strong>{{ users.length }}</strong> enregistrements</div>{% endif %}
       {% if institutions.length %}<div><strong>{{ institutions.length }}</strong> mises à jour d'établissements</div>{% endif %}
-      {% if sushi.length %}<div><strong>{{ sushi.length }}</strong> mises à jour d'identifiants SUSHI </div>{% endif %}
+      {% if sushi.length %}<div><strong>{{ sushi.length }}</strong> mises à jour d'identifiants COUNTER </div>{% endif %}
       {% if files.length %}<div><strong>{{ files.length }}</strong> dépôts de fichiers</div>{% endif %}
       {% if insertions.length %}<div><strong>{{ insertions.length }}</strong> chargements</div>{% endif %}
     </mj-text>
@@ -106,7 +106,7 @@
 <mj-section>
   <mj-column>
     <mj-text mj-class="subheading">
-      Mises à jour d'identifiants SUSHI ({{ sushi.length }})
+      Mises à jour d'identifiants COUNTER ({{ sushi.length }})
     </mj-text>
     <mj-table cellpadding="5px">
       <thead>

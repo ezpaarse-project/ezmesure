@@ -11,7 +11,7 @@ Activité récente
 - {{ institutions.length }} mises à jour d'établissements
 {% endif -%}
 {% if sushi.length -%}
-- {{ sushi.length }} mises à jour d'identifiants SUSHI
+- {{ sushi.length }} mises à jour d'identifiants COUNTER
 {% endif -%}
 {% if files.length -%}
 - {{ files.length }} dépôts de fichiers
@@ -36,7 +36,7 @@ Mises à jour établissements ({{ institutions.length }})
 {% endif -%}
 
 {% if sushi.length -%}
-Mises à jour d'identifiants SUSHI ({{ sushi.length }})
+Mises à jour d'identifiants COUNTER ({{ sushi.length }})
   {% for action in sushi -%}
   {% if action.action == 'sushi/delete-many' -%}
   {% for result in action.metadata.sushiDeleteResult -%}
