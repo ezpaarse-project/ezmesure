@@ -257,7 +257,7 @@ const repositoryMappingToIndexMapping = (mapping) => {
  *
  * @returns {Record<string, esIndicesAlias> | undefined}
  */
-const repositoryAlisesToIndexAliases = (aliases) => {
+const repositoryAliasesToIndexAliases = (aliases) => {
   const entries = aliases.map((a) => [
     a.pattern,
     Array.isArray(a.filters) && a.filters.length > 0
@@ -281,7 +281,7 @@ const upsertIndexTemplates = async (repo) => {
     mappingSchema.validate(repo.mapping).value || {},
   );
 
-  const aliases = repositoryAlisesToIndexAliases(repo.aliases);
+  const aliases = repositoryAliasesToIndexAliases(repo.aliases);
 
   const body = {
     priority: indexTemplatePriority,
