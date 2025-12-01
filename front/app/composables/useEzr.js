@@ -1,5 +1,6 @@
 import { prepareClient } from '@ezpaarse-project/ezreeport-vue';
 import '@ezpaarse-project/ezreeport-vue/styles';
+
 import {
   useFetch,
   useLocalStorage,
@@ -11,6 +12,7 @@ export default async function useEzr() {
   const {
     data: ezrProfile,
     error,
+    refresh,
   } = await useFetch('/api/profile/reporting_token', {
     deep: true,
   });
@@ -42,5 +44,6 @@ export default async function useEzr() {
     error,
     itemsPerPageOptions,
     itemsPerPage,
+    refresh,
   };
 }
