@@ -9,7 +9,7 @@ const { appLogger } = require('../../services/logger');
 const {
   syncRepositoryAlias,
   unmountAlias,
-  syncRepositoryIndexTemplate,
+  syncRepositoryIndexTemplates,
 } = require('../../services/sync/elastic');
 
 /**
@@ -120,7 +120,7 @@ const onRepositoryAliasDelete = async (repositoryAlias) => {
  */
 const syncTargetIndexTemplate = async (repositoryAlias) => {
   try {
-    await syncRepositoryIndexTemplate(repositoryAlias.target);
+    await syncRepositoryIndexTemplates(repositoryAlias.target);
   } catch (error) {
     appLogger.error(
       `[elastic][hooks] Index template for repository [${repositoryAlias?.target}] could not be synced:\n${error}`,

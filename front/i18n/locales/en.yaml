@@ -2,9 +2,11 @@ menu:
   homepage: ezMESURE homepage
   home: Home
   dashboard: Dashboard
+  documentation: Documentation
   myspace: My space
   partners: Partners
   api: API
+  guide: User guide
   navigateTo: Navigate to
   myDeposits: My deposits
   credentials: Login information
@@ -916,6 +918,38 @@ repositories:
     1 repository
     |{count} repositories
   newRepository: New repository
+  updateForm:
+    title: Update repository
+    mapping:
+      properties:
+        title: Additional properties
+        emptyText: No additional properties is defined, click on the {'"'}@:add{'"'} button to define one.
+        exists: Property already defined
+        form:
+          label: Name of the property
+          type:
+            label: Type
+            options:
+              integer: Integer
+              float: Decimal number
+              keyword: Character string
+              boolean: Boolean
+              date: Date
+              ip: IP
+              text: Text
+              geo_point: Geographical point
+              geo_shape: Geographical shape
+          settings:
+            title: Advanced settings
+            ignoreMalformed: Ignored malformed values
+            format: Date format in data
+            format:hint: Based on {link}
+            subFields:
+              label: Sub fields
+              options:
+                date:
+                  title: Date
+                  tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
   manageRepositories: >
     Manage repositories
     |Manage {count} repositories
@@ -1041,21 +1075,44 @@ harvest:
       counterVersions: "{n} version of COUNTER|{n} versions of COUNTER"
     credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
     reportsMenuTitle: COUNTER Reports
-    sendEndMail: A mail will be sent on harvest end
-    notStarted: Not started
+    status:
+      list:
+        prepared: Not yet started
+        starting: Starting in progress
+        stopped: Stopped
+    form:
+      title:add: Create an harvest session
+      title:update: Update an harvest session
+      credentials:
+        title: COUNTER credentials to harvest
+        intro: >
+          Harvested credentials will be those that meet all the criteria (if they concern one of the
+          endpoints and one of the institutions).
+        institutions:
+          title: "@:institutions.toolbarTitle"
+          all: All institutions
+        endpoints:
+          title: "@:endpoints.toolbarTitle"
+          all: All endpoints
+        allowFaulty:
+          title: Include invalid credentials
+          description: >
+            By default, only the valid credentials for an institution will be harvested, but you can include
+            invalid ones by checking the dedicated checkbox below.
+      reports:
+        title: COUNTER reports to harvest
+        beginDate: "@:harvest.jobs.beginDate"
+        endDate: "@:harvest.jobs.endDate"
+        downloadUnsupported: Download reports even if unsupported by endpoint
+        useCache: Use report cache
+        useValidation: Respect report validation
+      settings:
+        title: Harvest settings
+        sendEndMail: A mail will be sent on harvest end
+        timeout: Completion time of tasks
     unableToRetrive: Unable to retrieve harvests
-    add: Create an harvest session
-    update: Update an harvest session
     start: Start the session
     stop: Stop the session
-    credentials: COUNTER credentials to harvest
-    reports: COUNTER reports to harvest
-    settings: Harvest settings
-    downloadUnsupported: Download reports even if unsupported by endpoint
-    allowFaulty: Include invalid credentials
-    useCache: Use report cache
-    useValidation: Respect report validation
-    timeout: Completion time of tasks
   jobs:
     title: Harvesting Tasks
     filtersTitle: Filter Tasks

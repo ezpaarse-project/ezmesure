@@ -15,7 +15,7 @@ module.exports = {
   client: new PrismaClient({
     adapter: new PrismaPg(
       { connectionString: DATABASE_URL.href },
-      { schema: DATABASE_URL.searchParams.get('schema') || undefined }
+      { schema: DATABASE_URL.searchParams.get('schema') || undefined },
     ),
     // Disable formatted errors in production
     errorFormat: process.env.NODE_ENV === 'production' ? 'minimal' : 'pretty',

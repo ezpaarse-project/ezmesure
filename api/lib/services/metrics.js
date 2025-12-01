@@ -1,5 +1,5 @@
 const elastic = require('./elastic');
-const indexTemplate = require('../utils/metrics-template');
+const { metrics: indexTemplate } = require('../utils/index-templates');
 
 const index = '.ezmesure-metrics';
 

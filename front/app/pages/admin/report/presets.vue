@@ -33,5 +33,10 @@ definePageMeta({
 
 const { toggle } = useDrawerStore();
 
-const { error, itemsPerPage, itemsPerPageOptions } = await useEzr();
+const {
+  error,
+  itemsPerPage,
+  itemsPerPageOptions,
+  refresh,
+} = await useEzr();
 </script>
