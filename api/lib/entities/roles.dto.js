@@ -64,6 +64,7 @@ const adminUpsertSchema = withModifiers(
     restricted: true,
     exposed: false,
     notifications: [],
+    autoAssign: [],
     permissionsPreset: [],
   }),
   nullMissing(Object.keys(schema)),
