@@ -16,6 +16,7 @@ const {
   getOne,
   upsertOne,
   deleteOne,
+  importMany,
 } = require('./actions');
 
 const { stringOrArrayValidation } = require('../../services/std-query');
@@ -71,6 +72,19 @@ router.route({
     params: {
       roleId: Joi.string().trim().required(),
     },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: importMany,
+  validate: {
+    type: 'json',
+    query: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: Joi.array(),
   },
 });
 

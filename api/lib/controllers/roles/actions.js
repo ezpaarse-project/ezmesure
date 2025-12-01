@@ -1,8 +1,8 @@
 const RolesService = require('../../entities/roles.service');
 
-/** @typedef {import('@prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
+/** @typedef {import('@prisma/client').Prisma.RoleCreateInput} RoleCreateInput */
 
-const { schema, includableFields } = require('../../entities/roles.dto');
+const { schema, includableFields, adminImportSchema } = require('../../entities/roles.dto');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -79,4 +79,77 @@ exports.deleteOne = async (ctx) => {
   await rolesService.delete({ where: { id: roleId } });
 
   ctx.status = 204;
+};
+
+exports.importMany = async (ctx) => {
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  /**
+   * @param {RolesService} rolesService
+   * @param {*} roleData
+   */
+  const importItem = async (rolesService, roleData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(roleData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.id) {
+      const role = await rolesService.findUnique({ where: { id: item.id } });
+
+      if (role && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.role.alreadyExists', role.id));
+        return;
+      }
+    }
+
+    /** @type {RoleCreateInput} */
+    const data = { ...item };
+
+    const role = await rolesService.upsert({
+      where: { id: item.id },
+      create: data,
+      update: data,
+    });
+
+    addResponseItem(role, 'created');
+  };
+
+  await RolesService.$transaction(async (rolesService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const roleData = body[i] || {};
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(rolesService, roleData);
+      } catch (e) {
+        addResponseItem(roleData, 'error', e.message);
+      }
+    }
+  });
+
+  ctx.type = 'json';
+  ctx.body = response;
 };
