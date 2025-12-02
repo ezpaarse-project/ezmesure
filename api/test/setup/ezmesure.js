@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const ezmesure = axios.create({
   timeout: 3000,
@@ -11,4 +11,4 @@ const ezmesure = axios.create({
 
 ezmesure.baseURL = 'http://localhost:3000/';
 
-module.exports = ezmesure;
+export default ezmesure;

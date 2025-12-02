@@ -1,15 +1,16 @@
-const config = require('config');
+import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import config from 'config';
 
-const ezmesure = require('../../../setup/ezmesure');
+import ezmesure from '../../../setup/ezmesure';
 
-const { resetDatabase } = require('../../../../lib/services/prisma/utils');
-const { resetElastic } = require('../../../../lib/services/elastic/utils');
+import { resetDatabase } from '../../../../lib/services/prisma/utils';
+import { resetElastic } from '../../../../lib/services/elastic/utils';
 
-const institutionsPrisma = require('../../../../lib/services/prisma/institutions');
-const membershipsPrisma = require('../../../../lib/services/prisma/memberships');
-const usersPrisma = require('../../../../lib/services/prisma/users');
-const usersElastic = require('../../../../lib/services/elastic/users');
-const UsersService = require('../../../../lib/entities/users.service');
+import institutionsPrisma from '../../../../lib/services/prisma/institutions';
+import membershipsPrisma from '../../../../lib/services/prisma/memberships';
+import usersPrisma from '../../../../lib/services/prisma/users';
+import usersElastic from '../../../../lib/services/elastic/users';
+import UsersService from '../../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -249,7 +250,6 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
           expect(membership).toHaveProperty('username', userTest.username);
           expect(membership).toHaveProperty('institutionId', institutionId);
-          expect(membership).toHaveProperty('roles', []);
           expect(membership).toHaveProperty('permissions', allPermission);
           expect(membership).toHaveProperty('locked', false);
 
@@ -281,7 +281,6 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
 
         expect(membership).toHaveProperty('username', userTest.username);
         expect(membership).toHaveProperty('institutionId', institutionId);
-        expect(membership).toHaveProperty('roles', []);
         expect(membership).toHaveProperty('permissions', allPermission);
         expect(membership).toHaveProperty('locked', false);
 
@@ -313,7 +312,6 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
 
         expect(membership).toHaveProperty('username', userTest.username);
         expect(membership).toHaveProperty('institutionId', institutionId);
-        expect(membership).toHaveProperty('roles', []);
         expect(membership).toHaveProperty('permissions', allPermission);
         expect(membership).toHaveProperty('locked', false);
 

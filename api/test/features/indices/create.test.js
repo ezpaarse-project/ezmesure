@@ -1,11 +1,12 @@
-const config = require('config');
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import config from 'config';
 
-const ezmesure = require('../../setup/ezmesure');
+import ezmesure from '../../setup/ezmesure';
 
-const indicesPrisma = require('../../../lib/services/elastic/indices');
-const usersPrisma = require('../../../lib/services/prisma/users');
-const usersElastic = require('../../../lib/services/elastic/users');
-const UsersService = require('../../../lib/entities/users.service');
+import indicesPrisma from '../../../lib/services/elastic/indices';
+import usersPrisma from '../../../lib/services/prisma/users';
+import usersElastic from '../../../lib/services/elastic/users';
+import UsersService from '../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');

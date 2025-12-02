@@ -1,14 +1,15 @@
-const config = require('config');
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import config from 'config';
 
-const ezmesure = require('../../setup/ezmesure');
+import ezmesure from '../../setup/ezmesure';
 
-const { resetDatabase } = require('../../../lib/services/prisma/utils');
-const { resetElastic } = require('../../../lib/services/elastic/utils');
+import { resetDatabase } from '../../../lib/services/prisma/utils';
+import { resetElastic } from '../../../lib/services/elastic/utils';
 
-const institutionsPrisma = require('../../../lib/services/prisma/institutions');
-const usersPrisma = require('../../../lib/services/prisma/users');
-const usersElastic = require('../../../lib/services/elastic/users');
-const UsersService = require('../../../lib/entities/users.service');
+import institutionsPrisma from '../../../lib/services/prisma/institutions';
+import usersPrisma from '../../../lib/services/prisma/users';
+import usersElastic from '../../../lib/services/elastic/users';
+import UsersService from '../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
