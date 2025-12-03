@@ -1,4 +1,4 @@
-const { Prisma } = require('../../.prisma/client.ts');
+const { Prisma } = require('../../.prisma/client.mts');
 
 const elastic = require('../../services/elastic');
 const RepositoryAliasesService = require('../../entities/repository-aliases.service');
