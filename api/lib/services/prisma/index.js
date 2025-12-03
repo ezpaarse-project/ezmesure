@@ -6,7 +6,7 @@ const {
   HarvestJobStatus,
   HarvestSessionStatus,
   SushiAlertType,
-} = require('../../.prisma/client.ts');
+} = require('../../.prisma/client.mts');
 
 const DATABASE_URL = new URL(process.env.EZMESURE_POSTGRES_URL ?? '');
 
