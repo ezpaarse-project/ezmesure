@@ -9,6 +9,4 @@ const ezmesure = axios.create({
   validateStatus: (status) => status < 500,
 });
 
-ezmesure.baseURL = 'http://localhost:3000/';
-
 export default ezmesure;
