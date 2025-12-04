@@ -9,14 +9,14 @@ const MembershipsService = require('../../entities/memberships.service');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
- * @typedef {import('../../.prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryCreateOrConnectWithoutInstitutionsInput} RepositoryCreateOrConnectWithoutInstitutionsInput
- * @typedef {import('../../.prisma/client').Prisma.SpaceCreateOrConnectWithoutInstitutionInput} SpaceCreateOrConnectWithoutInstitutionInput
- * @typedef {import('../../.prisma/client').Prisma.MembershipCreateOrConnectWithoutInstitutionInput} MembershipCreateOrConnectWithoutInstitutionInput
- * @typedef {import('../../.prisma/client').Prisma.SushiCredentialsCreateOrConnectWithoutInstitutionInput} SushiCredentialsCreateOrConnectWithoutInstitutionInput
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionCreateOrConnectWithoutMembershipInput} RepositoryPermissionCreateOrConnectWithoutMembershipInput
- * @typedef {import('../../.prisma/client').Prisma.SpacePermissionCreateOrConnectWithoutMembershipInput} SpacePermissionCreateOrConnectWithoutMembershipInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionCreateInput} InstitutionCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryCreateOrConnectWithoutInstitutionsInput} RepositoryCreateOrConnectWithoutInstitutionsInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceCreateOrConnectWithoutInstitutionInput} SpaceCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipCreateOrConnectWithoutInstitutionInput} MembershipCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsCreateOrConnectWithoutInstitutionInput} SushiCredentialsCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionCreateOrConnectWithoutMembershipInput} RepositoryPermissionCreateOrConnectWithoutMembershipInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionCreateOrConnectWithoutMembershipInput} SpacePermissionCreateOrConnectWithoutMembershipInput
 */
 /* eslint-enable max-len */
 
@@ -265,7 +265,7 @@ exports.updateInstitution = async (ctx) => {
 
   const { sushiReadySince } = updatedInstitution;
   const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
-                         || (!wasSushiReady && sushiReadySince);
+    || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
     sendMail({
@@ -308,7 +308,7 @@ exports.updateInstitutionSushiReady = async (ctx) => {
 
   const { sushiReadySince } = updatedInstitution;
   const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
-                         || (!wasSushiReady && sushiReadySince);
+    || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
     sendMail({

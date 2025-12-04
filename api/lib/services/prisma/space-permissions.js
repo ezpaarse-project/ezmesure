@@ -2,15 +2,15 @@
 const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
-/** @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient */
-/** @typedef {import('../../.prisma/client').SpacePermission} SpacePermission */
-/** @typedef {import('../../.prisma/client').Prisma.SpacePermissionUpdateArgs} SpacePermissionUpdateArgs */
-/** @typedef {import('../../.prisma/client').Prisma.SpacePermissionUpsertArgs} SpacePermissionUpsertArgs */
-/** @typedef {import('../../.prisma/client').Prisma.SpacePermissionCountArgs} SpacePermissionCountArgs */
-/** @typedef {import('../../.prisma/client').Prisma.SpacePermissionFindUniqueArgs} SpacePermissionFindUniqueArgs */
-/** @typedef {import('../../.prisma/client').Prisma.SpacePermissionFindManyArgs} SpacePermissionFindManyArgs */
-/** @typedef {import('../../.prisma/client').Prisma.SpacePermissionCreateArgs} SpacePermissionCreateArgs */
-/** @typedef {import('../../.prisma/client').Prisma.SpacePermissionDeleteArgs} SpacePermissionDeleteArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient */
+/** @typedef {import('../../.prisma/client.mjs').SpacePermission} SpacePermission */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionUpdateArgs} SpacePermissionUpdateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionUpsertArgs} SpacePermissionUpsertArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionCountArgs} SpacePermissionCountArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionFindUniqueArgs} SpacePermissionFindUniqueArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionFindManyArgs} SpacePermissionFindManyArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionCreateArgs} SpacePermissionCreateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionDeleteArgs} SpacePermissionDeleteArgs */
 /* eslint-enable max-len */
 
 /**

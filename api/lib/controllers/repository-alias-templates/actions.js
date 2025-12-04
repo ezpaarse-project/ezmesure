@@ -16,15 +16,15 @@ const {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasGetPayload<{ include: { institutions: true } }>} RepoAliasWithInstitutions
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasGetPayload<{ select: { institutions: { select: { id: true } } } }>} RepoAliasWithOnlyInstitutionIds
- * @typedef {import('../../.prisma/client').RepositoryAliasTemplate} RepositoryAliasTemplate
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasUncheckedCreateInput} RepositoryAliasUncheckedCreateInput
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateCreateInput} RepositoryAliasTemplateCreateInput
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.InstitutionWhereInput} InstitutionWhereInput
- * @typedef {import('../../.prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasGetPayload<{ include: { institutions: true } }>} RepoAliasWithInstitutions
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasGetPayload<{ select: { institutions: { select: { id: true } } } }>} RepoAliasWithOnlyInstitutionIds
+ * @typedef {import('../../.prisma/client.mjs').RepositoryAliasTemplate} RepositoryAliasTemplate
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasUncheckedCreateInput} RepositoryAliasUncheckedCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateCreateInput} RepositoryAliasTemplateCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionWhereInput} InstitutionWhereInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
  * @typedef {import('koa').Context['query']} KoaQuery
  *
  * @typedef {object} ImportResponse

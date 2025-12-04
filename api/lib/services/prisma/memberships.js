@@ -3,20 +3,20 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client').Membership} Membership
- * @typedef {import('../../.prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
- * @typedef {import('../../.prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
- * @typedef {import('../../.prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs
- * @typedef {import('../../.prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
- * @typedef {import('../../.prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
- * @typedef {import('../../.prisma/client').Prisma.MembershipCountArgs} MembershipCountArgs
- * @typedef {import('../../.prisma/client').RepositoryPermission} RepositoryPermission
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').Membership} Membership
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipCreateArgs} MembershipCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipCountArgs} MembershipCountArgs
+ * @typedef {import('../../.prisma/client.mjs').RepositoryPermission} RepositoryPermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
  *
- * @typedef {import('../../.prisma/client').SpacePermission} SpacePermission
- * @typedef {import('../../.prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
+ * @typedef {import('../../.prisma/client.mjs').SpacePermission} SpacePermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  *
  * @typedef {Membership & { repositoryPermissions: RepositoryPermission[], spacePermissions: SpacePermission[] }} OldMembership
  * @typedef {{ deleteResult: Membership, membership: OldMembership }} MembershipRemoved

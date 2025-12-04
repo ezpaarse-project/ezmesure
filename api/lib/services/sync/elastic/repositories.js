@@ -21,8 +21,8 @@ const { filtersToESQuery } = require('../../elastic/filters');
 /* eslint-disable max-len */
 /**
  * @typedef {import('../../promises').ThrottledPromisesResult} ThrottledPromisesResult
- * @typedef {import('../../../.prisma/client').Repository} Repository
- * @typedef {import('../../../.prisma/client').Prisma.RepositoryGetPayload<{ include: { aliases: true } }>} RepositoryWithAliases
+ * @typedef {import('../../../.prisma/client.mjs').Repository} Repository
+ * @typedef {import('../../../.prisma/client.mjs').Prisma.RepositoryGetPayload<{ include: { aliases: true } }>} RepositoryWithAliases
  * @typedef {import('@elastic/elasticsearch').default.estypes.MappingTypeMapping} esMapping
  * @typedef {import('@elastic/elasticsearch').default.estypes.MappingProperty} esMappingProperty
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesAlias} esIndicesAlias

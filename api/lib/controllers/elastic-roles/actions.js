@@ -17,8 +17,8 @@ exports.standardQueryParams = standardQueryParams;
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Institution} Institution
- * @typedef {import('../../.prisma/client').Prisma.ElasticRoleCreateInput} ElasticRoleCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Institution} Institution
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleCreateInput} ElasticRoleCreateInput
   *
  * @typedef {object} ImportResponse
  * @property {number} errors
