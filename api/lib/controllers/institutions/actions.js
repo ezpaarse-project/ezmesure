@@ -1,5 +1,3 @@
-const config = require('config');
-
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
@@ -33,6 +31,7 @@ const {
   includableFields,
 } = require('../../entities/institutions.dto');
 
+const { getNotificationRecipients } = require('../../services/notifications');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -42,21 +41,31 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-const {
-  PERMISSIONS,
-} = require('../../entities/memberships.dto');
+const { PERMISSIONS } = require('../../entities/memberships.dto');
 
-const sender = config.get('notifications.sender');
-const supportRecipients = config.get('notifications.supportRecipients');
+async function sendValidateInstitutionMail(receivers, data) {
+  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.institutionValidated);
 
-function sendValidateInstitution(receivers, data) {
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supportRecipients,
+    bcc: admins,
     subject: 'Votre établissement a été validé',
     ...generateMail('validate-institution', data),
   });
+}
+
+async function sendCounterReadyChangeMail(data) {
+  try {
+    const admins = await getNotificationRecipients(NOTIFICATION_TYPES.counterReadyChange);
+
+    return sendMail({
+      to: admins,
+      subject: data.sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
+      ...generateMail('sushi-ready-change', data),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+  }
 }
 
 exports.getInstitutions = async (ctx) => {
@@ -268,7 +277,7 @@ exports.updateInstitution = async (ctx) => {
 
     if (Array.isArray(contacts) && contacts.length > 0) {
       try {
-        await sendValidateInstitution(contacts, {
+        await sendValidateInstitutionMail(contacts, {
           manageMemberLink: `${origin}/myspace/institutions/${institution.id}/memberships`,
           manageSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         });
@@ -283,17 +292,10 @@ exports.updateInstitution = async (ctx) => {
     || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
-    sendMail({
-      from: sender,
-      to: supportRecipients,
-      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
-      ...generateMail('sushi-ready-change', {
-        institutionName: institution.name,
-        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
-        sushiReadySince,
-      }),
-    }).catch((err) => {
-      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    sendCounterReadyChangeMail({
+      institutionName: institution.name,
+      institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
+      sushiReadySince,
     });
   }
 
@@ -326,17 +328,10 @@ exports.updateInstitutionSushiReady = async (ctx) => {
     || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
-    sendMail({
-      from: sender,
-      to: supportRecipients,
-      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
-      ...generateMail('sushi-ready-change', {
-        institutionName: institution.name,
-        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
-        sushiReadySince,
-      }),
-    }).catch((err) => {
-      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    sendCounterReadyChangeMail({
+      institutionName: institution.name,
+      institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
+      sushiReadySince,
     });
   }
 
@@ -460,7 +455,7 @@ exports.importInstitutions = async (ctx) => {
               },
             },
             create: {
-              ...(membership ?? {}),
+              ...membership,
               username: undefined,
               institutionId: undefined,
 

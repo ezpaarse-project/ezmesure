@@ -1,20 +1,17 @@
-const config = require('config');
-
 const { sendMail, generateMail } = require('../../services/mail');
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
-const sender = config.get('notifications.sender');
-const supportRecipients = config.get('notifications.supportRecipients');
-
 const { appLogger } = require('../../services/logger');
+const { getNotificationRecipients } = require('../../services/notifications');
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
 
-function sendValidateInstitution(receivers) {
+async function sendValidateInstitution(receivers) {
+  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.institutionValidated);
+
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supportRecipients,
+    bcc: admins,
     subject: 'Votre établissement a été validé',
     ...generateMail('validate-institution'),
   });

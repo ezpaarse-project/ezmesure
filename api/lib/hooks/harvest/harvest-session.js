@@ -9,9 +9,7 @@ const { sendMail, generateMail } = require('../../services/mail');
 
 const { client: prisma } = require('../../services/prisma');
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
-
-const sender = config.get('notifications.sender');
-const recipients = config.get('notifications.recipients');
+const { getNotificationRecipients } = require('../../services/notifications');
 
 /**
  * @typedef {object} SushiConnection
@@ -59,6 +57,11 @@ async function sendEndMail(session) {
               },
             },
           },
+          user: {
+            NOT: {
+              excludeNotifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
+            },
+          },
         },
         include: {
           user: true,
@@ -86,6 +89,8 @@ async function sendEndMail(session) {
       },
     },
   });
+
+  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.newCounterDataAvailable);
 
   try {
     await Promise.all(
@@ -121,14 +126,11 @@ async function sendEndMail(session) {
             ),
           credentialsURL: new URL(`myspace/institutions/${institution.id}/sushi`, publicUrl).href,
           spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
-          recipients,
         };
 
         await sendMail({
-          from: sender,
           to: contacts,
-          cc: recipients,
-          replyTo: recipients,
+          bcc: admins,
           subject: `Des nouvelles données COUNTER pour "${institution.name}" ont été moissonnées !`,
           ...generateMail('harvest-end', data),
         });

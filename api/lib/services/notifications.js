@@ -1,15 +1,17 @@
 /* eslint-disable no-underscore-dangle */
 const config = require('config');
-const { fr } = require('date-fns/locale');
-const { format, isValid } = require('date-fns');
 const { CronJob } = require('cron');
+const { format, isValid } = require('date-fns');
+const { fr } = require('date-fns/locale');
+
+const UserService = require('../entities/users.service');
+const { NOTIFICATION_TYPES } = require('../utils/notifications/constants');
+
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 const { appLogger } = require('./logger');
 
 const {
-  sender,
-  recipients,
   cron,
   sendEmptyActivity,
 } = config.get('notifications');
@@ -140,6 +142,29 @@ function setBroadcasted(actions) {
 }
 
 /**
+ * Return list of admin emails concerned by type of notification (or all if not provided)
+ *
+ * @param {string} [type] - The type of notification
+ *
+ * @returns {Promise<string[]>} The emails of admins
+ */
+async function getNotificationRecipients(type) {
+  const users = new UserService();
+
+  const targets = await users.findMany({
+    where: {
+      isAdmin: true,
+      NOT: {
+        excludeNotifications: { hasSome: [type] },
+      },
+    },
+    select: { email: true },
+  });
+
+  return targets.map((user) => user.mail);
+}
+
+/**
  * Send a mail containing new files and users
  */
 async function sendNotifications(logger = appLogger) {
@@ -157,9 +182,14 @@ async function sendNotifications(logger = appLogger) {
     return;
   }
 
+  const to = await getNotificationRecipients(NOTIFICATION_TYPES.appRecentActivity);
+  if (to.length === 0) {
+    logger.info('No admins to send recent activity');
+    return;
+  }
+
   await sendMail({
-    from: sender,
-    to: recipients,
+    to,
     subject: '[Admin] Activité ezMESURE',
     ...generateMail('recent-activity', {
       noActions: actions.length === 0,
@@ -183,6 +213,8 @@ async function sendNotifications(logger = appLogger) {
 }
 
 module.exports = {
+  getNotificationRecipients,
+
   start(logger = appLogger) {
     const job = new CronJob(cron, () => {
       sendNotifications(logger).catch((err) => {
@@ -190,10 +222,6 @@ module.exports = {
       });
     });
 
-    if (recipients) {
-      job.start();
-    } else {
-      logger.warn('No recipient configured, notifications will be disabled');
-    }
+    job.start();
   },
 };

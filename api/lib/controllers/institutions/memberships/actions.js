@@ -1,5 +1,3 @@
-const config = require('config');
-
 const { sendMail, generateMail } = require('../../../services/mail');
 const { appLogger } = require('../../../services/logger');
 const { prepareStandardQueryParams } = require('../../../services/std-query');
@@ -25,9 +23,7 @@ const {
 } = require('../../../entities/memberships.dto');
 
 const { NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
-
-const sender = config.get('notifications.sender');
-const supportRecipients = config.get('notifications.supportRecipients');
+const { getNotificationRecipients } = require('../../../services/notifications');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -36,17 +32,18 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-function sendNewContact(receiver, institutionName, role) {
+async function sendNewContact(receiver, institutionName, role) {
   const data = {
     contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
     institution: institutionName,
     role,
   };
 
+  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.roleAssigned);
+
   return sendMail({
-    from: sender,
     to: receiver,
-    cc: supportRecipients,
+    bcc: admins,
     subject: `Vous êtes correspondant de ${institutionName}`,
     ...generateMail('new-contact', { data }),
   });
@@ -273,10 +270,11 @@ exports.requestMembership = async (ctx) => {
   const emails = usersToNotify.map((user) => user.email);
   const linkInstitution = `${ctx.get('origin')}/myspace/institutions/${institutionId}/members`;
 
+  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.membershipRequest);
+
   await sendMail({
-    from: sender,
-    to: emails.length > 0 ? emails : supportRecipients,
-    cc: supportRecipients,
+    to: emails.length > 0 ? emails : admins,
+    bcc: emails.length > 0 ? admins : undefined,
     subject: 'Un utilisateur souhaite rejoindre votre établissement',
     ...generateMail('request-membership', {
       user: ctx.state.user.username,
