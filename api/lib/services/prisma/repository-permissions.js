@@ -3,14 +3,14 @@ const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client').RepositoryPermission} RepositoryPermission
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionUpdateArgs} RepositoryPermissionUpdateArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionUpsertArgs} RepositoryPermissionUpsertArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionFindUniqueArgs} RepositoryPermissionFindUniqueArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionFindManyArgs} RepositoryPermissionFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionCreateArgs} RepositoryPermissionCreateArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryPermissionDeleteArgs} RepositoryPermissionDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').RepositoryPermission} RepositoryPermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionUpdateArgs} RepositoryPermissionUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionUpsertArgs} RepositoryPermissionUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionFindUniqueArgs} RepositoryPermissionFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionFindManyArgs} RepositoryPermissionFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionCreateArgs} RepositoryPermissionCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionDeleteArgs} RepositoryPermissionDeleteArgs
  */
 /* eslint-enable max-len */
 

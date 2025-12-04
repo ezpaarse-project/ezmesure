@@ -5,8 +5,8 @@ const { client } = require('../services/prisma');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../.prisma/client').Prisma.PrismaPromise<unknown>} PrismaPromise
+ * @typedef {import('../.prisma/client.mts').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../.prisma/client.mts').Prisma.PrismaPromise<unknown>} PrismaPromise
  */
 
 /**

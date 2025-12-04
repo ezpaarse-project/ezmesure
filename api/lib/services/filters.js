@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /**
- * @typedef {import('../.prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
- * @typedef {import('../.prisma/client').Prisma.JsonValue} JsonValue
+ * @typedef {import('../.prisma/client.mts').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
+ * @typedef {import('../.prisma/client.mts').Prisma.JsonValue} JsonValue
  * @typedef {import('koa').Context['query']} KoaQuery
  *
  * @typedef {object} Filter

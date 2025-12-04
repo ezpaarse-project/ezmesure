@@ -7,17 +7,17 @@ const BasePrismaService = require('./base-prisma.service');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../.prisma/client').Harvest} Harvest
- * @typedef {import('../.prisma/client').Prisma.HarvestUpdateArgs} HarvestUpdateArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestGroupByArgs} HarvestGroupByArgs
- * @typedef {import('../.prisma/client').Prisma.HarvestInclude} HarvestInclude
+ * @typedef {import('../.prisma/client.mts').Harvest} Harvest
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestUpdateArgs} HarvestUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestCountArgs} HarvestCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestCreateArgs} HarvestCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestGroupByArgs} HarvestGroupByArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestInclude} HarvestInclude
  */
 
 /**

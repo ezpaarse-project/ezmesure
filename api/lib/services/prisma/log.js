@@ -3,14 +3,14 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client').Log} Log
- * @typedef {import('../../.prisma/client').Prisma.LogUpdateArgs} LogUpdateArgs
- * @typedef {import('../../.prisma/client').Prisma.LogUpsertArgs} LogUpsertArgs
- * @typedef {import('../../.prisma/client').Prisma.LogFindUniqueArgs} LogFindUniqueArgs
- * @typedef {import('../../.prisma/client').Prisma.LogFindManyArgs} LogFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.LogCreateArgs} LogCreateArgs
- * @typedef {import('../../.prisma/client').Prisma.LogCountArgs} LogCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').Log} Log
+ * @typedef {import('../../.prisma/client.mjs').Prisma.LogUpdateArgs} LogUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.LogUpsertArgs} LogUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.LogFindUniqueArgs} LogFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.LogFindManyArgs} LogFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.LogCreateArgs} LogCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.LogCountArgs} LogCountArgs
  */
 /* eslint-enable max-len */
 
