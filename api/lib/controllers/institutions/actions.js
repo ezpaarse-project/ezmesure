@@ -6,6 +6,7 @@ const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 const RolesService = require('../../entities/roles.service');
 
+const { getNotificationRecipients } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES, EVENT_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
@@ -31,7 +32,6 @@ const {
   includableFields,
 } = require('../../entities/institutions.dto');
 
-const { getNotificationRecipients } = require('../../services/notifications');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -267,6 +267,11 @@ exports.updateInstitution = async (ctx) => {
             role: {
               notifications: { has: NOTIFICATION_TYPES.institutionValidated },
             },
+          },
+        },
+        user: {
+          NOT: {
+            excludeNotifications: { has: NOTIFICATION_TYPES.institutionValidated },
           },
         },
       },
@@ -592,6 +597,11 @@ exports.harvestableInstitutions = async (ctx) => {
                   role: {
                     notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
                   },
+                },
+              },
+              user: {
+                NOT: {
+                  excludeNotifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
                 },
               },
             },

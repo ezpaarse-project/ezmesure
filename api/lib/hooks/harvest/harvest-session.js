@@ -8,9 +8,9 @@ const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
 
 const { client: prisma } = require('../../services/prisma');
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
-const { getNotificationRecipients } = require('../../services/notifications');
 
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 /**
  * @typedef {object} SushiConnection
  * @property {number} date

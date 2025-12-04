@@ -1,9 +1,9 @@
 const { appName } = require('config');
 
 const { sendMail, generateMail } = require('../../services/mail');
-const { getNotificationRecipients } = require('../../services/notifications');
 const { appLogger } = require('../../services/logger');
 
+const { getNotificationRecipients } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 exports.contact = async (ctx) => {

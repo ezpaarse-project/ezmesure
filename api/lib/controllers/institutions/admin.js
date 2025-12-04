@@ -1,10 +1,11 @@
 const { sendMail, generateMail } = require('../../services/mail');
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 const { appLogger } = require('../../services/logger');
-const { getNotificationRecipients } = require('../../services/notifications');
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
+
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 async function sendValidateInstitution(receivers) {
   const admins = await getNotificationRecipients(NOTIFICATION_TYPES.institutionValidated);

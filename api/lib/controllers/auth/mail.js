@@ -1,6 +1,6 @@
 const { sendMail, generateMail } = require('../../services/mail');
-const { getNotificationRecipients } = require('../../services/notifications');
 
+const { getNotificationRecipients } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /**

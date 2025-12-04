@@ -4,7 +4,7 @@ const { CronJob } = require('cron');
 const { format, isValid } = require('date-fns');
 const { fr } = require('date-fns/locale');
 
-const UserService = require('../entities/users.service');
+const { getNotificationRecipients } = require('../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../utils/notifications/constants');
 
 const { sendMail, generateMail } = require('./mail');
@@ -139,29 +139,6 @@ function setBroadcasted(actions) {
   });
 
   return elastic.bulk({ body: bulk });
-}
-
-/**
- * Return list of admin emails concerned by type of notification (or all if not provided)
- *
- * @param {string} [type] - The type of notification
- *
- * @returns {Promise<string[]>} The emails of admins
- */
-async function getNotificationRecipients(type) {
-  const users = new UserService();
-
-  const targets = await users.findMany({
-    where: {
-      isAdmin: true,
-      NOT: {
-        excludeNotifications: { hasSome: [type] },
-      },
-    },
-    select: { email: true },
-  });
-
-  return targets.map((user) => user.mail);
 }
 
 /**

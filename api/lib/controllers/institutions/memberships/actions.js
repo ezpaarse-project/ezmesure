@@ -22,8 +22,8 @@ const {
   upsertSchema,
 } = require('../../../entities/memberships.dto');
 
+const { getNotificationRecipients } = require('../../../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
-const { getNotificationRecipients } = require('../../../services/notifications');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
