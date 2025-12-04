@@ -19,7 +19,7 @@ model User {
   /// User additional roles specific to elastic
   elasticRoles         ElasticRole[]
   /// Motification that the user doesnt want
-  excludeNotifications String[]
+  excludeNotifications String[]     @default([])
   /// Actions that were triggered by the user
   actions              Action[]
 }
