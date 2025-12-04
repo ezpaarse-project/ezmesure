@@ -3,13 +3,13 @@ const BasePrismaService = require('./base-prisma.service');
 const logPrisma = require('../services/prisma/log');
 
 /* eslint-disable max-len */
-/** @typedef {import('../.prisma/client').Log} Log */
-/** @typedef {import('../.prisma/client').Prisma.LogUpdateArgs} LogUpdateArgs */
-/** @typedef {import('../.prisma/client').Prisma.LogUpsertArgs} LogUpsertArgs */
-/** @typedef {import('../.prisma/client').Prisma.LogFindUniqueArgs} LogFindUniqueArgs */
-/** @typedef {import('../.prisma/client').Prisma.LogFindManyArgs} LogFindManyArgs */
-/** @typedef {import('../.prisma/client').Prisma.LogCreateArgs} LogCreateArgs */
-/** @typedef {import('../.prisma/client').Prisma.LogCountArgs} LogCountArgs */
+/** @typedef {import('../.prisma/client.mts').Log} Log */
+/** @typedef {import('../.prisma/client.mts').Prisma.LogUpdateArgs} LogUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.LogUpsertArgs} LogUpsertArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.LogFindUniqueArgs} LogFindUniqueArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.LogFindManyArgs} LogFindManyArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.LogCreateArgs} LogCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.LogCountArgs} LogCountArgs */
 /* eslint-enable max-len */
 
 module.exports = class LogsService extends BasePrismaService {

@@ -4,16 +4,16 @@ const sushiCredentialsPrisma = require('../services/prisma/sushi-credentials');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../.prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('../.prisma/client').SushiEndpoint} SushiEndpoint
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsUpdateArgs} SushiCredentialsUpdateArgs
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsUpsertArgs} SushiCredentialsUpsertArgs
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsCountArgs} SushiCredentialsCountArgs
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsFindUniqueArgs} SushiCredentialsFindUniqueArgs
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs
- * @typedef {import('../.prisma/client').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput
+ * @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials
+ * @typedef {import('../.prisma/client.mts').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsUpdateArgs} SushiCredentialsUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsUpsertArgs} SushiCredentialsUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsCountArgs} SushiCredentialsCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsFindUniqueArgs} SushiCredentialsFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput
  */
 /* eslint-enable max-len */
 
@@ -24,7 +24,7 @@ module.exports = class SushiCredentialsService extends BasePrismaService {
   /**
    * Prisma query to find enabled credentials
    *
-   * @type {import('../.prisma/client').Prisma.SushiCredentialsWhereInput}
+   * @type {import('../.prisma/client.mts').Prisma.SushiCredentialsWhereInput}
    */
   static enabledCredentialsQuery = {
     active: true,

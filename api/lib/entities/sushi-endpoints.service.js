@@ -20,15 +20,15 @@ const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) =>
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../.prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('../.prisma/client').SushiEndpoint} SushiEndpoint
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
+ * @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials
+ * @typedef {import('../.prisma/client.mts').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
  */
 /**
  * @template DataType

@@ -4,15 +4,15 @@ const BasePrismaService = require('./base-prisma.service');
 const spacesPrisma = require('../services/prisma/spaces');
 
 /* eslint-disable max-len */
-/** @typedef {import('../.prisma/client').Space} Space */
-/** @typedef {import('../.prisma/client').Prisma.SpaceUpdateArgs} SpaceUpdateArgs */
-/** @typedef {import('../.prisma/client').Prisma.SpaceUpsertArgs} SpaceUpsertArgs */
-/** @typedef {import('../.prisma/client').Prisma.SpaceFindUniqueArgs} SpaceFindUniqueArgs */
-/** @typedef {import('../.prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs */
-/** @typedef {import('../.prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs */
-/** @typedef {import('../.prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs */
-/** @typedef {import('../.prisma/client').Prisma.SpaceCountArgs} SpaceCountArgs */
-/** @typedef {import('../.prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs */
+/** @typedef {import('../.prisma/client.mts').Space} Space */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceUpdateArgs} SpaceUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceUpsertArgs} SpaceUpsertArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceFindUniqueArgs} SpaceFindUniqueArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceFindManyArgs} SpaceFindManyArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceCreateArgs} SpaceCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceDeleteArgs} SpaceDeleteArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceCountArgs} SpaceCountArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs */
 /* eslint-enable max-len */
 
 module.exports = class SpacesService extends BasePrismaService {

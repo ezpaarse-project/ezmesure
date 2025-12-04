@@ -34,8 +34,8 @@ const storageDir = path.resolve(config.get('storage.path'), 'sushi');
 const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
 /**
- * @typedef {import('../.prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('../.prisma/client').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials
+ * @typedef {import('../.prisma/client.mts').SushiEndpoint} SushiEndpoint
  *
  * @typedef {object} SushiException
  * @property {number} Code
@@ -57,7 +57,7 @@ const downloads = new Map();
  * using COUNTER 5.1
  * It also remove the trailing `/`
  *
- * @param {import('../.prisma/client').SushiEndpoint} endpoint - The endpoint
+ * @param {import('../.prisma/client.mts').SushiEndpoint} endpoint - The endpoint
  * @param {string} [version=5] - The COUNTER version
  * @returns
  */
