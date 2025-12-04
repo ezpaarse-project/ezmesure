@@ -20,7 +20,7 @@ const {
 } = require('../../services/sync/elastic');
 
 /**
- * @typedef {import('../../.prisma/client').RepositoryAlias} RepositoryAlias
+ * @typedef {import('../../.prisma/client.mjs').RepositoryAlias} RepositoryAlias
  */
 
 /**

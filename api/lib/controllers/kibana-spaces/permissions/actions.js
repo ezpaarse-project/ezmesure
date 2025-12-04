@@ -10,7 +10,7 @@ const {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../../.prisma/client').Prisma.RepositoryPermissionCreateInput} RepositoryPermissionCreateInput
+ * @typedef {import('../../../.prisma/client.mjs').Prisma.RepositoryPermissionCreateInput} RepositoryPermissionCreateInput
 */
 /* eslint-enable max-len */
 

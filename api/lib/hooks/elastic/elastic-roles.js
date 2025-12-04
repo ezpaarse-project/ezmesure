@@ -9,7 +9,7 @@ const {
 } = require('../../services/sync/kibana');
 
 /**
- * @typedef {import('../../.prisma/client').ElasticRole} ElasticRole
+ * @typedef {import('../../.prisma/client.mjs').ElasticRole} ElasticRole
  */
 
 /**

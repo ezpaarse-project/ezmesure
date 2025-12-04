@@ -2,19 +2,19 @@
 const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
-/** @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient */
-/** @typedef {import('../../.prisma/client').HarvestJob} HarvestJob */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobDeleteManyArgs} HarvestJobDeleteManyArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobGroupByArgs} HarvestJobGroupByArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobAggregateArgs} HarvestJobAggregateArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
-/** @typedef {import('../../.prisma/client').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient */
+/** @typedef {import('../../.prisma/client.mjs').HarvestJob} HarvestJob */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobDeleteManyArgs} HarvestJobDeleteManyArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobGroupByArgs} HarvestJobGroupByArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobAggregateArgs} HarvestJobAggregateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
 /* eslint-enable max-len */
 
 /**
