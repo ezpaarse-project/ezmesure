@@ -9,7 +9,7 @@ const { sendMail, generateMail } = require('../../services/mail');
 
 const { client: prisma } = require('../../services/prisma');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 /**
  * @typedef {object} SushiConnection
@@ -49,20 +49,7 @@ async function sendEndMail(session) {
     include: {
       // Get current contacts
       memberships: {
-        where: {
-          roles: {
-            some: {
-              role: {
-                notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
-              },
-            },
-          },
-          user: {
-            NOT: {
-              excludeNotifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
-            },
-          },
-        },
+        where: getNotificationMembershipWhere(NOTIFICATION_TYPES.newCounterDataAvailable),
         include: {
           user: true,
         },

@@ -22,7 +22,7 @@ const {
   upsertSchema,
 } = require('../../../entities/memberships.dto');
 
-const { getNotificationRecipients } = require('../../../utils/notifications');
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -255,13 +255,7 @@ exports.requestMembership = async (ctx) => {
       memberships: {
         some: {
           institutionId,
-          roles: {
-            some: {
-              role: {
-                notifications: { has: NOTIFICATION_TYPES.membershipRequest },
-              },
-            },
-          },
+          ...getNotificationMembershipWhere(NOTIFICATION_TYPES.membershipRequest),
         },
       },
     },

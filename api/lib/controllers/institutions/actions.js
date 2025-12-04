@@ -6,7 +6,7 @@ const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 const RolesService = require('../../entities/roles.service');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES, EVENT_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
@@ -262,18 +262,7 @@ exports.updateInstitution = async (ctx) => {
     const contactMemberships = await membershipsService.findMany({
       where: {
         institutionId: ctx.state.institution.id,
-        roles: {
-          some: {
-            role: {
-              notifications: { has: NOTIFICATION_TYPES.institutionValidated },
-            },
-          },
-        },
-        user: {
-          NOT: {
-            excludeNotifications: { has: NOTIFICATION_TYPES.institutionValidated },
-          },
-        },
+        ...getNotificationMembershipWhere(NOTIFICATION_TYPES.institutionValidated),
       },
       include: { user: true },
     });
@@ -591,20 +580,7 @@ exports.harvestableInstitutions = async (ctx) => {
           repositories: { where: { type: 'counter5' } },
           sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
           memberships: {
-            where: {
-              roles: {
-                some: {
-                  role: {
-                    notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
-                  },
-                },
-              },
-              user: {
-                NOT: {
-                  excludeNotifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
-                },
-              },
-            },
+            where: getNotificationMembershipWhere(NOTIFICATION_TYPES.newCounterDataAvailable),
           },
         },
       },

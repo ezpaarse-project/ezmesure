@@ -4,7 +4,7 @@ const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 async function sendValidateInstitution(receivers) {
@@ -39,13 +39,7 @@ exports.validateInstitution = async (ctx) => {
         memberships: {
           some: {
             institutionId: institution.id,
-            roles: {
-              some: {
-                role: {
-                  notifications: { has: NOTIFICATION_TYPES.institutionValidated },
-                },
-              },
-            },
+            ...getNotificationMembershipWhere(NOTIFICATION_TYPES.institutionValidated),
           },
         },
       },
