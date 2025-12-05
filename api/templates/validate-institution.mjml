@@ -19,7 +19,7 @@
       <p>Nous vous informons que l'établissement auquel vous êtes rattachés a été validé.</p>
       <p>
         En tant que correspondant, vous pouvez à présent <a target="_blank" href="{{ manageMemberLink }}">gérer les membres</a> de votre établissement
-        et <a target="_blank" href="{{ manageSushiLink }}">saisir vos identifiants SUSHI</a>.
+        et <a target="_blank" href="{{ manageSushiLink }}">saisir vos identifiants COUNTER</a>.
       </p>
     </mj-text>
 

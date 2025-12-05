@@ -7,7 +7,7 @@ const {
   syncRepositories,
   syncRepository,
   unmountRepository,
-  syncRepositoryIndexTemplate,
+  syncRepositoryIndexTemplates,
 } = require('./repositories');
 const { syncRepositoryAlias, syncRepositoryAliases, unmountAlias } = require('./alias');
 const { syncUser, syncUsers } = require('./users');
@@ -53,7 +53,7 @@ module.exports = {
   syncRepositoryAlias,
   unmountAlias,
   syncRepositoryAliases,
-  syncRepositoryIndexTemplate,
+  syncRepositoryIndexTemplates,
   syncUser,
   syncUsers,
   syncApiKey,

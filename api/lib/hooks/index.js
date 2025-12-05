@@ -7,5 +7,6 @@ require('./kibana');
 require('./harvest');
 require('./users');
 require('./api-keys');
+require('./onboarding');
 
 module.exports = hookEmitter;

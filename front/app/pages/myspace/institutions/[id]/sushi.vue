@@ -29,9 +29,27 @@
         variant="tonal"
         color="green"
         class="mr-2"
-        @click="sushiFormRef.open(undefined, { institution })"
+        @click="openForm()"
       />
     </SkeletonPageBar>
+
+    <v-slide-y-transition>
+      <v-banner
+        v-if="isLocked"
+        color="info"
+        icon="mdi-lock"
+        :lines="lockStatus?.reason ? 'two' : 'one'"
+      >
+        <template #text>
+          <div class="font-weight-bold">
+            {{ $t('sushi.managementIsLocked') }}
+          </div>
+          <div v-if="lockStatus?.reason">
+            {{ $t('reason', { reason: lockStatus?.reason }) }}
+          </div>
+        </template>
+      </v-banner>
+    </v-slide-y-transition>
 
     <v-container fluid>
       <v-row>
@@ -43,110 +61,139 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="isLocked">
-        <v-col>
-          <v-alert
-            :title="$t('sushi.managementIsLocked')"
-            :text="lockStatus?.reason ? $t('reason', { reason: lockStatus?.reason }) : undefined"
-            type="info"
-            icon="mdi-lock"
-            variant="outlined"
-            prominent
+      <v-row v-if="!sushiMetrics">
+        <v-col v-for="i in 4" :key="i" cols="3">
+          <v-skeleton-loader
+            height="64"
+            type="list-item-avatar"
           />
         </v-col>
       </v-row>
 
-      <v-row class="justify-space-evenly">
-        <template v-if="!sushiMetrics?.statuses">
-          <v-col v-for="n in 4" :key="n" cols="2">
-            <v-skeleton-loader
-              height="100"
-              type="paragraph"
-            />
-          </v-col>
-        </template>
-
-        <template v-else>
-          <v-col cols="2">
+      <v-slide-y-transition>
+        <v-row v-if="sushiMetrics?.statuses">
+          <v-col cols="3">
             <SushiMetric
               :model-value="sushiMetrics.statuses.success"
-              title-key="sushi.nOperationalCredentials"
+              :title="$t('sushi.operationalCredentials')"
               icon="mdi-check"
               color="success"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
               :model-value="sushiMetrics.statuses.untested"
+              :title="$t('sushi.untestedCredentials')"
               :action-text="$t('show')"
-              title-key="sushi.nUntestedCredentials"
               icon="mdi-bell-alert"
               color="info"
               @click="query.connection = 'untested'; refresh()"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
               :model-value="sushiMetrics.statuses.unauthorized"
+              :title="$t('sushi.invalidCredentials')"
               :action-text="$t('show')"
-              title-key="sushi.nInvalidCredentials"
               icon="mdi-key-alert-outline"
               color="warning"
               @click="query.connection = 'unauthorized'; refresh()"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
               :model-value="sushiMetrics.statuses.failed"
+              :title="$t('sushi.problematicEndpoints', sushiMetrics.statuses.failed)"
               :action-text="$t('show')"
-              title-key="sushi.nProblematicEndpoints"
               icon="mdi-alert-circle"
               color="error"
               @click="query.connection = 'failed'; refresh()"
             />
           </v-col>
-        </template>
-      </v-row>
+        </v-row>
+      </v-slide-y-transition>
 
-      <v-row class="mt-4">
-        <v-col>
-          <v-chip
-            :text="sushiReadyLabels.status.text"
-            :color="sushiReadyLabels.status.color"
-            size="small"
-            variant="outlined"
+      <v-row>
+        <v-col cols="6">
+          <v-card
+            :title="sushiReadyLabels.card.title"
+            :text="sushiReadyLabels.card.text"
+            variant="flat"
+            :class="['border', 'border-opacity-100', `border-${sushiReadyLabels.button.color}`]"
           >
-            <template v-if="!!sushiReadyLabels.status.icon" #prepend>
-              <v-icon :icon="sushiReadyLabels.status.icon" start />
-            </template>
-          </v-chip>
-        </v-col>
+            <template #actions>
+              <v-chip
+                :text="sushiReadyLabels.status.text"
+                :color="sushiReadyLabels.status.color"
+                size="small"
+                variant="outlined"
+              >
+                <template v-if="!!sushiReadyLabels.status.icon" #prepend>
+                  <v-icon :icon="sushiReadyLabels.status.icon" start />
+                </template>
+              </v-chip>
 
-        <v-col class="text-end">
-          <ConfirmPopover
-            v-if="canEdit"
-            :title="sushiReadyLabels.confirm.title"
-            :text="sushiReadyLabels.confirm.text"
-            :agree-icon="sushiReadyLabels.confirm.ok.icon"
-            :agree-text="sushiReadyLabels.confirm.ok.text"
-            :agree="() => toggleSushiReady()"
-            :disagree-text="$t('close')"
-            width="500"
-          >
-            <template #activator="{ props: confirm }">
+              <v-spacer />
+
               <v-btn
                 :text="sushiReadyLabels.button.text"
+                :prepend-icon="sushiReadyLabels.button.icon"
                 :color="sushiReadyLabels.button.color"
-                append-icon="mdi-chevron-down"
+                :loading="sushiReadyLoading"
                 size="small"
                 variant="flat"
-                v-bind="confirm"
+                @click="toggleSushiReady()"
               />
             </template>
-          </ConfirmPopover>
+          </v-card>
+        </v-col>
+
+        <v-col v-if="!harvestableLabels">
+          <v-skeleton-loader
+            height="100"
+            type="avatar, paragraph"
+          />
+        </v-col>
+
+        <v-slide-x-reverse-transition>
+          <v-col v-if="harvestableLabels">
+            <v-alert
+              :title="harvestableLabels.title"
+              :type="harvestableLabels.type"
+              :icon="harvestableLabels.icon"
+              variant="tonal"
+            >
+              <template #text>
+                {{ harvestableLabels.text }}
+
+                <ul v-if="(sushiMetrics?.harvestable.reasons.length ?? 0) > 0" class="mt-2">
+                  <li
+                    v-for="reason in sushiMetrics.harvestable.reasons"
+                    :key="reason"
+                    class="font-weight-bold"
+                  >
+                    - {{ $t(`sushi.isNotHarvestable.reasons.${reason}`) }}
+                  </li>
+                </ul>
+              </template>
+            </v-alert>
+          </v-col>
+        </v-slide-x-reverse-transition>
+      </v-row>
+
+      <v-row>
+        <v-col>
+          <v-btn
+            v-if="harvestMatrixRef"
+            :text="$t('sushi.globalHarvestState.title')"
+            prepend-icon="mdi-table-headers-eye"
+            size="small"
+            variant="outlined"
+            @click="harvestMatrixRef.open()"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -179,7 +226,9 @@
               :institution="institution"
               :is-locked="lockStatus?.locked"
               :can-edit="canEdit"
-              :define-tab="(tab) => { tabsData.set(item.value, tab); }"
+              @mounted="tabsData.set(item.value, $event)"
+              @refresh="sushiMetricsRefresh()"
+              @[`update:institution.sushiReadySince`]="toggleSushiReady()"
             />
           </v-tabs-window-item>
         </template>
@@ -190,6 +239,11 @@
       ref="sushiFormRef"
       @submit="refresh()"
       @update:model-value="refresh()"
+    />
+
+    <InstitutionHarvestGlobalMatrixDialog
+      ref="harvestMatrixRef"
+      :institution="institution"
     />
   </div>
 </template>
@@ -213,12 +267,15 @@ const { params } = useRoute();
 const { t } = useI18n();
 const { data: user } = useAuthState();
 const { hasPermission } = useCurrentUserStore();
+const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
 const tabsData = ref(new Map());
 const currentTabId = shallowRef('');
+const sushiReadyLoading = shallowRef(false);
 
 const sushiFormRef = useTemplateRef('sushiFormRef');
+const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
 
 const {
   error,
@@ -303,14 +360,22 @@ const toolbarTitle = computed(() => {
 /**
  * Sushi ready formatted date
  */
+const isSushiReady = computed(() => institution.value?.sushiReadySince || false);
+/**
+ * Sushi ready formatted date
+ */
 const sushiReadySince = useDateFormat(() => institution.value?.sushiReadySince, 'P');
 /**
  * Sushi ready labels
  */
 const sushiReadyLabels = computed(() => {
-  if (institution.value?.sushiReadySince) {
+  if (isSushiReady.value) {
     // Is ready
     return {
+      card: {
+        title: t('institutions.sushi.resumeMyEntry'),
+        text: t('institutions.sushi.readyPopup.completed', { date: sushiReadySince.value }),
+      },
       status: {
         icon: 'mdi-checkbox-marked-circle-outline',
         color: 'success',
@@ -318,35 +383,51 @@ const sushiReadyLabels = computed(() => {
       },
       button: {
         color: 'secondary',
+        icon: 'mdi-text-box-edit-outline',
         text: t('institutions.sushi.resumeMyEntry'),
-      },
-      confirm: {
-        title: t('institutions.sushi.resumeMyEntry'),
-        text: t('institutions.sushi.readyPopup.completed', { date: sushiReadySince.value }),
-        ok: {
-          icon: 'mdi-text-box-edit-outline',
-          text: t('institutions.sushi.resumeMyEntry'),
-        },
       },
     };
   }
   // Is not ready
   return {
+    card: {
+      title: t('institutions.sushi.validateMyCredentials'),
+      text: t('institutions.sushi.readyPopup.inProgress'),
+    },
     status: {
+      icon: undefined,
+      color: undefined,
       text: t('institutions.sushi.entryInProgress'),
     },
     button: {
       color: 'primary',
+      icon: 'mdi-text-box-check-outline',
       text: t('institutions.sushi.validateMyCredentials'),
     },
-    confirm: {
-      title: t('institutions.sushi.validateMyCredentials'),
-      text: t('institutions.sushi.readyPopup.inProgress'),
-      ok: {
-        icon: 'mdi-text-box-check-outline',
-        text: t('institutions.sushi.validateMyCredentials'),
-      },
-    },
+  };
+});
+/**
+ * Harvestable labels
+ */
+const harvestableLabels = computed(() => {
+  if (!sushiMetrics.value) {
+    return undefined;
+  }
+
+  if (sushiMetrics.value.harvestable.value) {
+    return {
+      title: t('sushi.isHarvestable.title'),
+      text: t('sushi.isHarvestable.text'),
+      type: 'success',
+      icon: 'mdi-check',
+    };
+  }
+
+  return {
+    title: t('sushi.isNotHarvestable.title'),
+    text: t('sushi.isNotHarvestable.text'),
+    type: 'warning',
+    icon: 'mdi-alert',
   };
 });
 
@@ -365,19 +446,43 @@ const debouncedRefresh = useDebounceFn(refresh, 250);
  */
 async function toggleSushiReady() {
   if (!institution.value) {
-    return Promise.reject();
+    return;
   }
 
+  sushiReadyLoading.value = true;
   const value = institution.value.sushiReadySince ? null : new Date();
   try {
     await $fetch(`/api/institutions/${institution.value.id}/sushiReadySince`, {
       method: 'PUT',
       body: { value },
     });
-    return institutionRefresh();
+
+    await institutionRefresh();
+    // fix issue where institution is shown as not ready
+    setTimeout(async () => {
+      await sushiMetricsRefresh();
+    }, 500);
   } catch (err) {
     snacks.error(t('errors.generic'), err);
   }
-  return Promise.resolve();
+  sushiReadyLoading.value = false;
+}
+
+async function openForm() {
+  // Show confirm if already ready
+  if (!user.value.isAdmin && isSushiReady.value) {
+    const shouldUnready = await openConfirm({
+      title: t('institutions.sushi.resumeEntryQuestion'),
+      text: t('institutions.sushi.resumeEntryDesc'),
+    });
+
+    if (!shouldUnready) {
+      return;
+    }
+
+    toggleSushiReady();
+  }
+
+  sushiFormRef.value.open(undefined, { institution: institution.value });
 }
 </script>

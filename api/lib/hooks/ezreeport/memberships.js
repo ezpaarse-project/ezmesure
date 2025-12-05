@@ -6,7 +6,7 @@ const { appLogger } = require('../../services/logger');
 const ezrMemberships = require('../../services/ezreeport/memberships');
 
 /**
- * @typedef {import('@prisma/client').Membership} Membership
+ * @typedef {import('../../.prisma/client.mjs').Membership} Membership
  */
 
 /**

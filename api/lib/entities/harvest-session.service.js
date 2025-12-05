@@ -25,25 +25,25 @@ const { appLogger } = require('../services/logger');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').HarvestSession} HarvestSession
- * @typedef {import('@prisma/client').Prisma.HarvestSessionUpdateArgs} HarvestSessionUpdateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionUpsertArgs} HarvestSessionUpsertArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionDeleteArgs} HarvestSessionDeleteArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindUniqueArgs} HarvestSessionFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindFirstArgs} HarvestSessionFindFirstArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionFindManyArgs} HarvestSessionFindManyArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionAggregateArgs} HarvestSessionAggregateArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionCountArgs} HarvestSessionCountArgs
- * @typedef {import('@prisma/client').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs
- * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('@prisma/client').Prisma.SushiCredentialsInclude} SushiCredentialsInclude
- * @typedef {import('@prisma/client').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput
- * @typedef {import('@prisma/client').HarvestJobStatus} HarvestJobStatus
- * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
- * @typedef {import('@prisma/client').Institution} Institution
- * @typedef {import('@prisma/client').HarvestJob} HarvestJob
+ * @typedef {import('../.prisma/client.mts').HarvestSession} HarvestSession
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionUpdateArgs} HarvestSessionUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionUpsertArgs} HarvestSessionUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionDeleteArgs} HarvestSessionDeleteArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionFindUniqueArgs} HarvestSessionFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionFindFirstArgs} HarvestSessionFindFirstArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionFindManyArgs} HarvestSessionFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionAggregateArgs} HarvestSessionAggregateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionCountArgs} HarvestSessionCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs
+ * @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsInclude} SushiCredentialsInclude
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput
+ * @typedef {import('../.prisma/client.mts').HarvestJobStatus} HarvestJobStatus
+ * @typedef {import('../.prisma/client.mts').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../.prisma/client.mts').Institution} Institution
+ * @typedef {import('../.prisma/client.mts').HarvestJob} HarvestJob
  * @typedef {{ credentials: { include: { endpoint: true, institution: true } } }} HarvestJobCredentialsInclude
- * @typedef {import('@prisma/client').Prisma.HarvestJobGetPayload<{ include: HarvestJobCredentialsInclude }>} HarvestJobCredentials
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestJobGetPayload<{ include: HarvestJobCredentialsInclude }>} HarvestJobCredentials
  * @typedef {import('./sushi-endpoints.service').VersionSupportedData} VersionSupportedData
  *
  * @typedef {Record<'beginDate' | 'endDate', string>} HarvestPeriod
@@ -93,38 +93,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       beginDate,
       endDate,
     };
-  }
-
-  /**
-   * Is given period is requesting data before the given limit.
-   *
-   * @param {HarvestPeriod} period - The period to check
-   * @param {Date | number | string | undefined} limit - The limit
-   *
-   * @returns {boolean}
-   */
-  static isBeginBeforeLimit(period, limit) {
-    if (!limit) {
-      return false;
-    }
-
-    return isBefore(period.beginDate, limit);
-  }
-
-  /**
-   * Is given period is requesting data after the given limit.
-   *
-   * @param {HarvestPeriod} period - The period to check
-   * @param {Date | number | string | undefined} limit - The limit
-   *
-   * @returns {boolean}
-   */
-  static isEndAfterLimit(period, limit) {
-    if (!limit) {
-      return false;
-    }
-
-    return isBefore(limit, period.endDate);
   }
 
   /**
@@ -228,13 +196,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const sushiCredentialsService = new SushiCredentialsService(this);
     const credentials = await sushiCredentialsService.findMany({
       where: {
+        ...SushiCredentialsService.enabledCredentialsQuery,
         id: queryToPrismaFilter(session.credentialsQuery.sushiIds?.toString()),
         institutionId: queryToPrismaFilter(session.credentialsQuery.institutionIds?.toString()),
         endpointId: queryToPrismaFilter(session.credentialsQuery.endpointIds?.toString()),
-        active: true,
-        endpoint: {
-          active: true,
-        },
       },
       include: {
         endpoint: { select: { counterVersions: true } },
@@ -375,7 +340,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
   /* eslint-disable max-len */
   /**
-   * @typedef {import('@prisma/client').Prisma.SushiCredentialsGetPayload<{ include: { endpoint: true, institution: true } }>} CredentialsToHarvest
+   * @typedef {import('../.prisma/client.mts').Prisma.SushiCredentialsGetPayload<{ include: { endpoint: true, institution: true } }>} CredentialsToHarvest
    * @typedef {Partial<HarvestJob> & { credentials: { id: string }, session: { id: string }, repository: { pattern: string } }} BaseHarvestJob
    */
   /* eslint-enable max-len */
@@ -447,7 +412,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    * @returns {Generator<{ reportType: string, params: HarvestPeriod }>} The reports to
    * harvest with specific params
    */
-  static* #getReportsToHarvestForEndpoint(session, endpoint, supportedData) {
+  static * #getReportsToHarvestForEndpoint(session, endpoint, supportedData) {
     // Get report types
     let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
     if (reportTypes.includes('all')) {
@@ -491,13 +456,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       if (firstMonthAvailable?.value) {
         // If session requests data before available data, skip the report
-        if (!HarvestSessionService.isEndAfterLimit(session, firstMonthAvailable.value)) {
+        if (endDate < firstMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Period is not compatible with [${reportType}] of [${endpoint.id}] availability`);
           // eslint-disable-next-line no-continue
           continue;
         }
 
-        if (HarvestSessionService.isBeginBeforeLimit(session, firstMonthAvailable.value)) {
+        if (beginDate < firstMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Restricting [${reportType}] of [${endpoint.id}] from [${firstMonthAvailable.value}]`);
           beginDate = firstMonthAvailable.value;
         }
@@ -505,11 +470,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       if (lastMonthAvailable?.value) {
         // If session requests data after available data, skip the report
-        if (!HarvestSessionService.isBeginBeforeLimit(session, lastMonthAvailable.value)) {
+        if (session.beginDate > lastMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Period is not compatible with [${reportType}] of [${endpoint.id}] availability`);
+          // eslint-disable-next-line no-continue
+          continue;
         }
 
-        if (HarvestSessionService.isEndAfterLimit(session, lastMonthAvailable.value)) {
+        if (endDate > lastMonthAvailable.value) {
           appLogger.verbose(`[harvest-start][${session.id}] Restricting [${reportType}] of [${endpoint.id}] to [${lastMonthAvailable.value}]`);
           endDate = lastMonthAvailable.value;
         }
@@ -527,7 +494,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    *
    * @return {Generator<({ version: string } & HarvestPeriod)>} The versions with period of validity
    */
-  static* #getCounterVersionForEndpoint(session, endpoint) {
+  static * #getCounterVersionForEndpoint(session, endpoint) {
     const allowedVersions = new Set(session.allowedCounterVersions);
 
     const availableVersions = endpoint.counterVersions
@@ -583,7 +550,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         return;
       }
 
-      if (HarvestSessionService.isEndAfterLimit(remainingPeriod, firstMonthAvailable)) {
+      if (remainingPeriod.endDate > firstMonthAvailable) {
         const beginDate = formatDate(max([firstMonthAvailable, remainingPeriod.beginDate]), 'yyyy-MM');
 
         yield {
@@ -634,18 +601,8 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       cache.set(institution.id, pattern);
     }
 
-    const prefix = pattern.replace(/[*]/g, '');
-    // Get index by COUNTER version
-    let index;
-    switch (counterVersion) {
-      case '5.1':
-        index = `${prefix}-r51`;
-        break;
+    const index = RepositoriesService.getCounterIndex(pattern, counterVersion);
 
-      default:
-        index = prefix;
-        break;
-    }
     return { pattern, index };
   }
 
@@ -678,7 +635,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         const {
           pattern,
           index,
-        // eslint-disable-next-line no-await-in-loop
+          // eslint-disable-next-line no-await-in-loop
         } = await this.#getIndexForInstitution(
           institution,
           version,
@@ -774,7 +731,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
      *
      * @param {object[]} jobs Jobs to create
      *
-     * @returns {Promise<import('@prisma/client').HarvestJob[]>} Created jobs
+     * @returns {Promise<import('../.prisma/client.mts').HarvestJob[]>} Created jobs
      */
     const createJobs = async (jobs) => HarvestJobsService.$transaction(
       async (service) => Promise.all(
@@ -887,9 +844,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     /**
      * Cancel jobs in bulk
      *
-     * @param {import('@prisma/client').HarvestJob[]} jobs Jobs to cancel
+     * @param {import('../.prisma/client.mts').HarvestJob[]} jobs Jobs to cancel
      *
-     * @returns {Promise<import('@prisma/client').HarvestJob[]>} Canceled jobs
+     * @returns {Promise<import('../.prisma/client.mts').HarvestJob[]>} Canceled jobs
      */
     const cancelJobs = async (jobs) => HarvestJobsService.$transaction(
       async (service) => Promise.all(

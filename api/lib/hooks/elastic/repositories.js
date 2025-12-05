@@ -9,7 +9,7 @@ const {
 } = require('../../services/sync/elastic');
 
 /**
- * @typedef {import('@prisma/client').Repository} Repository
+ * @typedef {import('../../.prisma/client.mjs').Repository} Repository
  */
 
 /**

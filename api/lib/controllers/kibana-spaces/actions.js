@@ -15,7 +15,7 @@ const { toDataUrl } = require('../../services/images');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.SpaceCreateInput} SpaceCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceCreateInput} SpaceCreateInput
 */
 /* eslint-enable max-len */
 

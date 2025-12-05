@@ -3,14 +3,14 @@ const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').ElasticRoleSpacePermission} ElasticRoleSpacePermission
- * @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionUpdateArgs} ElasticRoleSpacePermissionUpdateArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionUpsertArgs} ElasticRoleSpacePermissionUpsertArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionFindUniqueArgs} ElasticRoleSpacePermissionFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionFindManyArgs} ElasticRoleSpacePermissionFindManyArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionCreateArgs} ElasticRoleSpacePermissionCreateArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionDeleteArgs} ElasticRoleSpacePermissionDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').ElasticRoleSpacePermission} ElasticRoleSpacePermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleSpacePermissionUpdateArgs} ElasticRoleSpacePermissionUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleSpacePermissionUpsertArgs} ElasticRoleSpacePermissionUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleSpacePermissionFindUniqueArgs} ElasticRoleSpacePermissionFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleSpacePermissionFindManyArgs} ElasticRoleSpacePermissionFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleSpacePermissionCreateArgs} ElasticRoleSpacePermissionCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleSpacePermissionDeleteArgs} ElasticRoleSpacePermissionDeleteArgs
  */
 /* eslint-enable max-len */
 

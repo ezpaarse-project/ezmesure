@@ -89,7 +89,7 @@
 
             <v-col>
               <SyncCard
-                :title="$t('sync.elasticRoles')"
+                :title="$t('sync.shares')"
                 :value="syncState?.data?.result?.elasticRoles ?? {}"
                 :expected="syncState?.expected?.elasticRoles ?? 0"
                 :loading="isSynchronizing"

@@ -25,7 +25,7 @@ const queues = new Map();
  * @param {string} key - The key of the queue
  * @returns {QueueFunction} the queued function
  */
-const createQueue = (key) => {
+const registerHookQueue = (key) => {
   const queue = queues.get(key) ?? [];
   if (!queues.has(key)) {
     queues.set(key, queue);
@@ -105,7 +105,7 @@ const registerHook = (event, handler, opts = {}) => {
   }
 
   if (opts.queue) {
-    const queued = createQueue(opts.queue);
+    const queued = registerHookQueue(opts.queue);
     fnc = (key, payload) => queued(safeHandler)(payload);
   }
 

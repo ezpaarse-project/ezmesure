@@ -2,9 +2,11 @@ menu:
   homepage: ezMESURE homepage
   home: Home
   dashboard: Dashboard
+  documentation: Documentation
   myspace: My space
   partners: Partners
   api: API
+  guide: User guide
   navigateTo: Navigate to
   myDeposits: My deposits
   credentials: Login information
@@ -22,7 +24,7 @@ menu:
   profile: Profile
   members: Members
   users: Users
-  elasticRoles: Elastic Roles
+  shares: Shares
   logout: Logout
   contact: Contact
   report: Reports
@@ -36,6 +38,7 @@ menu:
   spaces: Spaces
   harvest:
     group: Harvest
+    institutions: Institutions
     sessions: Sessions
     alerts: Alertes
   sync: Synchronisation
@@ -54,7 +57,7 @@ home:
 myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
-  determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE correspondent in your institution, or use the menu to your left to {join}.
+  determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE contact in your institution, or use the menu to your left to {join}.
   ezmesureTeam: ezMESURE team
   name: Name
   mail: Mail
@@ -280,6 +283,7 @@ endpoints:
   registryId: Platform ID in the COUNTER registry
   registryIdHint: You can directly paste the URL of the COUNTER registry
   registryUrl: Link to the COUNTER registry
+  goToRegistry: COUNTER registry
 institutions:
   toolbarTitle: Institutions ({count})
   title: Institution
@@ -300,12 +304,12 @@ institutions:
   noLogo: No logo
   noInstitutions: You're not attached to a institution.
   institutionFoundDeclareNewInstitution: Your institution is not declared, declare a new institution.
-  sendMailToJoin: An email has been sent to the institution's correspondents
+  sendMailToJoin: An email has been sent to the institution's contacts
   askToJoinAnInstitution: Join an institution
   searchForInstitution: Look for your institution
   joinInstitution: Would you join {institution} ?
-  joinInstitutionEmail: A message will be sent to the correspondents of this institution to let them know.
-  createMailContactList: Copy the emails of the correspondents
+  joinInstitutionEmail: A message will be sent to the contacts of this institution to let them know.
+  createMailContactList: Copy the emails of the contacts
   modify: Modify my institution
   reports:
     reports: Reports
@@ -360,6 +364,9 @@ institutions:
     validated: Validated
     notValidated: Not validated
     hidePartner: Do not show as partner
+    onboarding:
+      title: '"Onboarding" institution'
+      description: This institution will be added to any new user of ezMESURE, and will be removed once this user will join any other institution.
     failedToUpdateValidation: Failed to update validation
     attachedDomains: Attached domains
     noAttachedDomains: There's no domain attached to this institution yet.
@@ -399,15 +406,15 @@ institutions:
     deleteN: You are about to revoke {count} member's access.|You are about to revoke {count} members' access.
     technical: Technical
     documentary: Documentary
-    noCorrespondent: No correspondent
-    technicalCorrespondent: Technical correspondent
-    documentaryCorrespondent: Documentary correspondent
+    noCorrespondent: No contact
+    technicalCorrespondent: Technical contact
+    documentaryCorrespondent: Documentary contact
     creator: Creator
     unableToRetriveMembers: Unable to retrieve members
     cannotAddMember: Unable to add member
     name: Name
     username: Identifier
-    correspondent: Correspondent
+    correspondent: Contact
     permissions: Permissions
     read: Read
     write: Write
@@ -517,6 +524,24 @@ institutions:
     readyPopup:
       inProgress: Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
+  harvestable:
+    title: Harvestable institutions
+    harvestableInstitutions: Harvestable
+    status:
+      harvestable: Harvestable
+      non-harvestable: Non harvestable
+      selectable: Selectable
+      harvested: Already harvested
+    members: "@:institutions.members.roleNames.contact:doc{'s'}"
+    repositories: 'COUNTER @:repositories.repositories'
+    spaces: 'COUNTER @:spaces.spaces'
+    settings: Search settings
+    allowNotReady: Include non ready institutions
+    allowFaulty: Include invalid credentials
+    allowHarvested: Include harvested institutions
+    harvestedMonth: Target period
+    nSelectable: ({n} selectable)
+    institutions: Institutions
   unableToRetriveInformations: Unable to retrieve institution information
   unableToRetrivePlatforms: Unable to retrieve plateform information
   notAttachedToAnyInstitution: You are not attached to any institution, where you have not declared any information about your institution.
@@ -532,6 +557,7 @@ group:
 tasks:
   failedToFetchTasks: Failed to fetch tasks list
   logs: Logs
+  counterVersion: Harvested with COUNTER {version}
   history: Tasks history
   oneHistory: Task history
   parameters: Parameters
@@ -544,6 +570,8 @@ tasks:
     cancelled: The harvest has been cancelled.
     delayed: The harvest has been initiated, but the report was not ready yet. A new attempt will be made soon.
     missing: The harvest is terminated, but the requested period is missing.
+    harvested: The harvest has been initiated.
+    unharvested: The harvest hasn't been initiated.
   status:
     notLaunchedYet: Not launched yet
     waiting: Waiting
@@ -555,6 +583,8 @@ tasks:
     cancelled: Cancelled
     delayed: Delayed
     missing: Empty report
+    harvested: Harvested
+    unharvested: Unharvested
     exceptions:
       network_error: Unreachable service
       unreadable_report: Unreadable report
@@ -621,8 +651,8 @@ sushi:
   credentialsCount: "{count} credentials"
   tabs:
     active:
-      title: Active credentials
-      description: This list contains the active credentials that will be used for harvesting.
+      title: Current credentials
+      description: This list contains the current credentials that will be used for harvesting.
     archived:
       title: Archived credentials
       description: This list contains the archived credentials that will be NOT used for harvesting.
@@ -640,15 +670,12 @@ sushi:
   deletingWaiting: Waiting for deletion
   deletingError: "Unable to delete credentials: {error}"
   deletionTask: Deletion state
-  nInstitutions: >
-    1 institution use this endpoint
-    |{count} institutions use this endpoint
-  nUntestedCredentials: "{count} untested credentials"
-  nInvalidCredentials: "{count} invalid credentials"
-  nOperationalCredentials: "{count} valid credentials"
-  nProblematicEndpoints: >
-    1 problematic endpoint
-    |{count} problematic endpoints
+  nEnabled: ({n} enabled)
+  institutions: Institution|Institutions
+  untestedCredentials: Untested credentials
+  invalidCredentials: Invalid credentials
+  operationalCredentials: Valid credentials
+  problematicEndpoints: Problematic endpoint
   nErrsCredentials: >
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
@@ -659,6 +686,19 @@ sushi:
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
   harvestStateDescription: This matrix shows the different results of the harvesting of those credentials. Each result can be hovered to get more information, including any errors that may have occurred while retrieving the data.
+  globalHarvestState:
+    institution:
+      title: Harvest state
+      description: This matrix shows the different results of the harvesting of endpoints. Each result can be hovered to get more information, including any error that may have occurred while retrieving the data.
+    endpoint:
+      title: Harvest state
+    harvest-session:
+      title: Harvest state
+      description: This matrix shows the different results of the harvesting of institutions. Each result can be hovered to get more information, including any error that may have occurred while retrieving the data.
+    title: Global harvest state
+    loading: Global harvest state is being generated, it can take a few seconds
+    periodShortcut: 1 month|{n} months
+    showUnharvested: Show unharvested institutions
   harvestedAt: Harvested on {date}
   inactive: Inactive credentials
   inactiveDescription: Institution made theses credentials inactive and will not be harvested.
@@ -710,6 +750,35 @@ sushi:
     mistake: I entered the identifiers by mistake
     neverWorked: The access point has never worked for our institution
     duplicate: This identifier is a duplicate of another one
+  duplicateDialog:
+    title: Similar credentials have been found!
+    text:
+      alert: Creating COUNTER credentials that are identical to existing credentials will trigger duplicates in report harvests for your institution
+      start: "The credentials for your institution below {reason}:"
+      content:
+        title: Credentials already registered
+        state: State
+      end:create: Do you want to edit the already registered credentials, or continue creating new credentials?
+      end:update: Do you want to edit the already registered credentials (by canceling the current edition), or continue your current edition ?
+    reasons:
+      samePackage: concern the same endpoint and package
+      sameParameters: have exactly the same parameters
+    actions:
+      main:create: '@:update'
+      main:createArchived: '@:update and unarchive'
+      main:update: I will edit the already registered credentials
+      secondary:create: Create new credentials
+      secondary:update: Continue editing
+  isHarvestable:
+    title: Your institution is eligible for harvesting
+    text: Your institution will be included in next harvest session, no action is need from your end.
+  isNotHarvestable:
+    title: Your institution is currently not eligible for harvesting
+    text: 'You need to address the following issues in order to be harvested :'
+    reasons:
+      institutionIsNotReady: Your entry is not complete
+      institutionHasNoCredentials: No COUNTER credentials has been declared
+      institutionHasFaultyCredentials: Some of your credentials have not been tested or are invalid
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
@@ -854,6 +923,38 @@ repositories:
     1 repository
     |{count} repositories
   newRepository: New repository
+  updateForm:
+    title: Update repository
+    mapping:
+      properties:
+        title: Additional properties
+        emptyText: No additional properties is defined, click on the {'"'}@:add{'"'} button to define one.
+        exists: Property already defined
+        form:
+          label: Name of the property
+          type:
+            label: Type
+            options:
+              integer: Integer
+              float: Decimal number
+              keyword: Character string
+              boolean: Boolean
+              date: Date
+              ip: IP
+              text: Text
+              geo_point: Geographical point
+              geo_shape: Geographical shape
+          settings:
+            title: Advanced settings
+            ignoreMalformed: Ignored malformed values
+            format: Date format in data
+            format:hint: Based on {link}
+            subFields:
+              label: Sub fields
+              options:
+                date:
+                  title: Date
+                  tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
   manageRepositories: >
     Manage repositories
     |Manage {count} repositories
@@ -929,7 +1030,6 @@ repoAliasTemplates:
   applyToSeeAliases: Apply the template to see the affected aliases
   noAliasCreated: No alias has been created
   applyHadNoEffect: The application of the template had no effect. No institution matched the conditions.
-
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
@@ -963,6 +1063,7 @@ spaces:
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
+    title: Harvest session
     pendingSession: Pending harvest...
     startedAt: Harvest started {date}
     metrics:
@@ -976,13 +1077,51 @@ harvest:
       endpoints: "{n} endpoint|{n} endpoints"
       reportTypes: "{n} report type|{n} report types"
       credentials: "{n} credentials"
+      counterVersions: "{n} version of COUNTER|{n} versions of COUNTER"
     credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
-    sendEndMail: A mail will be sent on harvest end
-    notStarted: Not started
+    reportsMenuTitle: COUNTER Reports
+    status:
+      list:
+        prepared: Not yet started
+        starting: Starting in progress
+        stopped: Stopped
+    form:
+      title:add: Create an harvest session
+      title:update: Update an harvest session
+      credentials:
+        title: COUNTER credentials to harvest
+        intro: >
+          Harvested credentials will be those that meet all the criteria (if they concern one of the
+          endpoints and one of the institutions).
+        institutions:
+          title: "@:institutions.toolbarTitle"
+          all: All institutions
+        endpoints:
+          title: "@:endpoints.toolbarTitle"
+          all: All endpoints
+        allowFaulty:
+          title: Include invalid credentials
+          description: >
+            By default, only the valid credentials for an institution will be harvested, but you can include
+            invalid ones by checking the dedicated checkbox below.
+      reports:
+        title: COUNTER reports to harvest
+        beginDate: "@:harvest.jobs.beginDate"
+        endDate: "@:harvest.jobs.endDate"
+        downloadUnsupported: Download reports even if unsupported by endpoint
+        useCache: Use report cache
+        useValidation: Respect report validation
+      settings:
+        title: Harvest settings
+        sendEndMail: A mail will be sent on harvest end
+        timeout: Completion time of tasks
     unableToRetrive: Unable to retrieve harvests
+    start: Start the session
+    stop: Stop the session
   jobs:
     title: Harvesting Tasks
     filtersTitle: Filter Tasks
+    versions: Versions
     harvestId: Harvesting ID
     reportType: Report Type
     errorCode: Error Code
@@ -1003,22 +1142,23 @@ harvest:
     unableToDelete: Unable to delete the harvesting task
     counterVersionTooltip: Harvest a COUNTER {version} report
     noData: No data in the harvested report
-elasticRoles:
-  toolbarTitle: Elastic Roles ({count})
-  newRole: New role
-  filtersForm.title: Filters of the role
+shares:
+  toolbarTitle: Shares ({count})
+  pageDesc: In this page, you can grant specific rights to users or institutions. The rights granted here cannot be modified by institution members.
+  newShare: New share
+  filtersForm.title: Filters of the share
   institutions: Institutions
   addInstitution: Add institution
-  noInstitutions: No institutions is using this role
+  noInstitutions: No institutions is associated to this share
   readonly: Readonly
   users: Users
   addUser: Add user
-  noUsers: No users is using this role
-  manageElasticRoles: >
-    Manage roles
-    |Manage {count} roles
-  deleteNbRoles: You are about to delete {n} roles
-  grantedBy: Rights granted by a role
+  noUsers: No users is associated to this share
+  manageShares: >
+    Manage shares
+    |Manage {count} shares
+  deleteNbShares: You are about to delete {n} shares
+  grantedBy: Rights granted by a share
 sync:
   status:
     notSynced: Not yet synchronized
@@ -1044,7 +1184,8 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
-  elasticRoles: Elastic Roles
+  shares: Shares
+  elasticRoles: Elastic roles
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization
@@ -1052,7 +1193,7 @@ sync:
 permissions:
   none: None
   read: Read
-  write: Read / Write
+  write: Write
 social:
   website: Website
   twitter: Twitter
@@ -1213,3 +1354,5 @@ version: Version
 back: Back
 pleaseWait: Please wait...
 never: Never
+select: Select
+all: All

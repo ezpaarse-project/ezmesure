@@ -2,15 +2,15 @@
 const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient */
-/** @typedef {import('@prisma/client').SushiCredentials} SushiCredentials */
-/** @typedef {import('@prisma/client').Prisma.SushiCredentialsUpdateArgs} SushiCredentialsUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiCredentialsUpsertArgs} SushiCredentialsUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiCredentialsCountArgs} SushiCredentialsCountArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindUniqueArgs} SushiCredentialsFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient */
+/** @typedef {import('../../.prisma/client.mjs').SushiCredentials} SushiCredentials */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsUpdateArgs} SushiCredentialsUpdateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsUpsertArgs} SushiCredentialsUpsertArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsCountArgs} SushiCredentialsCountArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsFindUniqueArgs} SushiCredentialsFindUniqueArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs */
 /* eslint-enable max-len */
 
 /**

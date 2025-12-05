@@ -3,21 +3,21 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').Space} Space
- * @typedef {import('@prisma/client').Prisma.SpaceUpdateArgs} SpaceUpdateArgs
- * @typedef {import('@prisma/client').Prisma.SpaceUpsertArgs} SpaceUpsertArgs
- * @typedef {import('@prisma/client').Prisma.SpaceFindUniqueArgs} SpaceFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs
- * @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs
- * @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs
- * @typedef {import('@prisma/client').Prisma.SpaceCountArgs} SpaceCountArgs
- * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').Space} Space
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceUpdateArgs} SpaceUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceUpsertArgs} SpaceUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceFindUniqueArgs} SpaceFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceFindManyArgs} SpaceFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceCreateArgs} SpaceCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceDeleteArgs} SpaceDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceCountArgs} SpaceCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  *
- * @typedef {import('@prisma/client').SpacePermission} SpacePermission
- * @typedef {import('@prisma/client').ElasticRoleSpacePermission} ElasticRoleSpacePermission
+ * @typedef {import('../../.prisma/client.mjs').SpacePermission} SpacePermission
+ * @typedef {import('../../.prisma/client.mjs').ElasticRoleSpacePermission} ElasticRoleSpacePermission
  *
- * @typedef {import('@prisma/client').Space & { permissions: SpacePermission[], elasticRolePermissions: ElasticRoleSpacePermission[] }} OldSpace
+ * @typedef {import('../../.prisma/client.mjs').Space & { permissions: SpacePermission[], elasticRolePermissions: ElasticRoleSpacePermission[] }} OldSpace
  * @typedef {{deleteResult: Space, deletedSpace: OldSpace }} SpaceRemoved
  */
 /* eslint-enable max-len */

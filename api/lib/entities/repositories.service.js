@@ -3,15 +3,15 @@ const BasePrismaService = require('./base-prisma.service');
 const repositoriesPrisma = require('../services/prisma/repositories');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Repository} Repository */
-/** @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryCountArgs} RepositoryCountArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
+/** @typedef {import('../.prisma/client.mts').Repository} Repository */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryCountArgs} RepositoryCountArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositoriesService extends BasePrismaService {
@@ -167,5 +167,24 @@ module.exports = class RepositoriesService extends BasePrismaService {
       return transaction(this);
     }
     return RepositoriesService.$transaction(transaction);
+  }
+
+  /**
+   * Get index used to insert harvested data
+   *
+   * @param {string} pattern - The target repository pattern
+   * @param {string} counterVersion - The version of COUNTER used
+   */
+  static getCounterIndex(pattern, counterVersion) {
+    const prefix = pattern.replace(/[*]/g, '');
+
+    // Get index by COUNTER version
+    switch (counterVersion) {
+      case '5.1':
+        return `${prefix}-r51`;
+
+      default:
+        return prefix;
+    }
   }
 };

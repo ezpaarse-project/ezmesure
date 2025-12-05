@@ -206,6 +206,14 @@
         />
       </div>
     </template>
+
+    <SushiDuplicateFormDialog
+      v-model="duplicateConfirmShown"
+      :sushi="sushi"
+      :similar="similar"
+      :institution="institution"
+      @submit="$emit('submit', $event)"
+    />
   </v-card>
 </template>
 
@@ -240,6 +248,9 @@ const isAdvancedOpen = shallowRef(false);
 const loadingPackages = shallowRef(false);
 const packageSearch = shallowRef('');
 const sushi = ref({ ...props.modelValue });
+
+const duplicateConfirmShown = shallowRef(false);
+const similar = ref({});
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -360,6 +371,7 @@ async function save() {
 
   try {
     let newSushi;
+
     if (isEditing.value) {
       newSushi = await $fetch(`/api/sushi/${sushi.value.id}`, {
         method: 'PATCH',
@@ -381,12 +393,20 @@ async function save() {
         },
       });
     }
+
     emit('submit', newSushi);
   } catch (err) {
-    snacks.error(t('anErrorOccurred'), err);
-  }
+    if (!err.data.similar) {
+      snacks.error(t('anErrorOccurred'), err);
+      return;
+    }
 
-  saving.value = false;
+    // Similar credentials were found
+    similar.value = err.data.similar;
+    duplicateConfirmShown.value = true;
+  } finally {
+    saving.value = false;
+  }
 }
 
 onMounted(() => {

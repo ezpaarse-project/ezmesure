@@ -55,6 +55,7 @@ errors:
     badStatus: Le point d'accès a répondu avec un code %s %s
     requestFailed: La requête a échoué pour une raison indéterminée
     managementLocked: La gestion des identifiants COUNTER est actuellement verrouillée
+    similar: Des identifiants similaires existent déjà, utilisez le paramètre "update" pour mettre à jour les identifiants similaires (ou "force" pour continuer votre action)
 
     import:
       belongsToAnother: Les identifiants COUNTER [%s] appartiennent à un autre établissement

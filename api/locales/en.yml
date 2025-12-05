@@ -55,6 +55,7 @@ errors:
     badStatus: The endpoint responded with %s %s
     requestFailed: Request failed for an unknown reason
     managementLocked: COUNTER credentials management is currently locked
+    similar: Similar credentials already exists, use the parameter "update" to update the similar credentials (or "force" to continue your action)
 
     import:
       belongsToAnother: COUNTER credentials [%s] belongs to an other institution

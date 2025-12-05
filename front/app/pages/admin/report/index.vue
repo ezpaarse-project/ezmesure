@@ -91,6 +91,13 @@
               </template>
             </v-card>
           </v-col>
+          <v-col>
+            <v-card>
+              <template #text>
+                <ezr-template-tag-table />
+              </template>
+            </v-card>
+          </v-col>
         </v-row>
       </v-container>
     </div>
@@ -105,5 +112,10 @@ definePageMeta({
 
 const { toggle } = useDrawerStore();
 
-const { error, itemsPerPage, itemsPerPageOptions } = await useEzr();
+const {
+  error,
+  itemsPerPage,
+  itemsPerPageOptions,
+  refresh,
+} = await useEzr();
 </script>

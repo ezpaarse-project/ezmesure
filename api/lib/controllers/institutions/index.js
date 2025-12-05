@@ -21,6 +21,7 @@ const {
   getInstitution,
   updateInstitution,
   updateInstitutionSushiReady,
+  harvestableInstitutions,
 } = require('./actions');
 
 const {
@@ -61,6 +62,23 @@ router.route({
   handler: getInstitutions,
   validate: {
     query: standardQueryParams.manyValidation,
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/_harvestable',
+  handler: [
+    harvestableInstitutions,
+  ],
+  validate: {
+    query: {
+      allowNotReady: Joi.boolean(),
+      allowFaulty: Joi.boolean(),
+      allowHarvested: Joi.boolean(),
+      allEndpointsMustBeUnharvested: Joi.boolean(),
+      harvestedMonth: Joi.string(),
+    },
   },
 });
 

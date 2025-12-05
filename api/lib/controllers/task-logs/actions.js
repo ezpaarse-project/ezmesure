@@ -1,6 +1,6 @@
 const LogService = require('../../entities/log.service');
 
-/** @typedef {import('@prisma/client').Prisma.LogWhereInput} LogWhereInput */
+/** @typedef {import(../../../.prisma/client').Prisma.LogWhereInput} LogWhereInput */
 
 const { schema, includableFields } = require('../../entities/log.dto');
 const { prepareStandardQueryParams } = require('../../services/std-query');

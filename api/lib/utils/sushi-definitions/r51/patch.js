@@ -15,6 +15,8 @@ function fixRegistryRecord(...schemas) {
     if (schema?.properties?.Registry_Record) {
       const { Registry_Record: item } = schema.properties;
       item.pattern = undefined;
+
+      schema.required = schema.required.filter((property) => property !== 'Registry_Record');
     }
   }
 }
@@ -44,6 +46,25 @@ function fixPeriodDateFormat(...schemas) {
   }
 }
 
+/**
+ * Fix performances needing at least 2 properties in schema
+ * while actually needing one given the case
+ *
+ * Update by reference
+ *
+ * @deprecated should be fixed by R5.1.1
+ *
+ * @param  {...object} schemas to fix
+ */
+function fixPerfMinProperties(...schemas) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const schema of schemas) {
+    if (schema.type === 'object') {
+      schema.minProperties = 1;
+    }
+  }
+}
+
 // Patches application
 
 fixRegistryRecord(
@@ -53,6 +74,11 @@ fixRegistryRecord(
 
 fixPeriodDateFormat(
   defSchema.definitions.Base_Report_Filters,
+);
+
+fixPerfMinProperties(
+  defSchema.definitions.TR_Performance,
+  defSchema.definitions.TR_B2_Performance,
 );
 
 module.exports = defSchema;

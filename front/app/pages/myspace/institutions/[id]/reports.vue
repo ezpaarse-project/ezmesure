@@ -42,7 +42,7 @@ const { params } = useRoute();
 
 const { toggle } = useDrawerStore();
 
-const { error: ezrError } = await useEzr();
+const { error: ezrError, refresh } = await useEzr();
 
 const {
   error,

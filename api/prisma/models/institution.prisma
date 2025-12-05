@@ -1,0 +1,89 @@
+/// An institution
+model Institution {
+  /// ID of the institution
+  id                  String                @id @default(cuid())
+  /// ID of the parent institution
+  parentInstitutionId String?
+  /// The parent institution
+  parentInstitution   Institution?          @relation("ParentInstitution", fields: [parentInstitutionId], references: [id])
+  /// Creation date
+  createdAt           DateTime              @default(now())
+  /// Latest update date
+  updatedAt           DateTime              @updatedAt
+  /// Institution name
+  name                String
+  /// Institution namespace (ex: b-bibcnrs)
+  namespace           String?
+  /// Whether the institution has been validated or not
+  validated           Boolean               @default(false)
+  /// Whether the institution should appear in the partner list or not
+  hidePartner         Boolean               @default(false)
+  /// A list of tags associated to the institution
+  tags                String[]
+  /// ID of the institution logo
+  logoId              String?
+  /// Institution type (ex: university)
+  type                String?
+  /// Institution acronym
+  acronym             String?
+  /// Institution website URL
+  websiteUrl          String?
+  /// Institution city
+  city                String?
+  /// Institution UAI (Unité Administrative Immatriculée)
+  uai                 String?
+  /// Social links of the institution
+  social              Json?
+  /// Date when SUSHI credentials have been marked as ready for harvest
+  sushiReadySince     DateTime?
+  /// Is a onboarding institution (will be added for new users and removed when a membership is created)
+  onboarding          Boolean               @default(false)
+  /// Institution members
+  memberships         Membership[]
+  /// Additional roles to give to each member
+  elasticRoles        ElasticRole[]
+  /// Institution spaces
+  spaces              Space[]
+  /// Actions that were triggered in the scope of the institution
+  actions             Action[]
+  /// Institution SUSHI credentials
+  sushiCredentials    SushiCredentials[]
+  /// Child institutions
+  childInstitutions   Institution[]         @relation("ParentInstitution")
+  /// Institution repositories
+  repositories        Repository[]
+  /// Institution aliases
+  repositoryAliases   RepositoryAlias[]
+  /// Custom properties
+  customProps         InstitutionProperty[]
+  /// API Keys related to institution
+  apiKeys             ApiKey[]
+}
+
+/// A membership (a user belonging to an institution)
+model Membership {
+  /// Username of the member
+  username                   String
+  /// The member
+  user                       User                        @relation(fields: [username], references: [username], onDelete: Cascade)
+  /// ID of the institution
+  institutionId              String
+  /// The institution
+  institution                Institution                 @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  /// Roles of the member inside the institution
+  roles                      String[]
+  /// Permissions of the user for the institution (members management, SUSHI, ezREEPORT...)
+  permissions                String[]
+  /// Permissions of the user for the institution spaces
+  spacePermissions           SpacePermission[]
+  /// Permissions of the user for the institution repositories
+  repositoryPermissions      RepositoryPermission[]
+  /// Permissions of the user for the institution aliases
+  repositoryAliasPermissions RepositoryAliasPermission[]
+  /// Whether the membership can be modified or not by non-admins
+  locked                     Boolean                     @default(false)
+  /// Abritrary comment about the membership
+  comment                    String?
+
+  @@id([username, institutionId])
+}

@@ -3,16 +3,16 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').SushiAlert} SushiAlert
- * @typedef {import('@prisma/client').Prisma.SushiAlertUpdateArgs} SushiAlertUpdateArgs
- * @typedef {import('@prisma/client').Prisma.SushiAlertUpsertArgs} SushiAlertUpsertArgs
- * @typedef {import('@prisma/client').Prisma.SushiAlertFindUniqueArgs} SushiAlertFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.SushiAlertFindManyArgs} SushiAlertFindManyArgs
- * @typedef {import('@prisma/client').Prisma.SushiAlertCreateArgs} SushiAlertCreateArgs
- * @typedef {import('@prisma/client').Prisma.SushiAlertDeleteArgs} SushiAlertDeleteArgs
- * @typedef {import('@prisma/client').Prisma.SushiAlertDeleteManyArgs} SushiAlertDeleteManyArgs
- * @typedef {import('@prisma/client').Prisma.SushiAlertCountArgs} SushiAlertCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').SushiAlert} SushiAlert
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertUpdateArgs} SushiAlertUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertUpsertArgs} SushiAlertUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertFindUniqueArgs} SushiAlertFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertFindManyArgs} SushiAlertFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertCreateArgs} SushiAlertCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertDeleteArgs} SushiAlertDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertDeleteManyArgs} SushiAlertDeleteManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiAlertCountArgs} SushiAlertCountArgs
  *
  * @typedef {{deleteResult: SushiAlert, deletedAlert: SushiAlert }} AlertRemoved
  */

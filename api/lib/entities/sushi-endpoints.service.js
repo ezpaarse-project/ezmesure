@@ -4,7 +4,6 @@ const {
   subMonths,
   isValid: isValidDate,
   isBefore,
-  formatDate,
 } = require('date-fns');
 
 const sushiEndpointsPrisma = require('../services/prisma/sushi-endpoints');
@@ -20,15 +19,15 @@ const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) =>
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
- * @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
+ * @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials
+ * @typedef {import('../.prisma/client.mts').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
  */
 /**
  * @template DataType
@@ -173,6 +172,19 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
 
     const isValidReport = (report) => (report.Report_ID && report.Report_Name);
 
+    const applySupportedData = (reportId, key, raw) => {
+      const { manual, value } = supportedData[reportId]?.[key] ?? {};
+
+      supportedData[reportId] = {
+        ...supportedData[reportId],
+        [key]: {
+          raw,
+          value: manual ? value : raw,
+          manual,
+        },
+      };
+    };
+
     try {
       const { data } = await sushiService.getAvailableReports(credentials, counterVersion);
 
@@ -184,17 +196,9 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
 
       // Remove unsupported reports
       defaultHarvestedReports.forEach((reportId) => {
-        const { supported, ...otherParams } = supportedData[reportId] ?? {};
+        const supported = list.has(reportId);
 
-        const supportedRaw = list.has(reportId);
-
-        supportedData[reportId] = {
-          supported: {
-            raw: supportedRaw,
-            value: supported?.manual ? supported.value : supportedRaw,
-          },
-          ...otherParams,
-        };
+        applySupportedData(reportId, 'supported', supported);
       });
 
       // Update supported data
@@ -202,30 +206,13 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
         const reportId = report.Report_ID.toLowerCase();
 
         const {
-          supported,
-          firstMonthAvailable,
-          lastMonthAvailable,
-          ...otherParams
-        } = supportedData[reportId] ?? {};
+          firstMonth,
+          lastMonth,
+        } = sushiService.extractMonthsAvailable(report);
 
-        const reportFirstMonth = report.First_Month_Available && formatDate(report.First_Month_Available, 'yyyy-MM');
-        const reportLastMonth = report.Last_Month_Available && formatDate(report.Last_Month_Available, 'yyyy-MM');
-
-        supportedData[reportId] = {
-          supported: {
-            raw: true,
-            value: supported?.manual ? supported.value : true,
-          },
-          firstMonthAvailable: {
-            raw: reportFirstMonth,
-            value: firstMonthAvailable?.manual ? firstMonthAvailable.value : reportFirstMonth,
-          },
-          lastMonthAvailable: {
-            raw: reportLastMonth,
-            value: lastMonthAvailable?.manual ? lastMonthAvailable.value : reportLastMonth,
-          },
-          ...otherParams,
-        };
+        applySupportedData(reportId, 'supported', true);
+        applySupportedData(reportId, 'firstMonthAvailable', firstMonth);
+        applySupportedData(reportId, 'lastMonthAvailable', lastMonth);
       });
     } catch (e) {
       appLogger.warn(`Failed to update supported reports of [${credentials.endpoint.vendor}] (Reason: ${e.message})`);

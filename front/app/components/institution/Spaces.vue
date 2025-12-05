@@ -90,7 +90,7 @@
             <SpaceCard :model-value="space">
               <template v-if="!userSpaced" #append>
                 <v-chip
-                  v-tooltip:left="$t('elasticRoles.grantedBy')"
+                  v-tooltip:left="$t('shares.grantedBy')"
                   :text="elasticRole.name"
                   append-icon="mdi-account-tag"
                   color="secondary"

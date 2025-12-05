@@ -1,13 +1,21 @@
 <template>
   <SimpleMetric
-    :text="$t(titleKey, modelValue)"
+    :title="title"
     :icon="icon"
     :color="color"
   >
+    <template #value>
+      {{ modelValue.total }}
+
+      <span v-if="shouldShowEnabled" style="font-size: 0.65em">
+        {{ $t('sushi.nEnabled', modelValue.enabled) }}
+      </span>
+    </template>
+
     <template v-if="actionText" #actions>
       <v-btn
         :text="actionText"
-        :disabled="modelValue <= 0"
+        :disabled="modelValue.total <= 0"
         :loading="loading"
         size="small"
         variant="outlined"
@@ -18,12 +26,12 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   modelValue: {
-    type: Number,
+    type: Object,
     required: true,
   },
-  titleKey: {
+  title: {
     type: String,
     required: true,
   },
@@ -48,4 +56,10 @@ defineProps({
 defineEmits({
   click: () => true,
 });
+
+const shouldShowEnabled = computed(
+  () => props.modelValue.total > 0
+      && props.modelValue.enabled != null
+      && props.modelValue.total !== props.modelValue.enabled,
+);
 </script>

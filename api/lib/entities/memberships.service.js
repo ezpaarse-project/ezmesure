@@ -4,16 +4,16 @@ const membershipsPrisma = require('../services/prisma/memberships');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Membership} Membership
- * @typedef {import('@prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
- * @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
- * @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs
- * @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
- * @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
- * @typedef {import('@prisma/client').Prisma.MembershipCountArgs} MembershipCountArgs
- * @typedef {import('@prisma/client').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
- * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
+ * @typedef {import('../.prisma/client.mts').Membership} Membership
+ * @typedef {import('../.prisma/client.mts').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.MembershipCreateArgs} MembershipCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.MembershipCountArgs} MembershipCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  */
 /* eslint-enable max-len */
 

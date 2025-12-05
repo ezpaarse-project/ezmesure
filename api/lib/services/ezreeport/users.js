@@ -1,7 +1,7 @@
 // @ts-check
 const ezrAxios = require('./axios');
 
-/** @typedef {import('@prisma/client').User} User */
+/** @typedef {import('../../.prisma/client.mjs').User} User */
 
 /**
  * Get token of a user from a ezREEPORT

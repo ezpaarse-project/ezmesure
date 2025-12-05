@@ -1,0 +1,69 @@
+// An API Key to authenticate users or institutions
+model ApiKey {
+  /// ID of the key
+  id                         String                            @id @default(cuid())
+  /// Value of the key, shouldn't be published and should be a hash of the actual value
+  value                      String                            @unique
+  /// Institution id related to the key. If no institution are related, ApiKey is related to user
+  institutionId              String?
+  /// Institution related to the key. If no institution are related, ApiKey is related to user
+  institution                Institution?                      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  // User related to the key. If institution is related, this field represents the creator
+  username                   String?
+  // User related to the key. If institution is related, this field represents the creator
+  user                       User?                             @relation(fields: [username], references: [username])
+  /// Name of the key
+  name                       String
+  /// Description of the key
+  description                String                            @default("")
+  /// Permissions of the key (members management, SUSHI, ezREEPORT...). Only relevant if API key is related to an institution.
+  permissions                String[]
+  /// Permissions of the key for the institution repositories. Only relevant if API key is related to an institution.
+  repositoryPermissions      ApiKeyRepositoryPermission[]
+  /// Permissions of the key for the institution aliases. Only relevant if API key is related to an institution.
+  repositoryAliasPermissions ApiKeyRepositoryAliasPermission[]
+  /// Whether the key is active
+  active                     Boolean                           @default(true)
+  /// Date on which the active status was last modified
+  activeUpdatedAt            DateTime                          @default(now())
+  /// Creation date
+  createdAt                  DateTime                          @default(now())
+  /// Latest update date
+  updatedAt                  DateTime                          @updatedAt
+  /// Expiration date
+  expiresAt                  DateTime?
+  /// Date of last activity
+  lastActivity               DateTime                          @default(now())
+
+  @@index([value])
+}
+
+/// A repository permission for an ApiKey
+model ApiKeyRepositoryPermission {
+  /// ID of the key
+  apiKeyId   String
+  /// The related ApiKey
+  apiKey     ApiKey     @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  /// Pattern of the repository
+  pattern    String
+  /// The repository
+  repository Repository @relation(fields: [pattern], references: [pattern], onDelete: Cascade)
+  /// Whether the api key has a readonly access to the repository
+  readonly   Boolean    @default(false)
+
+  @@id([apiKeyId, pattern])
+}
+
+/// A alias permission for an ApiKey
+model ApiKeyRepositoryAliasPermission {
+  /// ID of the key
+  apiKeyId     String
+  /// The related ApiKey
+  apiKey       ApiKey          @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  // Pattern of the alias
+  aliasPattern String
+  /// The alias
+  alias        RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+
+  @@id([apiKeyId, aliasPattern])
+}

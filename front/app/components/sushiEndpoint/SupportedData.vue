@@ -237,7 +237,6 @@ const tabs = computed(
 );
 
 const rows = computed(() => {
-  console.log(props.modelValue);
   const entries = Object.entries(innerSupportedData.value[currentVersion.value] ?? {});
   return entries.filter(([, data]) => !!data).sort(([a], [b]) => a.localeCompare(b));
 });

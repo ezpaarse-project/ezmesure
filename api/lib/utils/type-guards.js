@@ -7,7 +7,7 @@ module.exports.isObject = (value) => value
          && !Array.isArray(value);
 
 module.exports.isFalse = (value) => value === false
-  || ['false', 'off', 'no'].include(`${value}`.toLowerCase());
+  || ['false', 'off', 'no'].includes(`${value}`.toLowerCase());
 
 module.exports.isTrue = (value) => value === true
-  || ['true', 'on', 'yes'].include(`${value}`.toLowerCase());
+  || ['true', 'on', 'yes'].includes(`${value}`.toLowerCase());
