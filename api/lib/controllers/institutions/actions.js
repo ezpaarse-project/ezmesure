@@ -3,19 +3,20 @@ const config = require('config');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
+const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
- * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
- * @typedef {import('@prisma/client').Prisma.RepositoryCreateOrConnectWithoutInstitutionsInput} RepositoryCreateOrConnectWithoutInstitutionsInput
- * @typedef {import('@prisma/client').Prisma.SpaceCreateOrConnectWithoutInstitutionInput} SpaceCreateOrConnectWithoutInstitutionInput
- * @typedef {import('@prisma/client').Prisma.MembershipCreateOrConnectWithoutInstitutionInput} MembershipCreateOrConnectWithoutInstitutionInput
- * @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateOrConnectWithoutInstitutionInput} SushiCredentialsCreateOrConnectWithoutInstitutionInput
- * @typedef {import('@prisma/client').Prisma.RepositoryPermissionCreateOrConnectWithoutMembershipInput} RepositoryPermissionCreateOrConnectWithoutMembershipInput
- * @typedef {import('@prisma/client').Prisma.SpacePermissionCreateOrConnectWithoutMembershipInput} SpacePermissionCreateOrConnectWithoutMembershipInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionCreateInput} InstitutionCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryCreateOrConnectWithoutInstitutionsInput} RepositoryCreateOrConnectWithoutInstitutionsInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceCreateOrConnectWithoutInstitutionInput} SpaceCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipCreateOrConnectWithoutInstitutionInput} MembershipCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiCredentialsCreateOrConnectWithoutInstitutionInput} SushiCredentialsCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryPermissionCreateOrConnectWithoutMembershipInput} RepositoryPermissionCreateOrConnectWithoutMembershipInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionCreateOrConnectWithoutMembershipInput} SpacePermissionCreateOrConnectWithoutMembershipInput
 */
 /* eslint-enable max-len */
 
@@ -264,7 +265,7 @@ exports.updateInstitution = async (ctx) => {
 
   const { sushiReadySince } = updatedInstitution;
   const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
-                         || (!wasSushiReady && sushiReadySince);
+    || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
     sendMail({
@@ -307,7 +308,7 @@ exports.updateInstitutionSushiReady = async (ctx) => {
 
   const { sushiReadySince } = updatedInstitution;
   const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
-                         || (!wasSushiReady && sushiReadySince);
+    || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
     sendMail({
@@ -532,4 +533,45 @@ exports.deleteInstitution = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = data;
+};
+
+exports.harvestableInstitutions = async (ctx) => {
+  const institutionsService = new InstitutionsService();
+
+  const institutions = await institutionsService.findMany({
+    where: {
+      sushiCredentials: {
+        some: {
+          ...SushiCredentialsService.enabledCredentialsQuery,
+        },
+      },
+    },
+    orderBy: {
+      name: 'asc',
+    },
+    include: {
+      _count: {
+        select: {
+          spaces: { where: { type: 'counter5' } },
+          repositories: { where: { type: 'counter5' } },
+          memberships: { where: { roles: { has: 'contact:doc' } } },
+          sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
+        },
+      },
+    },
+  });
+
+  const response = [];
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const institution of institutions) {
+    response.push({
+      institution,
+      // eslint-disable-next-line no-await-in-loop
+      harvestable: await institutionsService.isHarvestable(institution.id, ctx.query),
+    });
+  }
+
+  ctx.status = 200;
+  ctx.body = response;
 };

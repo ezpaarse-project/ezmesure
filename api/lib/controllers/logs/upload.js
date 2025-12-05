@@ -9,7 +9,6 @@ const { isValid: dateIsValid, format: formatDate } = require('date-fns');
 
 const validator = require('../../services/validator');
 const elastic = require('../../services/elastic');
-const indexTemplate = require('../../utils/index-template');
 const { appLogger } = require('../../services/logger');
 
 const storagePath = config.get('storage.path');
@@ -30,7 +29,7 @@ async function createIndex(index) {
   let body;
 
   try {
-    ({ body } = await elastic.indices.create({ index, body: indexTemplate }));
+    ({ body } = await elastic.indices.create({ index }));
   } catch (err) {
     appLogger.error(`[ec-upload] Failed to create index [${index}]:\n${err}`);
     throw new Error(err);

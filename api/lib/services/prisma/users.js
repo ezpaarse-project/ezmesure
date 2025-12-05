@@ -13,20 +13,20 @@ const {
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').User} User
- * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
- * @typedef {import('@prisma/client').Prisma.UserCountArgs} UserCountArgs
- * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
- * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
- * @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs
- * @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs
- * @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').User} User
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserUpsertArgs} UserUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserCountArgs} UserCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserFindManyArgs} UserFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserUpdateArgs} UserUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserCreateArgs} UserCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserDeleteArgs} UserDeleteArgs
  *
- * @typedef {import('@prisma/client').Membership} Membership
- * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
- * @typedef {import('@prisma/client').SpacePermission} SpacePermission
+ * @typedef {import('../../.prisma/client.mjs').Membership} Membership
+ * @typedef {import('../../.prisma/client.mjs').RepositoryPermission} RepositoryPermission
+ * @typedef {import('../../.prisma/client.mjs').SpacePermission} SpacePermission
  *
  * @typedef {Membership & { repositoryPermissions: RepositoryPermission[], spacePermissions: SpacePermission[] }} OldUserMembership
  * @typedef {User & { memberships: OldUserMembership[] }} OldUser

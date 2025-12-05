@@ -201,6 +201,11 @@
             "description": "Institution name",
             "example": "University of Foobar"
           },
+          "onboarding": {
+            "type": "boolean",
+            "description": "True when the institution should be added to new users",
+            "default": false
+          },
           "validated": {
             "type": "boolean",
             "description": "True when the institution has been validated",
@@ -1183,7 +1188,8 @@
               "finished",
               "failed",
               "cancelled",
-              "interrupted"
+              "interrupted",
+              "empty"
             ]
           },
           "period": {
@@ -1242,6 +1248,137 @@
             "description": "Number of report items that failed to be inserted into Elasticsearch",
             "type": "integer",
             "readOnly": true
+          }
+        }
+      },
+      "HarvestMatrixCell": {
+        "description": "Aggregation of harvest states",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "columnId": {
+            "type": "string"
+          },
+          "harvestedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "The date of the harvest"
+          },
+          "status": {
+            "description": "Status of the aggregation",
+            "type": "string",
+            "enum": [
+              "waiting",
+              "running",
+              "delayed",
+              "finished",
+              "failed",
+              "cancelled",
+              "interrupted",
+              "empty"
+            ]
+          },
+          "counterVersions": {
+            "description": "Counter versions found in aggregated harvests",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reportIds": {
+            "description": "Report ids found in aggregated harvests",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "errors": {
+            "description": "Errors found in aggregated harvests",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "total": {
+            "description": "Count of harvests in aggregation",
+            "type": "integer"
+          },
+          "counts": {
+            "description": "Count of each status found in aggregated harvests",
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "beginDate": {
+                "description": "Start if the period found in aggregated harvests",
+                "type": "string",
+                "format": "date",
+                "pattern": "yyyy-MM"
+              },
+              "endDate": {
+                "description": "End if the period found in aggregated harvests",
+                "type": "string",
+                "format": "date",
+                "pattern": "yyyy-MM"
+              }
+            }
+          },
+          "items": {
+            "type": "object",
+            "properties": {
+              "inserted": {
+                "description": "Number of report items that were successfuly inserted into Elasticsearch",
+                "type": "integer"
+              },
+              "updated": {
+                "description": "Number of report items that were updated in Elasticsearch",
+                "type": "integer"
+              },
+              "failed": {
+                "description": "Number of report items that failed to be inserted into Elasticsearch",
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "HarvestMatrix": {
+        "type": "object",
+        "properties": {
+          "headers": {
+            "type": "object",
+            "properties": {
+              "columns": {
+                "type": "array"
+              },
+              "rows": {
+                "type": "array"
+              }
+            }
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "cells": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HarvestMatrixCell"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -3865,6 +4002,61 @@
         ]
       }
     },
+    "/institutions/_harvestable": {
+      "get": {
+        "summary": "Get harvestable status of all institutions",
+        "operationId": "get-institutions-harvestable",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "institution": {
+                        "$ref": "#/components/schemas/Institution"
+                      },
+                      "harvestable": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "boolean",
+                            "description": "Is the institution harvestable"
+                          },
+                          "reasons": {
+                            "type": "array",
+                            "description": "Reasons why the institution IS NOT harvestable",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Get harvestable status of all institutions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Institutions"]
+      }
+    },
     "/institutions/{id}/validated": {
       "parameters": [
         {
@@ -4178,20 +4370,68 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "harvestable": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "boolean",
+                          "description": "Is the institution harvestable"
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "description": "Reasons why the institution IS NOT harvestable",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
                     "statuses": {
                       "type": "object",
                       "properties": {
                         "success": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         },
                         "unauthorized": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         },
                         "failed": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         },
                         "untested": {
-                          "type": "number"
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "enabled": {
+                              "type": "number"
+                            }
+                          }
                         }
                       }
                     }
@@ -4212,6 +4452,106 @@
         },
         "operationId": "get-institutions-id-sushi-metrics",
         "description": "Get metrics about sushi credentials",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/{id}/sushi/_matrix": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get harvest matrix of an institution",
+        "tags": ["Institutions", "Harvests"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:from",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:to",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "name": "retryCode",
+            "in": "query",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "validUntil": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "matrix": {
+                      "$ref": "#/components/schemas/HarvestMatrix"
+                    },
+                    "statusCount": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-institutions-id-sushi-matrix",
+        "description": "Get harvest matrix of an institution",
         "security": [
           {
             "bearerAuth": []
@@ -8792,6 +9132,180 @@
         ]
       }
     },
+    "/harvests/_institutions-matrix": {
+      "get": {
+        "summary": "Get harvest matrix about institutions",
+        "tags": ["Harvests"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:from",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:to",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "name": "retryCode",
+            "in": "query",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "validUntil": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "matrix": {
+                      "$ref": "#/components/schemas/HarvestMatrix"
+                    },
+                    "unharvested": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Institution"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-harvests-institions-matrix",
+        "description": "Get matrix about institutions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/harvests/_endpoints-matrix": {
+      "get": {
+        "summary": "Get harvest matrix about endpoints",
+        "tags": ["Harvests"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:from",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:to",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "name": "retryCode",
+            "in": "query",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "validUntil": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "matrix": {
+                      "$ref": "#/components/schemas/HarvestMatrix"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-harvests-endpoints-matrix",
+        "description": "Get matrix about endpoints",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/harvests-sessions": {
       "parameters": [],
       "get": {
@@ -9328,6 +9842,86 @@
         },
         "operationId": "delete-harvests-sessions",
         "description": "Delete an harvest session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/harvests-sessions/{harvestId}/_matrix": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "harvestId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get harvest matrix of an harvest session",
+        "tags": ["Harvests"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "name": "retryCode",
+            "in": "query",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "validUntil": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "matrix": {
+                      "$ref": "#/components/schemas/HarvestMatrix"
+                    },
+                    "summary": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HarvestMatrixCell"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-harvests-sessions-id-matrix",
+        "description": "Get matrix about harvest session",
         "security": [
           {
             "bearerAuth": []
@@ -11219,6 +11813,101 @@
           }
         ],
         "tags": ["Sushi"]
+      }
+    },
+    "/sushi-endpoints/{id}/_matrix": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the endpoint"
+        }
+      ],
+      "get": {
+        "summary": "Get harvest matrix of an endpoint",
+        "tags": ["Sushi", "Harvests"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:from",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "yyyy-MM"
+            },
+            "name": "period:to",
+            "in": "query",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "name": "retryCode",
+            "in": "query",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "validUntil": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "matrix": {
+                      "$ref": "#/components/schemas/HarvestMatrix"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-sushi-endpoints-id-matrix",
+        "description": "Get matrix about sushi endpoints",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/sushi-alerts": {

@@ -46,7 +46,7 @@
                   :label="`${$t('repoAliasTemplates.aliasesPattern')} *`"
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
-                    v => /^([a-z0-9_-]+|{.*?})+$/i.test(v) || $t('invalidFormat'),
+                    v => /^[a-z0-9_-]+$/i.test(v?.replace(/{{.+?}}/g), 'abc') || $t('invalidFormat'),
                   ]"
                   prepend-icon="mdi-form-textbox"
                   variant="underlined"

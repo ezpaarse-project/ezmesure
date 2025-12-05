@@ -3,16 +3,16 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
- * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
- * @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../../.prisma/client.mjs').SushiCredentials} SushiCredentials
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
  * @typedef {{deleteResult: SushiEndpoint, deletedEndpoint: (SushiEndpoint & { credentials: SushiCredentials[] }) }} SushiEndpointRemoved
  */
 

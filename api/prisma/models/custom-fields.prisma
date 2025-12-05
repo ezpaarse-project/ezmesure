@@ -1,0 +1,49 @@
+model CustomField {
+  /// ID of the field
+  id                    String                @id
+  /// Creation date
+  createdAt             DateTime              @default(now())
+  /// Latest update date
+  updatedAt             DateTime              @updatedAt
+  /// Whether the field should accept multiple values
+  multiple              Boolean               @default(false)
+  /// Whether the values of this field can be edited by regular users
+  editable              Boolean               @default(false)
+  /// Whether the field should be visible by regular users
+  visible               Boolean               @default(false)
+  /// Field label in French
+  labelFr               String?
+  /// Field label in English
+  labelEn               String?
+  /// Field description in French
+  descriptionFr         String?
+  /// Field description in English
+  descriptionEn         String?
+  /// URL (if any) to a page containing explanations about that field
+  helpUrl               String?
+  /// URL (if any) to the page dedicated to the institution (use {{id}} to insert the field value)
+  itemUrl               String?
+  /// Source to be used to autocomplete values (format: { index: String, field: String })
+  autocomplete          Json?
+  /// Institution properties that reference the field
+  institutionProperties InstitutionProperty[]
+}
+
+model InstitutionProperty {
+  /// ID of the custom field
+  fieldId       String
+  /// ID of the institution
+  institutionId String
+  /// The custom field
+  field         CustomField @relation(fields: [fieldId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  /// The institution
+  institution   Institution @relation(fields: [institutionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  /// Creation date
+  createdAt     DateTime    @default(now())
+  /// Latest update date
+  updatedAt     DateTime    @updatedAt
+  /// The value of the field for the institution
+  value         Json?
+
+  @@id([fieldId, institutionId])
+}

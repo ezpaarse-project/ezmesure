@@ -1,7 +1,7 @@
 // @ts-check
 const ezrAxios = require('./axios');
 
-/** @typedef {import('@prisma/client').Institution} Institution */
+/** @typedef {import('../../.prisma/client.mjs').Institution} Institution */
 
 /**
  * Updates (or create) a namespace in ezREEPORT from an ezMESURE's institution

@@ -4,13 +4,13 @@ const BasePrismaService = require('./base-prisma.service');
 const elasticRoleSpacePermissionsPrisma = require('../services/prisma/elastic-role-space-permissions');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').ElasticRoleSpacePermission} ElasticRoleSpacePermission */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionUpdateArgs} ElasticRoleSpacePermissionUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionUpsertArgs} ElasticRoleSpacePermissionUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionFindUniqueArgs} ElasticRoleSpacePermissionFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionFindManyArgs} ElasticRoleSpacePermissionFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionCreateArgs} ElasticRoleSpacePermissionCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.ElasticRoleSpacePermissionDeleteArgs} ElasticRoleSpacePermissionDeleteArgs */
+/** @typedef {import('../.prisma/client.mts').ElasticRoleSpacePermission} ElasticRoleSpacePermission */
+/** @typedef {import('../.prisma/client.mts').Prisma.ElasticRoleSpacePermissionUpdateArgs} ElasticRoleSpacePermissionUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.ElasticRoleSpacePermissionUpsertArgs} ElasticRoleSpacePermissionUpsertArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.ElasticRoleSpacePermissionFindUniqueArgs} ElasticRoleSpacePermissionFindUniqueArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.ElasticRoleSpacePermissionFindManyArgs} ElasticRoleSpacePermissionFindManyArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.ElasticRoleSpacePermissionCreateArgs} ElasticRoleSpacePermissionCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.ElasticRoleSpacePermissionDeleteArgs} ElasticRoleSpacePermissionDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class ElasticRoleSpacePermissionService extends BasePrismaService {

@@ -39,6 +39,18 @@
             </template>
 
             <template v-if="!userSpaced" #append>
+              <v-btn
+                v-if="repositoryUpdateFormDialogRef"
+                v-tooltip="$t('modify')"
+                icon="mdi-pencil"
+                variant="text"
+                size="small"
+                density="comfortable"
+                color="blue"
+                class="mr-2"
+                @click="repositoryUpdateFormDialogRef.open(repository)"
+              />
+
               <ConfirmPopover
                 v-if="user.isAdmin"
                 :agree-text="$t('delete')"
@@ -81,7 +93,7 @@
 
             <template v-if="!userSpaced" #append>
               <v-chip
-                v-tooltip:left="$t('elasticRoles.grantedBy')"
+                v-tooltip:left="$t('shares.grantedBy')"
                 :text="elasticRole.name"
                 append-icon="mdi-account-tag"
                 color="secondary"
@@ -105,6 +117,11 @@
       v-if="user.isAdmin"
       ref="repositoryFormDialogRef"
       completion
+      @submit="onRepositoryAdded($event)"
+    />
+
+    <RepositoryUpdateFormDialog
+      ref="repositoryUpdateFormDialogRef"
       @submit="onRepositoryAdded($event)"
     />
   </v-card>
@@ -138,6 +155,7 @@ const repositories = ref(props.institution.repositories || []);
 const elasticRoles = ref(props.institution.elasticRoles || []);
 
 const repositoryFormDialogRef = useTemplateRef('repositoryFormDialogRef');
+const repositoryUpdateFormDialogRef = useTemplateRef('repositoryUpdateFormDialogRef');
 
 const sortedRepositories = computed(
   () => repositories.value.toSorted((a, b) => a.pattern.localeCompare(b.pattern)),
@@ -158,10 +176,14 @@ const repositoryCount = computed(
 );
 
 function onRepositoryAdded(item) {
-  repositories.value.push(item);
+  const index = repositories.value.findIndex((i) => i.pattern === item.pattern);
+  if (index >= 0) {
+    repositories.value[index] = item;
+  } else {
+    repositories.value.push(item);
+  }
   emit('update:modelValue', repositories.value);
 }
-
 async function removeRepository(item) {
   try {
     await $fetch(`/api/institutions/${props.institution.id}/repositories/${item.pattern}`, {

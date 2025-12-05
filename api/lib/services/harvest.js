@@ -1,8 +1,8 @@
-const { HarvestJobStatus } = require('@prisma/client');
 const { subDays, endOfDay, formatDistanceToNow } = require('date-fns');
 const { CronJob } = require('cron');
 const config = require('config');
 
+const { HarvestJobStatus } = require('../.prisma/client.mts');
 const HarvestsService = require('../entities/harvest.service');
 const HarvestJobsService = require('../entities/harvest-job.service');
 

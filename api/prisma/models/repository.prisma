@@ -1,0 +1,61 @@
+/// A repository (a section of elasticsearch allocated to an institution)
+model Repository {
+  /// The institution this repository is associated to
+  institutions           Institution[]
+  /// Creation date
+  createdAt              DateTime                          @default(now())
+  /// Latest update date
+  updatedAt              DateTime                          @updatedAt
+  /// The index pattern (ex: b-bibcnrs*)
+  pattern                String                            @id
+  /// The repository type (ezpaarse, counter5)
+  type                   String                            @db.VarChar(50)
+  /// The repository mapping options
+  mapping                Json                              @default("{}")
+  /// Member permissions associated to this repository
+  permissions            RepositoryPermission[]
+  /// Aliases associated to this repository
+  aliases                RepositoryAlias[]
+  /// Permissions granted by role for this repository
+  elasticRolePermissions ElasticRoleRepositoryPermission[]
+  /// Alias templates that target this repository
+  aliasTemplates         RepositoryAliasTemplate[]
+  /// Harvest jobs using this repository
+  harvestJobs            HarvestJob[]
+}
+
+/// A repository permission (access rights of a member for a specific repository)
+model RepositoryPermission {
+  /// Username of the member
+  username          String
+  /// Institution of the member
+  institutionId     String
+  /// The member
+  membership        Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  /// Pattern of the repository
+  repositoryPattern String
+  /// The repository
+  repository        Repository @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
+  /// Whether the member has a readonly access to the repository
+  readonly          Boolean    @default(false)
+  /// Whether the permission can be modified or not
+  locked            Boolean    @default(false)
+
+  @@id([username, institutionId, repositoryPattern])
+}
+
+/// Permission on repository granted by a role
+model ElasticRoleRepositoryPermission {
+  /// Name of the concerned role
+  elasticRoleName   String
+  /// The concerned role
+  elasticRole       ElasticRole @relation(fields: [elasticRoleName], references: [name], onDelete: Cascade)
+  /// Pattern of the concerned repository
+  repositoryPattern String
+  /// The concerned repository
+  repository        Repository  @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
+  /// Whether the member has a readonly access to the repository
+  readonly          Boolean     @default(false)
+
+  @@id([elasticRoleName, repositoryPattern])
+}

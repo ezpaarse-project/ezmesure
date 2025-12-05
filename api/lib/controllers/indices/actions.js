@@ -1,6 +1,4 @@
 const elastic = require('../../services/elastic');
-const indexTemplate = require('../../utils/index-template');
-const publisherIndexTemplates = require('../../utils/sushi-templates');
 
 exports.getIndex = async (ctx) => {
   const { index } = ctx.request.params;
@@ -15,9 +13,8 @@ exports.getIndex = async (ctx) => {
 };
 
 exports.createIndex = async (ctx) => {
-  const { query, params } = ctx.request;
+  const { params } = ctx.request;
   const { index } = params;
-  const { type, version } = query ?? {};
 
   const { body: exists } = await elastic.indices.exists({ index });
 
@@ -25,19 +22,9 @@ exports.createIndex = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.index.alreadyExists', index));
   }
 
-  let template = indexTemplate;
-
-  if (type === 'publisher') {
-    template = publisherIndexTemplates.get(version || '5');
-  }
-
-  if (!template) {
-    ctx.throw(409, ctx.$t('errors.index.noTemplateFound', version, type));
-  }
-
   const elasticResponse = await elastic.indices.create({
     index,
-    body: template,
+    body: {},
   });
 
   ctx.body = elasticResponse?.body;

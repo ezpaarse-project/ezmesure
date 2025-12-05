@@ -11,15 +11,15 @@ const passwordResetValidity = config.get('passwordResetValidity');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').User} User
- * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
- * @typedef {import('@prisma/client').Prisma.UserCountArgs} UserCountArgs
- * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
- * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
- * @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs
- * @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs
- * @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs
+ * @typedef {import('../.prisma/client.mts').User} User
+ * @typedef {import('../.prisma/client.mts').Prisma.UserUpsertArgs} UserUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserCountArgs} UserCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserFindManyArgs} UserFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserUpdateArgs} UserUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserCreateArgs} UserCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserDeleteArgs} UserDeleteArgs
  */
 /* eslint-enable max-len */
 

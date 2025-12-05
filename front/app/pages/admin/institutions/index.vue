@@ -272,7 +272,10 @@ const {
   // Initial data for the query, don't use refs here. If you want
   // reactivity please use `query.something = myReactiveThingy.value`
   data: {
-    sortBy: [{ key: 'name', order: 'asc' }],
+    sortBy: [
+      { key: 'name', order: 'asc' },
+      { key: 'createdAt', order: 'desc' },
+    ],
   },
 });
 

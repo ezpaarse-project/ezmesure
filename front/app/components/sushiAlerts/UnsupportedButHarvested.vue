@@ -110,10 +110,14 @@ const {
     },
   },
   data: {
-    sortBy: [{ key: 'severity', order: 'desc' }],
+    sortBy: [
+      { key: 'severity', order: 'desc' },
+      { key: 'createdAt', order: 'desc' },
+    ],
     search: undefined,
   },
   async: {
+    key: 'sushi-alerts-harvested-but-unsupported',
     lazy: true,
   },
 });

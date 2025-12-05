@@ -5,7 +5,7 @@ const { isValid: dateIsValid, isBefore: dateIsBefore } = require('date-fns');
 const { CronJob } = require('cron');
 
 const elastic = require('./elastic');
-const indexTemplate = require('../utils/opendata-template');
+const { opendata: indexTemplate } = require('../utils/index-templates');
 
 const { cron, index } = config.get('opendata');
 

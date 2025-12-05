@@ -3,6 +3,8 @@ const crypto = require('node:crypto');
 const { appLogger } = require('../../../logger');
 const elastic = require('../../../elastic');
 
+const SushiEndpointsService = require('../../../../entities/sushi-endpoints.service');
+
 const transformers = require('../../../../utils/sushi-transformers');
 
 /**
@@ -55,6 +57,27 @@ module.exports = async function process(params) {
   // Init transformer
   const reportTransformer = prepareTransformer(report);
   timeout.reset();
+
+  // Update endpoint with registry URL
+  if (Object.keys(reportTransformer.endpoint).length > 0) {
+    const endpointService = new SushiEndpointsService();
+
+    try {
+      await endpointService.update({
+        where: { id: credentials.endpoint.id },
+        data: {
+          ...reportTransformer.endpoint,
+          // Keep registry id if already present
+          registryId: credentials.endpoint.registryId
+            ? undefined
+            : reportTransformer.endpoint.registryId,
+        },
+      });
+      appLogger.verbose(`[harvest] Udated endpoint [${credentials.endpoint.id}] with data from report`);
+    } catch (err) {
+      appLogger.warn(`[harvest] Couldn't update endpoint [${credentials.endpoint.id}] with data from report: ${err}`);
+    }
+  }
 
   // Prepare progress
   insertStep.data.totalReportItems = reportTransformer.totalItems;

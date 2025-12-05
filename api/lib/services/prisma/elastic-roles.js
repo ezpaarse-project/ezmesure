@@ -3,21 +3,21 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').ElasticRole} ElasticRole
- * @typedef {import('@prisma/client').Prisma.ElasticRoleUpdateArgs} ElasticRoleUpdateArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleUpsertArgs} ElasticRoleUpsertArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleCountArgs} ElasticRoleCountArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleFindUniqueArgs} ElasticRoleFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleFindFirstArgs} ElasticRoleFindFirstArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleFindManyArgs} ElasticRoleFindManyArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleCreateArgs} ElasticRoleCreateArgs
- * @typedef {import('@prisma/client').Prisma.ElasticRoleDeleteArgs} ElasticRoleDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').ElasticRole} ElasticRole
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleUpdateArgs} ElasticRoleUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleUpsertArgs} ElasticRoleUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleCountArgs} ElasticRoleCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleFindUniqueArgs} ElasticRoleFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleFindFirstArgs} ElasticRoleFindFirstArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleFindManyArgs} ElasticRoleFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleCreateArgs} ElasticRoleCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleDeleteArgs} ElasticRoleDeleteArgs
  *
- * @typedef {import('@prisma/client').User} User
- * @typedef {import('@prisma/client').Institution} institution
+ * @typedef {import('../../.prisma/client.mjs').User} User
+ * @typedef {import('../../.prisma/client.mjs').Institution} institution
  *
- * @typedef {import('@prisma/client').Prisma.ElasticRoleGetPayload<{ include: { users: true, institutions: true } }>} OldElasticRole
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleGetPayload<{ include: { users: true, institutions: true } }>} OldElasticRole
  * @typedef {{deleteResult: ElasticRole, deletedElasticRole: OldElasticRole }} ElasticRoleRemoved
  * @typedef {{newElasticRole: ElasticRole, oldElasticRole: OldElasticRole }} ElasticRoleUpdated
  */

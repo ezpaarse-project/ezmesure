@@ -4,13 +4,13 @@ const BasePrismaService = require('./base-prisma.service');
 const repositoryAliasPermissionsPrisma = require('../services/prisma/repository-alias-permissions');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').RepositoryAliasPermission} RepositoryAliasPermission */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasPermissionUpdateArgs} RepositoryAliasPermissionUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasPermissionUpsertArgs} RepositoryAliasPermissionUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasPermissionFindUniqueArgs} RepositoryAliasPermissionFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasPermissionFindManyArgs} RepositoryAliasPermissionFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasPermissionCreateArgs} RepositoryAliasPermissionCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryAliasPermissionDeleteArgs} RepositoryAliasPermissionDeleteArgs */
+/** @typedef {import('../.prisma/client.mts').RepositoryAliasPermission} RepositoryAliasPermission */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasPermissionUpdateArgs} RepositoryAliasPermissionUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasPermissionUpsertArgs} RepositoryAliasPermissionUpsertArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasPermissionFindUniqueArgs} RepositoryAliasPermissionFindUniqueArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasPermissionFindManyArgs} RepositoryAliasPermissionFindManyArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasPermissionCreateArgs} RepositoryAliasPermissionCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasPermissionDeleteArgs} RepositoryAliasPermissionDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositoryAliasPermissionsService extends BasePrismaService {

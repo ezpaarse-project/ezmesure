@@ -7,9 +7,10 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "lint": "eslint --ext .js .",
-    "test": "jest --runInBand --verbose",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
     "db:migrate": "prisma migrate deploy",
-    "db:diff": "prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma"
+    "db:diff": "prisma migrate diff --from-schema-datasource prisma --to-schema-datamodel prisma"
   },
   "repository": {
     "type": "git",
@@ -30,7 +31,8 @@
     "@elastic/elasticsearch": "^7.14.1",
     "@koa/bodyparser": "^5.1.1",
     "@koa/cors": "^5.0.0",
-    "@prisma/client": "^6.8.1",
+    "@prisma/adapter-pg": "^6.17.1",
+    "@prisma/client": "^6.17.1",
     "ajv": "^8.17.1",
     "ajv-formats": "^2.1.1",
     "axios": "^1.9.0",
@@ -69,9 +71,8 @@
     "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jest": "^28.11.0",
-    "jest": "^29.5.0",
     "nodemon": "^3.1.10",
-    "prisma": "^6.8.1"
+    "prisma": "^6.17.1",
+    "vitest": "^4.0.14"
   }
 }

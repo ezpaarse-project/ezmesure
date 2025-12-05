@@ -1,0 +1,17 @@
+enum SushiAlertType {
+  HARVESTED_BUT_UNSUPPORTED
+  ENDPOINT
+}
+
+model SushiAlert {
+  /// ID of the alert
+  id        String         @id @default(cuid())
+  /// Type of the alert
+  type      SushiAlertType
+  /// Severity of the alert (info, warn, error, etc.)
+  severity  String
+  /// Context about alert
+  context   Json           @default("{}")
+  /// Creation date
+  createdAt DateTime       @default(now())
+}

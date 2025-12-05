@@ -123,6 +123,10 @@ router.route({
   ],
   validate: {
     type: 'json',
+    query: {
+      update: Joi.boolean(),
+      force: Joi.boolean(),
+    },
     body: createSchema,
   },
 });
@@ -321,6 +325,9 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
     },
+    query: {
+      force: Joi.boolean(),
+    },
     body: updateSchema,
   },
 });
@@ -340,6 +347,20 @@ router.route({
     body: Joi.object({
       reason: Joi.string().trim(),
     }),
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId/_sushiUrls',
+  handler: [
+    commonHandlers(FEATURES.sushi.read),
+    getSushiUrls,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
   },
 });
 
@@ -391,20 +412,6 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
       filePath: Joi.string().trim().regex(/^[a-z0-9/_.-]+$/).required(),
-    },
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/:sushiId/_sushiUrls',
-  handler: [
-    fetchSushi({ include: { endpoint: true } }),
-    getSushiUrls,
-  ],
-  validate: {
-    params: {
-      sushiId: Joi.string().trim().required(),
     },
   },
 });

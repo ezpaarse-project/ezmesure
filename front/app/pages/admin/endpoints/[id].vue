@@ -26,7 +26,7 @@
         density="compact"
         color="primary"
         hide-details
-        class="mt-0 mr-4"
+        class="mt-0 mr-2"
         style="transform: scale(0.9);"
         @update:model-value="toggleActiveStates()"
       />
@@ -38,22 +38,39 @@
         variant="tonal"
         density="comfortable"
         color="blue"
-        class="mr-4"
+        class="mr-2"
         @click="endpointFormDialogRef.open(endpoint)"
+      />
+
+      <v-btn
+        v-if="endpoint.registryId"
+        v-tooltip="$t('endpoints.goToRegistry')"
+        :href="registryUrl.href"
+        icon="mdi-open-in-new"
+        variant="tonal"
+        density="comfortable"
+        color="secondary"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mr-6"
       />
     </SkeletonPageBar>
 
     <v-container fluid>
-      <v-row>
-        <v-col cols="6">
-          <template v-if="!sushiMetrics">
-            <v-skeleton-loader
-              height="100"
-              type="avatar, paragraph"
+      <v-row v-if="endpoint">
+        <v-slide-x-transition>
+          <v-col v-if="!endpoint.active" cols="6">
+            <v-alert
+              :title="$t('endpoints.inactive')"
+              :text="$t('endpoints.inactiveDescription')"
+              type="warning"
+              prominent
             />
-          </template>
+          </v-col>
+        </v-slide-x-transition>
 
-          <template v-else-if="sushiMetrics.failed > 0">
+        <v-slide-x-reverse-transition>
+          <v-col v-if="(sushiMetrics?.failed ?? 0) > 0" cols="6">
             <v-alert
               :title="$t('sushi.problematicEndpoint')"
               :text="$t('sushi.nErrsCredentials', sushiMetrics.failed)"
@@ -69,68 +86,73 @@
                 />
               </template>
             </v-alert>
-          </template>
-        </v-col>
+          </v-col>
+        </v-slide-x-reverse-transition>
+      </v-row>
 
-        <v-col v-if="!endpoint.active" cols="6">
-          <v-alert
-            :title="$t('endpoints.inactive')"
-            :text="$t('endpoints.inactiveDescription')"
-            type="warning"
-            prominent
+      <v-row v-if="!sushiMetrics">
+        <v-col v-for="i in 4" :key="i" cols="3">
+          <v-skeleton-loader
+            height="64"
+            type="list-item-avatar"
           />
         </v-col>
       </v-row>
 
-      <v-row class="justify-space-evenly">
-        <template v-if="!sushiMetrics">
-          <v-col v-for="n in 4" :key="n" cols="2">
-            <v-skeleton-loader
-              height="100"
-              type="paragraph"
-            />
-          </v-col>
-        </template>
-
-        <template v-else>
-          <v-col cols="2">
+      <v-slide-y-transition>
+        <v-row v-if="sushiMetrics">
+          <v-col cols="3">
             <SimpleMetric
-              :text="$t('sushi.nInstitutions', sushiMetrics.institutions)"
+              :title="$t('sushi.institutions', sushiMetrics.institutions)"
+              :value="`${sushiMetrics.institutions}`"
               icon="mdi-domain"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.success || 0"
-              title-key="sushi.nOperationalCredentials"
+              :model-value="sushiMetrics.success || { total: 0 }"
+              :title="$t('sushi.operationalCredentials')"
               icon="mdi-check"
               color="success"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.untested || 0"
+              :model-value="sushiMetrics.untested || { total: 0 }"
+              :title="$t('sushi.untestedCredentials')"
               :action-text="$t('show')"
-              title-key="sushi.nUntestedCredentials"
               icon="mdi-bell-alert"
               color="info"
               @click="filters.connection = 'untested'"
             />
           </v-col>
 
-          <v-col cols="2">
+          <v-col cols="3">
             <SushiMetric
-              :model-value="sushiMetrics.unauthorized || 0"
+              :model-value="sushiMetrics.unauthorized || { total: 0 }"
+              :title="$t('sushi.invalidCredentials')"
               :action-text="$t('show')"
-              title-key="sushi.nInvalidCredentials"
               icon="mdi-key-alert-outline"
               color="warning"
               @click="filters.connection = 'unauthorized'"
             />
           </v-col>
-        </template>
+        </v-row>
+      </v-slide-y-transition>
+
+      <v-row class="mt-4">
+        <v-col>
+          <v-btn
+            v-if="globalHarvestMatrixRef"
+            :text="$t('sushi.globalHarvestState.title')"
+            prepend-icon="mdi-table-headers-eye"
+            size="small"
+            variant="outlined"
+            @click="globalHarvestMatrixRef.open()"
+          />
+        </v-col>
       </v-row>
     </v-container>
 
@@ -221,7 +243,7 @@
           </span>
 
           <v-btn
-            :disabled="status === 'pending' || currentHarvestYear >= maxHarvestYear"
+            :disabled="status === 'pending' || currentHarvestYear >= MAX_HARVEST_YEAR"
             color="primary"
             variant="text"
             density="comfortable"
@@ -368,6 +390,11 @@
     <SushiHarvestHistoryDialog ref="historyRef" />
 
     <SushiReportsDialog ref="reportsRef" />
+
+    <SushiEndpointHarvestGlobalMatrixDialog
+      ref="globalHarvestMatrixRef"
+      :endpoint="endpoint"
+    />
   </div>
 </template>
 
@@ -377,10 +404,11 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
-const maxHarvestYear = new Date().getFullYear();
+const MAX_HARVEST_YEAR = new Date().getFullYear();
 
 const { params } = useRoute();
 const { t, locale } = useI18n();
+const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { addToCheck } = useSushiCheckQueueStore();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
@@ -391,10 +419,11 @@ const filters = ref({});
 const sushiMetrics = ref(undefined);
 const loading = shallowRef(false);
 const selectedInstitutions = ref([]);
-const currentHarvestYear = ref(maxHarvestYear);
+const currentHarvestYear = ref(MAX_HARVEST_YEAR);
 
 const endpointFormDialogRef = useTemplateRef('endpointFormDialogRef');
 const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
+const globalHarvestMatrixRef = useTemplateRef('globalHarvestMatrixRef');
 const reportsRef = useTemplateRef('reportsRef');
 const filesRef = useTemplateRef('filesRef');
 const historyRef = useTemplateRef('historyRef');
@@ -477,6 +506,14 @@ const institutionsSelectionStatus = computed(() => {
   return 'partial';
 });
 
+const registryUrl = computed(() => {
+  if (!endpoint.value.registryId) {
+    return undefined;
+  }
+
+  return new URL(`/platform/${endpoint.value.registryId}`, counterRegistryUrl);
+});
+
 function shouldGreyRow(item) {
   return item.deletedAt || item.archived || !item.active;
 }
@@ -490,7 +527,7 @@ function calcSushiMetrics() {
   const value = Object.fromEntries(
     Object.entries(
       Object.groupBy(sushis.value, (s) => s.connection?.status ?? 'untested') || {},
-    ).map(([k, s]) => [k, s.length]),
+    ).map(([k, s]) => [k, { total: s.length }]),
   );
   value.institutions = institutionsMap.value.size;
 

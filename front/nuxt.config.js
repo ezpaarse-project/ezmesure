@@ -11,6 +11,7 @@ export default defineNuxtConfig({
       supportMail: 'ezteam@couperin.org',
       currentInstance: '',
       oidcProfileUri: '',
+      counterRegistryUrl: 'https://registry.countermetrics.org',
     },
   },
 

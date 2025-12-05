@@ -37,7 +37,7 @@
       :model-value="sushi?.connection"
       :endpoint-url="sushi?.endpoint?.sushiUrl"
     >
-      <template #actions>
+      <template v-if="!readonly" #actions>
         <v-btn
           :text="$t('institutions.sushi.checkCredentials')"
           :disabled="disabled"
@@ -59,6 +59,10 @@ const props = defineProps({
     default: () => undefined,
   },
   disabled: {
+    type: Boolean,
+    default: false,
+  },
+  readonly: {
     type: Boolean,
     default: false,
   },

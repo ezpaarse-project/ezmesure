@@ -1,0 +1,25 @@
+/// A user
+model User {
+  /// The username
+  username     String        @id
+  /// Full name
+  fullName     String
+  /// Email
+  email        String
+  /// Creation date
+  createdAt    DateTime      @default(now())
+  /// Latest update date
+  updatedAt    DateTime      @updatedAt
+  /// Date of last activity
+  lastActivity DateTime      @default(now())
+  /// Whether the user has admin access or not
+  isAdmin      Boolean       @default(false)
+  /// Arbitrary metadata
+  metadata     Json          @default("{}")
+  /// User memberships
+  memberships  Membership[]
+  /// User additional roles specific to elastic
+  elasticRoles ElasticRole[]
+  /// Actions that were triggered by the user
+  actions      Action[]
+}
