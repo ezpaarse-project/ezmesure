@@ -113,6 +113,43 @@ async function remove(params, tx = prisma) {
   return transactionResult;
 }
 
+/**
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Array<MembershipRole> | null>}
+ */
+async function removeAll(tx) {
+  if (process.env.NODE_ENV !== 'dev') { return null; }
+
+  /** @param {TransactionClient} txx */
+  const transaction = async (txx) => {
+    const membershipRoles = await findMany({}, txx);
+
+    if (membershipRoles.length === 0) { return null; }
+
+    await Promise.all(
+      membershipRoles.map((membershipRole) => remove(
+        {
+          where: {
+            username_institutionId_roleId: {
+              username: membershipRole.username,
+              institutionId: membershipRole.institutionId,
+              roleId: membershipRole.roleId,
+            },
+          },
+        },
+        txx,
+      )),
+    );
+
+    return membershipRoles;
+  };
+
+  if (tx) {
+    return transaction(tx);
+  }
+  return prisma.$transaction(transaction);
+}
+
 module.exports = {
   create,
   findMany,
@@ -121,4 +158,5 @@ module.exports = {
   upsert,
   count,
   remove,
+  removeAll,
 };
