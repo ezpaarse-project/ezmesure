@@ -1,7 +1,7 @@
 const { sendMail, generateMail } = require('../../services/mail');
 
 const { getNotificationRecipients } = require('../../utils/notifications');
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /**
  * Sends an email to a newly created user where there is a link to create his password
@@ -73,7 +73,10 @@ exports.sendPasswordRecovery = function sendPasswordRecovery(user, data) {
  * @returns {Promise<void>}
  */
 exports.sendNewUserToContacts = async (receivers, data) => {
-  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.newUserMatchingInstitution);
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.newUserMatchingInstitution,
+    receivers,
+  );
 
   return sendMail({
     to: receivers,

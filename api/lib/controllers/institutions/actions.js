@@ -7,7 +7,7 @@ const MembershipsService = require('../../entities/memberships.service');
 const RolesService = require('../../entities/roles.service');
 
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
-const { NOTIFICATION_TYPES, EVENT_TYPES } = require('../../utils/notifications/constants');
+const { NOTIFICATION_TYPES, EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
 /**
@@ -44,7 +44,10 @@ exports.standardQueryParams = standardQueryParams;
 const { PERMISSIONS } = require('../../entities/memberships.dto');
 
 async function sendValidateInstitutionMail(receivers, data) {
-  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.institutionValidated);
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.institutionValidated,
+    receivers,
+  );
 
   return sendMail({
     to: receivers,
@@ -56,7 +59,7 @@ async function sendValidateInstitutionMail(receivers, data) {
 
 async function sendCounterReadyChangeMail(data) {
   try {
-    const admins = await getNotificationRecipients(NOTIFICATION_TYPES.counterReadyChange);
+    const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.counterReadyChange);
 
     return sendMail({
       to: admins,

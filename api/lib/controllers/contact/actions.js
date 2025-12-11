@@ -4,7 +4,7 @@ const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 
 const { getNotificationRecipients } = require('../../utils/notifications');
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 exports.contact = async (ctx) => {
   const { body } = ctx.request;
@@ -12,7 +12,7 @@ exports.contact = async (ctx) => {
   ctx.status = 200;
 
   try {
-    const admins = await getNotificationRecipients(NOTIFICATION_TYPES.contactForm);
+    const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.contactForm);
 
     ctx.body = await sendMail({
       from: body.email,

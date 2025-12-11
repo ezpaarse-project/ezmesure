@@ -5,10 +5,13 @@ const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
 
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 async function sendValidateInstitution(receivers) {
-  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.institutionValidated);
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.institutionValidated,
+    receivers,
+  );
 
   return sendMail({
     to: receivers,

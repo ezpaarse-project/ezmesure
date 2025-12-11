@@ -5,7 +5,7 @@ const { format, isValid } = require('date-fns');
 const { fr } = require('date-fns/locale');
 
 const { getNotificationRecipients } = require('../utils/notifications');
-const { NOTIFICATION_TYPES } = require('../utils/notifications/constants');
+const { ADMIN_NOTIFICATION_TYPES } = require('../utils/notifications/constants');
 
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
@@ -159,7 +159,7 @@ async function sendNotifications(logger = appLogger) {
     return;
   }
 
-  const to = await getNotificationRecipients(NOTIFICATION_TYPES.appRecentActivity);
+  const to = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.appRecentActivity);
   if (to.length === 0) {
     logger.info('No admins to send recent activity');
     return;

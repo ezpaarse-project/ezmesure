@@ -23,7 +23,7 @@ const {
 } = require('../../../entities/memberships.dto');
 
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../../utils/notifications');
-const { NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
+const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -39,7 +39,7 @@ async function sendNewContact(receiver, institutionName, role) {
     role,
   };
 
-  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.roleAssigned);
+  const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.roleAssigned, [receiver]);
 
   return sendMail({
     to: receiver,
@@ -264,7 +264,10 @@ exports.requestMembership = async (ctx) => {
   const emails = usersToNotify.map((user) => user.email);
   const linkInstitution = `${ctx.get('origin')}/myspace/institutions/${institutionId}/members`;
 
-  const admins = await getNotificationRecipients(NOTIFICATION_TYPES.membershipRequest);
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.membershipRequest,
+    emails,
+  );
 
   await sendMail({
     to: emails.length > 0 ? emails : admins,
