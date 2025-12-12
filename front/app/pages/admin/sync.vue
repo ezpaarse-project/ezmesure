@@ -6,7 +6,7 @@
       @update:model-value="debouncedRefresh()"
     >
       <template #title>
-        {{ $t('menu.sync') }}
+        {{ $t('menu.admin.sync') }}
 
         <v-chip
           v-if="syncState?.data?.startedAt"

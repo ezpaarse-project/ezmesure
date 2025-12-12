@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-toolbar
-      :title="`${$t('menu.adminReport')} / ${$t('report.admin.adminTab')}`"
+      :title="`${$t('menu.admin.report')} / ${$t('report.admin.adminTab')}`"
       color="transparent"
       density="comfortable"
     >
@@ -16,7 +16,7 @@
         <v-dialog width="75%">
           <template #activator="{ props: dialog }">
             <v-btn
-              :text="$t('menu.api')"
+              :text="$t('menu.bar.documentation.entries.api')"
               prepend-icon="mdi-file-document-outline"
               color="primary"
               variant="tonal"

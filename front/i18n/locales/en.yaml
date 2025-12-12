@@ -1,44 +1,29 @@
 menu:
-  homepage: ezMESURE homepage
-  home: Home
-  dashboard: Dashboard
-  documentation: Documentation
-  myspace: My space
-  partners: Partners
-  api: API
-  guide: User guide
-  navigateTo: Navigate to
-  myDeposits: My deposits
-  credentials: Login information
-  authentificationToken: Authentification token
-  administration: Administration
-  myInstitution: My institution
-  myInstitutions: My institutions
-  myForeignAccess: Shared with you
-  institutions: Institutions
-  sushiEndpoints: COUNTER endpoints
-  activity: Activity
-  actions:
-    title: Actions
-    tooltip: New version of the activity, actions will being rolled out progressively
-  profile: Profile
-  members: Members
-  users: Users
-  roles: Roles
-  shares: Shares
-  logout: Logout
-  contact: Contact
-  report: Reports
-  adminReport: ezREEPORT
-  repositories: Repositories
-  repositoryAliases:
-    group: Repository aliases
-    aliases: Aliases
-    templates: Templates
-    orphans: Orphans
-  spaces: Spaces
-  harvest:
-    group: Harvest
+  report: Rapports
+
+  bar:
+    homepage: ezMESURE homepage
+    documentation:
+      title: Documentation
+      entries:
+        user: User guide
+        api: API
+    partners: Partners
+    contact: Contact
+    dashboard: Dashboard
+    myspace: My space
+    administration: Administration
+
+  myspace:
+    institutions: My institutions
+    deposits: My deposits
+    foreignAccess: Shared with you
+    credentials: Login information
+    authentificationToken: Authentification token
+    settings: My settings
+    logout: Logout
+
+  admin:
     institutions: Institutions
     sessions: Sessions
     alerts: Alertes

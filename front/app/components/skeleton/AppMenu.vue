@@ -5,7 +5,7 @@
       <v-menu>
         <template #activator="{ props }">
           <v-btn
-            :text="$t('menu.documentation')"
+            :text="$t('menu.bar.documentation.title')"
             v-bind="props"
             variant="text"
             append-icon="mdi-chevron-down"
@@ -14,7 +14,7 @@
 
         <v-list>
           <v-list-item
-            :title="$t('menu.guide')"
+            :title="$t('menu.bar.documentation.entries.user')"
             href="https://docs.readmetrics.org/s/fr-ezmesure-user"
             target="_blank"
             rel="noopener noreferrer"
@@ -23,7 +23,7 @@
           />
           <v-list-item
             to="/api-reference"
-            :title="$t('menu.api')"
+            :title="$t('menu.bar.documentation.entries.api')"
             prepend-icon="mdi-code-tags"
             slim
           />
@@ -80,16 +80,16 @@
         </template>
 
         <v-list>
-          <v-list-subheader>{{ t('menu.documentation') }}</v-list-subheader>
+          <v-list-subheader>{{ t('menu.bar.documentation.title') }}</v-list-subheader>
           <v-list-item
-            :title="$t('menu.guide')"
+            :title="$t('menu.bar.documentation.entries.user')"
             href="https://docs.readmetrics.org/s/fr-ezmesure-user"
             target="_blank"
             rel="noopener noreferrer"
           />
           <v-list-item
             :to="'/api-reference'"
-            :title="$t('menu.api')"
+            :title="$t('menu.bar.documentation.entries.api')"
           />
           <v-divider />
           <template v-for="item in items">
@@ -116,16 +116,16 @@ const { t } = useI18n();
 const { data: user } = useAuthState();
 
 const items = computed(() => [
-  { text: t('menu.partners'), to: '/partners', exact: true },
-  { text: t('menu.contact'), to: '/contact-us', exact: true },
+  { text: t('menu.bar.partners'), to: '/partners', exact: true },
+  { text: t('menu.bar.contact'), to: '/contact-us', exact: true },
   { separator: true, key: 'menu-separator' },
   {
-    text: t('menu.dashboard'),
+    text: t('menu.bar.dashboard'),
     href: '/kibana/',
     exact: true,
     target: '_blank',
   },
-  { text: t('menu.myspace'), to: '/myspace/' },
-  { text: t('administration'), to: '/admin/', hide: !user.value?.isAdmin },
+  { text: t('menu.bar.myspace'), to: '/myspace/' },
+  { text: t('menu.bar.administration'), to: '/admin/', hide: !user.value?.isAdmin },
 ].filter((item) => !item.hide));
 </script>

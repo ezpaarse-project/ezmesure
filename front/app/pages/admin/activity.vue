@@ -1,7 +1,7 @@
 <template>
   <div>
     <SkeletonPageBar
-      :title="$t('menu.activity')"
+      :title="$t('menu.admin.activity')"
       :refresh="refresh"
       icons
     />

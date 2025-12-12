@@ -1,7 +1,7 @@
 <template>
   <div>
     <SkeletonPageBar
-      :title="`${$t('menu.harvest.group')} / ${$t('sushi.alerts.title')}`"
+      :title="`${$t('menu.admin.harvest.title')} / ${$t('sushi.alerts.title')}`"
       icons
     />
 
