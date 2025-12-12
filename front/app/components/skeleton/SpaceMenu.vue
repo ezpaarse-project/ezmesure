@@ -60,6 +60,12 @@
         prepend-icon="mdi-key"
         class="text-grey-darken-3"
       />
+      <v-list-item
+        :title="$t('menu.myspace.settings')"
+        to="/myspace/settings"
+        prepend-icon="mdi-cog"
+        class="text-grey-darken-3"
+      />
 
       <v-list-item
         :title="user.fullName"
