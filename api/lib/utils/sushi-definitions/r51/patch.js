@@ -64,6 +64,35 @@ function fixPerfMinProperties(...schemas) {
     }
   }
 }
+/**
+ * Fix ISBN format by removing the need of having hyphens
+ *
+ * Update by reference
+ *
+ * @deprecated should be fixed by R5.1.1
+ *
+ * @param  {...object} schemas to fix
+ */
+function fixISBNHyphens(...schemas) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const schema of schemas) {
+    if (schema.type === 'object' && !!schema.properties?.ISBN) {
+      schema.properties.ISBN = {
+        oneOf: [
+          // Keep original validation
+          schema.properties.ISBN,
+          // Add un-hyphened validation
+          {
+            type: 'string',
+            pattern: '^97[89][0-9]+$',
+            minLength: 13,
+            maxLength: 13,
+          },
+        ],
+      };
+    }
+  }
+}
 
 // Patches application
 
@@ -80,5 +109,7 @@ fixPerfMinProperties(
   defSchema.definitions.TR_Performance,
   defSchema.definitions.TR_B2_Performance,
 );
+
+fixISBNHyphens(defSchema.definitions.Item_ID);
 
 module.exports = defSchema;
