@@ -44,7 +44,7 @@ jobs:
 
       - name: Update version ⬇️
         working-directory: ./api
-        run: npm i isbn3@${{ steps.docker_tags.outputs.tag }}
+        run: npm i --save-exact isbn3@~${{ steps.isbn3.outputs.version }}
 
       - name: Create pull request 🚀
         uses: peter-evans/create-pull-request@v8
