@@ -71,6 +71,7 @@
     "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.31.0",
+    "fx": "^39.2.0",
     "nodemon": "^3.1.10",
     "prisma": "^6.17.1",
     "vitest": "^4.0.14"
