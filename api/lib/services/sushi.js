@@ -17,7 +17,6 @@ const { CronJob } = require('cron');
 const { glob } = require('glob');
 const config = require('config');
 const { create: createAxios } = require('axios');
-const { version: axiosVersion } = require('axios/package.json');
 const fs = require('fs-extra');
 
 const { version: appVersion } = require('../../package.json');
@@ -51,7 +50,7 @@ const downloads = new Map();
 
 const axios = createAxios({
   headers: {
-    'User-Agent': `axios/${axiosVersion} (ezMESURE/${appVersion}; +${publicUrl})`,
+    'User-Agent': `Mozilla/5.0 (compatible; ezMESURE/${appVersion}; +${publicUrl})`,
   },
 });
 
