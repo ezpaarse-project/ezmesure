@@ -549,10 +549,6 @@ const syncRepositories = async () => {
   return res;
 };
 
-setTimeout(async () => {
-  await syncRepositories();
-}, 1000);
-
 module.exports = {
   syncRepository,
   syncRepositories,
