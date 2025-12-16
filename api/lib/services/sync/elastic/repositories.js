@@ -550,21 +550,7 @@ const syncRepositories = async () => {
 };
 
 setTimeout(async () => {
-  console.log('===== Starting');
-
   await syncRepositories();
-
-  // const repositoriesService = new RepositoriesService();
-
-  // const repositories = await repositoriesService.findMany({
-  //   orderBy: { pattern: 'asc' },
-  // });
-
-  // console.log(
-  //   calcRepositoryPriorities({ pattern: 'a-univ-strasbourg-ezpaarse*' }, repositories),
-  // );
-
-  console.log('===== End');
 }, 1000);
 
 module.exports = {
