@@ -57,9 +57,9 @@ jobs:
           title: 'build(api): bumping `isbn3` to `${{ steps.docker_tags.outputs.tag }}`'
           body: |
             > [!NOTE]
-            > Changes are made by GitHub Qctions, please review changes carefully before merging
+            > Changes are made by GitHub Actions, please review changes carefully before merging
 
-            ISBN groups data are updated monthly. Keeping it up to date avoid parsing errors while inserting ISBNs from COUNTER reports
+            ISBN groups data are updated monthly. Keeping it up to date prevents parsing errors while inserting ISBNs from COUNTER reports
 
             # API
 
