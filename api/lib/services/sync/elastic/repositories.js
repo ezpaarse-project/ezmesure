@@ -82,9 +82,7 @@ const calcHashOfPattern = (pattern) => createHash('sha1')
  * @returns The RegEx
  */
 const patternToRegex = (pattern) => {
-  const exp = pattern
-    .replace(/[-_]\*[-_]/g, '*') // treat -*- as * to avoid rare conflicts
-    .replaceAll('*', '.*?');
+  const exp = pattern.replaceAll('*', '.*?');
 
   return new RegExp(`^${exp}$`, 'i');
 };
@@ -107,13 +105,14 @@ function calcRepositoryPriorities(targetRepository, allRepositories) {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const repository of allRepositories) {
-    if (repository.pattern === targetRepository.pattern) {
+    // Mimic a index under repository by removing *
+    const index = repository.pattern.replaceAll('*', '');
+
+    if (index === targetIndex) {
       // eslint-disable-next-line no-continue
       continue;
     }
 
-    // Mimic a index under repository by removing *
-    const index = repository.pattern.replaceAll('*', '');
     const regex = patternToRegex(repository.pattern);
 
     if (targetRegex.test(index)) {
@@ -125,17 +124,25 @@ function calcRepositoryPriorities(targetRepository, allRepositories) {
     }
   }
 
-  // Avoid conflicts between repository types
-  let typeOffset = 0;
-  if (targetRepository.type === 'counter5') {
-    typeOffset = 1;
+  // Priorities before 100 are internal, starting with an offset of 200 gives us some space
+  let priority = 200;
+  // Add a slight priority boost depending on the pattern length, so that similar patterns like
+  // example-* and example* won't be given the same priority if they have the same number of parents
+  priority += targetIndex.length * 5;
+  // Child patterns must be much more specific than their parents
+  priority += parentCount * 1000;
+  // Pattern does not start with a wildcard, it's more specific
+  if (!targetRepository.pattern.startsWith('*')) {
+    priority += 100;
   }
-
-  // Avoid conflicts between prefixes and suffixes
-  const suffixOffset = targetRepository.pattern[0] === '*' ? 0 : 50;
-
-  // Priorities before 200 are internal, 100 offset gives us space
-  const priority = 200 + (parentCount * 100) + typeOffset + suffixOffset;
+  // If the pattern does not end with a wildcard, it's more specific
+  if (!targetRepository.pattern.endsWith('*')) {
+    priority += 50;
+  }
+  // Avoid conflicts between repository types
+  if (targetRepository.type === 'counter5') {
+    priority += 1;
+  }
 
   const children = childRepositories.flatMap(
     (repository) => calcRepositoryPriorities(repository, allRepositories),
