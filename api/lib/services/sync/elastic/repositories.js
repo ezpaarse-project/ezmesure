@@ -26,14 +26,13 @@ const { filtersToESQuery } = require('../../elastic/filters');
  * @typedef {import('@elastic/elasticsearch').default.estypes.MappingTypeMapping} esMapping
  * @typedef {import('@elastic/elasticsearch').default.estypes.MappingProperty} esMappingProperty
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesAlias} esIndicesAlias
+ *
+ * @typedef {{ repository: RepositoryWithAliases, priority: number }} RepositoryPriority
  */
 /* eslint-enable max-len */
 
 // Namespace for index templates dedicated to repositories
 const indexTemplatePrefix = 'ezm-tpl';
-// Random high priority for index templates
-// An index pattern cannot match multiple templates with the same priority
-const indexTemplatePriority = 679;
 // Metadata added to the templates created by ezMESURE so that we can easily recognize them
 const indexTemplateMeta = {
   createdBy: 'ezmesure',
@@ -74,6 +73,87 @@ const calcHashOfPattern = (pattern) => createHash('sha1')
   .update(pattern)
   .digest('hex')
   .substring(0, 10);
+
+/**
+ * Transform repository patterns as RegEx
+ *
+ * @param {string} pattern - The pattern (wildcard)
+ *
+ * @returns The RegEx
+ */
+const patternToRegex = (pattern) => {
+  const exp = pattern.replaceAll('*', '.*?');
+
+  return new RegExp(`^${exp}$`, 'i');
+};
+
+/**
+ * Calculate the priority of a pattern and the priority of the repositories it includes
+ *
+ * @param {RepositoryWithAliases} targetRepository - The pattern we want the priority
+ * @param {RepositoryWithAliases[]} allRepositories - The list containing all repository
+ *
+ * @returns {RepositoryPriority[]} - The affected patterns with their priority
+ */
+function calcRepositoryPriorities(targetRepository, allRepositories) {
+  // Mimic an index under repository by removing *
+  const targetIndex = targetRepository.pattern.replaceAll('*', '');
+  const targetRegex = patternToRegex(targetRepository.pattern);
+
+  let parentCount = 0;
+  const childRepositories = [];
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const repository of allRepositories) {
+    // Mimic an index under repository by removing *
+    const index = repository.pattern.replaceAll('*', '');
+
+    // Indices like *-example* and *-example must not be considered as parent and child
+    if (index === targetIndex) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    const regex = patternToRegex(repository.pattern);
+
+    if (targetRegex.test(index)) {
+      childRepositories.push(repository);
+    }
+
+    if (regex.test(targetIndex)) {
+      parentCount += 1;
+    }
+  }
+
+  // Priorities before 100 are internal, starting with an offset of 200 gives us some space
+  let priority = 200;
+  // Add a slight priority boost depending on the pattern length, so that similar patterns like
+  // example-* and example* won't be given the same priority if they have the same number of parents
+  priority += targetIndex.length * 5;
+  // Child patterns must be much more specific than their parents
+  priority += parentCount * 1000;
+  // Pattern does not start with a wildcard, it's more specific
+  if (!targetRepository.pattern.startsWith('*')) {
+    priority += 100;
+  }
+  // If the pattern does not end with a wildcard, it's more specific
+  if (!targetRepository.pattern.endsWith('*')) {
+    priority += 50;
+  }
+  // Avoid conflicts between repository types
+  if (targetRepository.type === 'counter5') {
+    priority += 1;
+  }
+
+  const children = childRepositories.flatMap(
+    (repository) => calcRepositoryPriorities(repository, allRepositories),
+  );
+
+  return [
+    { repository: targetRepository, priority },
+    ...children,
+  ];
+}
 
 /**
  * Upsert the index template component matching the repository type
@@ -274,35 +354,48 @@ const repositoryAliasesToIndexAliases = (aliases) => {
 /**
  * Upsert an index template that contains aliases for a repository
  * @param {RepositoryWithAliases} repo - The repository with its aliases
+ * @param {RepositoryWithAliases[]} allRepositories - The list containing all repository
+ * @param {boolean} [skipChildren] - Should skip the child of repository
  * @returns {Promise<void>}
  */
-const upsertIndexTemplates = async (repo) => {
-  const mappings = repositoryMappingToIndexMapping(
-    mappingSchema.validate(repo.mapping).value || {},
-  );
+const upsertIndexTemplates = async (repo, allRepositories, skipChildren) => {
+  const repositories = calcRepositoryPriorities(repo, allRepositories);
 
-  const aliases = repositoryAliasesToIndexAliases(repo.aliases);
+  const repositoriesToUpdate = skipChildren ? [repositories[0]] : repositories;
 
-  const body = {
-    priority: indexTemplatePriority,
-    _meta: indexTemplateMeta,
-    template: {
-      mappings,
-      aliases,
-    },
-  };
-
-  const definitions = getIndexTemplateDefinitions(repo);
   await Promise.all(
-    definitions.map((definition) => upsertTemplate({
-      name: definition.name,
-      create: false,
-      body: {
-        ...body,
-        index_patterns: [definition.pattern],
-        composed_of: definition.components,
-      },
-    })),
+    repositoriesToUpdate.flatMap(({ repository, priority }) => {
+      const mappings = repositoryMappingToIndexMapping(
+        mappingSchema.validate(repository.mapping).value || {},
+      );
+
+      const aliases = repositoryAliasesToIndexAliases(repository.aliases);
+
+      const body = {
+        priority,
+        _meta: indexTemplateMeta,
+        template: {
+          mappings,
+          aliases,
+        },
+      };
+
+      const definitions = getIndexTemplateDefinitions(repository);
+
+      return definitions.map((definition) => {
+        appLogger.verbose(`[elastic] Resolved index template [${definition.name}] - priority=[${priority}]`);
+
+        return upsertTemplate({
+          name: definition.name,
+          create: false,
+          body: {
+            ...body,
+            index_patterns: [definition.pattern],
+            composed_of: definition.components,
+          },
+        });
+      });
+    }),
   );
 };
 
@@ -325,23 +418,28 @@ const deleteRepositoryIndexTemplates = async (pattern) => {
 /**
  * Synchronize the index template for the given repository pattern
  * @param {string} pattern - The repository pattern
+ * @param {RepositoryWithAliases[]} [allRepositories] - The list containing all repository
  * @returns {Promise<void>}
  */
-const syncRepositoryIndexTemplates = async (pattern) => {
+const syncRepositoryIndexTemplates = async (pattern, allRepositories = []) => {
   const repositoriesService = new RepositoriesService();
+
+  let repoList = allRepositories;
+  if (allRepositories.length <= 0) {
+    // @ts-expect-error
+    repoList = await repositoriesService.findMany({
+      select: {
+        pattern: true,
+        type: true,
+        aliases: true,
+        mapping: true,
+      },
+    });
+  }
 
   /** @type {RepositoryWithAliases} */
   // @ts-ignore
-  const repository = await repositoriesService.findUnique({
-    where: { pattern },
-    select: {
-      pattern: true,
-      type: true,
-      aliases: true,
-      mapping: true,
-    },
-  });
-
+  const repository = repoList.find((repo) => repo.pattern === pattern);
   if (!repository) {
     return deleteRepositoryIndexTemplates(pattern);
   }
@@ -354,7 +452,9 @@ const syncRepositoryIndexTemplates = async (pattern) => {
   }
 
   try {
-    await upsertIndexTemplates(repository);
+    // If allRepositories is specified, we're updating every repositories
+    // so we don't need to update children of repositories
+    await upsertIndexTemplates(repository, repoList, allRepositories.length > 0);
     appLogger.verbose(`[elastic] Index templates for [${repository.pattern}] has been upserted`);
   } catch (error) {
     appLogger.error(`[elastic] Index templates for [${repository.pattern}] cannot be upserted:\n${error}`);
@@ -390,9 +490,10 @@ const unmountRepository = async (repo) => {
 /**
  * Synchronize a repository with Elasticsearch, making sure that associated roles exists
  * @param {Repository} repo - The repository to sync
+ * @param {RepositoryWithAliases[]} [allRepositories] - The list containing all repository
  * @returns {Promise<void>}
  */
-const syncRepository = async (repo) => {
+const syncRepository = async (repo, allRepositories) => {
   const readOnlyRole = generateRoleNameFromRepository(repo, 'readonly');
   const allRole = generateRoleNameFromRepository(repo, 'all');
 
@@ -412,7 +513,7 @@ const syncRepository = async (repo) => {
     appLogger.error(`[elastic] Role [${allRole}] cannot be upserted:\n${error}`);
   }
 
-  await syncRepositoryIndexTemplates(repo.pattern);
+  await syncRepositoryIndexTemplates(repo.pattern, allRepositories);
 
   const spacesService = new SpacesService();
 
@@ -438,9 +539,14 @@ const syncRepository = async (repo) => {
  */
 const syncRepositories = async () => {
   const repositoriesService = new RepositoriesService();
-  const repositories = await repositoriesService.findMany({});
 
-  const executors = repositories.map((repo) => () => syncRepository(repo));
+  const repositories = await repositoriesService.findMany({
+    include: { aliases: true },
+    orderBy: { pattern: 'asc' },
+  });
+
+  // @ts-expect-error/
+  const executors = repositories.map((repo) => () => syncRepository(repo, repositories));
 
   const res = await execThrottledPromises(
     executors,
