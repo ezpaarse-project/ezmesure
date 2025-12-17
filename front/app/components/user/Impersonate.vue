@@ -177,7 +177,7 @@ const props = defineProps({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 const { copy } = useClipboard();
-const { refresh: refreshSession } = useAuth();
+const { getSession } = useAuth();
 
 const windowId = ref('root');
 const connectingToKibana = ref(false);
@@ -261,7 +261,7 @@ async function impersonateUser() {
 
   try {
     await $fetch(`/api/users/${props.user.username}/_impersonate`, { method: 'POST' });
-    await refreshSession();
+    await getSession({ force: true });
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
     return;
