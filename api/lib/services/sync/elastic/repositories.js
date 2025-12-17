@@ -96,7 +96,7 @@ const patternToRegex = (pattern) => {
  * @returns {RepositoryPriority[]} - The affected patterns with their priority
  */
 function calcRepositoryPriorities(targetRepository, allRepositories) {
-  // Mimic a index under repository by removing *
+  // Mimic an index under repository by removing *
   const targetIndex = targetRepository.pattern.replaceAll('*', '');
   const targetRegex = patternToRegex(targetRepository.pattern);
 
@@ -105,9 +105,10 @@ function calcRepositoryPriorities(targetRepository, allRepositories) {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const repository of allRepositories) {
-    // Mimic a index under repository by removing *
+    // Mimic an index under repository by removing *
     const index = repository.pattern.replaceAll('*', '');
 
+    // Indices like *-example* and *-example must not be considered as parent and child
     if (index === targetIndex) {
       // eslint-disable-next-line no-continue
       continue;
