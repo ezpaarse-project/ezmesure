@@ -11,7 +11,7 @@ const { FEATURES } = require('../../entities/memberships.dto');
 const { EVENT_TYPES } = require('../../utils/notifications/constants');
 
 /**
- * @typedef {import('../../.prisma/client').User} User
+ * @typedef {import('../../.prisma/client.mjs').User} User
  */
 
 /**

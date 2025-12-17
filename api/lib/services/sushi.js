@@ -1,3 +1,8 @@
+const os = require('node:os');
+const path = require('node:path');
+const { stat: fsStats } = require('node:fs/promises');
+const EventEmitter = require('node:events');
+
 const {
   startOfMonth,
   endOfMonth,
@@ -8,18 +13,13 @@ const {
   isValid: isValidDate,
   format,
 } = require('date-fns');
-
 const { CronJob } = require('cron');
 const { glob } = require('glob');
-
-const os = require('os');
 const config = require('config');
-const axios = require('axios');
-const path = require('path');
+const { create: createAxios } = require('axios');
 const fs = require('fs-extra');
-const { stat: fsStats } = require('fs/promises');
-const EventEmitter = require('events');
 
+const { version: appVersion } = require('../../package.json');
 const {
   DEFAULT_REPORT_TYPE,
   REPORT_IDS,
@@ -29,13 +29,14 @@ const {
 const definitions = require('../utils/sushi-definitions');
 const { appLogger } = require('./logger');
 
+const publicUrl = config.get('publicUrl');
 const cleanConfig = config.get('counter.clean');
 const storageDir = path.resolve(config.get('storage.path'), 'sushi');
 const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
 /**
- * @typedef {import('../.prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('../.prisma/client').SushiEndpoint} SushiEndpoint
+ * @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials
+ * @typedef {import('../.prisma/client.mts').SushiEndpoint} SushiEndpoint
  *
  * @typedef {object} SushiException
  * @property {number} Code
@@ -47,6 +48,12 @@ const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
 const downloads = new Map();
 
+const axios = createAxios({
+  headers: {
+    'User-Agent': `Mozilla/5.0 (compatible; ezMESURE/${appVersion}; +${publicUrl})`,
+  },
+});
+
 // https://app.swaggerhub.com/apis/COUNTER/counter-sushi_5_0_api/
 
 /**
@@ -57,7 +64,7 @@ const downloads = new Map();
  * using COUNTER 5.1
  * It also remove the trailing `/`
  *
- * @param {import('../.prisma/client').SushiEndpoint} endpoint - The endpoint
+ * @param {import('../.prisma/client.mts').SushiEndpoint} endpoint - The endpoint
  * @param {string} [version=5] - The COUNTER version
  * @returns
  */

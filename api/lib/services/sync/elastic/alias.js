@@ -19,7 +19,7 @@ const { filtersToESQuery } = require('../../elastic/filters');
 
 /**
  * @typedef {import('../../promises').ThrottledPromisesResult} ThrottledPromisesResult
- * @typedef {import('../../../.prisma/client').RepositoryAlias} RepositoryAlias
+ * @typedef {import('../../../.prisma/client.mjs').RepositoryAlias} RepositoryAlias
  */
 
 /**

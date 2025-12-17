@@ -3,16 +3,16 @@ const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client').RepositoryAlias} RepositoryAlias
- * @typedef {import('../../.prisma/client').RepositoryAliasTemplate} RepositoryAliasTemplate
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateCountArgs} RepositoryAliasTemplateCountArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateUpdateArgs} RepositoryAliasTemplateUpdateArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateUpsertArgs} RepositoryAliasTemplateUpsertArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateFindUniqueArgs} RepositoryAliasTemplateFindUniqueArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateCreateArgs} RepositoryAliasTemplateCreateArgs
- * @typedef {import('../../.prisma/client').Prisma.RepositoryAliasTemplateDeleteArgs} RepositoryAliasTemplateDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').RepositoryAlias} RepositoryAlias
+ * @typedef {import('../../.prisma/client.mjs').RepositoryAliasTemplate} RepositoryAliasTemplate
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateCountArgs} RepositoryAliasTemplateCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateUpdateArgs} RepositoryAliasTemplateUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateUpsertArgs} RepositoryAliasTemplateUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateFindUniqueArgs} RepositoryAliasTemplateFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateCreateArgs} RepositoryAliasTemplateCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateDeleteArgs} RepositoryAliasTemplateDeleteArgs
  *
  * @typedef {RepositoryAliasTemplate & { aliases: RepositoryAlias[] }} RepositoryAliasTemplateWithAliases
  * @typedef {{ result: RepositoryAliasTemplate, deletedItem: RepositoryAliasTemplateWithAliases }} RepositoryAliasTemplateRemoveResult

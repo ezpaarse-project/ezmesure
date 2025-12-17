@@ -9,25 +9,25 @@ const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client').Institution} Institution
- * @typedef {import('../../.prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
- * @typedef {import('../../.prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
- * @typedef {import('../../.prisma/client').Prisma.InstitutionCountArgs} InstitutionCountArgs
- * @typedef {import('../../.prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
- * @typedef {import('../../.prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
- * @typedef {import('../../.prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').Institution} Institution
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionCountArgs} InstitutionCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
  *
- * @typedef {import('../../.prisma/client').Membership} Membership
- * @typedef {import('../../.prisma/client').Repository} Repository
- * @typedef {import('../../.prisma/client').Space} Space
- * @typedef {import('../../.prisma/client').SushiCredentials} SushiCredentials
- * @typedef {import('../../.prisma/client').RepositoryPermission} RepositoryPermission
- * @typedef {import('../../.prisma/client').SpacePermission} SpacePermission
+ * @typedef {import('../../.prisma/client.mjs').Membership} Membership
+ * @typedef {import('../../.prisma/client.mjs').Repository} Repository
+ * @typedef {import('../../.prisma/client.mjs').Space} Space
+ * @typedef {import('../../.prisma/client.mjs').SushiCredentials} SushiCredentials
+ * @typedef {import('../../.prisma/client.mjs').RepositoryPermission} RepositoryPermission
+ * @typedef {import('../../.prisma/client.mjs').SpacePermission} SpacePermission
  *
  * @typedef {{ memberships: { include: { repositoryPermissions: true, spacePermissions: true }, repositories: { institutions: true }, sushiCredentials: true, spaces: true } }} OldInstitutionInclude
- * @typedef {import('../../.prisma/client').Prisma.InstitutionGetPayload<{ include: OldInstitutionInclude }>} OldInstitution
+ * @typedef {import('../../.prisma/client.mjs').Prisma.InstitutionGetPayload<{ include: OldInstitutionInclude }>} OldInstitution
  * @typedef {{deletedInstitution: Institution, deletedRepos: Repository[], institution: OldInstitution }} InstitutionRemoved
  */
 /* eslint-enable max-len */

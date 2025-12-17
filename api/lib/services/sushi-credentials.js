@@ -8,8 +8,8 @@ const { deleteByQuery, getTask } = require('./elastic/tasks');
 const { client: prisma } = require('./prisma');
 
 /* eslint-disable max-len */
-/** @typedef {import('../.prisma/client').SushiCredentials} SushiCredentials */
-/** @typedef {import('../.prisma/client').Repository} Repository */
+/** @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials */
+/** @typedef {import('../.prisma/client.mts').Repository} Repository */
 /* eslint-enable max-len */
 
 const deleteConfig = config.get('counter.deleteSushi');
