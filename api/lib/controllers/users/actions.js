@@ -83,7 +83,7 @@ exports.list = async (ctx) => {
       const operator = hasSomeRoles ? 'OR' : 'AND';
 
       prismaQuery.where[operator] = [
-        ...prismaQuery.where[operator] ?? [],
+        ...(prismaQuery.where[operator] ?? []),
         ...roles.map((role) => ({
           memberships: {
             some: {

@@ -42,9 +42,7 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-const {
-  PERMISSIONS,
-} = require('../../entities/memberships.dto');
+const { PERMISSIONS } = require('../../entities/memberships.dto');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
@@ -118,6 +116,7 @@ exports.createInstitution = async (ctx) => {
 
   if (!isAdmin || addAsMember !== false) {
     const rolesService = new RolesService();
+
     const roles = await rolesService.findMany({
       select: { id: true },
       where: {
