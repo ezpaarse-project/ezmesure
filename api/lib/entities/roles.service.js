@@ -4,14 +4,14 @@ const BasePrismaService = require('./base-prisma.service');
 const rolesPrisma = require('../services/prisma/roles');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Role} Role */
-/** @typedef {import('@prisma/client').Prisma.RoleUpdateArgs} RoleUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.RoleUpsertArgs} RoleUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.RoleCountArgs} RoleCountArgs */
-/** @typedef {import('@prisma/client').Prisma.RoleFindUniqueArgs} RoleFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.RoleFindManyArgs} RoleFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.RoleCreateArgs} RoleCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.RoleDeleteArgs} RoleDeleteArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Role} Role */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.RoleUpdateArgs} RoleUpdateArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.RoleUpsertArgs} RoleUpsertArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.RoleCountArgs} RoleCountArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.RoleFindUniqueArgs} RoleFindUniqueArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.RoleFindManyArgs} RoleFindManyArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.RoleCreateArgs} RoleCreateArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.RoleDeleteArgs} RoleDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RolesService extends BasePrismaService {
@@ -77,8 +77,13 @@ module.exports = class RolesService extends BasePrismaService {
    * @returns {Promise<Role | null>}
    */
   async delete(params) {
-    const role = await rolesPrisma.remove(params, this.prisma);
+    const deleted = await rolesPrisma.remove(params, this.prisma);
+    if (!deleted) {
+      return null;
+    }
+
+    const { deleteResult, role } = deleted;
     this.triggerHooks('role:delete', role);
-    return role;
+    return deleteResult;
   }
 };

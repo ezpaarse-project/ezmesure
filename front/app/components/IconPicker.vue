@@ -12,8 +12,8 @@
 
       <v-empty-state
         v-if="iconLines.length === 0"
-        icon="mdi-ghost-outline"
         :title="$t('noMatch')"
+        icon="mdi-ghost-outline"
       />
 
       <v-virtual-scroll

@@ -294,11 +294,11 @@ const spacePermissions = ref(new Map());
 
 const formRef = useTemplateRef('formRef');
 
-const institution = computed(() => props.modelValue.institution);
 const roles = ref((props.modelValue.roles ?? []).map((role) => role.role));
-const roleIds = computed(() => roles.value.map((r) => r.id));
-
 const rolesBeingSaved = ref(new Set());
+
+const institution = computed(() => props.modelValue.institution);
+const roleIds = computed(() => roles.value.map((r) => r.id));
 
 /**
  * If current member is locked

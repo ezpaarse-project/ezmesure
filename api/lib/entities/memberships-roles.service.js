@@ -4,14 +4,14 @@ const BasePrismaService = require('./base-prisma.service');
 const membershipRolesPrisma = require('../services/prisma/membership-roles');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').MembershipRole} MembershipRole */
-/** @typedef {import('@prisma/client').Prisma.MembershipRoleUpdateArgs} MembershipRoleUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipRoleUpsertArgs} MembershipRoleUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipRoleCountArgs} MembershipRoleCountArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipRoleFindUniqueArgs} MembershipRoleFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipRoleFindManyArgs} MembershipRoleFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipRoleCreateArgs} MembershipRoleCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipRoleDeleteArgs} MembershipRoleDeleteArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').MembershipRole} MembershipRole */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.MembershipRoleUpdateArgs} MembershipRoleUpdateArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.MembershipRoleUpsertArgs} MembershipRoleUpsertArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.MembershipRoleCountArgs} MembershipRoleCountArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.MembershipRoleFindUniqueArgs} MembershipRoleFindUniqueArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.MembershipRoleFindManyArgs} MembershipRoleFindManyArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.MembershipRoleCreateArgs} MembershipRoleCreateArgs */
+/** @typedef {import('../../lib/.prisma/client.mjs').Prisma.MembershipRoleDeleteArgs} MembershipRoleDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class MembershipRolesService extends BasePrismaService {
@@ -77,8 +77,13 @@ module.exports = class MembershipRolesService extends BasePrismaService {
    * @returns {Promise<MembershipRole | null>}
    */
   async delete(params) {
-    const role = await membershipRolesPrisma.remove(params, this.prisma);
+    const deleted = await membershipRolesPrisma.remove(params, this.prisma);
+    if (!deleted) {
+      return null;
+    }
+
+    const { deleteResult, role } = deleted;
     this.triggerHooks('role:delete', role);
-    return role;
+    return deleteResult;
   }
 };

@@ -39,11 +39,11 @@
               :modes="['hex']"
               :swatches="genericColorPalette"
               hide-details="auto"
+              mode="hex"
+              variant="underlined"
               color-pip
               clearable
-              mode="hex"
               show-swatches
-              variant="underlined"
             />
           </v-col>
 
@@ -84,7 +84,7 @@
           <v-col cols="12">
             <v-autocomplete
               v-model="role.notifications"
-              :label="$t('roles.notifiateUserWhen')"
+              :label="$t('roles.notifyUserWhen')"
               :items="availableNotifications"
               prepend-icon="mdi-bell"
               variant="underlined"

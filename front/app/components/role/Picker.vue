@@ -23,7 +23,7 @@
           :loading="loadingRoles"
           variant="elevated"
           color="secondary"
-          @click="refreshRoles"
+          @click="refreshRoles()"
         />
       </template>
     </v-empty-state>
@@ -46,7 +46,11 @@
       >
         <template #append="{ isSelected, select }">
           <v-list-item-action start>
-            <v-checkbox-btn :model-value="isSelected" @update:model-value="select" />
+            <v-checkbox-btn
+              :model-value="isSelected"
+              color="primary"
+              @update:model-value="select($event)"
+            />
           </v-list-item-action>
         </template>
       </v-list-item>
@@ -96,13 +100,13 @@ const {
   refresh: refreshRoles,
 } = await useFetch('/api/roles', { lazy: true });
 
-const loadingRoles = computed(() => props.loading.value || rolesFetchStatus.value === 'pending');
+const loadingRoles = computed(() => props.loading || rolesFetchStatus.value === 'pending');
 const rolesError = computed(() => rolesFetchError.value && getErrorMessage(rolesFetchError.value));
 
 const disabledItems = computed(() => new Set(props.disabledItems));
 
 const filteredRoles = computed(() => (availableRoles.value ?? []).filter((role) => {
-  if (props.hideRestricted.value && role.restricted) { return false; }
+  if (props.hideRestricted && role.restricted) { return false; }
   if (!searchRole.value) { return true; }
   if (role.label.toLowerCase().includes(searchRole.value.toLowerCase())) { return true; }
   if (role.description?.toLowerCase().includes(searchRole.value.toLowerCase())) { return true; }

@@ -20,6 +20,7 @@ const {
  * Give alias permissions to the members of an institution
  * that have a role with "repositories" permissions preset
  * @param {RepositoryAlias} alias
+ * @param {string} institutionId
  */
 const givePermissionsToMembers = async (alias, institutionId) => {
   const membershipsService = new MembershipsService();

@@ -5,8 +5,6 @@ const {
   PERMISSIONS,
 } = require('../../entities/memberships.dto');
 
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
-
 /* eslint-disable max-len */
 /**
  * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient

@@ -12,9 +12,11 @@
       <template #prepend>
         <RoleChip :role="roleData" />
       </template>
+
       <template #title>
         {{ $t('institutions.members.title', { count: membershipRoles.length }) }}
       </template>
+
       <template #append>
         <v-btn
           v-if="emails.length"
@@ -58,7 +60,7 @@
               :loading="loading"
               variant="elevated"
               color="secondary"
-              @click="refreshForm"
+              @click="refreshForm()"
             />
           </template>
         </v-empty-state>
@@ -108,7 +110,6 @@ const snacks = useSnacksStore();
 
 const isOpen = shallowRef(false);
 const roleId = shallowRef(null);
-
 const roleData = ref(null);
 const search = shallowRef('');
 const loading = shallowRef(false);

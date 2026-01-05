@@ -130,6 +130,7 @@ exports.createInstitution = async (ctx) => {
 
   if (!isAdmin || addAsMember !== false) {
     const rolesService = new RolesService();
+
     const roles = await rolesService.findMany({
       select: { id: true },
       where: {
