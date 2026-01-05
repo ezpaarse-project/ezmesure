@@ -46,7 +46,11 @@
       >
         <template #append="{ isSelected, select }">
           <v-list-item-action start>
-            <v-checkbox-btn :model-value="isSelected" @update:model-value="select" />
+            <v-checkbox-btn
+              :model-value="isSelected"
+              color="primary"
+              @update:model-value="select"
+            />
           </v-list-item-action>
         </template>
       </v-list-item>

@@ -12,9 +12,11 @@
       <template #prepend>
         <RoleChip :role="roleData" />
       </template>
+
       <template #title>
         {{ $t('institutions.members.title', { count: membershipRoles.length }) }}
       </template>
+
       <template #append>
         <v-btn
           v-if="emails.length"

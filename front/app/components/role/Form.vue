@@ -39,11 +39,11 @@
               :modes="['hex']"
               :swatches="genericColorPalette"
               hide-details="auto"
+              mode="hex"
+              variant="underlined"
               color-pip
               clearable
-              mode="hex"
               show-swatches
-              variant="underlined"
             />
           </v-col>
 

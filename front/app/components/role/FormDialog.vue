@@ -57,11 +57,11 @@ const { t } = useI18n();
 
 const isOpen = shallowRef(false);
 const roleId = shallowRef(null);
-
 const roleData = ref(null);
 const loading = shallowRef(false);
 const errorMessage = shallowRef('');
 const errorIcon = shallowRef('');
+
 const dialogMaxWidth = computed(() => {
   if (loading.value) { return 200; }
   if (errorMessage.value) { return 500; }

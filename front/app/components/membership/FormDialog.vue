@@ -64,6 +64,7 @@ const membershipData = ref(null);
 const loading = shallowRef(false);
 const errorMessage = shallowRef('');
 const errorIcon = shallowRef('');
+
 const dialogMaxWidth = computed(() => {
   if (loading.value) { return 200; }
   if (errorMessage.value) { return 500; }
