@@ -100,13 +100,13 @@ const {
   refresh: refreshRoles,
 } = await useFetch('/api/roles', { lazy: true });
 
-const loadingRoles = computed(() => props.loading.value || rolesFetchStatus.value === 'pending');
+const loadingRoles = computed(() => props.loading || rolesFetchStatus.value === 'pending');
 const rolesError = computed(() => rolesFetchError.value && getErrorMessage(rolesFetchError.value));
 
 const disabledItems = computed(() => new Set(props.disabledItems));
 
 const filteredRoles = computed(() => (availableRoles.value ?? []).filter((role) => {
-  if (props.hideRestricted.value && role.restricted) { return false; }
+  if (props.hideRestricted && role.restricted) { return false; }
   if (!searchRole.value) { return true; }
   if (role.label.toLowerCase().includes(searchRole.value.toLowerCase())) { return true; }
   if (role.description?.toLowerCase().includes(searchRole.value.toLowerCase())) { return true; }
