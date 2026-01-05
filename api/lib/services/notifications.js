@@ -2,7 +2,6 @@
 const config = require('config');
 const { fr } = require('date-fns/locale');
 const { format, isValid } = require('date-fns');
-const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 const { appLogger } = require('./logger');
@@ -10,7 +9,6 @@ const { appLogger } = require('./logger');
 const {
   sender,
   recipients,
-  cron,
   sendEmptyActivity,
 } = config.get('notifications');
 
@@ -183,17 +181,5 @@ async function sendNotifications(logger = appLogger) {
 }
 
 module.exports = {
-  start(logger = appLogger) {
-    const job = new CronJob(cron, () => {
-      sendNotifications(logger).catch((err) => {
-        logger.error(`Failed to broadcast recent activity : ${err}`);
-      });
-    });
-
-    if (recipients) {
-      job.start();
-    } else {
-      logger.warn('No recipient configured, notifications will be disabled');
-    }
-  },
+  sendNotifications,
 };

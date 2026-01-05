@@ -6,7 +6,7 @@ const { appLogger } = require('../../services/logger');
 const {
   syncRepository,
   unmountRepository,
-} = require('../../services/sync/elastic');
+} = require('../../services/sync/elastic/repositories');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').Repository} Repository

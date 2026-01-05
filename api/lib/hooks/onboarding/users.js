@@ -3,7 +3,7 @@ const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 const { client: prisma } = require('../../services/prisma');
-const { syncUser: syncElasticUser } = require('../../services/sync/elastic');
+const { syncUser: syncElasticUser } = require('../../services/sync/elastic/users');
 const { upsertFromUser: syncEzrUser } = require('../../services/ezreeport/users');
 
 const { MEMBER_ROLES, FEATURES } = require('../../entities/memberships.dto');

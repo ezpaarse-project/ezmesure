@@ -13,11 +13,8 @@ const {
   },
 } = require('../../entities/memberships.dto');
 
-const {
-  syncRepositoryAlias,
-  unmountAlias,
-  syncRepositoryIndexTemplates,
-} = require('../../services/sync/elastic');
+const { syncRepositoryIndexTemplates } = require('../../services/sync/elastic/repositories');
+const { syncRepositoryAlias, unmountAlias } = require('../../services/sync/elastic/alias');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').RepositoryAlias} RepositoryAlias

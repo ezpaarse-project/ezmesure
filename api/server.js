@@ -13,16 +13,18 @@ const LocalizedError = require('./lib/models/LocalizedError');
 
 const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
-const notifications = require('./lib/services/notifications');
-const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
-const testUsers = require('./lib/services/elastic/test-users');
-const sushi = require('./lib/services/sushi');
-const sushiCredentials = require('./lib/services/sushi-credentials');
-const sushiAlerts = require('./lib/services/sushi-alerts');
-const harvest = require('./lib/services/harvest');
 
-const ezreeportSync = require('./lib/services/sync/ezreeport');
+// Crons
+const notifications = require('./lib/services/crons/notifications');
+const opendata = require('./lib/services/crons/opendata');
+const ezreeportSync = require('./lib/services/crons/sync/ezreeport');
+const sushi = require('./lib/services/crons/sushi');
+const sushiCredentials = require('./lib/services/crons/sushi-credentials');
+const sushiAlerts = require('./lib/services/crons/sushi-alerts');
+const harvest = require('./lib/services/crons/harvest');
+const cronMetrics = require('./lib/services/crons/metrics');
+const testUsers = require('./lib/services/crons/test-users');
 
 /**
  * Register hooks. Must not be called elsewhere. Some services can both
@@ -30,7 +32,6 @@ const ezreeportSync = require('./lib/services/sync/ezreeport');
  */
 require('./lib/hooks');
 
-const cronMetrics = require('./lib/controllers/metrics/cron');
 const { appLogger, httpLogger } = require('./lib/services/logger');
 
 const mailSender = config.get('notifications.sender');
@@ -145,15 +146,15 @@ app.on('error', (err, ctx = {}) => {
 app.use(mount('/', controller));
 
 function start() {
-  notifications.start(appLogger);
-  opendata.startCron(appLogger);
-  ezreeportSync.startCron();
+  notifications.startBroadcastCron();
+  opendata.startRefreshCron();
+  ezreeportSync.startSyncCron();
   sushi.startCleanCron();
-  sushiCredentials.startCron();
-  sushiAlerts.startCron();
+  sushiCredentials.startDeletionCron();
+  sushiAlerts.startFetchCron();
   harvest.startCancelCron();
   cronMetrics.start();
-  testUsers.startCron();
+  testUsers.startExpiredCron();
 
   const server = app.listen(config.port);
   server.setTimeout(1000 * 60 * 30);
