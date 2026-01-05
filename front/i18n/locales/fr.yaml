@@ -880,11 +880,11 @@ contact:
         credentials:
           required: Des identifiants COUNTER sont requis
     wrong-custom-properties:
-      title: Rapporter une erreur dans les champs personnalisé d'un établissement
+      title: Rapporter une erreur dans les champs personnalisés d'un établissement
       fields:
         content: Informations complémentaires
         institution: Établissement concerné
-        property: Propriétée concernée
+        property: Propriété concernée
         value: Nouvelle valeur|Nouvelles valeurs
   snacks:
     success: Votre demande de contact vient d'être envoyée à l'équipe.

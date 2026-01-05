@@ -870,7 +870,7 @@ contact:
         credentials:
           required: COUNTER credentials are required
     wrong-custom-properties:
-      title: Report error in custom properties of an institution
+      title: Report an error in the custom properties of an institution
       fields:
         content: Additional information
         institution: Affected institution
