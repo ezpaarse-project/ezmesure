@@ -873,7 +873,10 @@ contact:
       title: Report an error in the custom properties of an institution
       fields:
         content: Additional information
-        institution: Affected institution
+        institution:
+          label: Affected institution
+          emptySearch: No institution matches the search.
+          noMemberships: You are not a member of any institution.
         property: Affected property
         value: New value|New values
   snacks:

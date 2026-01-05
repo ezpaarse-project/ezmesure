@@ -152,14 +152,17 @@
                     <v-autocomplete
                       v-model="additionalData.institution"
                       :items="institutions ?? []"
-                      :label="$t('contact.types.wrong-custom-properties.fields.institution')"
+                      :label="$t('contact.types.wrong-custom-properties.fields.institution.label')"
+                      :no-data-text="hasMemberships
+                        ? 'contact.types.wrong-custom-properties.fields.institution.emptySearch'
+                        : 'contact.types.wrong-custom-properties.fields.institution.noMemberships'
+                      "
                       :rules="[
                         v => !!v || $t('fieldIsRequired'),
                       ]"
                       item-title="name"
                       variant="underlined"
                       hide-details="auto"
-                      hide-no-data
                       return-object
                       required
                     >
@@ -281,7 +284,7 @@ const { data: user } = useAuthState();
 const currentUserStore = useCurrentUserStore();
 const snacks = useSnacksStore();
 
-const { institutions } = storeToRefs(currentUserStore);
+const { institutions, hasMemberships } = storeToRefs(currentUserStore);
 
 const loading = shallowRef(false);
 const valid = shallowRef(false);

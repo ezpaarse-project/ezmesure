@@ -883,7 +883,10 @@ contact:
       title: Rapporter une erreur dans les champs personnalisés d'un établissement
       fields:
         content: Informations complémentaires
-        institution: Établissement concerné
+        institution:
+          label: Établissement concerné
+          emptySearch: Aucun établissement ne correspond à la recherche.
+          noMemberships: Vous n'êtes membre d'aucun établissement.
         property: Propriété concernée
         value: Nouvelle valeur|Nouvelles valeurs
   snacks:
