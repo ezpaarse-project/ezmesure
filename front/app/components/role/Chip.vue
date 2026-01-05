@@ -8,10 +8,10 @@
 </template>
 
 <script setup>
-const { role } = defineProps({
+defineProps({
   role: {
     type: Object,
-    default: () => ({}),
+    required: true,
   },
 });
 </script>
