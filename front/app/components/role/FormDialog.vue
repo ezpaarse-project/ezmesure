@@ -24,7 +24,7 @@
             :loading="loading"
             variant="elevated"
             color="secondary"
-            @click="refreshForm"
+            @click="refreshForm()"
           />
         </template>
       </v-empty-state>

@@ -23,7 +23,7 @@
           :loading="loadingRoles"
           variant="elevated"
           color="secondary"
-          @click="refreshRoles"
+          @click="refreshRoles()"
         />
       </template>
     </v-empty-state>
@@ -49,7 +49,7 @@
             <v-checkbox-btn
               :model-value="isSelected"
               color="primary"
-              @update:model-value="select"
+              @update:model-value="select($event)"
             />
           </v-list-item-action>
         </template>

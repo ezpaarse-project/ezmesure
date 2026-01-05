@@ -60,7 +60,7 @@
               :loading="loading"
               variant="elevated"
               color="secondary"
-              @click="refreshForm"
+              @click="refreshForm()"
             />
           </template>
         </v-empty-state>
@@ -110,7 +110,6 @@ const snacks = useSnacksStore();
 
 const isOpen = shallowRef(false);
 const roleId = shallowRef(null);
-
 const roleData = ref(null);
 const search = shallowRef('');
 const loading = shallowRef(false);
