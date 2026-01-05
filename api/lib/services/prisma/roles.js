@@ -3,19 +3,19 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').Role} Role
- * @typedef {import('@prisma/client').MembershipRole} MembershipRole
- * @typedef {import('@prisma/client').Prisma.RoleFindUniqueArgs} RoleFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.RoleFindManyArgs} RoleFindManyArgs
- * @typedef {import('@prisma/client').Prisma.RoleUpdateArgs} RoleUpdateArgs
- * @typedef {import('@prisma/client').Prisma.RoleCreateArgs} RoleCreateArgs
- * @typedef {import('@prisma/client').Prisma.RoleDeleteArgs} RoleDeleteArgs
- * @typedef {import('@prisma/client').Prisma.RoleUpsertArgs} RoleUpsertArgs
- * @typedef {import('@prisma/client').Prisma.RoleCountArgs} RoleCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').Role} Role
+ * @typedef {import('../../.prisma/client.mjs').MembershipRole} MembershipRole
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RoleFindUniqueArgs} RoleFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RoleFindManyArgs} RoleFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RoleUpdateArgs} RoleUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RoleCreateArgs} RoleCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RoleDeleteArgs} RoleDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RoleUpsertArgs} RoleUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RoleCountArgs} RoleCountArgs
  *
- * @typedef {import('@prisma/client').SpacePermission} SpacePermission
- * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
+ * @typedef {import('../../.prisma/client.mjs').SpacePermission} SpacePermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  *
  * @typedef {Role & { membershipRoles: MembershipRole[] }} OldRole
  * @typedef {{ deleteResult: Role, role: OldRole }} RoleRemoved

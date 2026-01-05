@@ -3,20 +3,20 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('@prisma/client').MembershipRole} MembershipRole
- * @typedef {import('@prisma/client').Membership} Membership
- * @typedef {import('@prisma/client').Role} Role
- * @typedef {import('@prisma/client').Prisma.MembershipRoleFindUniqueArgs} MembershipRoleFindUniqueArgs
- * @typedef {import('@prisma/client').Prisma.MembershipRoleFindManyArgs} MembershipRoleFindManyArgs
- * @typedef {import('@prisma/client').Prisma.MembershipRoleUpdateArgs} MembershipRoleUpdateArgs
- * @typedef {import('@prisma/client').Prisma.MembershipRoleCreateArgs} MembershipRoleCreateArgs
- * @typedef {import('@prisma/client').Prisma.MembershipRoleDeleteArgs} MembershipRoleDeleteArgs
- * @typedef {import('@prisma/client').Prisma.MembershipRoleUpsertArgs} MembershipRoleUpsertArgs
- * @typedef {import('@prisma/client').Prisma.MembershipRoleCountArgs} MembershipRoleCountArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').MembershipRole} MembershipRole
+ * @typedef {import('../../.prisma/client.mjs').Membership} Membership
+ * @typedef {import('../../.prisma/client.mjs').Role} Role
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipRoleFindUniqueArgs} MembershipRoleFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipRoleFindManyArgs} MembershipRoleFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipRoleUpdateArgs} MembershipRoleUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipRoleCreateArgs} MembershipRoleCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipRoleDeleteArgs} MembershipRoleDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipRoleUpsertArgs} MembershipRoleUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.MembershipRoleCountArgs} MembershipRoleCountArgs
  *
- * @typedef {import('@prisma/client').SpacePermission} SpacePermission
- * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
+ * @typedef {import('../../.prisma/client.mjs').SpacePermission} SpacePermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  *
  * @typedef {MembershipRole & { membership: Membership, role: Role }} OldMembershipRole
  * @typedef {{ deleteResult: MembershipRole, role: OldMembershipRole }} MembershipRoleRemoved
