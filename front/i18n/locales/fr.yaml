@@ -290,7 +290,7 @@ institutions:
   title: Établissement
   all: Tous les établissements
   count: >
-    aucun établissement
+    Aucun établissement
     |{count} établissement
     |{count} établissements
   updateInstitution: Mettre à jour l'établissement
@@ -1162,7 +1162,7 @@ roles:
   onlyAdmins: Assignable uniquement par les administrateurs
   notOnlyAdmins: Assignable par les utilisateurs
   exposeMembers: Exposer sur la page des partenaires
-  notifiateUserWhen: Notifications reçues par l'utilisateur
+  notifyUserWhen: Notifications reçues par l'utilisateur
   autoAssignWhen: Assigner automatiquement lorsque
   assignments: Assignations
   definePermissionsPreset: Définir des permissions par défaut

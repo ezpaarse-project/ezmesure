@@ -288,7 +288,7 @@ institutions:
   title: Institution
   all: All institutions
   count: >
-    no institution
+    No institution
     |{count} institution
     |{count} institutions
   validateSwitch: Validate/Invalidate
@@ -1149,7 +1149,7 @@ roles:
   onlyAdmins: Only assignable by administrators
   notOnlyAdmins: Assignable by users
   exposeMembers: Expose on the partner page
-  notifiateUserWhen: Notifications received by the user
+  notifyUserWhen: Notifications received by the user
   autoAssignWhen: Assign automatically when
   assignments: Assignments
   definePermissionsPreset: Define permissions presets
