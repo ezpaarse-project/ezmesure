@@ -110,7 +110,7 @@ const permissionsItems = computed(() => {
 const {
   data: roleItems,
   status: rolesStatus,
-} = useFetch('/api/roles', { lazy: true });
+} = await useFetch('/api/roles', { lazy: true });
 
 const loadingRoles = computed(() => rolesStatus.value === 'pending');
 
