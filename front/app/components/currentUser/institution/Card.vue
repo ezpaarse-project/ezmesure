@@ -33,7 +33,7 @@
 
         <div>{{ $t('myspace.roles') }}</div>
 
-        <div class="d-flex flex-wrap ga-1">
+        <div class="d-flex flex-wrap ga-1 ml-1">
           <RoleChip
             v-for="role in membership.roles"
             :key="role.roleId"
