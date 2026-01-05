@@ -77,8 +77,13 @@ module.exports = class MembershipRolesService extends BasePrismaService {
    * @returns {Promise<MembershipRole | null>}
    */
   async delete(params) {
-    const role = await membershipRolesPrisma.remove(params, this.prisma);
+    const deleted = await membershipRolesPrisma.remove(params, this.prisma);
+    if (!deleted) {
+      return null;
+    }
+
+    const { deleteResult, role } = deleted;
     this.triggerHooks('role:delete', role);
-    return role;
+    return deleteResult;
   }
 };
