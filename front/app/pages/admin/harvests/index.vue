@@ -10,7 +10,7 @@
     >
       <v-btn
         v-if="harvestSessionFormDialogRef"
-        v-tooltip="$t('harvest.sessions.form.title:add')"
+        v-tooltip="$t('harvest.sessions.add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"
@@ -18,7 +18,7 @@
         class="mr-2"
         @click="harvestSessionFormDialogRef.open()"
       />
-
+      
       <v-btn
         v-if="globalHarvestMatrixRef"
         v-tooltip="$t('sushi.globalHarvestState.title')"

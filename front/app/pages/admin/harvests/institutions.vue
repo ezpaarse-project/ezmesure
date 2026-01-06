@@ -286,7 +286,7 @@
 
         <v-list-item
           v-if="harvestSessionFormDialogRef"
-          :title="$t('harvest.sessions.form.title:add')"
+          :title="$t('harvest.sessions.add')"
           prepend-icon="mdi-tractor"
           @click="harvestSessionFormDialogRef.open({
             credentialsQuery: { institutionIds: selected },
