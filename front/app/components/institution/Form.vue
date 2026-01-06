@@ -255,6 +255,14 @@
                   :text="user?.isAdmin ? $t('institutions.institution.addNewCustomProp') : undefined"
                 />
 
+                <i18n-t v-else keypath="institutions.institution.customPropsContact.text" tag="p">
+                  <template #contact-us>
+                    <nuxt-link :to="`/contact-us?subject=wrong-custom-properties&institutionId=${institution.id}`">
+                      {{ $t('institutions.institution.customPropsContact.contact-us') }}
+                    </nuxt-link>
+                  </template>
+                </i18n-t>
+
                 <div
                   v-for="(customProp, index) in institution.customProps"
                   :key="customProp.fieldId"
