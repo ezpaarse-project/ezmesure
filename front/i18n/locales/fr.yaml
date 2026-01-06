@@ -392,6 +392,9 @@ institutions:
     propertyName: Nom de propriété
     noCustomProps: Aucune propriété personnalisée
     addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite
+    customPropsContact:
+      text: Si vous remarquez une erreur dans les propriétés non éditables, vous pouvez {contact-us} via le formulaire de contact.
+      contact-us: contacter l'équipe d'administration
     tags: Étiquettes
     tagsDescription: Les étiquettes permettent d'organiser les établissements en leur associant des mots-clés.
   members:

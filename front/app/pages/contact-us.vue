@@ -250,6 +250,12 @@ function resetForm() {
   subject.value = query.subject || '';
   message.value = '';
   additionalData.value = { sendBrowser: subject.value === 'bugs' ? true : undefined };
+
+  if (subject.value === 'wrong-custom-properties' && query.institutionId) {
+    additionalData.value.institution = institutions.value
+      .find(({ id }) => id === query.institutionId);
+  }
+
   formRef.value?.validate();
 }
 async function sendMail() {

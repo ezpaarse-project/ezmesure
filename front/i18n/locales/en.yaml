@@ -390,6 +390,9 @@ institutions:
     propertyName: Property name
     noCustomProps: No custom properties
     addNewCustomProp: Add a new one by clicking on the + in the top right corner
+    customPropsContact:
+      text: If you notice an error in the non-editable properties, you can {contact-us} via the contact form.
+      contact-us: contact the administration team
     tags: Tags
     tagsDescription: Tags allow you to organize institutions by associating them with keywords.
   members:
