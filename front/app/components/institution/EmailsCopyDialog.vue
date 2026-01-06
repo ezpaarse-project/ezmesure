@@ -64,19 +64,23 @@ const allInstitutions = computed(() => institutionIds.value.size === 0);
 const {
   data: roles,
   status,
-  error,
-} = useAsyncData(`roles-${Array.from(selectedRoles.value)}`, () => {
+} = useAsyncData(`roles-${Array.from(selectedRoles.value)}`, async () => {
   if (selectedRoles.value.length <= 0) {
     return [];
   }
 
-  return $fetch('/api/roles', {
-    query: {
-      id: selectedRoles.value,
-      include: ['membershipRoles.membership.user'],
-      size: 0,
-    },
-  });
+  try {
+    return await $fetch('/api/rolses', {
+      query: {
+        id: selectedRoles.value,
+        include: ['membershipRoles.membership.user'],
+        size: 0,
+      },
+    });
+  } catch (e) {
+    snacks.error(t('anErrorOccurred'), e);
+    throw e;
+  }
 }, {
   lazy: true,
   immediate: false,
@@ -85,12 +89,6 @@ const {
 });
 
 const loadingEmails = computed(() => status.value === 'pending');
-
-watch(error, (value) => {
-  if (value) {
-    snacks.error(t('anErrorOccurred'), value?.cause ?? value);
-  }
-});
 
 const selectedEmails = computed(() => new Set(
   (roles.value ?? [])
