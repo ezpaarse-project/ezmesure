@@ -881,7 +881,10 @@ contact:
           emptySearch: No institution matches the search.
           noMemberships: You are not a member of any institution.
         property: Affected property
-        value: New value|New values
+        value:
+          label: Desired value|Desired values
+          diff:removed: Deleted values
+          diff:added: Added values
   snacks:
     success: Your contact request has just been sent to the team.
     failed: Sending the contact form failed.

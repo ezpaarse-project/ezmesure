@@ -208,7 +208,7 @@
                       <component
                         :is="additionalData.prop.multiple ? MultiTextField : VTextField"
                         :model-value="additionalData.value || additionalData.prop.value"
-                        :label="$t('contact.types.wrong-custom-properties.fields.value', additionalData.prop.multiple ? 2 : 1)"
+                        :label="$t('contact.types.wrong-custom-properties.fields.value.label', additionalData.prop.multiple ? 2 : 1)"
                         :rules="[
                           v => v?.length > 0 || $t('fieldIsRequired'),
                         ]"
@@ -353,16 +353,32 @@ function isValidUrl(v) {
   }
 }
 
-function diffValues(oldValues, newValues) {
-  const oldValuesSet = new Set(oldValues);
-  const newValuesSet = new Set(newValues);
+function diffValues(oldValue, newValue) {
+  if (!Array.isArray(oldValue) && !Array.isArray(newValue)) {
+    return [
+      `${t('contact.types.wrong-custom-properties.fields.value.label')}:`,
+      newValue,
+    ];
+  }
+
+  const oldValuesArr = Array.isArray(oldValue) ? oldValue : [oldValue];
+  const oldValuesSet = new Set(oldValuesArr);
+
+  const newValuesArr = Array.isArray(newValue) ? newValue : [newValue];
+  const newValuesSet = new Set(newValuesArr);
 
   return [
-    // Mark absent values and keep unchanged ones
-    ...oldValues.map((val) => (!newValuesSet.has(val) ? `- ${val}` : val)),
-    // Get values that are new
-    ...newValues.map((val) => (!oldValuesSet.has(val) ? `+ ${val}` : '')),
-  ].filter((val) => !!val);
+    // Show new value of the list
+    `${t('contact.types.wrong-custom-properties.fields.value.label', 2)}:`,
+    ...newValue,
+    '',
+    // Show values that were removed
+    `${t('contact.types.wrong-custom-properties.fields.value.diff:removed')}:`,
+    ...oldValuesArr.filter((val) => !newValuesSet.has(val)),
+    // Show values that were added
+    `${t('contact.types.wrong-custom-properties.fields.value.diff:added')}:`,
+    ...newValuesArr.filter((val) => !oldValuesSet.has(val)),
+  ];
 }
 
 function onSubjectChange() {
@@ -426,15 +442,11 @@ function generateSushiEndpointMail() {
 function generateWrongPropertiesMail() {
   const meta = additionalData.value;
 
-  const diff = diffValues(
-    Array.isArray(meta.prop.value) ? meta.prop.value : [meta.prop.value],
-    Array.isArray(meta.value) ? meta.value : [meta.value],
-  );
+  const diff = diffValues(meta.prop.value, meta.value);
 
   const parts = [
     `${t('institutions.title')}:`, meta.institution.name,
     `${t('institutions.institution.propertyName')}:`, meta.prop.label,
-    `${t('value')}:`,
     ...diff,
     '',
     message.value,
