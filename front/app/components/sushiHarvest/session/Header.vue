@@ -64,7 +64,7 @@
 
       <v-chip
         v-if="modelValue.sendEndMail"
-        v-tooltip:top="$t('harvest.sessions.form.settings.sendEndMail')"
+        v-tooltip:top="$t('harvest.sessions.sendEndMail')"
         size="small"
         variant="outlined"
         class="mr-2 mt-1"
