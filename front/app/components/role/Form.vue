@@ -204,10 +204,10 @@ const snacks = useSnacksStore();
 
 const ID_PATTERN = /^[a-z0-9_-]+$/i;
 
-const idRules = [
+const idRules = computed(() => [
   (v) => !!v || t('fieldIsRequired'),
   (v) => (!v || ID_PATTERN.test(v)) || t('fieldMustMatch', { pattern: ID_PATTERN.toString() }),
-];
+]);
 
 const showIconMenu = shallowRef(false);
 const saving = shallowRef(false);
