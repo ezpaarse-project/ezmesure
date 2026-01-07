@@ -82,37 +82,99 @@
           </v-col>
 
           <v-col cols="12">
-            <v-autocomplete
-              v-model="role.notifications"
-              :label="$t('roles.notifyUserWhen')"
-              :items="availableNotifications"
+            <v-input
               prepend-icon="mdi-bell"
-              variant="underlined"
-              item-value="id"
-              item-title="text"
-              multiple
-              chips
-              small-chips
               hide-details
-              closable-chips
-            />
+            >
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <template #title>
+                    {{ $t('roles.notifyUserWhen') }}
+                    <v-chip
+                      class="ml-1"
+                      size="x-small"
+                      variant="outlined"
+                    >
+                      {{ role.notifications?.length ?? 0 }} / {{ availableNotifications.length }}
+                    </v-chip>
+                  </template>
+
+                  <template #text>
+                    <v-list
+                      v-model:selected="role.notifications"
+                      select-strategy="leaf"
+                      density="compact"
+                      class="py-0"
+                    >
+                      <v-list-item
+                        v-for="item in availableNotifications"
+                        :key="item.id"
+                        :title="item.text"
+                        :value="item.id"
+                      >
+                        <template #prepend="{ isSelected, select }">
+                          <v-list-item-action start>
+                            <v-checkbox-btn
+                              density="compact"
+                              :model-value="isSelected"
+                              @update:model-value="select"
+                            />
+                          </v-list-item-action>
+                        </template>
+                      </v-list-item>
+                    </v-list>
+                  </template>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-input>
           </v-col>
 
           <v-col cols="12">
-            <v-autocomplete
-              v-model="role.autoAssign"
-              :label="$t('roles.autoAssignWhen')"
-              :items="availableEvents"
+            <v-input
               prepend-icon="mdi-refresh-auto"
-              variant="underlined"
-              item-value="id"
-              item-title="text"
-              multiple
-              chips
-              small-chips
               hide-details
-              closable-chips
-            />
+            >
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <template #title>
+                    {{ $t('roles.autoAssignWhen') }}
+                    <v-chip
+                      class="ml-1"
+                      size="x-small"
+                      variant="outlined"
+                    >
+                      {{ role.autoAssign?.length ?? 0 }} / {{ availableEvents.length }}
+                    </v-chip>
+                  </template>
+
+                  <template #text>
+                    <v-list
+                      v-model:selected="role.autoAssign"
+                      select-strategy="leaf"
+                      density="compact"
+                      class="py-0"
+                    >
+                      <v-list-item
+                        v-for="item in availableEvents"
+                        :key="item.id"
+                        :title="item.text"
+                        :value="item.id"
+                      >
+                        <template #prepend="{ isSelected, select }">
+                          <v-list-item-action start>
+                            <v-checkbox-btn
+                              density="compact"
+                              :model-value="isSelected"
+                              @update:model-value="select"
+                            />
+                          </v-list-item-action>
+                        </template>
+                      </v-list-item>
+                    </v-list>
+                  </template>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-input>
           </v-col>
 
           <v-col cols="12">
@@ -258,3 +320,9 @@ async function save() {
   saving.value = false;
 }
 </script>
+
+<style lang="scss" scoped>
+  :deep(.v-expansion-panel-text__wrapper) {
+    padding: 0 !important;
+  }
+</style>
