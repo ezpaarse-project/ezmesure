@@ -226,19 +226,19 @@ const hasPresets = computed(() => !!role.value.permissionsPreset);
 const getNotificationItem = (id) => ({ id, text: t(`roles.notificationTypes.${id}`) });
 const getEventItem = (id) => ({ id, text: t(`roles.eventTypes.${id}`) });
 
-const availableNotifications = ref([
-  getNotificationItem('institution:validated'),
-  getNotificationItem('institution:role_assigned'),
-  getNotificationItem('institution:new_user_matching_institution'),
-  getNotificationItem('institution:membership_request'),
-  getNotificationItem('counter:new_data_available'),
-]);
+const availableNotifications = computed(() => [
+  'institution:validated',
+  'institution:role_assigned',
+  'institution:new_user_matching_institution',
+  'institution:membership_request',
+  'counter:new_data_available',
+].map(getNotificationItem));
 
-const availableEvents = ref([
-  getEventItem('institution:self_join'),
-  getEventItem('institution:user_onboarded'),
-  getEventItem('institution:declared'),
-]);
+const availableEvents = computed(() => [
+  'institution:self_join',
+  'institution:user_onboarded',
+  'institution:declared',
+].map(getEventItem));
 
 /**
  * Available features
