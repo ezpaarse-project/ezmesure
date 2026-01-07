@@ -13,19 +13,19 @@ const { isObject, isFalse } = require('../utils/type-guards');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../.prisma/client').SushiAlert} SushiAlert
- * @typedef {import('../.prisma/client').Prisma.SushiAlertUpdateArgs} SushiAlertUpdateArgs
- * @typedef {import('../.prisma/client').Prisma.SushiAlertUpsertArgs} SushiAlertUpsertArgs
- * @typedef {import('../.prisma/client').Prisma.SushiAlertFindUniqueArgs} SushiAlertFindUniqueArgs
- * @typedef {import('../.prisma/client').Prisma.SushiAlertFindManyArgs} SushiAlertFindManyArgs
- * @typedef {import('../.prisma/client').Prisma.SushiAlertCreateArgs} SushiAlertCreateArgs
- * @typedef {import('../.prisma/client').Prisma.SushiAlertCreateInput} SushiAlertCreateInput
- * @typedef {import('../.prisma/client').Prisma.SushiAlertDeleteArgs} SushiAlertDeleteArgs
- * @typedef {import('../.prisma/client').Prisma.SushiAlertDeleteManyArgs} SushiAlertDeleteManyArgs
- * @typedef {import('../.prisma/client').Prisma.SushiAlertCountArgs} SushiAlertCountArgs
- * @typedef {import('../.prisma/client').Prisma.SushiEndpointGetPayload<{ include: { credentials: true } }>} SushiEndpointWithCredentials
- * @typedef {import('../.prisma/client').Prisma.HarvestGetPayload<{ include: { credentials: { include: { endpoint: true, institution: true } } } }>} HarvestWithInstitutionAndEndpoint
- * @typedef {import('../.prisma/client').Prisma.PrismaPromise<unknown>} PrismaPromise
+ * @typedef {import('../.prisma/client.mts').SushiAlert} SushiAlert
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertUpdateArgs} SushiAlertUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertUpsertArgs} SushiAlertUpsertArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertFindUniqueArgs} SushiAlertFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertFindManyArgs} SushiAlertFindManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertCreateArgs} SushiAlertCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertCreateInput} SushiAlertCreateInput
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertDeleteArgs} SushiAlertDeleteArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertDeleteManyArgs} SushiAlertDeleteManyArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiAlertCountArgs} SushiAlertCountArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.SushiEndpointGetPayload<{ include: { credentials: true } }>} SushiEndpointWithCredentials
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestGetPayload<{ include: { credentials: { include: { endpoint: true, institution: true } } } }>} HarvestWithInstitutionAndEndpoint
+ * @typedef {import('../.prisma/client.mts').Prisma.PrismaPromise<unknown>} PrismaPromise
  */
 /* eslint-enable max-len */
 

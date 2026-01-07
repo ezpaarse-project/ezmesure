@@ -9,7 +9,7 @@ const { upsertFromUser: syncEzrUser } = require('../../services/ezreeport/users'
 const { MEMBER_ROLES, FEATURES } = require('../../entities/memberships.dto');
 
 /**
- * @typedef {import('../../.prisma/client').User} User
+ * @typedef {import('../../.prisma/client.mjs').User} User
  */
 
 /**

@@ -390,6 +390,9 @@ institutions:
     propertyName: Property name
     noCustomProps: No custom properties
     addNewCustomProp: Add a new one by clicking on the + in the top right corner
+    customPropsContact:
+      text: If you notice an error in the non-editable properties, you can {contact-us} via the contact form.
+      contact-us: contact the administration team
     tags: Tags
     tagsDescription: Tags allow you to organize institutions by associating them with keywords.
   members:
@@ -826,27 +829,63 @@ password:
   length: The password must be at least 6 characters long
   update: Update your password
 contact:
-  contactUs: Contact us
-  email: Email address
-  subject: Subject
-  content: Message content
-  sendNavigatorVersion: Send my browser version
-  emailSent: Your contact request has just been sent to the team.
-  failed: Sending the contact form failed.
-  requestInformation: Information request
-  bugReport: Bug report
-  declareSushiEndpoint: Declare a COUNTER endpoint
-  emailIsRequired: The email address is required
-  emailMustBeValid: The email address must be valid
-  contentIsRequired: A message is required
-  subjectIsRequired: Subject is required
-  sushiIsRequired: COUNTER credentials are required
-  endpointVendor: Vendor name
-  endpointUrl: URL of the COUNTER endpoint
-  pleaseEnterFullVendorName: Please enter the full name (possibly with its acronym)
-  sushiDetails: Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER5 compliant.
-  endpointDetails: If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.
-  additionalInformation: Additional information
+  title: Contact us
+  fields:
+    email: Email address
+    subject: Subject
+    content: Message content
+  rules:
+    email:
+      required: The email address is required
+      valid: The email address must be valid
+    subject:
+      required: Subject is required
+    content:
+      required: A message is required
+  types:
+    informations:
+      title: Information request
+    bugs:
+      title: Bug report
+      fields:
+        browser: Send my browser version
+    sushi-endpoint:
+      title: Declare a COUNTER endpoint
+      fields:
+        content: Additional information
+        endpoint:
+          title: '@:endpoints.endpoint'
+          fields:
+            vendor:
+              label: Vendor name
+              hint: Please enter the full name (possibly with its acronym)
+            url: URL of the COUNTER endpoint
+        credentials:
+          title: '@:sushi.auth'
+          text: Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER compliant.
+          fields:
+            customerId: '@:institutions.sushi.customerId'
+            requestorId: '@:institutions.sushi.requestorId'
+            apiKey: '@:institutions.sushi.apiKey'
+      rules:
+        credentials:
+          required: COUNTER credentials are required
+    wrong-custom-properties:
+      title: Report an error in the custom properties of an institution
+      fields:
+        content: Additional information
+        institution:
+          label: Affected institution
+          emptySearch: No institution matches the search.
+          noMemberships: You are not a member of any institution.
+        property: Affected property
+        value:
+          label: Desired value|Desired values
+          diff:removed: Deleted values
+          diff:added: Added values
+  snacks:
+    success: Your contact request has just been sent to the team.
+    failed: Sending the contact form failed.
 errors:
   "404": La page demandée n'a pas été trouvée
   "500": An internal error occurred

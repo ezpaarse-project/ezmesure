@@ -12,9 +12,9 @@ const HarvestSessionService = require('../../entities/harvest-session.service');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').HarvestJob} HarvestJob
- * @typedef {import('../../.prisma/client').Prisma.HarvestUncheckedCreateInput} HarvestUncheckedCreateInput
- * @typedef {import('../../.prisma/client').Prisma.HarvestUncheckedUpdateInput} HarvestUncheckedUpdateInput
+ * @typedef {import('../../.prisma/client.mjs').HarvestJob} HarvestJob
+ * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestUncheckedCreateInput} HarvestUncheckedCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestUncheckedUpdateInput} HarvestUncheckedUpdateInput
 */
 /* eslint-enable max-len */
 

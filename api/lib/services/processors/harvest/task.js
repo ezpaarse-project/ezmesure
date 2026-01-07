@@ -7,7 +7,7 @@ const { appLogger } = require('../../logger');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../../.prisma/client').Step} Step
+ * @typedef {import('../../../.prisma/client.mjs').Step} Step
  * @typedef {import('../../../entities/institutions.service').Institution} Institution
  * @typedef {import('../../../entities/sushi-endpoints.service').SushiEndpoint} SushiEndpoint
  * @typedef {import('../../../entities/sushi-credentials.service').SushiCredentials} SushiCredentials

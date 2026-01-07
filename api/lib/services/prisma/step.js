@@ -3,13 +3,13 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client').Step} Step
- * @typedef {import('../../.prisma/client').Prisma.StepUpdateArgs} StepUpdateArgs
- * @typedef {import('../../.prisma/client').Prisma.StepUpsertArgs} StepUpsertArgs
- * @typedef {import('../../.prisma/client').Prisma.StepFindUniqueArgs} StepFindUniqueArgs
- * @typedef {import('../../.prisma/client').Prisma.StepFindManyArgs} StepFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.StepCreateArgs} StepCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').Step} Step
+ * @typedef {import('../../.prisma/client.mjs').Prisma.StepUpdateArgs} StepUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.StepUpsertArgs} StepUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.StepFindUniqueArgs} StepFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.StepFindManyArgs} StepFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.StepCreateArgs} StepCreateArgs
  */
 /* eslint-enable max-len */
 

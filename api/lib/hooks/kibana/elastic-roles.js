@@ -6,7 +6,7 @@ const { appLogger } = require('../../services/logger');
 const { syncCustomRole, unmountCustomRole } = require('../../services/sync/kibana');
 
 /**
- * @typedef {import('../../.prisma/client').ElasticRole} ElasticRole
+ * @typedef {import('../../.prisma/client.mjs').ElasticRole} ElasticRole
  */
 
 /**

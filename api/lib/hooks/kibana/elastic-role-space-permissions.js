@@ -7,7 +7,7 @@ const { syncCustomRole } = require('../../services/sync/kibana');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').ElasticRoleSpacePermission} ElasticRoleSpacePermission
+ * @typedef {import('../../.prisma/client.mjs').ElasticRoleSpacePermission} ElasticRoleSpacePermission
  */
 /* eslint-enable max-len */
 

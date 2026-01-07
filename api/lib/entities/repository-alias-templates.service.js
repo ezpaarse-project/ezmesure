@@ -3,15 +3,15 @@ const BasePrismaService = require('./base-prisma.service');
 const repositoryAliasTemplatesPrisma = require('../services/prisma/repository-alias-templates');
 
 /* eslint-disable max-len */
-/** @typedef {import('../.prisma/client').RepositoryAliasTemplate} RepositoryAliasTemplate */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateUpdateArgs} RepositoryAliasTemplateUpdateArgs */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateUpsertArgs} RepositoryAliasTemplateUpsertArgs */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateCountArgs} RepositoryAliasTemplateCountArgs */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateFindUniqueArgs} RepositoryAliasTemplateFindUniqueArgs */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateFindFirstArgs} RepositoryAliasTemplateFindFirstArgs */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateCreateArgs} RepositoryAliasTemplateCreateArgs */
-/** @typedef {import('../.prisma/client').Prisma.RepositoryAliasTemplateDeleteArgs} RepositoryAliasTemplateDeleteArgs */
+/** @typedef {import('../.prisma/client.mts').RepositoryAliasTemplate} RepositoryAliasTemplate */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateUpdateArgs} RepositoryAliasTemplateUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateUpsertArgs} RepositoryAliasTemplateUpsertArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateCountArgs} RepositoryAliasTemplateCountArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateFindUniqueArgs} RepositoryAliasTemplateFindUniqueArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateFindFirstArgs} RepositoryAliasTemplateFindFirstArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateCreateArgs} RepositoryAliasTemplateCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateDeleteArgs} RepositoryAliasTemplateDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositoriesService extends BasePrismaService {

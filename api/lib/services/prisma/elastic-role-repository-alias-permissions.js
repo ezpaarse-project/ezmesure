@@ -3,14 +3,14 @@ const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../.prisma/client').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client').ElasticRoleRepositoryAliasPermission} ElasticRoleRepositoryAliasPermission
- * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryAliasPermissionUpdateArgs} ElasticRoleRepositoryAliasPermissionUpdateArgs
- * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryAliasPermissionUpsertArgs} ElasticRoleRepositoryAliasPermissionUpsertArgs
- * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryAliasPermissionFindUniqueArgs} ElasticRoleRepositoryAliasPermissionFindUniqueArgs
- * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryAliasPermissionFindManyArgs} ElasticRoleRepositoryAliasPermissionFindManyArgs
- * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryAliasPermissionCreateArgs} ElasticRoleRepositoryAliasPermissionCreateArgs
- * @typedef {import('../../.prisma/client').Prisma.ElasticRoleRepositoryAliasPermissionDeleteArgs} ElasticRoleRepositoryAliasPermissionDeleteArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
+ * @typedef {import('../../.prisma/client.mjs').ElasticRoleRepositoryAliasPermission} ElasticRoleRepositoryAliasPermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleRepositoryAliasPermissionUpdateArgs} ElasticRoleRepositoryAliasPermissionUpdateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleRepositoryAliasPermissionUpsertArgs} ElasticRoleRepositoryAliasPermissionUpsertArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleRepositoryAliasPermissionFindUniqueArgs} ElasticRoleRepositoryAliasPermissionFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleRepositoryAliasPermissionFindManyArgs} ElasticRoleRepositoryAliasPermissionFindManyArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleRepositoryAliasPermissionCreateArgs} ElasticRoleRepositoryAliasPermissionCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ElasticRoleRepositoryAliasPermissionDeleteArgs} ElasticRoleRepositoryAliasPermissionDeleteArgs
  */
 /* eslint-enable max-len */
 
