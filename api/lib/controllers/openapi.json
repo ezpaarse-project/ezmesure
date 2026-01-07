@@ -385,6 +385,13 @@
           "createdAt": {
             "$ref": "#/components/schemas/ItemCreationDate"
           },
+          "lastAcitvity": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Last activity date",
+            "readOnly": true
+          },
           "fullName": {
             "description": "User full name",
             "type": "string",
@@ -6291,7 +6298,7 @@
         "operationId": "getInstitutions"
       }
     },
-    "/profile": {
+    "/auth": {
       "get": {
         "tags": ["Authentication"],
         "summary": "Fetch profile",
@@ -6319,7 +6326,7 @@
         "operationId": "getProfile"
       }
     },
-    "/profile/memberships": {
+    "/auth/memberships": {
       "get": {
         "tags": ["Authentication"],
         "summary": "Fetch memberships for profile",
@@ -6390,7 +6397,7 @@
         "operationId": "getProfileMemberships"
       }
     },
-    "/profile/elastic-role": {
+    "/auth/elastic-roles": {
       "get": {
         "tags": ["Authentication"],
         "summary": "Fetch elastic roles for profile",
@@ -6464,7 +6471,7 @@
         "operationId": "getProfileElasticRoles"
       }
     },
-    "/profile/token": {
+    "/auth/token": {
       "get": {
         "tags": ["Authentication"],
         "summary": "Get an authorization token",
@@ -6491,48 +6498,6 @@
           }
         },
         "operationId": "getAuthToken"
-      }
-    },
-    "/profile/terms/accept": {
-      "post": {
-        "tags": ["Authentication"],
-        "summary": "Accept terms of service",
-        "description": "Accept terms of service. You should read them first!",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Terms accepted successfully"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        },
-        "operationId": "acceptTerms"
-      }
-    },
-    "/profile/password/reset": {
-      "post": {
-        "tags": ["Authentication"],
-        "summary": "Reset Kibana password",
-        "description": "Reset Kibana password of the authenticated user.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Password successfully reset"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        },
-        "operationId": "resetPassword"
       }
     },
     "/queues": {

@@ -10,6 +10,8 @@ model User {
   createdAt    DateTime      @default(now())
   /// Latest update date
   updatedAt    DateTime      @updatedAt
+  /// Date of last activity
+  lastActivity DateTime      @default(now())
   /// Whether the user has admin access or not
   isAdmin      Boolean       @default(false)
   /// Arbitrary metadata

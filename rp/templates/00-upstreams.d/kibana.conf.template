@@ -1,0 +1,4 @@
+upstream kibana_server {
+  zone upstream_dynamic 64k;
+  server ${KIBANA_HOST} max_fails=0  resolve;
+}

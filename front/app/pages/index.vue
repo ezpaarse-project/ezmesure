@@ -90,6 +90,14 @@
 import logo from '@@/static/images/logo-ezMESURE-slogan.png';
 
 const { t } = useI18n();
+const router = useRouter();
+
+const snacks = useSnacksStore();
+if (router.currentRoute.value.query.error) {
+  const err = JSON.parse(atob(router.currentRoute.value.query.error));
+  snacks.error(t('authenticate.failed'), err);
+  router.replace({ query: undefined });
+}
 
 const features = computed(() => [
   {

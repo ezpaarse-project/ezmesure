@@ -21,6 +21,7 @@ const schema = {
   isAdmin: Joi.boolean(),
 
   metadata: Joi.object(),
+  lastActivity: Joi.date(),
 
   memberships: Joi.array().items(Joi.object()),
   elasticRoles: Joi.array().items(Joi.object()),
@@ -34,6 +35,7 @@ const immutableFields = [
   'username',
   'updatedAt',
   'createdAt',
+  'lastActivity',
   'memberships',
   'historyEntries',
   'elasticRoles',

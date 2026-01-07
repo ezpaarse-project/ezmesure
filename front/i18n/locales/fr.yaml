@@ -57,6 +57,7 @@ myspace:
   title: Mon profil
   noMemberships: Vous ne faites partie d'aucun établissement.
   determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'{team} ou le contact ezMESURE de votre établissement, ou a utiliser le menu à gauche pour demander à {join}.
+  iamAccount: Accéder aux paramètres du profil
   ezmesureTeam: équipe
   name: Nom
   mail: Mail
@@ -808,6 +809,9 @@ authenticate:
   loginFailed: Les informations transmises n'ont pas permis de vous authentifier
   failed: Une erreur est survenue
   impersonate: Emprunter l'identité
+  loadingDesc: Vous serez redirigé vers la page d'authentification dans quelques instants !
+  longLoadingDesc: Si vous voyez cette page après quelques instants, veuillez vérifier votre connexion internet, ou cliquer sur le bouton ci-dessous
+  longLoadingBtn: Accéder à la page de connexion
 impersonate:
   ezmesureDesc: Prendre l'identité de l'utilisateur dans l'interface d'ezMESURE.
   kibanaDesc: Créer des utilisateurs test dans Kibana.
@@ -941,6 +945,7 @@ users:
     membershipsCount: >
       1 établissement
       |{count} établissements
+    lastActivity: Dernière activité
     roles: Rôles
     no_roles: Aucun rôle
     permissions: Permissions
@@ -1367,6 +1372,9 @@ deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
 version: Version
 back: Retour
+<<<<<<< HEAD
+=======
 select: Sélectionner
 all: Tous
+>>>>>>> develop
 pleaseWait: Veuillez patienter...

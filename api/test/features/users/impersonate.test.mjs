@@ -70,7 +70,7 @@ describe('[users]: Test impersonation features', () => {
 
       const profileResponse = await ezmesure({
         method: 'GET',
-        url: '/profile',
+        url: '/auth',
         headers: {
           Authorization: `Bearer ${targetUserToken}`,
         },

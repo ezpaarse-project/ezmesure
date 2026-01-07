@@ -37,7 +37,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
   });
 
   async function fetchMemberships() {
-    const mems = await $fetch('/api/profile/memberships', {
+    const mems = await $fetch('/api/auth/memberships', {
       query: {
         include: [
           'institution.customProps.field', // Used to show details in institution page
@@ -50,7 +50,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
       },
     });
 
-    const roles = await $fetch('/api/profile/elastic-roles', {
+    const roles = await $fetch('/api/auth/elastic-roles', {
       query: {
         include: [
           'spacePermissions.space', // Used to show spaces in menu

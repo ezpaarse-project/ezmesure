@@ -1,0 +1,4 @@
+upstream front_server {
+  zone upstream_dynamic 64k;
+  server ${FRONT_HOST} max_fails=0  resolve;
+}

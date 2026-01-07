@@ -78,7 +78,7 @@ const triggerHooks = (event, ...payload) => {
  * @param {string} event The event name
  * @param {(payload: any) => void | Promise<void>} handler The handled of the hook
  * @param {Object} opts Options of the hook
- * @param {boolean} [opts.debounce] Should the hook be debounced
+ * @param {boolean | number} [opts.debounce] Should the hook be debounced
  * @param {(payload) => string | number} [opts.uniqueResolver]
  * @param {string} [opts.queue] Should the hook be queued with a given key
  *
@@ -87,6 +87,7 @@ const triggerHooks = (event, ...payload) => {
 const registerHook = (event, handler, opts = {}) => {
   const safeHandler = async (...params) => {
     try {
+      appLogger.verbose(`[hooks] "${event}" running`);
       await handler(...params);
     } catch (error) {
       appLogger.error(`[hooks] "${event}" encountered an error: ${error.message}`);
@@ -96,7 +97,11 @@ const registerHook = (event, handler, opts = {}) => {
   let fnc = (key, payload) => safeHandler(payload);
 
   if (opts.debounce !== false || !opts.queue) {
-    fnc = memoizeDebounce(safeHandler, 250, {});
+    fnc = memoizeDebounce(
+      safeHandler,
+      typeof opts.debounce === 'number' ? opts.debounce : 250,
+      {},
+    );
   }
 
   if (opts.queue) {

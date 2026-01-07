@@ -1,192 +1,86 @@
 <template>
   <v-container class="fill-height">
     <v-row class="justify-center">
-      <v-col cols="12" md="8" lg="6">
-        <v-card elevation="10">
-          <v-card-title class="bg-primary d-flex">
-            {{ $t('authenticate.restrictedAccess') }}
+      <v-empty-state
+        :title="$t('pleaseWait')"
+        :text="$t('authenticate.loadingDesc')"
+      >
+        <template #media>
+          <v-progress-circular
+            color="primary"
+            size="128"
+            indeterminate
+            class="mb-4"
+          >
+            <v-icon icon="mdi-login" />
+          </v-progress-circular>
+        </template>
 
-            <v-spacer />
+        <template #actions>
+          <v-slide-y-transition>
+            <v-row v-if="userIsWaiting" class="text-center mx-auto" style="max-width: 500px;">
+              <v-col cols="12" class="text-body-2">
+                {{ $t('authenticate.longLoadingDesc') }}
+              </v-col>
 
-            <v-icon icon="mdi-lock" />
-          </v-card-title>
-
-          <v-card-text class="pa-0">
-            <v-expansion-panels variant="accordion" :value="provider">
-              <v-expansion-panel model:value="true">
-                <v-expansion-panel-title>
-                  <div>
-                    <img
-                      src="/images/kibana_logo.svg"
-                      alt="Kibana"
-                      height="35"
-                    >
-                  </div>
-                </v-expansion-panel-title>
-
-                <v-expansion-panel-text>
-                  <v-row>
-                    <v-col>
-                      <p>
-                        {{ $t('authenticate.kibanaAuth') }}
-                      </p>
-                    </v-col>
-                  </v-row>
-
-                  <v-row v-if="errorMessage">
-                    <v-col>
-                      <v-alert
-                        :title="errorMessage.title"
-                        :text="errorMessage.text"
-                        type="error"
-                        density="compact"
-                        closable
-                        @update:model-value="() => (errorMessage = undefined)"
-                      />
-                    </v-col>
-                  </v-row>
-
-                  <v-form v-model="valid" class="mt-4" @submit.prevent="login()">
-                    <v-row>
-                      <v-col>
-                        <v-text-field
-                          v-model="credentials.username"
-                          :placeholder="$t('authenticate.user')"
-                          :rules="[() => !!credentials.username || ($t('authenticate.fieldIsRequired'))]"
-                          prepend-icon="mdi-account"
-                          variant="underlined"
-                          required
-                        />
-                      </v-col>
-                    </v-row>
-
-                    <v-row>
-                      <v-col>
-                        <v-text-field
-                          v-model="credentials.password"
-                          :placeholder="$t('authenticate.password')"
-                          :type="showPassword ? 'text' : 'password'"
-                          :rules="[() => !!credentials.password || ($t('authenticate.fieldIsRequired'))]"
-                          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                          prepend-icon="mdi-lock"
-                          variant="underlined"
-                          required
-                          @click:append="showPassword = !showPassword"
-                        />
-                      </v-col>
-                    </v-row>
-
-                    <v-row class="align-center">
-                      <v-col>
-                        <nuxt-link to="/password/reset">
-                          {{ $t('password.forgot') }}
-                        </nuxt-link>
-                      </v-col>
-
-                      <v-col style="text-align: end;">
-                        <v-btn
-                          :text="$t('authenticate.logIn')"
-                          :loading="loading"
-                          :disabled="!valid"
-                          color="primary"
-                          type="submit"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-form>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-
-              <v-expansion-panel v-if="!config.shibbolethDisabled">
-                <v-expansion-panel-title>
-                  <div>
-                    <img
-                      src="/images/shibboleth_logo.png"
-                      alt="Shibboleth"
-                      height="40"
-                    >
-                  </div>
-                </v-expansion-panel-title>
-
-                <v-expansion-panel-text>
-                  <v-row>
-                    <v-col>
-                      <p>
-                        {{ $t('authenticate.logInWithProvider') }}
-                      </p>
-                    </v-col>
-                  </v-row>
-
-                  <v-row>
-                    <v-col>
-                      <p class="text-center">
-                        <v-btn
-                          :text="$t('authenticate.logIn')"
-                          :href="`/login?origin=/myspace`"
-                          color="primary"
-                        />
-                      </p>
-                    </v-col>
-                  </v-row>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-card-text>
-        </v-card>
-      </v-col>
+              <v-col>
+                <v-btn
+                  :text="$t('authenticate.longLoadingBtn')"
+                  :href="redirectUrl.href"
+                  append-icon="mdi-login-variant"
+                  variant="outlined"
+                  color="primary"
+                />
+              </v-col>
+            </v-row>
+          </v-slide-y-transition>
+        </template>
+      </v-empty-state>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
-import { getErrorMessage } from '@/lib/errors';
-
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
   },
 });
 
-const { public: config } = useRuntimeConfig();
-const { t } = useI18n();
-const { signIn, status } = useAuth();
+const { status } = useAuth();
 const { query } = useRoute();
 
 if (status.value === 'authenticated') {
   await navigateTo(query?.redirect || '/myspace');
 }
 
-let provider = config.shibbolethDisabled ? 0 : 1;
-if (query?.provider === 'kibana') {
-  provider = 0;
-}
+let timeoutId;
+const userIsWaiting = shallowRef(false);
 
-const valid = shallowRef(false);
-const loading = shallowRef(false);
-const showPassword = shallowRef(false);
-const errorMessage = ref(undefined);
-const credentials = ref({
-  username: '',
-  password: '',
+const redirectUrl = computed(() => {
+  const url = new URL('/api/auth/oauth/login', window.location);
+  if (query?.redirect) { url.searchParams.set('origin', query.redirect); }
+
+  return url;
 });
 
-async function login() {
-  loading.value = true;
-  errorMessage.value = undefined;
-
-  try {
-    await signIn(credentials.value, { callbackUrl: query?.redirect || '/myspace' });
-  } catch (err) {
-    if (err.statusCode >= 400 && err.statusCode < 500) {
-      errorMessage.value = { text: t('authenticate.loginFailed') };
-    } else {
-      errorMessage.value = {
-        title: t('authenticate.failed'),
-        text: getErrorMessage(err),
-      };
-    }
+async function goToLogin() {
+  userIsWaiting.value = false;
+  if (timeoutId) {
+    clearTimeout(timeoutId);
   }
 
-  loading.value = false;
+  await navigateTo(
+    { path: redirectUrl.value.pathname, query: Object.fromEntries(redirectUrl.value.searchParams) },
+    { external: true },
+  );
+
+  timeoutId = setTimeout(() => {
+    userIsWaiting.value = true;
+  }, 5000);
 }
+
+onMounted(async () => {
+  await goToLogin();
+});
 </script>

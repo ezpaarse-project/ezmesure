@@ -28,48 +28,6 @@
             <v-form v-model="valid" @submit.prevent="activateProfile()">
               <v-row>
                 <v-col>
-                  <v-text-field
-                    v-model="password"
-                    :label="$t('password.password')"
-                    :type="showPassword ? 'text' : 'password'"
-                    :hint="$t('password.pattern')"
-                    :rules="[
-                      (v) => !!v.length || $t('password.passwordIsRequired'),
-                      (v) => v.length >= 6 || $t('password.length'),
-                    ]"
-                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                    prepend-icon="mdi-lock"
-                    variant="underlined"
-                    persistent-hint
-                    required
-                    class="mb-2"
-                    @click:append="showPassword = !showPassword"
-                  />
-                </v-col>
-              </v-row>
-
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    v-model="passwordRepeat"
-                    :label="$t('password.repeatPassword')"
-                    :type="showPassword ? 'text' : 'password'"
-                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[
-                      (v) => !!v.length || $t('password.passwordIsRequired'),
-                      () => passwordRepeat === password || $t('password.notEqual'),
-                      (v) => v.length >= 6 || $t('password.length'),
-                    ]"
-                    prepend-icon="mdi-lock"
-                    variant="underlined"
-                    required
-                    @click:append="showPassword = !showPassword"
-                  />
-                </v-col>
-              </v-row>
-
-              <v-row>
-                <v-col>
                   <i18n-t keypath="account.description.text" tag="p">
                     <template #regulationLink>
                       <a href="https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2" target="_blank" rel="noopener noreferrer">
@@ -114,20 +72,17 @@
 <script setup>
 import { getErrorMessage } from '@/lib/errors';
 
-const { currentRoute } = useRouter();
+const currentRoute = useRoute();
 const { t } = useI18n();
 const { status: authStatus, getSession } = useAuth();
 
-if (authStatus.value === 'unauthenticated' && !currentRoute.value.query?.token) {
+if (authStatus.value === 'unauthenticated' && !currentRoute.query?.token) {
   await navigateTo('/');
 }
 
 const valid = shallowRef(false);
 const loading = shallowRef(false);
-const password = shallowRef('');
-const passwordRepeat = shallowRef('');
 const accepted = shallowRef(false);
-const showPassword = shallowRef(false);
 const errorMessage = ref(undefined);
 
 async function activateProfile() {
@@ -137,19 +92,12 @@ async function activateProfile() {
     return;
   }
 
-  const { token, username } = currentRoute.value.query ?? {};
-
   loading.value = true;
   try {
-    await $fetch('/api/profile/_activate', {
+    await $fetch('/api/auth/_activate', {
       method: 'POST',
       body: {
-        password: password.value,
         acceptTerms: accepted.value,
-        username,
-      },
-      headers: {
-        Authorization: token ? `Bearer ${token}` : undefined,
       },
     });
 

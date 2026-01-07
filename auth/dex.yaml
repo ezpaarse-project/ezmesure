@@ -1,0 +1,60 @@
+issuer: {{ getenv "OIDC_ISSUER_URI" }}
+
+storage:
+  type: sqlite3
+  config:
+    file: "/var/dex/dex.db"
+
+web:
+  http: "0.0.0.0:5556"
+
+expiry:
+  deviceRequests: "5m"
+  signingKeys: "6h"
+  idTokens: "24h"
+  authRequests: "24h"
+
+logger:
+  level: info
+  format: text
+
+enablePasswordDB: true
+
+staticPasswords:
+  - email: {{ getenv "EZMESURE_ADMIN_EMAIL" "ezmesure-admin@admin.com" }}
+    hash: {{ getenv "EZMESURE_ADMIN_PASSWORD_HASH" }}
+    username: {{ getenv "EZMESURE_ADMIN_USERNAME" "ezmesure-admin" }}
+    userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+
+oauth2:
+  responseTypes: [code]
+  skipApprovalScreen: false
+  alwaysShowLoginScreen: false
+
+staticClients:
+- id: {{ getenv "OIDC_CLIENT_ID" }}
+  secret: {{ getenv "OIDC_CLIENT_SECRET" }}
+  name: {{ getenv "OIDC_CLIENT_NAME"}}
+  redirectURIs:
+    - '{{ getenv "EZMESURE_PUBLIC_URL" }}/api/auth/oauth/login/callback'
+
+connectors:
+- type: mockCallback
+  id: mock
+  name: Mock
+{{- if getenv "SATOSA_ENABLED" }}
+- type: oidc
+  id: satosa
+  name: Renater
+  config:
+    issuer: {{ getenv "SATOSA_PUBLIC_URL" }}
+    clientId: dex
+    clientSecret: dex-secret
+    redirectURI: '{{ getenv "OIDC_ISSUER_URI" }}/callback'
+
+    insecureSkipEmailVerified: true # SATOSA doesn't provide "email_verified" (as it's a proxy)
+    getUserInfo: true # SATOSA doesn't expose user in the IDToken, dex should query user info to get user
+
+    rootCAs:
+      - /etc/ssl/ezmesure.pem
+{{- end }}

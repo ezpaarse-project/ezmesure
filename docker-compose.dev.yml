@@ -11,17 +11,20 @@ services:
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
       - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
     working_dir: /usr/src/app
+    extra_hosts:
+      - "${EZMESURE_DOMAIN}:host-gateway"
     environment:
       - http_proxy
       - https_proxy
       - no_proxy=localhost,kibana
-      - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
-      - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
-      - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
-      - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
-      - EZMESURE_REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - EZMESURE_ELASTIC_HOST=elastic
+      - EZMESURE_ELASTIC_PORT=9200
+      - EZMESURE_KIBANA_HOST=kibana
+      - EZMESURE_KIBANA_PORT=5601
+      - EZMESURE_REDIS_HOST=redis
       - EZMESURE_REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
-      - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZMESURE_POSTGRES_DB:-ezmesure}
+      - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@postgres:5432/${EZMESURE_POSTGRES_DB:-ezmesure}
       - EZMESURE_HARVEST_CONCURRENCY
       - EZMESURE_MAX_DEFERRALS
       - EZMESURE_DEFERRAL_BACKOFF_DURATION
@@ -32,6 +35,17 @@ services:
       - EZMESURE_ADMIN_PASSWORD
       - EZMESURE_ADMIN_EMAIL
       - EZMESURE_AUTH_SECRET
+      - EZMESURE_OIDC_CLIENT_ID
+      - EZMESURE_OIDC_CLIENT_SECRET
+      - EZMESURE_OIDC_CONFIG_URI
+      - EZMESURE_OIDC_DISCOVERY_URI
+      - EZMESURE_OIDC_ISSUER_URI
+      - EZMESURE_OIDC_AUTH_URI
+      - EZMESURE_OIDC_TOKEN_URI
+      - EZMESURE_OIDC_INTROSPECTION_URI
+      - EZMESURE_OIDC_REVOCATION_URI
+      - EZMESURE_OIDC_USERINFO_URI
+      - EZMESURE_OIDC_SCOPES
       - EZMESURE_SMTP_HOST=maildev
       - EZMESURE_SMTP_PORT=25
       - EZMESURE_SMTP_SECURE=false
@@ -60,8 +74,8 @@ services:
     environment:
       - NODE_ENV
       - NUXT_PUBLIC_CURRENT_INSTANCE
+      - NUXT_PUBLIC_OIDC_PROFILE_URI
       - NUXT_PUBLIC_SUPPORT_MAIL
-      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
     tmpfs: /tmp
     command: npm run dev -- --host 0.0.0.0
     restart: "no"

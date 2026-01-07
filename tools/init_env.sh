@@ -19,14 +19,17 @@ declare -A answers
 HASH_1=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 HASH_2=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
-defaults[EZMESURE_DISABLE_SHIBBOLETH]="true"
+defaults[SATOSA_ENABLED]=""
 defaults[EZMESURE_AUTH_SECRET]="$HASH_1"
 defaults[EZMESURE_ENCRYPTION_SECRET]="$HASH_2"
 
 order=(
   "EZMESURE_DOMAIN"
+  "SATOSA_DOMAIN"
+  "SATOSA_ENCRYPTION_KEY"
+  "SATOSA_ENCRYPTION_SALT"
   "APPLI_APACHE_SERVERADMIN"
-  "EZMESURE_DISABLE_SHIBBOLETH"
+  "SATOSA_ENABLED"
   ""
   "EZMESURE_AUTH_SECRET"
   "EZMESURE_ENCRYPTION_SECRET"
@@ -46,9 +49,6 @@ order=(
   ""
   "EZMESURE_NOTIFICATIONS_SENDER"
   "EZMESURE_NOTIFICATIONS_RECIPIENTS"
-  "EZMESURE_NOTIFICATIONS_CRON"
-  "REPORTING_SENDER"
-  "KIBANA_EXTERNAL_URL"
 )
 
 for i in "${order[@]}"
@@ -65,9 +65,6 @@ do
     fi
 
     read -e -p "$i: " -i "$default" answer
-
-    if [ "$i" == "EZMESURE_DOMAIN" ]; then defaults[KIBANA_EXTERNAL_URL]="https://$answer/kibana"; fi
-    if [ "$i" == "EZMESURE_NOTIFICATIONS_SENDER" ]; then defaults[REPORTING_SENDER]="$answer"; fi
 
     if [ ! -z "$answer" ]
     then

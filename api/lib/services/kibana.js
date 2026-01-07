@@ -428,6 +428,38 @@ const importDashboard = (opts) => {
   return axiosClient.post(`${spacePrefix}/api/kibana/dashboards/import`, data, { params });
 };
 
+/**
+ * Makes a request to login a user
+ *
+ * **USES INTERNAL API** Makes sure to update this function whenever you upgrade Kibana
+ *
+ * @param {string} user
+ * @param {string} passwd
+ * @param {string} currentURL
+ *
+ * @returns {Promise<AxiosResponse<unknown>>}
+ */
+function loginUser(user, passwd, currentURL) {
+  return axiosClient.post(
+    '/internal/security/login',
+    {
+      providerType: 'basic',
+      providerName: 'basic',
+      currentURL,
+      params: {
+        username: user,
+        password: passwd,
+      },
+    },
+    {
+      withCredentials: true,
+      headers: {
+        'kbn-xsrf': 'true',
+      },
+    },
+  );
+}
+
 module.exports = {
   DEFAULT_SPACE,
   getSpaces,
@@ -448,4 +480,5 @@ module.exports = {
   getObject,
   exportDashboard,
   importDashboard,
+  loginUser,
 };
