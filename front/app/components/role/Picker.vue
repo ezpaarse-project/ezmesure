@@ -32,7 +32,7 @@
       v-else
       three-line
       select-strategy="leaf"
-      :selected="props.modelValue"
+      :selected="model"
       @click:select="selectRole($event)"
     >
       <v-list-item
@@ -60,10 +60,6 @@
 
 <script setup>
 const props = defineProps({
-  modelValue: {
-    type: Array,
-    default: () => [],
-  },
   items: {
     type: Object,
     default: () => ({}),
@@ -87,9 +83,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  'update:modelValue': (value) => Array.isArray(value) || value instanceof Set,
   selected: (role) => !!role,
 });
+
+const model = defineModel({ type: Array, default: () => [] });
 
 const searchRole = ref('');
 
@@ -114,11 +111,11 @@ const filteredRoles = computed(() => (availableRoles.value ?? []).filter((role) 
 }));
 
 const selectRole = ({ id, value }) => {
-  const newRoleList = new Set([...props.modelValue, id]);
+  const newRoleList = new Set([...model.value, id]);
   if (!value) {
     newRoleList.delete(id);
   }
-  emit('update:modelValue', Array.from(newRoleList));
+  model.value = Array.from(newRoleList);
   emit('selected', { role: availableRoles.value.find((r) => r.id === id), value });
 };
 </script>

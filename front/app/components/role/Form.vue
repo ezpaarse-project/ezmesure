@@ -187,17 +187,11 @@
 <script setup>
 import { presetScopes } from '@/lib/permissions/utils';
 
-const props = defineProps({
-  modelValue: {
-    type: Object,
-    default: () => undefined,
-  },
-});
-
 const emit = defineEmits({
   submit: (item) => !!item,
-  'update:modelValue': (item) => !!item,
 });
+
+const model = defineModel({ type: Object, default: () => undefined });
 
 const { t } = useI18n();
 const snacks = useSnacksStore();
@@ -213,12 +207,12 @@ const showIconMenu = shallowRef(false);
 const saving = shallowRef(false);
 const valid = shallowRef(false);
 const role = ref({
-  ...(props.modelValue ?? {}),
-  restricted: !!props.modelValue?.restricted,
-  permissionsPreset: props.modelValue?.permissionsPreset || null,
+  ...(model.value ?? {}),
+  restricted: !!model.value?.restricted,
+  permissionsPreset: model.value?.permissionsPreset || null,
 });
 
-const originalId = computed(() => props.modelValue?.id);
+const originalId = computed(() => model.value?.id);
 const isEditing = computed(() => !!originalId.value);
 
 const hasPresets = computed(() => !!role.value.permissionsPreset);
