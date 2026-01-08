@@ -145,6 +145,7 @@
               <ConfirmPopover
                 :agree="() => deleteAccount()"
                 :text="$t('myspace.profile.buttons.deleteAccount.confirm')"
+                max-width="600"
               >
                 <template #activator="{ props: confirm }">
                   <v-btn
