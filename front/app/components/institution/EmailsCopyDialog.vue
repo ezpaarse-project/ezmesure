@@ -70,7 +70,7 @@ const {
   }
 
   try {
-    return await $fetch('/api/rolses', {
+    return await $fetch('/api/roles', {
       query: {
         id: selectedRoles.value,
         include: ['membershipRoles.membership.user'],
