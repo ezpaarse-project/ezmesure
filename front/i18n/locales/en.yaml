@@ -73,7 +73,7 @@ myspace:
     buttons:
       deleteAccount:
         text: Delete account
-        confirm: This action is immediate and irreversible.
+        confirm: Your account and all related data will be deleted within 7 days. Any attempt to log in will cancel this deletion. Do you wish to continue?
 files:
   title: My Deposits
   manageN: >

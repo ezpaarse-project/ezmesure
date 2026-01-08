@@ -73,7 +73,7 @@ myspace:
     buttons:
       deleteAccount:
         text: Supprimer le compte
-        confirm: Cette action est immédiate et irréversible.
+        confirm: Votre compte et toutes les données qui y sont liées seront supprimées d'ici 7 jours. Toute tentative de connexion anulera cette suppression. Souhaitez vous continuer ?
 files:
   title: Mes dépôts
   manageN: >

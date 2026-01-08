@@ -141,13 +141,29 @@
       <v-row>
         <v-col>
           <v-card :title="$t('myspace.title')">
-            <template v-if="refreshShibUrl" #append>
-              <v-btn :href="refreshShibUrl" variant="text">
-                <v-icon left>
-                  mdi-refresh
-                </v-icon>
-                {{ $t('refreshShib') }}
-              </v-btn>
+            <template #append>
+              <ConfirmPopover
+                :agree="() => deleteAccount()"
+                :text="$t('myspace.profile.buttons.deleteAccount.confirm')"
+              >
+                <template #activator="{ props: confirm }">
+                  <v-btn
+                    :text="$t('myspace.profile.buttons.deleteAccount.text')"
+                    prepend-icon="mdi-delete"
+                    color="red"
+                    variant="text"
+                    v-bind="confirm"
+                  />
+                </template>
+              </ConfirmPopover>
+
+              <v-btn
+                v-if="refreshShibUrl"
+                :text="$t('refreshShib')"
+                :href="refreshShibUrl"
+                prepend-icon="mdi-refresh"
+                variant="text"
+              />
             </template>
 
             <template #text>
@@ -178,7 +194,7 @@ definePageMeta({
 });
 
 const { public: config } = useRuntimeConfig();
-const { data: user } = useAuthState();
+const { data: user, signOut } = useAuth();
 const { openInTab } = useSingleTabLinks('profile');
 const { t } = useI18n();
 
@@ -245,5 +261,18 @@ async function replacePassword() {
     }
   }
   loading.value = false;
+}
+
+async function deleteAccount() {
+  await $fetch('/api/profile', {
+    method: 'DELETE',
+  });
+
+  if (!config.shibbolethDisabled) {
+    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
+    return;
+  }
+
+  await signOut({ callbackUrl: '/' });
 }
 </script>
