@@ -1,0 +1,69 @@
+name: Auto-patch isbn3
+
+on:
+  schedule:
+    # Every 3rd of the month at 10:00, 72h after isbn3 updates
+    # See :
+    # - https://github.com/inventaire/isbn3/issues/5#issuecomment-667523086
+    # - https://github.com/inventaire/isbn3/blob/main/.github/workflows/auto_update_groups_data.yml
+    - cron: "0 10 3 * *"
+
+env:
+  BRANCH_NAME: build/auto-update-isbn3
+  PR_TARGET: develop
+
+jobs:
+  update:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PR_TARGET }}
+
+      - name: Setup Node ⚙️
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Switch to dedicated branch ⤴️
+        run: git branch ${{ env.BRANCH_NAME }}; git switch ${{ env.BRANCH_NAME }}
+
+      - name: Install dependencies ⚙️
+        working-directory: ./api
+        run: npm ci
+
+      - name: Get current version of "isbn3" 🔍
+        id: isbn3
+        working-directory: ./api
+        run: echo "version=$(npx fx ./package.json '.dependencies.isbn3')" >> $GITHUB_OUTPUT
+
+      - name: Update version ⬇️
+        working-directory: ./api
+        run: npm i --save-exact isbn3@~${{ steps.isbn3.outputs.version }}
+
+      - name: Create pull request 🚀
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: ${{ env.BRANCH_NAME }}
+          base: ${{ env.PR_TARGET }}
+
+          commit-message: "build(api): updated isbn3 groups data[skip ci]"
+
+          title: 'build(api): bumping `isbn3` to `${{ steps.docker_tags.outputs.tag }}`'
+          body: |
+            > [!NOTE]
+            > Changes are made by GitHub Actions, please review changes carefully before merging
+
+            ISBN groups data are updated monthly. Keeping it up to date prevents parsing errors while inserting ISBNs from COUNTER reports
+
+            # API
+
+            - [x] Updated to latest patch of `isbn3`
+              - See [auto-update groups data](https://github.com/inventaire/isbn3/issues/5#issuecomment-667523086) on `isbn3` repo for more details
+
+          maintainer-can-modify: false

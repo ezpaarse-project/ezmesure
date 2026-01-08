@@ -46,6 +46,7 @@
     "fs-extra": "^11.3.0",
     "glob": "^11.0.2",
     "http-proxy-middleware": "^3.0.5",
+    "isbn3": "2.0.1",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.15.0",
@@ -70,6 +71,7 @@
     "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.31.0",
+    "fx": "^39.2.0",
     "nodemon": "^3.1.10",
     "prisma": "^6.17.1",
     "vitest": "^4.0.14"
