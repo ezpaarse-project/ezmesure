@@ -51,7 +51,7 @@
                       :hide-restricted="!user.value?.isAdmin"
                       :loading="rolesBeingSaved.size > 0"
                       min-width="400"
-                      @selected="onRoleSelected($event)"
+                      @click:select="onRoleSelected($event)"
                     />
                   </v-menu>
                 </template>

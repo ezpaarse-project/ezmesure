@@ -83,7 +83,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  selected: (role) => !!role,
+  'click:select': (role) => !!role,
 });
 
 const model = defineModel({ type: Array, default: () => [] });
@@ -116,6 +116,6 @@ const selectRole = ({ id, value }) => {
     newRoleList.delete(id);
   }
   model.value = Array.from(newRoleList);
-  emit('selected', { role: availableRoles.value.find((r) => r.id === id), value });
+  emit('click:select', { role: availableRoles.value.find((r) => r.id === id), value });
 };
 </script>
