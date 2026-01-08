@@ -178,7 +178,13 @@ exports.elasticLogin = async (ctx) => {
 
   if (!user) {
     ctx.throw(401);
+    return;
   }
+
+  await usersService.update({
+    where: { username },
+    data: { deletedAt: null },
+  });
 
   const token = generateToken(user);
   ctx.metadata = { username };
