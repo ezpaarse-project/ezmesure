@@ -69,6 +69,11 @@ myspace:
   repos: My repositories
   spaces: My spaces
   roles: "My roles:"
+  profile:
+    buttons:
+      deleteAccount:
+        text: Delete account
+        confirm: This action is immediate and irreversible.
 files:
   title: My Deposits
   manageN: >
@@ -897,6 +902,8 @@ users:
     permissions: Permissions
     no_permissions: No permissions
     no_institution: No institutions
+    deletedAt: Asked for it's deletion
+    deletedAt:tooltip: This user asked for it's deletion, it'll be effective on the {date}
 report:
   title: My reports
   health: Health status

@@ -32,6 +32,14 @@
           />
         </v-col>
 
+        <v-col cols="12" sm="6">
+          <ApiFiltersButtonsGroup
+            v-model="deletedFilter"
+            :label="$t('users.user.deletedAt')"
+            prepend-icon="mdi-delete"
+          />
+        </v-col>
+
         <v-col cols="12">
           <ApiFiltersSelect
             v-model="filters.permissions"
@@ -65,6 +73,8 @@
 </template>
 
 <script setup>
+import { format, startOfDay } from 'date-fns';
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -112,6 +122,25 @@ const rolesItems = computed(() => {
       appendIcon: icon,
     },
   }));
+});
+const deletedFilter = computed({
+  get: () => {
+    if (filters['deletedAt:from'] === '') {
+      return false;
+    }
+
+    return filters['deletedAt:from'] ? true : undefined;
+  },
+  set: (value) => {
+    if (value === true) {
+      const date = startOfDay(new Date());
+      filters['deletedAt:from'] = format(date, 'yyyy-MM-dd');
+      return;
+    }
+
+    // filters resolves `emptySymbol` as `""` but resolves `""` as `undefined`
+    filters['deletedAt:from'] = value === false ? emptySymbol : undefined;
+  },
 });
 
 function clearFilters() {

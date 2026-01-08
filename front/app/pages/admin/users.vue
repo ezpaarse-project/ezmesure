@@ -28,10 +28,17 @@
     <v-data-table-server
       v-model="selectedUsers"
       :headers="headers"
+      :row-props="({ item }) => ({ class: item.deletedAt && 'bg-grey-lighten-4 text-grey' })"
       show-select
       return-object
       v-bind="vDataTableOptions"
     >
+      <template #[`item.fullName`]="{ value, item }">
+        <UserSoftDeleteIcon :model-value="item" />
+
+        {{ value }}
+      </template>
+
       <template #[`item.memberships`]="{ value, item }">
         <v-chip
           :text="`${value.length}`"

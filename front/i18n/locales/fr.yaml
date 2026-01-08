@@ -69,6 +69,11 @@ myspace:
   repos: Mes entrepôts
   spaces: Mes espaces
   roles: 'Mes rôles :'
+  profile:
+    buttons:
+      deleteAccount:
+        text: Supprimer le compte
+        confirm: Cette action est immédiate et irréversible.
 files:
   title: Mes dépôts
   manageN: >
@@ -907,6 +912,8 @@ users:
     permissions: Permissions
     no_permissions: Aucune permission
     no_institution: Aucun établissement
+    deletedAt: À demandé sa suppression
+    deletedAt:tooltip: Cet utilisateur à demandé sa suppression, elle sera effective le {date}
 report:
   title: Mes rapports
   health: État de santé
