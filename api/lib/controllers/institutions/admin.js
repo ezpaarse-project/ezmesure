@@ -39,6 +39,7 @@ exports.validateInstitution = async (ctx) => {
   if (!wasValidated && validated === true) {
     let contacts = await usersService.findMany({
       where: {
+        deletedAt: { equals: null },
         memberships: {
           some: {
             institutionId: institution.id,

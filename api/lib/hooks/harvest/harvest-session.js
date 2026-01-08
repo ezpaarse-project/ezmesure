@@ -52,6 +52,9 @@ async function sendEndMail(session) {
       memberships: {
         where: {
           roles: { hasSome: ['contact:doc', 'contact:tech'] },
+          user: {
+            deletedAt: { equals: null },
+          },
         },
         include: {
           user: true,

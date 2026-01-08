@@ -245,6 +245,9 @@ exports.updateInstitution = async (ctx) => {
         roles: {
           hasSome: [DOC_CONTACT, TECH_CONTACT],
         },
+        user: {
+          deletedAt: { equals: null },
+        },
       },
       include: { user: true },
     });
