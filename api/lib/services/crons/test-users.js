@@ -5,9 +5,21 @@ const { isBefore, isValid } = require('date-fns');
 
 const { appLogger } = require('../logger');
 const esUsers = require('../elastic/users');
+const { isTestUser } = require('../elastic/test-users');
+
+/**
+ * @typedef {import('@elastic/elasticsearch').estypes.SecurityUser} ElasticUser
+ */
 
 const clean = config.get('testUsers.clean');
 
+/**
+ * Is test user expired
+ *
+ * @param {ElasticUser} user - The user to check
+ *
+ * @returns {boolean} `true` if the test user has expired
+ */
 const isExpired = (user) => {
   const expiresAt = new Date(user?.metadata?.expiresAt);
   return isValid(expiresAt) && isBefore(expiresAt, new Date());
@@ -21,7 +33,7 @@ async function removeExpiredTestUsers() {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const user of testUsers) {
-    if (esUsers.isTestUser(user) && isExpired(user)) {
+    if (isTestUser(user) && isExpired(user)) {
       nbExpired += 1;
 
       try {

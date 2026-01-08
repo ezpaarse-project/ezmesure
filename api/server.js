@@ -24,6 +24,7 @@ const sushiCredentials = require('./lib/services/crons/sushi-credentials');
 const sushiAlerts = require('./lib/services/crons/sushi-alerts');
 const harvest = require('./lib/services/crons/harvest');
 const cronMetrics = require('./lib/services/crons/metrics');
+const users = require('./lib/services/crons/users');
 const testUsers = require('./lib/services/crons/test-users');
 
 /**
@@ -154,6 +155,7 @@ function start() {
   sushiAlerts.startFetchCron();
   harvest.startCancelCron();
   cronMetrics.start();
+  users.startDeletionCron();
   testUsers.startExpiredCron();
 
   const server = app.listen(config.port);
