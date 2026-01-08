@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { addHours, isBefore, parseISO } = require('date-fns');
+const { add, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
 
 const usersElastic = require('../../services/elastic/users');
@@ -19,6 +19,7 @@ const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
+const { deleteDurationDays } = config.get('users');
 
 const resetPasswordSecret = `${secret}_password_reset`;
 
@@ -85,6 +86,7 @@ exports.renaterLogin = async (ctx) => {
       persistentId: headers['persistent-id'] || headers['targeted-id'],
       affiliation: headers.affiliation,
     },
+    deletedAt: null,
   };
 
   const { username } = userProps;
@@ -127,6 +129,11 @@ exports.renaterLogin = async (ctx) => {
   } else {
     ctx.action = 'user/connection';
     ctx.metadata = { username };
+
+    await usersService.update({
+      where: { username },
+      data: { deletedAt: null },
+    });
   }
 
   const token = generateToken(user);
@@ -268,7 +275,7 @@ exports.getResetToken = async (ctx) => {
   const origin = ctx.get('origin');
 
   const currentDate = new Date();
-  const expiresAt = addHours(currentDate, config.passwordResetValidity);
+  const expiresAt = add(currentDate, { hours: config.passwordResetValidity });
   const token = jwt.sign({
     username: user.username,
     createdAt: currentDate,
@@ -389,6 +396,17 @@ exports.getUser = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = user;
+};
+
+exports.deleteUser = async (ctx) => {
+  const usersService = new UsersService();
+
+  await usersService.update({
+    where: { username: ctx.state.user.username },
+    data: { deletedAt: add(new Date(), { days: deleteDurationDays }) },
+  });
+
+  ctx.status = 204;
 };
 
 exports.getToken = async (ctx) => {
