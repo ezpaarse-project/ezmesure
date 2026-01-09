@@ -103,6 +103,9 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
       email: { endsWith: `@${domain}` },
       memberships: {
         some: {
+          user: {
+            deletedAt: { equals: null },
+          },
           roles: {
             some: {
               role: {

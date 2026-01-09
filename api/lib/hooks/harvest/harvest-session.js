@@ -52,15 +52,15 @@ async function sendEndMail(session) {
       // Get current contacts
       memberships: {
         where: {
+          user: {
+            deletedAt: { equals: null },
+          },
           roles: {
             some: {
               role: {
                 notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
               },
             },
-          },
-          user: {
-            deletedAt: { equals: null },
           },
         },
         include: {

@@ -42,6 +42,9 @@ exports.validateInstitution = async (ctx) => {
         memberships: {
           some: {
             institutionId: institution.id,
+            user: {
+              deletedAt: { equals: null },
+            },
             roles: {
               some: {
                 role: {

@@ -266,6 +266,9 @@ exports.requestMembership = async (ctx) => {
       memberships: {
         some: {
           institutionId,
+          user: {
+            deletedAt: { equals: null },
+          },
           roles: {
             some: {
               role: {

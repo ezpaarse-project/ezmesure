@@ -252,15 +252,15 @@ exports.updateInstitution = async (ctx) => {
     const contactMemberships = await membershipsService.findMany({
       where: {
         institutionId: ctx.state.institution.id,
+        user: {
+          deletedAt: { equals: null },
+        },
         roles: {
           some: {
             role: {
               notifications: { has: NOTIFICATION_TYPES.institutionValidated },
             },
           },
-        },
-        user: {
-          deletedAt: { equals: null },
         },
       },
       include: { user: true },
@@ -594,6 +594,9 @@ exports.harvestableInstitutions = async (ctx) => {
           sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
           memberships: {
             where: {
+              user: {
+                deletedAt: { equals: null },
+              },
               roles: {
                 some: {
                   role: {
