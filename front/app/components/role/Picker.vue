@@ -90,7 +90,7 @@ const emit = defineEmits({
 
 const model = defineModel({ type: Array, default: () => [] });
 
-const searchRole = ref('');
+const searchRole = shallowRef('');
 
 const {
   data: availableRoles,

@@ -91,13 +91,13 @@
                 <v-expansion-panel>
                   <template #title>
                     {{ $t('roles.notifyUserWhen') }}
+
                     <v-chip
-                      class="ml-1"
+                      :text="`${role.notifications?.length ?? 0} / ${availableNotifications.length}`"
                       size="x-small"
                       variant="outlined"
-                    >
-                      {{ role.notifications?.length ?? 0 }} / {{ availableNotifications.length }}
-                    </v-chip>
+                      class="ml-1"
+                    />
                   </template>
 
                   <template #text>
@@ -139,13 +139,13 @@
                 <v-expansion-panel>
                   <template #title>
                     {{ $t('roles.autoAssignWhen') }}
+
                     <v-chip
-                      class="ml-1"
+                      :text="`${role.autoAssign?.length ?? 0} / ${availableEvents.length}`"
                       size="x-small"
                       variant="outlined"
-                    >
-                      {{ role.autoAssign?.length ?? 0 }} / {{ availableEvents.length }}
-                    </v-chip>
+                      class="ml-1"
+                    />
                   </template>
 
                   <template #text>
@@ -270,7 +270,7 @@ const showIconMenu = shallowRef(false);
 const saving = shallowRef(false);
 const valid = shallowRef(false);
 const role = ref({
-  ...(model.value ?? {}),
+  ...model.value,
   restricted: !!model.value?.restricted,
   permissionsPreset: model.value?.permissionsPreset || null,
 });
@@ -280,22 +280,23 @@ const isEditing = computed(() => !!originalId.value);
 
 const hasPresets = computed(() => !!role.value.permissionsPreset);
 
-const getNotificationItem = (id) => ({ id, text: t(`roles.notificationTypes.${id}`) });
-const getEventItem = (id) => ({ id, text: t(`roles.eventTypes.${id}`) });
+const availableNotifications = computed(
+  () => [
+    'institution:validated',
+    'institution:role_assigned',
+    'institution:new_user_matching_institution',
+    'institution:membership_request',
+    'counter:new_data_available',
+  ].map((id) => ({ id, text: t(`roles.notificationTypes.${id}`) })),
+);
 
-const availableNotifications = computed(() => [
-  'institution:validated',
-  'institution:role_assigned',
-  'institution:new_user_matching_institution',
-  'institution:membership_request',
-  'counter:new_data_available',
-].map(getNotificationItem));
-
-const availableEvents = computed(() => [
-  'institution:self_join',
-  'institution:user_onboarded',
-  'institution:declared',
-].map(getEventItem));
+const availableEvents = computed(
+  () => [
+    'institution:self_join',
+    'institution:user_onboarded',
+    'institution:declared',
+  ].map((id) => ({ id, text: t(`roles.eventTypes.${id}`) })),
+);
 
 /**
  * Available features
