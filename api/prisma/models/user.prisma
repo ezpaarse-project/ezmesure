@@ -18,7 +18,7 @@ model User {
   memberships          Membership[]
   /// User additional roles specific to elastic
   elasticRoles         ElasticRole[]
-  /// Motification that the user doesnt want
+  /// Notifications that the user doesnt want to receive
   excludeNotifications String[]     @default([])
   /// Actions that were triggered by the user
   actions              Action[]
