@@ -6952,6 +6952,50 @@
         "operationId": "resetPassword"
       }
     },
+    "/profile/excludeNotifications": {
+      "put": {
+        "tags": ["Authentication"],
+        "summary": "Update ignored notifications",
+        "description": "Update notifications that shouldn't been sent to user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "excludeNotifications"
+      }
+    },
     "/queues": {
       "get": {
         "summary": "Get status of all job queues",

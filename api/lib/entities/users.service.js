@@ -2,6 +2,7 @@
 const config = require('config');
 const jwt = require('jsonwebtoken');
 const { addHours } = require('date-fns');
+
 const BasePrismaService = require('./base-prisma.service');
 const elasticUsers = require('../services/elastic/users');
 const usersPrisma = require('../services/prisma/users');

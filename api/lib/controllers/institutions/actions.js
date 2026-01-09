@@ -1,5 +1,3 @@
-const config = require('config');
-
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
@@ -8,7 +6,8 @@ const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 const RolesService = require('../../entities/roles.service');
 
-const { NOTIFICATION_TYPES, EVENT_TYPES } = require('../../utils/notifications/constants');
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES, EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
 /**
@@ -44,17 +43,32 @@ exports.standardQueryParams = standardQueryParams;
 
 const { PERMISSIONS } = require('../../entities/memberships.dto');
 
-const sender = config.get('notifications.sender');
-const supportRecipients = config.get('notifications.supportRecipients');
+async function sendValidateInstitutionMail(receivers, data) {
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.institutionValidated,
+    receivers,
+  );
 
-function sendValidateInstitution(receivers, data) {
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supportRecipients,
+    bcc: admins,
     subject: 'Votre établissement a été validé',
     ...generateMail('validate-institution', data),
   });
+}
+
+async function sendCounterReadyChangeMail(data) {
+  try {
+    const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.counterReadyChange);
+
+    return sendMail({
+      to: admins,
+      subject: data.sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
+      ...generateMail('sushi-ready-change', data),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+  }
 }
 
 exports.getInstitutions = async (ctx) => {
@@ -252,16 +266,7 @@ exports.updateInstitution = async (ctx) => {
     const contactMemberships = await membershipsService.findMany({
       where: {
         institutionId: ctx.state.institution.id,
-        user: {
-          deletedAt: { equals: null },
-        },
-        roles: {
-          some: {
-            role: {
-              notifications: { has: NOTIFICATION_TYPES.institutionValidated },
-            },
-          },
-        },
+        ...getNotificationMembershipWhere(NOTIFICATION_TYPES.institutionValidated),
       },
       include: { user: true },
     });
@@ -270,7 +275,7 @@ exports.updateInstitution = async (ctx) => {
 
     if (Array.isArray(contacts) && contacts.length > 0) {
       try {
-        await sendValidateInstitution(contacts, {
+        await sendValidateInstitutionMail(contacts, {
           manageMemberLink: `${origin}/myspace/institutions/${institution.id}/memberships`,
           manageSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         });
@@ -285,17 +290,10 @@ exports.updateInstitution = async (ctx) => {
     || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
-    sendMail({
-      from: sender,
-      to: supportRecipients,
-      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
-      ...generateMail('sushi-ready-change', {
-        institutionName: institution.name,
-        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
-        sushiReadySince,
-      }),
-    }).catch((err) => {
-      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    sendCounterReadyChangeMail({
+      institutionName: institution.name,
+      institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
+      sushiReadySince,
     });
   }
 
@@ -328,17 +326,10 @@ exports.updateInstitutionSushiReady = async (ctx) => {
     || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
-    sendMail({
-      from: sender,
-      to: supportRecipients,
-      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
-      ...generateMail('sushi-ready-change', {
-        institutionName: institution.name,
-        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
-        sushiReadySince,
-      }),
-    }).catch((err) => {
-      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    sendCounterReadyChangeMail({
+      institutionName: institution.name,
+      institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
+      sushiReadySince,
     });
   }
 
@@ -462,7 +453,7 @@ exports.importInstitutions = async (ctx) => {
               },
             },
             create: {
-              ...(membership ?? {}),
+              ...membership,
               username: undefined,
               institutionId: undefined,
 
@@ -593,18 +584,7 @@ exports.harvestableInstitutions = async (ctx) => {
           repositories: { where: { type: 'counter5' } },
           sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
           memberships: {
-            where: {
-              user: {
-                deletedAt: { equals: null },
-              },
-              roles: {
-                some: {
-                  role: {
-                    notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
-                  },
-                },
-              },
-            },
+            where: getNotificationMembershipWhere(NOTIFICATION_TYPES.newCounterDataAvailable),
           },
         },
       },

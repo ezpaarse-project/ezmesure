@@ -1,25 +1,27 @@
 /// A user
 model User {
   /// The username
-  username     String        @id
+  username             String        @id
   /// Full name
-  fullName     String
+  fullName             String
   /// Email
-  email        String
+  email                String
   /// Creation date
-  createdAt    DateTime      @default(now())
+  createdAt            DateTime      @default(now())
   /// Latest update date
-  updatedAt    DateTime      @updatedAt
+  updatedAt            DateTime      @updatedAt
   /// When item was marked for deletion
-  deletedAt         DateTime?
+  deletedAt            DateTime?
   /// Whether the user has admin access or not
-  isAdmin      Boolean       @default(false)
+  isAdmin              Boolean       @default(false)
   /// Arbitrary metadata
-  metadata     Json          @default("{}")
+  metadata             Json          @default("{}")
   /// User memberships
-  memberships  Membership[]
+  memberships          Membership[]
   /// User additional roles specific to elastic
-  elasticRoles ElasticRole[]
+  elasticRoles         ElasticRole[]
+  /// Notifications that the user doesnt want to receive
+  excludeNotifications String[]      @default([])
   /// Actions that were triggered by the user
-  actions      Action[]
+  actions              Action[]
 }
