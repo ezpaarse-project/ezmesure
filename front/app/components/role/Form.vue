@@ -25,7 +25,8 @@
           <v-col cols="12" sm="6">
             <v-text-field
               v-model="role.label"
-              :label="$t('label')"
+              :label="`${$t('label')} *`"
+              :rules="[(v) => !!v || t('fieldIsRequired')]"
               prepend-icon="mdi-label-outline"
               variant="underlined"
               hide-details="auto"
@@ -82,37 +83,99 @@
           </v-col>
 
           <v-col cols="12">
-            <v-autocomplete
-              v-model="role.notifications"
-              :label="$t('roles.notifyUserWhen')"
-              :items="availableNotifications"
+            <v-input
               prepend-icon="mdi-bell"
-              variant="underlined"
-              item-value="id"
-              item-title="text"
-              multiple
-              chips
-              small-chips
               hide-details
-              closable-chips
-            />
+            >
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <template #title>
+                    {{ $t('roles.notifyUserWhen') }}
+
+                    <v-chip
+                      :text="`${role.notifications?.length ?? 0} / ${availableNotifications.length}`"
+                      size="x-small"
+                      variant="outlined"
+                      class="ml-1"
+                    />
+                  </template>
+
+                  <template #text>
+                    <v-list
+                      v-model:selected="role.notifications"
+                      select-strategy="leaf"
+                      density="compact"
+                      class="py-0"
+                    >
+                      <v-list-item
+                        v-for="item in availableNotifications"
+                        :key="item.id"
+                        :title="item.text"
+                        :value="item.id"
+                      >
+                        <template #prepend="{ isSelected, select }">
+                          <v-list-item-action start>
+                            <v-checkbox-btn
+                              density="compact"
+                              :model-value="isSelected"
+                              @update:model-value="select"
+                            />
+                          </v-list-item-action>
+                        </template>
+                      </v-list-item>
+                    </v-list>
+                  </template>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-input>
           </v-col>
 
           <v-col cols="12">
-            <v-autocomplete
-              v-model="role.autoAssign"
-              :label="$t('roles.autoAssignWhen')"
-              :items="availableEvents"
+            <v-input
               prepend-icon="mdi-refresh-auto"
-              variant="underlined"
-              item-value="id"
-              item-title="text"
-              multiple
-              chips
-              small-chips
               hide-details
-              closable-chips
-            />
+            >
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <template #title>
+                    {{ $t('roles.autoAssignWhen') }}
+
+                    <v-chip
+                      :text="`${role.autoAssign?.length ?? 0} / ${availableEvents.length}`"
+                      size="x-small"
+                      variant="outlined"
+                      class="ml-1"
+                    />
+                  </template>
+
+                  <template #text>
+                    <v-list
+                      v-model:selected="role.autoAssign"
+                      select-strategy="leaf"
+                      density="compact"
+                      class="py-0"
+                    >
+                      <v-list-item
+                        v-for="item in availableEvents"
+                        :key="item.id"
+                        :title="item.text"
+                        :value="item.id"
+                      >
+                        <template #prepend="{ isSelected, select }">
+                          <v-list-item-action start>
+                            <v-checkbox-btn
+                              density="compact"
+                              :model-value="isSelected"
+                              @update:model-value="select"
+                            />
+                          </v-list-item-action>
+                        </template>
+                      </v-list-item>
+                    </v-list>
+                  </template>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-input>
           </v-col>
 
           <v-col cols="12">
@@ -187,58 +250,53 @@
 <script setup>
 import { presetScopes } from '@/lib/permissions/utils';
 
-const props = defineProps({
-  modelValue: {
-    type: Object,
-    default: () => undefined,
-  },
-});
-
 const emit = defineEmits({
   submit: (item) => !!item,
-  'update:modelValue': (item) => !!item,
 });
+
+const model = defineModel({ type: Object, default: () => undefined });
 
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
 const ID_PATTERN = /^[a-z0-9_-]+$/i;
 
-const idRules = [
+const idRules = computed(() => [
   (v) => !!v || t('fieldIsRequired'),
   (v) => (!v || ID_PATTERN.test(v)) || t('fieldMustMatch', { pattern: ID_PATTERN.toString() }),
-];
+]);
 
 const showIconMenu = shallowRef(false);
 const saving = shallowRef(false);
 const valid = shallowRef(false);
 const role = ref({
-  ...(props.modelValue ?? {}),
-  restricted: !!props.modelValue?.restricted,
-  permissionsPreset: props.modelValue?.permissionsPreset || null,
+  ...model.value,
+  restricted: !!model.value?.restricted,
+  permissionsPreset: model.value?.permissionsPreset || null,
 });
 
-const originalId = computed(() => props.modelValue?.id);
+const originalId = computed(() => model.value?.id);
 const isEditing = computed(() => !!originalId.value);
 
 const hasPresets = computed(() => !!role.value.permissionsPreset);
 
-const getNotificationItem = (id) => ({ id, text: t(`roles.notificationTypes.${id}`) });
-const getEventItem = (id) => ({ id, text: t(`roles.eventTypes.${id}`) });
+const availableNotifications = computed(
+  () => [
+    'institution:validated',
+    'institution:role_assigned',
+    'institution:new_user_matching_institution',
+    'institution:membership_request',
+    'counter:new_data_available',
+  ].map((id) => ({ id, text: t(`roles.notificationTypes.${id}`) })),
+);
 
-const availableNotifications = ref([
-  getNotificationItem('institution:validated'),
-  getNotificationItem('institution:role_assigned'),
-  getNotificationItem('institution:new_user_matching_institution'),
-  getNotificationItem('institution:membership_request'),
-  getNotificationItem('counter:new_data_available'),
-]);
-
-const availableEvents = ref([
-  getEventItem('institution:self_join'),
-  getEventItem('institution:user_onboarded'),
-  getEventItem('institution:declared'),
-]);
+const availableEvents = computed(
+  () => [
+    'institution:self_join',
+    'institution:user_onboarded',
+    'institution:declared',
+  ].map((id) => ({ id, text: t(`roles.eventTypes.${id}`) })),
+);
 
 /**
  * Available features
@@ -264,3 +322,9 @@ async function save() {
   saving.value = false;
 }
 </script>
+
+<style lang="scss" scoped>
+  :deep(.v-expansion-panel-text__wrapper) {
+    padding: 0 !important;
+  }
+</style>

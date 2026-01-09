@@ -32,7 +32,7 @@
       v-else
       three-line
       select-strategy="leaf"
-      :selected="props.modelValue"
+      :selected="model"
       @click:select="selectRole($event)"
     >
       <v-list-item
@@ -59,11 +59,9 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const props = defineProps({
-  modelValue: {
-    type: Array,
-    default: () => [],
-  },
   items: {
     type: Object,
     default: () => ({}),
@@ -87,11 +85,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  'update:modelValue': (value) => Array.isArray(value) || value instanceof Set,
-  selected: (role) => !!role,
+  'click:select': (role) => !!role,
 });
 
-const searchRole = ref('');
+const model = defineModel({ type: Array, default: () => [] });
+
+const searchRole = shallowRef('');
 
 const {
   data: availableRoles,
@@ -114,11 +113,11 @@ const filteredRoles = computed(() => (availableRoles.value ?? []).filter((role) 
 }));
 
 const selectRole = ({ id, value }) => {
-  const newRoleList = new Set([...props.modelValue, id]);
+  const newRoleList = new Set([...model.value, id]);
   if (!value) {
     newRoleList.delete(id);
   }
-  emit('update:modelValue', Array.from(newRoleList));
-  emit('selected', { role: availableRoles.value.find((r) => r.id === id), value });
+  model.value = Array.from(newRoleList);
+  emit('click:select', { role: availableRoles.value.find((r) => r.id === id), value });
 };
 </script>

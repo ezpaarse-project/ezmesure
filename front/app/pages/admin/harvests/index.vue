@@ -10,7 +10,7 @@
     >
       <v-btn
         v-if="harvestSessionFormDialogRef"
-        v-tooltip="$t('harvest.sessions.add')"
+        v-tooltip="$t('harvest.sessions.form.title:add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"

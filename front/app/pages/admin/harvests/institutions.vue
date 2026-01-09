@@ -51,7 +51,7 @@
                 <MonthPickerField
                   v-model="harvestedMonth"
                   :label="$t('institutions.harvestable.harvestedMonth')"
-                  :max="'2025-10'"
+                  :max="MAX_PERIOD"
                   variant="underlined"
                   density="compact"
                   hide-details
@@ -286,7 +286,7 @@
 
         <v-list-item
           v-if="harvestSessionFormDialogRef"
-          :title="$t('harvest.sessions.add')"
+          :title="$t('harvest.sessions.form.title:add')"
           prepend-icon="mdi-tractor"
           @click="harvestSessionFormDialogRef.open({
             credentialsQuery: { institutionIds: selected },
@@ -315,10 +315,14 @@
 </template>
 
 <script setup>
+import { formatDate } from 'date-fns';
+
 definePageMeta({
   layout: 'admin',
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
+
+const MAX_PERIOD = formatDate(new Date(), 'yyyy-MM');
 
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();

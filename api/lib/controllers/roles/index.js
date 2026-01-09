@@ -28,12 +28,7 @@ router.route({
   path: '/',
   handler: getAll,
   validate: {
-    query: standardQueryParams.manyValidation.append({
-      endpointId: stringOrArrayValidation,
-      institutionId: stringOrArrayValidation,
-      tags: stringOrArrayValidation,
-      packages: stringOrArrayValidation,
-    }),
+    query: standardQueryParams.manyValidation,
   },
 });
 

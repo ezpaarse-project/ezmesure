@@ -76,8 +76,10 @@ exports.list = async (ctx) => {
 
     if (roles.length === 0) {
       prismaQuery.where.memberships = {
-        ...prismaQuery.where.memberships ?? {},
-        ...{ every: { roles: { none: {} } } },
+        AND: [
+          prismaQuery.where.memberships ?? {},
+          { every: { roles: { none: {} } } },
+        ]
       };
     } else {
       const operator = hasSomeRoles ? 'OR' : 'AND';
