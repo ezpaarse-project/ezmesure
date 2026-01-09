@@ -6,6 +6,9 @@ const InstitutionsService = require('../../entities/institutions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
+const RolesService = require('../../entities/roles.service');
+
+const { NOTIFICATION_TYPES, EVENT_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
 /**
@@ -39,13 +42,7 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-const {
-  PERMISSIONS,
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('../../entities/memberships.dto');
+const { PERMISSIONS } = require('../../entities/memberships.dto');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
@@ -118,12 +115,25 @@ exports.createInstitution = async (ctx) => {
   if (error) { ctx.throw(error); }
 
   if (!isAdmin || addAsMember !== false) {
+    const rolesService = new RolesService();
+
+    const roles = await rolesService.findMany({
+      select: { id: true },
+      where: {
+        autoAssign: { has: EVENT_TYPES.declareInstitution },
+      },
+    });
+
     memberships = {
       create: [{
         username,
         permissions: [...PERMISSIONS],
-        roles: [DOC_CONTACT, TECH_CONTACT],
         locked: true,
+        roles: {
+          createMany: {
+            data: roles.map((role) => ({ roleId: role.id })),
+          },
+        },
       }],
     };
   }
@@ -243,7 +253,11 @@ exports.updateInstitution = async (ctx) => {
       where: {
         institutionId: ctx.state.institution.id,
         roles: {
-          hasSome: [DOC_CONTACT, TECH_CONTACT],
+          some: {
+            role: {
+              notifications: { has: NOTIFICATION_TYPES.institutionValidated },
+            },
+          },
         },
       },
       include: { user: true },
@@ -453,6 +467,26 @@ exports.importInstitutions = async (ctx) => {
                 connect: { username: membership?.username },
               },
 
+              roles: {
+                connectOrCreate: membership?.roles?.map?.(
+                  (role) => ({
+                    where: {
+                      username_institutionId_roleId: {
+                        // For legacy roles, replace : by _ (ex: contact:doc => contact_doc)
+                        roleId: typeof role === 'string' ? role.replace(':', '_') : role?.roleId,
+                        username: membership?.username,
+                        institutionId: item.id,
+                      },
+                    },
+                    create: typeof role === 'string' ? { roleId: role.replace(':', '_') } : {
+                      ...role,
+                      username: undefined,
+                      institutionId: undefined,
+                    },
+                  }),
+                ),
+              },
+
               spacePermissions: {
                 connectOrCreate: membership?.spacePermissions?.map?.(
                   /** @returns {SpacePermissionCreateOrConnectWithoutMembershipInput} */
@@ -554,8 +588,18 @@ exports.harvestableInstitutions = async (ctx) => {
         select: {
           spaces: { where: { type: 'counter5' } },
           repositories: { where: { type: 'counter5' } },
-          memberships: { where: { roles: { has: 'contact:doc' } } },
           sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
+          memberships: {
+            where: {
+              roles: {
+                some: {
+                  role: {
+                    notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },

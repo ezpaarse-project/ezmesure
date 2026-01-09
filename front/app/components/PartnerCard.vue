@@ -85,38 +85,8 @@ const { t } = useI18n();
 const contacts = computed(
   () => props.partner.contacts
     .filter((user) => user.fullName)
-    .map(
-      (user) => {
-        const roles = new Set(user.roles);
-
-        if (roles.has('contact:doc')) {
-          return {
-            ...roleColors.get('contact:doc'),
-            name: user.fullName,
-            type: 'doc',
-            label: t('partners.documentary'),
-          };
-        }
-
-        if (roles.has('contact:tech')) {
-          return {
-            ...roleColors.get('contact:tech'),
-            name: user.fullName,
-            type: 'tech',
-            label: t('partners.technical'),
-          };
-        }
-
-        return {
-          name: user.fullName,
-          type: 'unknown',
-          icon: 'mdi-mdi',
-          color: 'grey',
-          label: '????',
-        };
-      },
-    )
-    .sort(({ type }) => (type === 'doc' ? -1 : 1)),
+    .flatMap((user) => user.roles.map((role) => ({ name: user.fullName, ...role })))
+    .sort((a, b) => (a.id < b.id ? -1 : 1)),
 );
 
 const services = computed(() => {

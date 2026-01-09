@@ -24,6 +24,7 @@ menu:
   profile: Profil
   members: Membres
   users: Utilisateurs
+  roles: Rôles
   shares: Partages
   logout: Déconnexion
   contact: Contact
@@ -287,6 +288,11 @@ endpoints:
 institutions:
   toolbarTitle: Établissements ({count})
   title: Établissement
+  all: Tous les établissements
+  count: >
+    Aucun établissement
+    |{count} établissement
+    |{count} établissements
   updateInstitution: Mettre à jour l'établissement
   validateSwitch: Valider/Invalider
   validateNbInstitutions: Vous allez valider ou invalider {count} établissement.
@@ -441,15 +447,14 @@ institutions:
     accessRights: Droits d'accès
     institutionManagement: Gestion de l'établissement
     roles: Rôles
-    roleNames:
-      contact:doc: Contact documentaire
-      contact:tech: Contact technique
-      guest: Invité
+    memberHasNoRole: Ce membre n'a pas de rôle assigné
     featureLabels:
       institution: Fiche établissement
       memberships: Membres
       sushi: ezCOUNTER
       reporting: ezREEPORT
+      repositories: Entrepôts
+      spaces: Espaces Kibana
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
@@ -534,7 +539,7 @@ institutions:
       non-harvestable: Non moissonnable
       selectable: Sélectionnable
       harvested: Déjà moissonné
-    members: Contacts documentaire
+    members: Contacts
     repositories: '@:repositories.repositories COUNTER'
     spaces: '@:spaces.spaces COUNTER'
     settings: Paramètres de recherche
@@ -1184,6 +1189,32 @@ harvest:
     unableToDelete: Impossible de supprimer la tâche de moissonnage
     counterVersionTooltip: Moissonne un rapport COUNTER {version}
     noData: Aucune donnée dans le rapport moissonné
+roles:
+  toolbarTitle: Rôles ({count})
+  pageDesc: Entrez ici les rôles que vous souhaitez pouvoir attribuer aux membres des établissements.
+  newRole: Nouveau rôle
+  editRole: Mise à jour du rôle
+  manageRoles: >
+    Gérer les rôles
+    |Gérer {count} rôles
+  restricted: Restreint
+  onlyAdmins: Assignable uniquement par les administrateurs
+  notOnlyAdmins: Assignable par les utilisateurs
+  exposeMembers: Exposer sur la page des partenaires
+  notifyUserWhen: Notifications reçues par l'utilisateur
+  autoAssignWhen: Assigner automatiquement lorsque
+  assignments: Assignations
+  definePermissionsPreset: Définir des permissions par défaut
+  notificationTypes:
+    'institution:validated': Son établissement a été validé
+    'institution:role_assigned': Le rôle lui a été assigné
+    'institution:new_user_matching_institution': Un utilisateur faisant partie de l'établissement s'est inscrit
+    'institution:membership_request': Un utilisateur demande à rejoindre l'établissement
+    'counter:new_data_available': De nouvelles données COUNTER sont disponibles
+  eventTypes:
+    'institution:self_join': L'utilisateur rejoint par lui-même un établissement en accès ouvert
+    'institution:user_onboarded': L'utilisateur est ajouté dans un établissement de bienvenue
+    'institution:declared': L'utilisateur déclare un établissement
 shares:
   toolbarTitle: Partages ({count})
   pageDesc: Dans cette page, vous pouvez accorder des droits d'accès spécifiques à des utilisateurs ou des établissements. Les droits accordés ici ne sont pas modifiables par les membres des établissements.
@@ -1252,8 +1283,8 @@ customFields:
   multivalued: Multivalué
   helpUrl: URL d'aide
   itemUrl: URL de la page de l'établissement
-  labelFr: Label en français
-  labelEn: Label en anglais
+  labelFr: Libellé en français
+  labelEn: Libellé en anglais
   descriptionFr: Description en français
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
@@ -1281,7 +1312,9 @@ value: Valeur
 status: Statut
 date: Date
 duration: Durée
-label: Label
+label: Libellé
+icon: Icône
+color: Couleur
 properties: Propriétés
 description: Description
 initials: Initiales
@@ -1347,6 +1380,7 @@ reason: 'Raison : {reason}'
 groupBy: Regrouper par
 indeterminate: indéterminée
 noMatchFor: Aucune correspondance pour "{search}". Appuyez sur {key} pour l'ajouter.
+noMatch: Aucune correspondance
 enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide

@@ -61,14 +61,28 @@ exports.list = async (ctx) => {
     },
     include: {
       memberships: {
-        // search for doc/tech contacts
+        // Include members exposed by their role (ex: technical or documentary contact)
         where: {
           roles: {
-            hasSome: ['contact:doc', 'contact:tech'],
+            some: {
+              role: {
+                exposed: true,
+              },
+            },
           },
         },
         include: {
           user: true,
+          roles: {
+            where: {
+              role: {
+                exposed: true,
+              },
+            },
+            include: {
+              role: true,
+            },
+          },
         },
       },
       spaces: true,
@@ -103,7 +117,12 @@ exports.list = async (ctx) => {
         const contacts = i.memberships.map(
           (m) => ({
             fullName: m.user.fullName,
-            roles: m.roles,
+            roles: m.roles.map((role) => ({
+              id: role.role?.id,
+              label: role.role?.label,
+              icon: role.role?.icon,
+              color: role.role?.color,
+            })),
           }),
         );
 
