@@ -62,18 +62,21 @@ const selectedRoles = ref([]);
 const allInstitutions = computed(() => institutionIds.value.size === 0);
 
 const {
-  data: roles,
+  data: memberships,
   status,
-} = useAsyncData(`roles-${Array.from(selectedRoles.value)}`, async () => {
+} = useAsyncData(computed(() => `roles-${Array.from(selectedRoles.value)}`), async (_nuxtApp, { signal }) => {
   if (selectedRoles.value.length <= 0) {
     return [];
   }
 
   try {
-    return await $fetch('/api/roles', {
-      query: {
-        id: selectedRoles.value,
-        include: ['membershipRoles.membership.user'],
+    return await $fetch('/api/memberships/_search', {
+      method: 'POST',
+      signal,
+      body: {
+        roleId: selectedRoles.value,
+        institutionId: Array.from(institutionIds.value),
+        include: ['user'],
         size: 0,
       },
     });
@@ -83,20 +86,13 @@ const {
   }
 }, {
   lazy: true,
-  immediate: false,
   dedupe: 'defer',
-  watch: [selectedRoles],
 });
 
 const loadingEmails = computed(() => status.value === 'pending');
 
 const selectedEmails = computed(() => new Set(
-  (roles.value ?? [])
-    .flatMap((role) => role?.membershipRoles ?? [])
-    .filter((mr) => (
-      allInstitutions.value || institutionIds.value.has(mr?.membership?.institutionId)
-    ))
-    .map((mr) => mr?.membership?.user?.email),
+  (memberships.value ?? []).map((membership) => membership?.user?.email),
 ));
 
 async function copyEmails() {
