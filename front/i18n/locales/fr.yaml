@@ -400,6 +400,9 @@ institutions:
     propertyName: Nom de propriété
     noCustomProps: Aucune propriété personnalisée
     addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite
+    customPropsContact:
+      text: Si vous remarquez une erreur dans les propriétés non éditables, vous pouvez {contact-us} via le formulaire de contact.
+      contact-us: contacter l'équipe d'administration
     tags: Étiquettes
     tagsDescription: Les étiquettes permettent d'organiser les établissements en leur associant des mots-clés.
   members:
@@ -843,27 +846,63 @@ password:
   length: Le mot de passe doit contenir au moins 6 caractères
   update: Mettre à jour votre mot de passe
 contact:
-  contactUs: Nous contacter
-  email: Adresse électronique
-  subject: Objet
-  content: Contenu du message
-  sendNavigatorVersion: Envoyer la version de mon navigateur
-  emailSent: Votre demande de contact vient d'être envoyée à l'équipe.
-  failed: L'envoi du formulaire de contact a échoué.
-  requestInformation: Demande d'information
-  bugReport: Rapporter un bug
-  declareSushiEndpoint: Déclarer un point d'accès COUNTER
-  emailIsRequired: L'adresse électronique est requise
-  emailMustBeValid: L'adresse électronique doit être valide
-  sushiIsRequired: Des identifiants COUNTER sont requis
-  contentIsRequired: Un message est requis
-  subjectIsRequired: L'objet est requis
-  endpointVendor: Nom du fournisseur
-  endpointUrl: URL du point d'accès COUNTER
-  pleaseEnterFullVendorName: Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)
-  sushiDetails: Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER5.
-  endpointDetails: Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.
-  additionalInformation: Informations complémentaires
+  title: Nous contacter
+  fields:
+    email: Adresse électronique
+    subject: Objet
+    content: Contenu du message
+  rules:
+    email:
+      required: L'adresse électronique est requise
+      valid: L'adresse électronique doit être valide
+    subject:
+      required: L'objet est requis
+    content:
+      required: Un message est requis
+  types:
+    informations:
+      title: Demande d'information
+    bugs:
+      title: Rapporter un bug
+      fields:
+        browser: Envoyer la version de mon navigateur
+    sushi-endpoint:
+      title: Déclarer un point d'accès COUNTER
+      fields:
+        content: Informations complémentaires
+        endpoint:
+          title: '@:endpoints.endpoint'
+          fields:
+            vendor:
+              label: Nom du fournisseur
+              hint: Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)
+            url: URL du point d'accès COUNTER
+        credentials:
+          title: '@:sushi.auth'
+          text: Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER.
+          fields:
+            customerId: '@:institutions.sushi.customerId'
+            requestorId: '@:institutions.sushi.requestorId'
+            apiKey: '@:institutions.sushi.apiKey'
+      rules:
+        credentials:
+          required: Des identifiants COUNTER sont requis
+    wrong-custom-properties:
+      title: Rapporter une erreur dans les champs personnalisés d'un établissement
+      fields:
+        content: Informations complémentaires
+        institution:
+          label: Établissement concerné
+          emptySearch: Aucun établissement ne correspond à la recherche.
+          noMemberships: Vous n'êtes membre d'aucun établissement.
+        property: Propriété concernée
+        value:
+          label: Valeur souhaitée|Valeurs souhaitées
+          diff:removed: Valeurs supprimées
+          diff:added: Valeurs ajoutées
+  snacks:
+    success: Votre demande de contact vient d'être envoyée à l'équipe.
+    failed: L'envoi du formulaire de contact a échoué.
 errors:
   '404': La page demandée n'a pas été trouvée
   '500': Une erreur interne est survenue
