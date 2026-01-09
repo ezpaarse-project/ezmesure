@@ -59,6 +59,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const props = defineProps({
   items: {
     type: Object,

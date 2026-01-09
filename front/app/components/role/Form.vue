@@ -25,7 +25,8 @@
           <v-col cols="12" sm="6">
             <v-text-field
               v-model="role.label"
-              :label="$t('label')"
+              :label="`${$t('label')} *`"
+              :rules="[(v) => !!v || t('fieldIsRequired')]"
               prepend-icon="mdi-label-outline"
               variant="underlined"
               hide-details="auto"
