@@ -3,10 +3,6 @@ const { client: prisma, Prisma } = require('./index');
 
 const {
   PERMISSIONS,
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
 } = require('../../entities/memberships.dto');
 
 /* eslint-disable max-len */
@@ -62,7 +58,6 @@ function createAsUser(institution, username, tx = prisma) {
             },
           },
           permissions: [...PERMISSIONS],
-          roles: [DOC_CONTACT, TECH_CONTACT],
           locked: true,
         }],
       },
@@ -266,28 +261,6 @@ async function removeAll(tx = prisma) {
   return prisma.$transaction(transaction);
 }
 
-/**
- * @param {string} institutionId
- * @param {TransactionClient} [tx]
- * @returns {Promise<Membership[]>}
- */
-function getContacts(institutionId, tx = prisma) {
-  return tx.membership.findMany({
-    where: {
-      institutionId,
-      roles: {
-        hasSome: [DOC_CONTACT, TECH_CONTACT],
-      },
-      user: {
-        deletedAt: { equals: null },
-      },
-    },
-    include: {
-      user: true,
-    },
-  });
-}
-
 module.exports = {
   create,
   createAsUser,
@@ -301,5 +274,4 @@ module.exports = {
   validate,
   remove,
   removeAll,
-  getContacts,
 };

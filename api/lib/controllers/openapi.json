@@ -110,6 +110,16 @@
           }
         }
       },
+      "NotFoundError": {
+        "description": "The requested resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
       "ConflictError": {
         "description": "Action is conflicted with the current state of the resource",
         "content": {
@@ -122,9 +132,13 @@
       }
     },
     "schemas": {
-      "MemberRole": {
+      "PermissionLevel": {
         "type": "string",
-        "enum": ["doc_contact", "tech_contact", "guest"]
+        "enum": [
+          "none",
+          "read",
+          "write"
+        ]
       },
       "MemberPermissions": {
         "type": "array",
@@ -137,7 +151,6 @@
             "memberships:write",
             "sushi:read",
             "sushi:write",
-            "sushi:delete",
             "reporting:read",
             "reporting:write"
           ]
@@ -441,7 +454,7 @@
             "description": "A list of user roles in the institution",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MemberRole"
+              "$ref": "#/components/schemas/Role"
             }
           },
           "permissions": {
@@ -2540,6 +2553,69 @@
           "severity": { "type": "string" },
           "context": { "type": "object" },
           "createdAt": { "$ref": "#/components/schemas/ItemCreationDate" }
+        }
+      },
+      "Role": {
+        "title": "Member role",
+        "type": "object",
+        "required": ["id", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string" },
+          "createdAt": { "$ref": "#/components/schemas/ItemCreationDate" },
+          "updatedAt": { "$ref": "#/components/schemas/ItemUpdateDate" },
+          "icon": {
+            "type": "string",
+            "example": "mdi-account"
+          },
+          "label": {
+            "type": "string",
+            "example": "Technical contact"
+          },
+          "description": { "type": "string" },
+          "restricted": { "type": "boolean" },
+          "color": {
+            "description": "Role color",
+            "example": "#458df9",
+            "type": "string"
+          },
+          "exposed": { "type": "boolean" },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissionsPreset": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "institution": {
+                "$ref": "#/components/schemas/PermissionLevel"
+              },
+              "memberships": {
+                "$ref": "#/components/schemas/PermissionLevel"
+              },
+              "sushi": {
+                "$ref": "#/components/schemas/PermissionLevel"
+              },
+              "reporting": {
+                "$ref": "#/components/schemas/PermissionLevel"
+              },
+              "repositories": {
+                "$ref": "#/components/schemas/PermissionLevel"
+              },
+              "spaces": {
+                "$ref": "#/components/schemas/PermissionLevel"
+              }
+            }
+          },
+          "membershipRoles": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
         }
       }
     },
@@ -4807,6 +4883,91 @@
         "description": "Remove a member from an institution"
       }
     },
+    "/institutions/{id}/memberships/{username}/roles/{roleId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "Username of the member"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "roleId",
+          "in": "path",
+          "required": true,
+          "description": "ID of the role"
+        }
+      ],
+      "put": {
+        "operationId": "put-institutions-id-memberships-username-roles-roleId",
+        "summary": "Add a role to a membership",
+        "description": "Add a role to a membership",
+        "tags": ["Roles"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Membership"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-institutions-id-memberships-username-roles-roleId",
+        "summary": "Remove a role from a membership",
+        "description": "Remove a role from a membership",
+        "tags": ["Roles"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
     "/institutions/{id}/subinstitutions": {
       "get": {
         "summary": "Get institution sub-institutions",
@@ -6146,6 +6307,237 @@
         "operationId": "counterizeLogs"
       }
     },
+    "/roles": {
+      "get": {
+        "operationId": "get-roles",
+        "tags": ["Roles"],
+        "summary": "Get member roles",
+        "description": "Get the list of member roles.",
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/roles/_import": {
+      "post": {
+        "operationId": "post-roles-import",
+        "tags": ["Roles"],
+        "summary": "Import roles",
+        "description": "Import a list of roles",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": ["error", "conflict", "created"]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/Role"
+                          }
+                        },
+                        "required": ["status", "data"]
+                      }
+                    }
+                  },
+                  "required": ["errors", "conflicts", "created", "items"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/roles/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "string",
+            "example": "1"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "get-roles-id",
+        "tags": ["Roles"],
+        "summary": "Get member role",
+        "description": "Get a member role.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      },
+      "put": {
+        "operationId": "put-roles-id",
+        "tags": ["Roles"],
+        "summary": "Update member role",
+        "description": "Update a member role.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Role"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-roles-id",
+        "tags": ["Roles"],
+        "summary": "Delete member role",
+        "description": "Delete a member role.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "204 response"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
     "/metrics": {
       "get": {
         "tags": ["Metrics"],
@@ -6237,7 +6629,13 @@
                             "roles": {
                               "type": "array",
                               "items": {
-                                "type": "string"
+                                "type": "object",
+                                "properties": {
+                                  "id": { "$ref": "#/components/schemas/Role/properties/id" },
+                                  "label": { "$ref": "#/components/schemas/Role/properties/label" },
+                                  "icon": { "$ref": "#/components/schemas/Role/properties/icon" },
+                                  "color": { "$ref": "#/components/schemas/Role/properties/color" }
+                                }
                               }
                             }
                           }

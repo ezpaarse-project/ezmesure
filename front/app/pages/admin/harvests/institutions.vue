@@ -309,6 +309,8 @@
       ref="harvestSessionFormDialogRef"
       @submit="navigateTo('/admin/harvests')"
     />
+
+    <InstitutionEmailsCopyDialog ref="emailsCopyDialogRef" />
   </div>
 </template>
 
@@ -339,6 +341,7 @@ const harvestedMonth = shallowRef(undefined);
 const institutionRepositoriesDialogRef = useTemplateRef('institutionRepositoriesDialogRef');
 const institutionSpacesDialogRef = useTemplateRef('institutionSpacesDialogRef');
 const harvestSessionFormDialogRef = useTemplateRef('harvestSessionFormDialogRef');
+const emailsCopyDialogRef = useTemplateRef('emailsCopyDialogRef');
 
 const headers = computed(() => [
   {
@@ -489,36 +492,12 @@ async function copyInstitutionId({ institution }) {
 /**
  * Put users email into clipboard
  */
-async function copyMailList() {
-  const addresses = [];
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const id of selected.value) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const memberships = await $fetch(`/api/institutions/${id}/memberships`, {
-        query: {
-          roles: 'contact:doc',
-          include: ['user'],
-        },
-      });
-
-      const { email } = memberships[0]?.user ?? {};
-      if (email) {
-        addresses.push(email);
-      }
-    } catch (err) {
-      snacks.error(t('anErrorOccurred'), err);
-      return;
-    }
-  }
-
-  try {
-    await copy(addresses.join('; '));
-  } catch (err) {
-    snacks.error(t('clipboard.unableToCopy'), err);
+async function copyMailList(ids) {
+  const toCopy = ids || selected.value;
+  if (toCopy.length <= 0) {
     return;
   }
-  snacks.info(t('emailsCopied'));
+
+  emailsCopyDialogRef.value.open(toCopy);
 }
 </script>

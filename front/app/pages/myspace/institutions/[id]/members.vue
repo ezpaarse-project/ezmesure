@@ -62,16 +62,15 @@
       </template>
 
       <template #[`item.roles`]="{ value }">
-        <v-chip
-          v-for="role in value"
-          :key="role"
-          :text="$t(`institutions.members.roleNames.${role}`)"
-          :prepend-icon="roleColors.get(role)?.icon"
-          :color="roleColors.get(role)?.color"
-          size="small"
-          label
-          class="mr-1"
-        />
+        <div class="d-flex flex-wrap ga-1 my-1">
+          <RoleChip
+            v-for="role in value"
+            :key="role.roleId"
+            :role="role.role"
+            size="small"
+            label
+          />
+        </div>
       </template>
 
       <template #[`item.repositoryPermissions`]="{ value, item }">
@@ -205,6 +204,7 @@ const {
         'repositoryPermissions',
         'repositoryAliasPermissions',
         'spacePermissions',
+        'roles.role',
       ],
     },
   },

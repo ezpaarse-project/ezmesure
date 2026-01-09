@@ -59,8 +59,11 @@
             v-model="filters.roles"
             v-model:loose="filters['roles:loose']"
             :empty-symbol="emptySymbol"
-            :items="rolesItems"
+            :items="roleItems"
             :label="$t('users.user.roles')"
+            :loading="loadingRoles"
+            item-title="label"
+            item-value="id"
             prepend-icon="mdi-tag"
             chips
             closable-chips
@@ -95,6 +98,13 @@ const {
   resetFilters,
 } = useFilters(() => props.modelValue, emit);
 
+const {
+  data: roleItems,
+  status: rolesStatus,
+} = await useFetch('/api/roles', { lazy: true });
+
+const loadingRoles = computed(() => rolesStatus.value === 'pending');
+
 const permissionsItems = computed(() => {
   const scopes = [
     'institution',
@@ -113,16 +123,7 @@ const permissionsItems = computed(() => {
     }),
   ));
 });
-const rolesItems = computed(() => {
-  const roles = Array.from(roleColors.entries());
-  return roles.map(([role, { icon }]) => ({
-    value: role,
-    title: t(`institutions.members.roleNames.${role}`),
-    props: {
-      appendIcon: icon,
-    },
-  }));
-});
+
 const deletedFilter = computed({
   get: () => {
     if (filters['deletedAt:from'] === '') {

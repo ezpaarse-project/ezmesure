@@ -1,6 +1,7 @@
 const config = require('config');
 
 const { sendMail, generateMail } = require('../../services/mail');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
@@ -9,15 +10,13 @@ const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
 
-const { MEMBER_ROLES } = require('../../entities/memberships.dto');
-
 function sendValidateInstitution(receivers) {
   return sendMail({
     from: sender,
     to: receivers,
     cc: supportRecipients,
     subject: 'Votre établissement a été validé',
-    ...generateMail('validated-institution'),
+    ...generateMail('validate-institution'),
   });
 }
 
@@ -43,7 +42,13 @@ exports.validateInstitution = async (ctx) => {
         memberships: {
           some: {
             institutionId: institution.id,
-            roles: { hasSome: [MEMBER_ROLES.docContact, MEMBER_ROLES.techContact] },
+            roles: {
+              some: {
+                role: {
+                  notifications: { has: NOTIFICATION_TYPES.institutionValidated },
+                },
+              },
+            },
           },
         },
       },

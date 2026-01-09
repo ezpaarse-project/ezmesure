@@ -7,7 +7,8 @@ const { client: prisma } = require('../../../services/prisma');
 
 const UsersService = require('../../../entities/users.service');
 const MembershipsService = require('../../../entities/memberships.service');
-const InstitutionsService = require('../../../entities/institutions.service');
+const MembershipRolesService = require('../../../entities/memberships-roles.service');
+const RolesService = require('../../../entities/roles.service');
 
 /* eslint-disable max-len */
 /**
@@ -21,11 +22,9 @@ const {
   schema,
   adminUpsertSchema,
   upsertSchema,
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
 } = require('../../../entities/memberships.dto');
+
+const { NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
@@ -37,10 +36,11 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-function sendNewContact(receiver, institutionName) {
+function sendNewContact(receiver, institutionName, role) {
   const data = {
     contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
     institution: institutionName,
+    role,
   };
 
   return sendMail({
@@ -166,10 +166,7 @@ exports.addInstitutionMember = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
-  const { roles } = body;
   const membership = user.memberships?.[0];
-  const memberIsContact = membership?.roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
-  const memberBecomesContact = roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
 
   if ((membership?.locked) && !connectedUser?.isAdmin) {
     ctx.throw(409, ctx.$t('errors.members.notEditable'));
@@ -195,14 +192,6 @@ exports.addInstitutionMember = async (ctx) => {
     update: membershipData,
   });
   appLogger.info(`Membership between user [${username}] and institution [${institutionId}] is upserted`);
-
-  if (user.email && !memberIsContact && memberBecomesContact) {
-    try {
-      await sendNewContact(user.email, institutionName);
-    } catch (err) {
-      appLogger.error(`Failed to send new contact mail: ${err}`);
-    }
-  }
 
   ctx.status = 200;
   ctx.body = newMembership;
@@ -265,16 +254,36 @@ exports.removeInstitutionMember = async (ctx) => {
 
 exports.requestMembership = async (ctx) => {
   ctx.action = 'institutions/requestMembership';
+  const { institutionId } = ctx.params;
 
-  const institutionsService = new InstitutionsService();
+  const usersService = new UsersService();
 
-  const members = await institutionsService.getContacts(ctx.state.institution.id);
-  const emails = members.map((member) => member.user.email);
-  const linkInstitution = `${ctx.get('origin')}/myspace/institutions/${ctx.state.institution.id}/members`;
+  const usersToNotify = await usersService.findMany({
+    select: {
+      email: true,
+    },
+    where: {
+      memberships: {
+        some: {
+          institutionId,
+          roles: {
+            some: {
+              role: {
+                notifications: { has: NOTIFICATION_TYPES.membershipRequest },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const emails = usersToNotify.map((user) => user.email);
+  const linkInstitution = `${ctx.get('origin')}/myspace/institutions/${institutionId}/members`;
 
   await sendMail({
     from: sender,
-    to: emails || supportRecipients,
+    to: emails.length > 0 ? emails : supportRecipients,
     cc: supportRecipients,
     subject: 'Un utilisateur souhaite rejoindre votre établissement',
     ...generateMail('request-membership', {
@@ -286,4 +295,129 @@ exports.requestMembership = async (ctx) => {
 
   ctx.type = 'json';
   ctx.status = 204;
+};
+
+exports.removeInstitutionMemberRole = async (ctx) => {
+  const { user } = ctx.state;
+  const { institutionId, username, roleId } = ctx.params;
+
+  await MembershipRolesService.$transaction(async (membershipRolesService) => {
+    const membershipRole = await membershipRolesService.findUnique({
+      where: {
+        username_institutionId_roleId: { roleId, username, institutionId },
+      },
+      select: {
+        role: {
+          select: {
+            restricted: true,
+          },
+        },
+      },
+    });
+
+    if (!membershipRole) {
+      return null;
+    }
+
+    if (membershipRole.role.restricted && !user.isAdmin) {
+      ctx.throw(403, ctx.$t('errors.role.restricted', roleId));
+    }
+
+    await membershipRolesService.delete({
+      where: {
+        username_institutionId_roleId: { roleId, username, institutionId },
+      },
+    });
+  });
+
+  ctx.status = 204;
+};
+
+exports.addInstitutionMemberRole = async (ctx) => {
+  const { user } = ctx.state;
+  const { institutionId, username, roleId } = ctx.params;
+
+  const {
+    updatedMembership,
+    alreadyHasRole,
+    appliedRole,
+  } = await MembershipsService.$transaction(async (membershipsService) => {
+    const membership = await membershipsService.findUnique({
+      where: {
+        username_institutionId: { username, institutionId },
+      },
+      include: {
+        institution: true,
+        user: true,
+        roles: true,
+      },
+    });
+
+    if (!membership) {
+      ctx.throw(404, ctx.$t('errors.membership.notFound'));
+    }
+
+    const hasRole = membership.roles.some((role) => role.id === roleId);
+
+    if (hasRole) {
+      return {
+        updatedMembership: membership,
+        alreadyHasRole: hasRole,
+      };
+    }
+
+    const rolesService = new RolesService(membershipsService);
+    const role = await rolesService.findUnique({ where: { id: roleId } });
+
+    if (!role) {
+      ctx.throw(404, ctx.$t('errors.role.notFound', role.id));
+    }
+
+    if (role.restricted && !user.isAdmin) {
+      ctx.throw(403, ctx.$t('errors.role.restricted', role.id));
+    }
+
+    const newMembership = await membershipsService.update({
+      where: {
+        username_institutionId: { username, institutionId },
+      },
+      data: {
+        roles: {
+          connectOrCreate: {
+            where: {
+              username_institutionId_roleId: { username, institutionId, roleId },
+            },
+            create: {
+              roleId,
+            },
+          },
+        },
+      },
+      include: {
+        institution: true,
+        user: true,
+        roles: true,
+      },
+    });
+
+    return {
+      updatedMembership: newMembership,
+      alreadyHasRole: false,
+      appliedRole: role,
+    };
+  });
+
+  const shouldBeNotified = appliedRole.notifications.includes(NOTIFICATION_TYPES.roleAssigned);
+  const { email } = updatedMembership.user;
+
+  if (shouldBeNotified && !alreadyHasRole && email) {
+    try {
+      await sendNewContact(email, updatedMembership.institution.name, appliedRole);
+    } catch (err) {
+      appLogger.error(`Failed to send new contact mail: ${err}`);
+    }
+  }
+
+  ctx.status = 200;
+  ctx.body = updatedMembership;
 };
