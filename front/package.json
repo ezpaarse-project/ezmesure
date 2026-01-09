@@ -14,23 +14,23 @@
     "@ezpaarse-project/ezreeport-vue": "^3.1.0",
     "@mdi/font": "^7.4.47",
     "@mdi/svg": "^7.4.47",
-    "@nuxt/devtools": "^2.6.2",
+    "@nuxt/devtools": "^3.1.1",
     "@nuxt/eslint-config": "^0.7.4",
     "@nuxtjs/i18n": "^10.0.0",
     "@pinia/nuxt": "^0.11.1",
     "@sidebase/nuxt-auth": "^1.0.0",
     "@types/node": "^24.0.14",
     "@vue/eslint-config-airbnb": "^8.0.0",
-    "@vueuse/core": "^13.5.0",
-    "@vueuse/nuxt": "^13.5.0",
+    "@vueuse/core": "^14.1.0",
+    "@vueuse/nuxt": "^14.1.0",
     "date-fns": "^4.1.0",
     "eslint": "^8.57.0",
-    "nuxt": "^4.0.0",
+    "nuxt": "^4.2.2",
     "pinia": "^3.0.3",
     "pretty-bytes": "^7.0.0",
     "sass": "^1.89.2",
     "vuetify": "^3.9.7",
-    "vuetify-nuxt-module": "^0.18.7"
+    "vuetify-nuxt-module": "^0.19.2"
   },
   "overrides": {
     "vue": "^3"
