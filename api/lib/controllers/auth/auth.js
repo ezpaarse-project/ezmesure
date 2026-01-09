@@ -376,6 +376,20 @@ exports.changePassword = async (ctx) => {
   ctx.status = 204;
 };
 
+exports.changeExcludeNotifications = async (ctx) => {
+  const { body } = ctx.request;
+  const { username } = ctx.state.user;
+
+  const service = new UsersService();
+  const user = await service.update({
+    where: { username },
+    data: { excludeNotifications: body },
+  });
+
+  ctx.status = 200;
+  ctx.body = user.excludeNotifications;
+};
+
 exports.getUser = async (ctx) => {
   const usersService = new UsersService();
   const user = await usersService.findUnique({

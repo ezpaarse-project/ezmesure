@@ -1,49 +1,55 @@
 menu:
-  homepage: ezMESURE homepage
-  home: Home
-  dashboard: Dashboard
-  documentation: Documentation
-  myspace: My space
-  partners: Partners
-  api: API
-  guide: User guide
-  navigateTo: Navigate to
-  myDeposits: My deposits
-  credentials: Login information
-  authentificationToken: Authentification token
-  administration: Administration
-  myInstitution: My institution
-  myInstitutions: My institutions
-  myForeignAccess: Shared with you
-  institutions: Institutions
-  sushiEndpoints: COUNTER endpoints
-  activity: Activity
-  actions:
-    title: Actions
-    tooltip: New version of the activity, actions will being rolled out progressively
-  profile: Profile
-  members: Members
-  users: Users
-  roles: Roles
-  shares: Shares
-  logout: Logout
-  contact: Contact
-  report: Reports
-  adminReport: ezREEPORT
-  repositories: Repositories
-  repositoryAliases:
-    group: Repository aliases
-    aliases: Aliases
-    templates: Templates
-    orphans: Orphans
-  spaces: Spaces
-  harvest:
-    group: Harvest
+  report: Rapports
+
+  bar:
+    homepage: ezMESURE homepage
+    documentation:
+      title: Documentation
+      entries:
+        user: User guide
+        api: API
+    partners: Partners
+    contact: Contact
+    dashboard: Dashboard
+    myspace: My space
+    administration: Administration
+
+  myspace:
+    institutions: My institutions
+    deposits: My deposits
+    foreignAccess: Shared with you
+    credentials: Login information
+    authentificationToken: Authentification token
+    settings: My settings
+    logout: Logout
+
+  admin:
     institutions: Institutions
-    sessions: Sessions
-    alerts: Alertes
-  sync: Synchronisation
-  customFields: Custom fields
+    repositories: Repositories
+    repositoryAliases:
+      title: Repository aliases
+      entries:
+        aliases: Aliases
+        templates: Templates
+        orphans: Orphans
+    spaces: Spaces
+    users: Users
+    roles: Roles
+    shares: Shares
+    sushiEndpoints: COUNTER endpoints
+    customFields: Custom fields
+    harvest:
+      title: Harvest
+      entries:
+        institutions: Institutions
+        sessions: Sessions
+        alerts: Alertes
+    report: ezREEPORT
+    sync: Synchronisation
+    actions:
+      title: Actions
+      tooltip: New version of the activity, actions will being rolled out progressively
+    activity: Activity
 home:
   whatDoesEzMESURE: What does ezMESURE ?
   supportedBy: This service is supported by
@@ -70,6 +76,48 @@ myspace:
   repos: My repositories
   spaces: My spaces
   roles: "My roles:"
+  settings:
+    notifications:
+      title: My notifications
+      description:
+        text: Select which notifications you want to receive. These notifications will be sent to you by email to the address linked to your account. You can check this address in your "{credentialsLink}" area.
+        parts:
+          credentialsLink: '@:menu.myspace.credentials'
+      modifiers:
+        user: General
+        admin: Administrator
+      scopes:
+        institution: Notifications about one institution
+        contact: Notifications if contacted
+        counter: Notifications related to COUNTER
+        app: Notifications from application
+      types:
+        institution:validated:
+          user: One of your institutions has been validated
+          admin: One institution has been validated
+        institution:new_user_matching_institution:
+          user: A user that is member of one of your institutions registered
+          admin: A user that is member of an institution registered
+        institution:membership_request:
+          user: A user asks to join one of your institutions
+          admin: A user asks to join an institution
+        institution:role_assigned:
+          user: A role has been assigned to you
+          admin: A role has been assigned to a user
+        institution:counter_ready_change:
+          admin: An institution is ready to be harvested
+        contact:form:
+          admin: An email has been sent through the contact form
+        counter:new_data_available:
+          user: One of your institutions has been harvested
+          admin: An institution has been harvested
+        app:recent_activity:
+          admin: Recent activity on application
+      alerts:
+        updated:
+          title: Your notification settings has been applied
+      buttons:
+        save: '@:save'
 files:
   title: My Deposits
   manageN: >

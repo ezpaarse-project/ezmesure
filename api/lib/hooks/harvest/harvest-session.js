@@ -8,11 +8,9 @@ const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
 
 const { client: prisma } = require('../../services/prisma');
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
-const sender = config.get('notifications.sender');
-const recipients = config.get('notifications.recipients');
-
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 /**
  * @typedef {object} SushiConnection
  * @property {number} date
@@ -51,15 +49,7 @@ async function sendEndMail(session) {
     include: {
       // Get current contacts
       memberships: {
-        where: {
-          roles: {
-            some: {
-              role: {
-                notifications: { has: NOTIFICATION_TYPES.newCounterDataAvailable },
-              },
-            },
-          },
-        },
+        where: getNotificationMembershipWhere(NOTIFICATION_TYPES.newCounterDataAvailable),
         include: {
           user: true,
         },
@@ -87,10 +77,12 @@ async function sendEndMail(session) {
     },
   });
 
+  const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.newCounterDataAvailable);
+
   try {
     await Promise.all(
       institutions.map(async (institution) => {
-        const contacts = institution.memberships.map((m) => m.user.email);
+        const contacts = new Set(institution.memberships.map((m) => m.user.email));
 
         // TODO: what if multiple spaces
         const spaceID = institution.spaces.at(0)?.id;
@@ -121,14 +113,11 @@ async function sendEndMail(session) {
             ),
           credentialsURL: new URL(`myspace/institutions/${institution.id}/sushi`, publicUrl).href,
           spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
-          recipients,
         };
 
         await sendMail({
-          from: sender,
-          to: contacts,
-          cc: recipients,
-          replyTo: recipients,
+          to: Array.from(contacts),
+          bcc: admins.filter((email) => !contacts.has(email)),
           subject: `Des nouvelles données COUNTER pour "${institution.name}" ont été moissonnées !`,
           ...generateMail('harvest-end', data),
         });

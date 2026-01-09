@@ -1,20 +1,21 @@
-const config = require('config');
-
 const { sendMail, generateMail } = require('../../services/mail');
-const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
-
-const sender = config.get('notifications.sender');
-const supportRecipients = config.get('notifications.supportRecipients');
 
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
 
-function sendValidateInstitution(receivers) {
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
+async function sendValidateInstitution(receivers) {
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.institutionValidated,
+    receivers,
+  );
+
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supportRecipients,
+    bcc: admins,
     subject: 'Votre établissement a été validé',
     ...generateMail('validate-institution'),
   });
@@ -41,13 +42,7 @@ exports.validateInstitution = async (ctx) => {
         memberships: {
           some: {
             institutionId: institution.id,
-            roles: {
-              some: {
-                role: {
-                  notifications: { has: NOTIFICATION_TYPES.institutionValidated },
-                },
-              },
-            },
+            ...getNotificationMembershipWhere(NOTIFICATION_TYPES.institutionValidated),
           },
         },
       },

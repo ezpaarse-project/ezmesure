@@ -19,6 +19,7 @@ const schema = {
   fullName: Joi.string().allow(''),
   email: Joi.string().email(),
   isAdmin: Joi.boolean(),
+  excludeNotifications: Joi.array().items(Joi.string()),
 
   metadata: Joi.object(),
 

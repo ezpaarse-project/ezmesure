@@ -13,11 +13,14 @@ const {
   getResetToken,
   resetPassword,
   changePassword,
+  changeExcludeNotifications,
   getMemberships,
   getElasticRoles,
   getReportingToken,
   activate,
 } = require('./auth');
+
+const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
 
 router.route({
   method: 'POST',
@@ -100,6 +103,20 @@ router.route({
       actualPassword: Joi.string().required().trim().min(1),
       password: Joi.string().trim().min(6).required(),
     }),
+  },
+});
+router.route({
+  method: 'PUT',
+  path: '/excludeNotifications',
+  handler: [
+    bodyParser(),
+    changeExcludeNotifications,
+  ],
+  validate: {
+    type: 'json',
+    body: Joi.array().items(
+      Joi.string().valid(...NOTIFICATION_KEYS),
+    ),
   },
 });
 

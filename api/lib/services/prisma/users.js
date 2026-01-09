@@ -5,6 +5,7 @@ const { client: prisma } = require('./index');
 const adminUsername = config.get('admin.username');
 
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { getNotificationMembershipWhere } = require('../../utils/notifications');
 
 /* eslint-disable max-len */
 /**
@@ -101,17 +102,7 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
     where: {
       email: { endsWith: `@${domain}` },
       memberships: {
-        some: {
-          roles: {
-            some: {
-              role: {
-                notifications: {
-                  has: NOTIFICATION_TYPES.newUserMatchingInstitution,
-                },
-              },
-            },
-          },
-        },
+        some: getNotificationMembershipWhere(NOTIFICATION_TYPES.newUserMatchingInstitution),
       },
     },
   });

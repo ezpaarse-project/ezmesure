@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SkeletonPageBar :title="$t('menu.credentials')" />
+    <SkeletonPageBar :title="$t('menu.myspace.credentials')" />
 
     <v-container>
       <v-row>
