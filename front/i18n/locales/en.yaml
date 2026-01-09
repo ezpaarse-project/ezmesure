@@ -80,7 +80,7 @@ myspace:
     notifications:
       title: My notifications
       description:
-        text: Select which notifications you want to receive. Theses notifications will be sent to you by email to the address linked to your account. You can check this address in your "{credentialsLink}" area.
+        text: Select which notifications you want to receive. These notifications will be sent to you by email to the address linked to your account. You can check this address in your "{credentialsLink}" area.
         parts:
           credentialsLink: '@:menu.myspace.credentials'
       modifiers:
@@ -93,14 +93,14 @@ myspace:
         app: Notifications from application
       types:
         institution:validated:
-          user: One of your institution has been validated
+          user: One of your institutions has been validated
           admin: One institution has been validated
         institution:new_user_matching_institution:
-          user: A user that is member of one of your institution registered
+          user: A user that is member of one of your institutions registered
           admin: A user that is member of an institution registered
         institution:membership_request:
-          user: A user ask to join one of your institution
-          admin: A user ask to join an institution
+          user: A user asks to join one of your institutions
+          admin: A user asks to join an institution
         institution:role_assigned:
           user: A role has been assigned to you
           admin: A role has been assigned to a user
@@ -109,13 +109,13 @@ myspace:
         contact:form:
           admin: An email has been sent through the contact form
         counter:new_data_available:
-          user: One of your institution has been harvested
+          user: One of your institutions has been harvested
           admin: An institution has been harvested
         app:recent_activity:
           admin: Recent activity on application
       alerts:
         updated:
-          title: You notification settings has been applied
+          title: Your notification settings has been applied
       buttons:
         save: '@:save'
 files:
