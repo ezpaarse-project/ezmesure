@@ -12,6 +12,7 @@ const ElasticRoleService = require('../../entities/elastic-roles.service');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { appLogger } = require('../../services/logger');
+const { sendMail, generateMail } = require('../../services/mail');
 const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
 const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
@@ -421,10 +422,22 @@ exports.getUser = async (ctx) => {
 exports.deleteUser = async (ctx) => {
   const usersService = new UsersService();
 
+  const deletedAt = add(new Date(), { days: deleteDurationDays });
+
   await usersService.update({
     where: { username: ctx.state.user.username },
-    data: { deletedAt: add(new Date(), { days: deleteDurationDays }) },
+    data: { deletedAt },
   });
+
+  try {
+    await sendMail({
+      to: ctx.state.user.email,
+      subject: 'Votre demande de suppression à bien été prise en compte',
+      ...generateMail('user-deletion-requested', { deletedAt }),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send mail to ${ctx.state.user.email}: ${err}`);
+  }
 
   ctx.status = 204;
 };

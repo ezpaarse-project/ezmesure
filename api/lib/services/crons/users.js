@@ -4,6 +4,7 @@ const config = require('config');
 const { isAfter, isValid, startOfDay } = require('date-fns');
 
 const { appLogger } = require('../logger');
+const { sendMail, generateMail } = require('../mail');
 
 const UsersService = require('../../entities/users.service');
 
@@ -37,7 +38,7 @@ async function deleteMarkedUsers() {
 
       return users.delete({ where: { username: user.username } })
         .catch((err) => {
-          appLogger.error(`[test-users] Failed to delete user [${user.username}]`, err);
+          appLogger.error(`[user-deletion] Failed to delete user [${user.username}]`, err);
           return err;
         });
     });
@@ -50,7 +51,21 @@ async function deleteMarkedUsers() {
     );
   });
 
-  appLogger.verbose(`[users] Deleted ${deletedUsers.length} users`);
+  appLogger.verbose(`[user-deletion] Deleted ${deletedUsers.length} users`);
+
+  await Promise.all(
+    deletedUsers.map(async (user) => {
+      try {
+        await sendMail({
+          to: user.email,
+          subject: 'La suppression de votre compte est maintenant effective',
+          ...generateMail('user-deleted'),
+        });
+      } catch (err) {
+        appLogger.error(`[user-deletion] Failed to send mail to [${user.email}]`, err);
+      }
+    }),
+  );
 }
 
 async function startDeletionCron() {

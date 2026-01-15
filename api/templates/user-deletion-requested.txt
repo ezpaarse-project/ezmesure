@@ -1,0 +1,10 @@
+Votre demande de suppression à bien été prise en compte
+
+Cher·e utilisateur·ice,
+
+Vous avez demandé la suppression de vos données utilisateur liées à ezMESURE, elle sera effective le {{ deletedAt }}.
+
+Si vous souhaitez annuler cette opération, il suffit de vous connectez à ezMESURE.
+
+Cordialement,
+L'équipe ezMESURE.
