@@ -95,6 +95,7 @@ myspace:
         institution: Notifications d'un établissement
         contact: Notifications en cas de contact
         counter: Notifications liées à COUNTER
+        user: Notifications liées à un utilisateur
         app: Notifications de l'application
       types:
         institution:validated:
@@ -111,6 +112,10 @@ myspace:
           admin: Un rôle a été assigné à un utilisateur
         institution:counter_ready_change:
           admin: Un établissement est prêt à être moissonné
+        user:request_deletion:
+          admin: Un utilisateur à demandé la suppression de ses données
+        user:auto_deleted:
+          admin: Un utilisateur à été supprimé automatiquement
         contact:form:
           admin: Un mail a été envoyé via le formulaire de contact
         counter:new_data_available:
