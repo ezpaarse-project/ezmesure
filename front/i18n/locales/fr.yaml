@@ -77,10 +77,11 @@ myspace:
   spaces: Mes espaces
   roles: 'Mes rôles :'
   profile:
-    buttons:
-      deleteAccount:
-        text: Supprimer le compte
-        confirm: Votre compte et toutes les données qui y sont liées seront supprimées d'ici 7 jours. Toute tentative de connexion anulera cette suppression. Souhaitez vous continuer ?
+    actions:
+      delete:
+        title: Supprimer le compte
+        confirm:
+          text: Votre compte et toutes les données qui y sont liées seront supprimées d'ici 7 jours. Toute tentative de connexion anulera cette suppression. Souhaitez vous continuer ?
   settings:
     notifications:
       title: Mes notifications
@@ -1011,6 +1012,21 @@ users:
     no_institution: Aucun établissement
     deletedAt: À demandé sa suppression
     deletedAt:tooltip: Cet utilisateur à demandé sa suppression, elle sera effective le {date}
+  actions:
+    disable:
+      title: Désactiver
+      confirm:
+        text: Les comptes et toutes les données qui y sont liées seront supprimées d'ici 7 jours. Toute tentative de connexion de l'un de ces utilisateurs anulera sa suppression. Souhaitez vous continuer ?
+        agree: Désactiver
+      error: Une erreur est survenue lors de la désactivation de l'utilisateur {id}
+      success: 1 utilisateur a été désactivé|{n} utilisateurs ont été désactivés
+    restore:
+      title: Restaurer
+      confirm:
+        text: Restaurer les utilisateurs annulera leur suppression prochaine. Souhaitez vous continuer ?
+        agree: Restaurer
+      error: Une erreur est survenue lors de la restauration de l'utilisateur {id}
+      success: 1 utilisateur a été restauré|{n} utilisateurs ont été restaurés
 report:
   title: Mes rapports
   health: État de santé

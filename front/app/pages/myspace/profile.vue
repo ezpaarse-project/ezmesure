@@ -144,12 +144,12 @@
             <template #append>
               <ConfirmPopover
                 :agree="() => deleteAccount()"
-                :text="$t('myspace.profile.buttons.deleteAccount.confirm')"
+                :text="$t('myspace.profile.actions.delete.confirm.text')"
                 max-width="600"
               >
                 <template #activator="{ props: confirm }">
                   <v-btn
-                    :text="$t('myspace.profile.buttons.deleteAccount.text')"
+                    :text="$t('myspace.profile.actions.delete.title')"
                     prepend-icon="mdi-delete"
                     color="red"
                     variant="text"

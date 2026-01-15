@@ -77,10 +77,11 @@ myspace:
   spaces: My spaces
   roles: "My roles:"
   profile:
-    buttons:
-      deleteAccount:
-        text: Delete account
-        confirm: Your account and all related data will be deleted within 7 days. Any attempt to log in will cancel this deletion. Do you wish to continue?
+    actions:
+      delete:
+        title: Delete account
+        confirm:
+          text: Your account and all related data will be deleted within 7 days. Any attempt to log in will cancel this deletion. Do you wish to continue?
   settings:
     notifications:
       title: My notifications
@@ -1001,6 +1002,21 @@ users:
     no_institution: No institutions
     deletedAt: Asked for it's deletion
     deletedAt:tooltip: This user asked for it's deletion, it'll be effective on the {date}
+  actions:
+    disable:
+      title: Disable
+      confirm:
+        text: The account and their data will be deleten in the following 7 days. Any attempt to log in from one of the users will cancel the deletion. Do you want to continue ?
+        agree: Disable
+      error: An error occured while disabling user {id}
+      success: 1 user has been disabled|{n} users has been disabled
+    restore:
+      title: Restore
+      confirm:
+        text: Restoring users will cancel their deletion. Do you want to continue ?
+        agree: Restore
+      error: An error occured while restoring user {id}
+      success: 1 user has been restored|{n} users has been restored
 report:
   title: My reports
   health: Health status
