@@ -1,22 +1,25 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { add, isBefore, parseISO } = require('date-fns');
-const elastic = require('../../services/elastic');
 
-const usersElastic = require('../../services/elastic/users');
-const ezrUsers = require('../../services/ezreeport/users');
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 const UsersService = require('../../entities/users.service');
 const MembershipsService = require('../../entities/memberships.service');
 const ElasticRoleService = require('../../entities/elastic-roles.service');
 
+const usersElastic = require('../../services/elastic/users');
+const elastic = require('../../services/elastic');
+const ezrUsers = require('../../services/ezreeport/users');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
-const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
 const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
 const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
+
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
@@ -420,23 +423,33 @@ exports.getUser = async (ctx) => {
 };
 
 exports.deleteUser = async (ctx) => {
-  const usersService = new UsersService();
+  const { username, email } = ctx.state.user;
 
   const deletedAt = add(new Date(), { days: deleteDurationDays });
 
+  const usersService = new UsersService();
+
   await usersService.update({
-    where: { username: ctx.state.user.username },
+    where: { username },
     data: { deletedAt },
   });
 
+  appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
+
   try {
+    const admins = await getNotificationRecipients(
+      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
+      [email],
+    );
+
     await sendMail({
-      to: ctx.state.user.email,
+      to: email,
+      bcc: admins,
       subject: 'Votre demande de suppression à bien été prise en compte',
-      ...generateMail('user-deletion-requested', { deletedAt }),
+      ...generateMail('user-deletion-requested', { deletedAt, isFromUser: true }),
     });
   } catch (err) {
-    appLogger.error(`Failed to send mail to ${ctx.state.user.email}: ${err}`);
+    appLogger.error(`Failed to send mail to ${email}: ${err}`);
   }
 
   ctx.status = 204;

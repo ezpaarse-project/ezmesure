@@ -3,10 +3,13 @@ const { CronJob } = require('cron');
 const config = require('config');
 const { isAfter, isValid, startOfDay } = require('date-fns');
 
-const { appLogger } = require('../logger');
-const { sendMail, generateMail } = require('../mail');
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 const UsersService = require('../../entities/users.service');
+
+const { appLogger } = require('../logger');
+const { sendMail, generateMail } = require('../mail');
 
 /**
  * @typedef {import('../../.prisma/client.mts').User} User
@@ -18,7 +21,7 @@ async function deleteMarkedUsers() {
   // Removing 1ms to include the users that should be deleted on the same day
   const date = startOfDay(new Date()).getTime() - 1;
 
-  appLogger.verbose('[users] Checking for users to delete...');
+  appLogger.verbose('[user-deletion] Checking for users to delete...');
 
   /** @type {User[]} */
   const deletedUsers = await UsersService.$transaction(async (users) => {
@@ -53,11 +56,17 @@ async function deleteMarkedUsers() {
 
   appLogger.verbose(`[user-deletion] Deleted ${deletedUsers.length} users`);
 
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.userDeleted,
+    // No need to exclude as users are deleted
+  );
+
   await Promise.all(
     deletedUsers.map(async (user) => {
       try {
         await sendMail({
           to: user.email,
+          bcc: admins,
           subject: 'La suppression de votre compte est maintenant effective',
           ...generateMail('user-deleted'),
         });

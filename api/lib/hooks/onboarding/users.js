@@ -114,13 +114,13 @@ const onUserUpsert = async (user) => {
   // Manual sync
   try {
     await syncElasticUser(user);
-    appLogger.error(`[onboarding][hooks] User [${user.username}] is synced to elastic`);
+    appLogger.verbose(`[onboarding][hooks] User [${user.username}] is synced to elastic`);
   } catch (error) {
     appLogger.error(`[onboarding][hooks] User [${user.username}] cannot be synced to elastic:\n${error}`);
   }
   try {
     await syncEzrUser(user);
-    appLogger.error(`[onboarding][hooks] User [${user.username}] is synced to ezreeport`);
+    appLogger.verbose(`[onboarding][hooks] User [${user.username}] is synced to ezreeport`);
   } catch (error) {
     appLogger.error(`[onboarding][hooks] User [${user.username}] cannot be synced to ezreeport:\n${error}`);
   }
