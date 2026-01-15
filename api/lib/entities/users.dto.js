@@ -73,6 +73,7 @@ const adminCreateSchema = withModifiers(
 const adminUpdateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
+  { deletedAt: () => schema.deletedAt },
 );
 
 /**
