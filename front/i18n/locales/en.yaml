@@ -1037,6 +1037,9 @@ repositories:
                 date:
                   title: Date
                   tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
+    settings:
+      defaultPipeline: Default pipeline
+      finalPipeline: Final pipeline
   manageRepositories: >
     Manage repositories
     |Manage {count} repositories

@@ -1050,6 +1050,9 @@ repositories:
                 date:
                   title: Date
                   tooltip: Ajoute un sous-champ ".date" transformant la valeur au type "Date"
+    settings:
+      defaultPipeline: Pipeline par défaut
+      finalPipeline: Pipeline finale
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type
