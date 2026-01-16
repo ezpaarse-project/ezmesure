@@ -15,7 +15,7 @@
 <mj-section>
   <mj-column>
     <mj-text>
-      Vous trouverez toutes les informations sur ce rôle dans le billet <a target="_blank" href="{{ contactBlogLink }}"> {{ data.contactBlogLink }} </a>
+      Vous trouverez toutes les informations sur ce rôle dans le billet <a target="_blank" href="{{ contactDocLink }}"> {{ data.contactDocLink }} </a>
     </mj-text>
 
     <mj-text>
