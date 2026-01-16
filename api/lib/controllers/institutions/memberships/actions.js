@@ -34,7 +34,7 @@ exports.standardQueryParams = standardQueryParams;
 
 async function sendNewContact(receiver, institutionName, role) {
   const data = {
-    contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
+    contactDocLink: 'https://docs.readmetrics.org/s/fr-ezmesure-user/doc/gestion-des-membres-et-des-droits-weKwpEeLVZ#h-les-roles-et-leurs-attributions-dans-ezmesure',
     institution: institutionName,
     role,
   };
