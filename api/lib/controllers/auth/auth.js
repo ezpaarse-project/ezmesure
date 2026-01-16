@@ -1,6 +1,13 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { add, isBefore, parseISO } = require('date-fns');
+const {
+  add,
+  isBefore,
+  parseISO,
+  format,
+} = require('date-fns');
+
+const { fr } = require('date-fns/locale');
 
 const { getNotificationRecipients } = require('../../utils/notifications');
 const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
@@ -446,7 +453,10 @@ exports.deleteUser = async (ctx) => {
       to: email,
       bcc: admins,
       subject: 'Votre demande de suppression à bien été prise en compte',
-      ...generateMail('user-deletion-requested', { deletedAt, isFromUser: true }),
+      ...generateMail('user-deletion-requested', {
+        deletedAt: format(deletedAt, 'PPPp', { locale: fr }),
+        isFromUser: true,
+      }),
     });
   } catch (err) {
     appLogger.error(`Failed to send mail to ${email}: ${err}`);
