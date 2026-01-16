@@ -6,6 +6,7 @@ const mount = require('koa-mount');
 const path = require('path');
 
 const { renaterLogin, elasticLogin, logout } = require('./auth/auth');
+const config = require('./config');
 const logs = require('./logs');
 const authorize = require('./auth');
 const partners = require('./partners');
@@ -77,6 +78,7 @@ const assetsDir = path.resolve(__dirname, '..', '..', 'uploads');
 app.use(mount('/assets', serve(assetsDir)));
 
 app.use(publicRouter.middleware());
+app.use(config.prefix('/config').middleware());
 app.use(partners.prefix('/partners').middleware());
 app.use(metrics.prefix('/metrics').middleware());
 app.use(contact.prefix('/contact').middleware());
