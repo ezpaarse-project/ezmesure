@@ -19,8 +19,8 @@ const mappingSchema = Joi.object({
 });
 
 const settingsSchema = Joi.object({
-  defaultPipeline: Joi.string().valid(null),
-  finalPipeline: Joi.string().valid(null),
+  defaultPipeline: Joi.string().allow(null),
+  finalPipeline: Joi.string().allow(null),
 });
 
 /**
