@@ -12,6 +12,8 @@ model Repository {
   type                   String                            @db.VarChar(50)
   /// The repository mapping options
   mapping                Json                              @default("{}")
+  /// The repository settings options
+  settings               Json                              @default("{}")
   /// Member permissions associated to this repository
   permissions            RepositoryPermission[]
   /// Aliases associated to this repository
