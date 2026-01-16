@@ -81,7 +81,7 @@ myspace:
       delete:
         title: Supprimer le compte
         confirm:
-          text: Votre compte et toutes les données qui y sont liées seront supprimées d'ici 7 jours. Toute tentative de connexion anulera cette suppression. Souhaitez vous continuer ?
+          text: Votre compte et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion annulera cette suppression. Souhaitez-vous continuer ?
   settings:
     notifications:
       title: Mes notifications
@@ -1016,7 +1016,7 @@ users:
     disable:
       title: Désactiver
       confirm:
-        text: Les comptes et toutes les données qui y sont liées seront supprimées d'ici 7 jours. Toute tentative de connexion de l'un de ces utilisateurs anulera sa suppression. Souhaitez vous continuer ?
+        text: Les comptes et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion de l'un de ces utilisateurs annulera sa suppression. Souhaitez-vous continuer ?
         agree: Désactiver
       error: Une erreur est survenue lors de la désactivation de l'utilisateur {id}
       success: 1 utilisateur a été désactivé|{n} utilisateurs ont été désactivés

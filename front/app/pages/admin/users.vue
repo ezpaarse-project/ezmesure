@@ -156,6 +156,8 @@
 </template>
 
 <script setup>
+import { millisecondsInDay } from 'date-fns/constants';
+
 /**
  * @typedef {import('~/stores/dialog').DialogData} DialogData
  */
@@ -165,7 +167,8 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
-const { t } = useI18n();
+const { data: apiConfig } = await useApiConfig();
+const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
@@ -175,6 +178,11 @@ const selectedUsers = ref([]);
 const userFormDialogRef = useTemplateRef('userFormDialogRef');
 const membershipsDialogRef = useTemplateRef('membershipsDialogRef');
 const impersonateDialogRef = useTemplateRef('impersonateDialogRef');
+
+const deleteDuration = computed(() => {
+  const deleteDurationDays = apiConfig?.value?.users?.deleteDurationDays;
+  return timeAgo(deleteDurationDays * millisecondsInDay, locale.value) ?? '...';
+});
 
 const {
   refresh,
@@ -324,7 +332,7 @@ async function disableUsers(items) {
   const toDisable = items || selectedUsers.value;
 
   await bulkActionWithConfirm(toDisable, {
-    text: t('users.actions.disable.confirm.text', toDisable.length),
+    text: t('users.actions.disable.confirm.text', { duration: deleteDuration.value }),
     agreeText: t('users.actions.disable.confirm.agree'),
     agreeIcon: 'mdi-account-cancel',
 

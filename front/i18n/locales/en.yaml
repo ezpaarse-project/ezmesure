@@ -81,7 +81,7 @@ myspace:
       delete:
         title: Delete account
         confirm:
-          text: Your account and all related data will be deleted within 7 days. Any attempt to log in will cancel this deletion. Do you wish to continue?
+          text: Your account and all related data will be deleted in {duration}. Any attempt to log in will cancel this deletion. Do you wish to continue?
   settings:
     notifications:
       title: My notifications
@@ -1006,7 +1006,7 @@ users:
     disable:
       title: Disable
       confirm:
-        text: The account and their data will be deleten in the following 7 days. Any attempt to log in from one of the users will cancel the deletion. Do you want to continue ?
+        text: The accounts and their related data will be deleted in {duration}. Any attempt to log in from one of the users will cancel his deletion. Do you want to continue ?
         agree: Disable
       error: An error occured while disabling user {id}
       success: 1 user has been disabled|{n} users has been disabled

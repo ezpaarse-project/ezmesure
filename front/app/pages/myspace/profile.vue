@@ -144,7 +144,7 @@
             <template #append>
               <ConfirmPopover
                 :agree="() => deleteAccount()"
-                :text="$t('myspace.profile.actions.delete.confirm.text')"
+                :text="$t('myspace.profile.actions.delete.confirm.text', { duration: deleteDuration })"
                 max-width="600"
               >
                 <template #activator="{ props: confirm }">
@@ -187,6 +187,7 @@
 </template>
 
 <script setup>
+import { millisecondsInDay } from 'date-fns/constants';
 import { getErrorMessage } from '@/lib/errors';
 
 definePageMeta({
@@ -195,9 +196,10 @@ definePageMeta({
 });
 
 const { public: config } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 const { data: user, signOut } = useAuth();
 const { openInTab } = useSingleTabLinks('profile');
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { spacesPermissions } = storeToRefs(useCurrentUserStore());
 
@@ -209,6 +211,11 @@ const password = shallowRef('');
 const passwordRepeat = shallowRef('');
 const showPassword = shallowRef(false);
 const errorMessage = ref(undefined);
+
+const deleteDuration = computed(() => {
+  const deleteDurationDays = apiConfig?.value?.users?.deleteDurationDays;
+  return timeAgo(deleteDurationDays * millisecondsInDay, locale.value) ?? '...';
+});
 
 const refreshShibUrl = computed(() => {
   if (config.shibbolethDisabled) {
