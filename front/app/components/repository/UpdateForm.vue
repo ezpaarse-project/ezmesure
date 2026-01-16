@@ -197,7 +197,7 @@
                       v-model="repository.settings.defaultPipeline"
                       :items="pipelineOptions"
                       :loading="pipelineOptionsLoading"
-                      :label="$t('repositories.updateForm.settings.defaultPipeline')"
+                      :label="$t('repositories.updateForm.settings.form.defaultPipeline')"
                       variant="underlined"
                       clearable
                       hide-details
@@ -209,7 +209,7 @@
                       v-model="repository.settings.finalPipeline"
                       :items="pipelineOptions"
                       :loading="pipelineOptionsLoading"
-                      :label="$t('repositories.updateForm.settings.finalPipeline')"
+                      :label="$t('repositories.updateForm.settings.form.finalPipeline')"
                       variant="underlined"
                       clearable
                       hide-details
