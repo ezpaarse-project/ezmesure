@@ -1038,7 +1038,7 @@ repositories:
                   title: Date
                   tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
     settings:
-      title: Settings of the repository
+      title: Repository settings
       form:
         defaultPipeline: Default pipeline
         finalPipeline: Final pipeline
