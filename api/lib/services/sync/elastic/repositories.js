@@ -7,7 +7,7 @@ const indexTemplates = require('../../../utils/index-templates');
 const RepositoriesService = require('../../../entities/repositories.service');
 const SpacesService = require('../../../entities/spaces.service');
 
-const { mappingSchema } = require('../../../entities/repositories.dto');
+const { mappingSchema, settingsSchema } = require('../../../entities/repositories.dto');
 
 const { syncIndexPatterns } = require('../kibana');
 
@@ -30,6 +30,24 @@ const { filtersToESQuery } = require('../../elastic/filters');
  * @typedef {{ repository: RepositoryWithAliases, priority: number }} RepositoryPriority
  */
 /* eslint-enable max-len */
+
+/**
+ * @typedef {object} RepositoryPropertyMapping
+ * @property {string} type
+ * @property {boolean} ignoreMalformed
+ * @property {string | undefined} format
+ * @property {('date')[]} subFields
+ */
+/**
+ * @typedef {object} RepositoryMapping
+ * @property {Record<string, RepositoryPropertyMapping>} properties
+ */
+
+/**
+  * @typedef {object} RepositorySettings
+  * @property {string} [defaultPipeline]
+  * @property {string} [finalPipeline]
+  */
 
 // Namespace for index templates dedicated to repositories
 const indexTemplatePrefix = 'ezm-tpl';
@@ -79,7 +97,7 @@ const calcHashOfPattern = (pattern) => createHash('sha1')
  *
  * @param {string} pattern - The pattern (wildcard)
  *
- * @returns The RegEx
+ * @returns {RegExp} The RegEx
  */
 const patternToRegex = (pattern) => {
   const exp = pattern.replaceAll('*', '.*?');
@@ -220,18 +238,6 @@ const getIndexTemplateDefinitions = (repo) => {
 };
 
 /**
- * @typedef {object} RepositoryPropertyMapping
- * @property {string} type
- * @property {boolean} ignoreMalformed
- * @property {string | undefined} format
- * @property {('date')[]} subFields
- */
-/**
- * @typedef {object} RepositoryMapping
- * @property {Record<string, RepositoryPropertyMapping>} properties
- */
-
-/**
  * Transform a property for a repository mapping into a property for a index mapping
  *
  * @param {RepositoryPropertyMapping} property - The property definition
@@ -352,6 +358,18 @@ const repositoryAliasesToIndexAliases = (aliases) => {
 };
 
 /**
+ * Transform settings of a repository into settings for an index
+ *
+ * @param {RepositorySettings} settings - The settings of the repository
+ *
+ * @returns {esIndexSettings}
+ */
+const repositorySettingsToIndexSettings = (settings) => ({
+  default_pipeline: settings.defaultPipeline || undefined,
+  final_pipeline: settings.finalPipeline || undefined,
+});
+
+/**
  * Upsert an index template that contains aliases for a repository
  * @param {RepositoryWithAliases} repo - The repository with its aliases
  * @param {RepositoryWithAliases[]} allRepositories - The list containing all repository
@@ -371,10 +389,15 @@ const upsertIndexTemplates = async (repo, allRepositories, skipChildren) => {
 
       const aliases = repositoryAliasesToIndexAliases(repository.aliases);
 
+      const settings = repositorySettingsToIndexSettings(
+        settingsSchema.validate(repository.settings).value || {},
+      );
+
       const body = {
         priority,
         _meta: indexTemplateMeta,
         template: {
+          settings,
           mappings,
           aliases,
         },
@@ -433,6 +456,7 @@ const syncRepositoryIndexTemplates = async (pattern, allRepositories = []) => {
         type: true,
         aliases: true,
         mapping: true,
+        settings: true,
       },
     });
   }

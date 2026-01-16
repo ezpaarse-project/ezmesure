@@ -18,6 +18,11 @@ const mappingSchema = Joi.object({
   ),
 });
 
+const settingsSchema = Joi.object({
+  defaultPipeline: Joi.string().valid(null),
+  finalPipeline: Joi.string().valid(null),
+});
+
 /**
  * Base schema
  * @type {Record<string, import('joi').AnySchema>}
@@ -32,6 +37,7 @@ const schema = {
   type: Joi.string().trim().min(1),
 
   mapping: mappingSchema,
+  settings: settingsSchema,
 
   permissions: Joi.array().items(Joi.object()),
   elasticRolePermissions: Joi.array().items(Joi.object()),
@@ -107,6 +113,7 @@ const adminImportSchema = withModifiers(
 module.exports = {
   schema,
   mappingSchema,
+  settingsSchema,
   includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminCreateOrConnectSchema: Joi.object(adminCreateOrConnectSchema).required(),
