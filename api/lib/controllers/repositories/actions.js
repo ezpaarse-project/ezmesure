@@ -288,3 +288,15 @@ exports.resolvePattern = async (ctx) => {
     ...body.aliases,
   ];
 };
+
+exports.getAvailablePipelines = async (ctx) => {
+  const { body } = await elastic.ingest.getPipeline();
+
+  ctx.type = 'json';
+  ctx.body = Object.entries(body).map(
+    ([id, pipeline]) => ({
+      id,
+      description: pipeline.description,
+    }),
+  );
+};
