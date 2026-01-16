@@ -72,19 +72,20 @@
               @click="userFormDialogRef.open(item)"
             />
             <v-list-item
+              v-if="!!item.deletedAt"
               :title="$t('delete')"
               prepend-icon="mdi-delete"
               @click="deleteUsers([item])"
             />
-
-            <v-divider />
-
             <v-list-item
+              v-else
               :title="$t('users.actions.disable.title')"
               :disabled="!!item.deletedAt"
               prepend-icon="mdi-account-cancel"
               @click="disableUsers([item])"
             />
+
+            <v-divider />
 
             <v-list-item
               :title="$t('users.actions.restore.title')"
