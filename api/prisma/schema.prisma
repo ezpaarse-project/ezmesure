@@ -7,8 +7,8 @@ generator client {
   engineType             = "client"
   runtime                = "nodejs"
   moduleFormat           = "esm"
-  generatedFileExtension = "ts"
-  importFileExtension    = "ts"
+  generatedFileExtension = "mts"
+  importFileExtension    = "mts"
 }
 
 datasource db {

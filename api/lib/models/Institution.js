@@ -5,7 +5,7 @@ const { randomBytes } = require('crypto');
 const { Joi } = require('koa-joi-router');
 const elastic = require('../services/elastic');
 const kibana = require('../services/kibana');
-const indexTemplate = require('../utils/index-template');
+const { ezpaarse: indexTemplate } = require('../utils/index-templates');
 const { registerModel, typedModel, getModel } = require('./TypedModel');
 
 const type = 'institution';

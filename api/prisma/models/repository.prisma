@@ -10,6 +10,8 @@ model Repository {
   pattern                String                            @id
   /// The repository type (ezpaarse, counter5)
   type                   String                            @db.VarChar(50)
+  /// The repository mapping options
+  mapping                Json                              @default("{}")
   /// Member permissions associated to this repository
   permissions            RepositoryPermission[]
   /// Aliases associated to this repository

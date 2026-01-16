@@ -2,9 +2,11 @@ menu:
   homepage: Page d'accueil ezMESURE
   home: Accueil
   dashboard: Tableau de bord
+  documentation: Documentation
   myspace: Mon compte
   partners: Nos partenaires
   api: API
+  guide: Guide d'utilisation
   navigateTo: Naviguer vers
   myDeposits: Mes dépôts
   credentials: Informations de connexion
@@ -963,6 +965,38 @@ repositories:
     Gérer les entrepôts
     |Gérer {count} entrepôts
   newRepository: Nouveau entrepôt
+  updateForm:
+    title: Mettre à jour l'entrepôt
+    mapping:
+      properties:
+        title: Propriétés additionnelles
+        emptyText: Aucune propriété additionnelle n'est définie, cliquez sur le bouton {'"'}@:add{'"'} pour en définir une.
+        exists: Propriété déjà définie
+        form:
+          label: Nom de la propriété
+          type:
+            label: Type
+            options:
+              integer: Nombre entier
+              float: Nombre décimal
+              keyword: Chaine de caractères
+              boolean: Booléen
+              date: Date
+              ip: IP
+              text: Texte
+              geo_point: Point géographique
+              geo_shape: Forme géographique
+          settings:
+            title: Paramètres avancés
+            ignoreMalformed: Ignorer les valeurs malformées
+            format: Format de la date dans les données
+            format:hint: Basé sur {link}
+            subFields:
+              label: Sous-champs
+              options:
+                date:
+                  title: Date
+                  tooltip: Ajoute un sous-champ ".date" transformant la valeur au type "Date"
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type
@@ -1088,21 +1122,44 @@ harvest:
       counterVersions: "{n} version de COUNTER|{n} versions de COUNTER"
     credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés"
     reportsMenuTitle: Rapports COUNTER
-    sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
-    notStarted: Pas encore lancé
+    status:
+      list:
+        prepared: Pas encore lancé
+        starting: Démarrage en cours
+        stopped: Arrété
+    form:
+      title:add: Créer une session de moissonnage
+      title:update: Éditer une session de moissonnage
+      credentials:
+        title: Identifiants COUNTER à moissonner
+        intro: >
+          Les identifiants moissonnés seront ceux qui répondent à tous les critères (s’ils concernent l’un
+          des point d’accès et l’un des établissements).
+        institutions:
+          title: "@:institutions.toolbarTitle"
+          all: Tous les établissements
+        endpoints:
+          title: "@:endpoints.toolbarTitle"
+          all: Tous les points d'accès
+        allowFaulty:
+          title: Inclure les identifiants invalides
+          description: >
+            Par défaut, seuls les identifiants déclarés par un établissement et valides seront moissonnés,
+            mais vous pouvez inclure les invalides en cochant la case ci-dessous.
+      reports:
+        title: Rapports COUNTER à moissonner
+        beginDate: "@:harvest.jobs.beginDate"
+        endDate: "@:harvest.jobs.endDate"
+        downloadUnsupported: Télécharger les rapports même si non supportés par le point d'accès
+        useCache: Utiliser le cache des rapports
+        useValidation: Respecter la validation des rapports
+      settings:
+        title: Paramètres de moissonnage
+        sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
+        timeout: Délai de complétion des tâches
     unableToRetrive: Impossible de récupérer les moissonnages
-    add: Créer une session de moissonnage
-    update: Éditer une session de moissonnage
     start: Démarrer la session
     stop: Arrêter la session
-    credentials: Identifiants COUNTER à moissonner
-    reports: Rapports COUNTER à moissonner
-    settings: Paramètres de moissonnage
-    downloadUnsupported: Télécharger les rapports même si non supportés par le point d'accès
-    allowFaulty: Inclure les identifiants invalides
-    useCache: Utiliser le cache des rapports
-    useValidation: Respecter la validation des rapports
-    timeout: Délai de complétion des tâches
   jobs:
     title: Tâches de moissonnage
     filtersTitle: Filtrer les tâches

@@ -14,6 +14,8 @@ const elastic = require('.');
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesDeleteAliasResponse} IndicesDeleteAliasResponse
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesStatsResponse} IndicesStatsResponse
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesExistsResponse} IndicesExistsResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.ClusterPutComponentTemplateRequest} ClusterPutComponentTemplateRequest
+ * @typedef {import('@elastic/elasticsearch').default.estypes.ClusterGetComponentTemplateResponse} ClusterGetComponentTemplateResponse
 */
 /* eslint-enable max-len */
 
@@ -50,20 +52,16 @@ exports.create = async function createIndex(indexName, mapping, requestConfig) {
 };
 
 /**
- * Create an alias in elastic.
+ * delete index in elastic.
  *
- * @param {string} aliasName The name of the alias
- * @param {string} indexName The name of the index targeted by the alias
- * @param {object} [filter] The filter for the alias
- * @param {TransportRequestOptions} [requestConfig] - Request config (timeouts, headers, ignore...)
+ * @param {string} indexName - index name.
+ * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @returns {Promise<ESResponse<IndicesPutAliasResponse>>} alias created
+ * @return {Promise<ApiResponse<IndicesDeleteResponse>>} index.
  */
-exports.upsertAlias = async function upsertAlias(aliasName, indexName, filter, requestConfig) {
-  return elastic.indices.putAlias({
-    name: aliasName,
+exports.delete = async function deleteIndex(indexName, requestConfig) {
+  return elastic.indices.delete({
     index: indexName,
-    body: filter ? { filter } : undefined,
   }, requestConfig);
 };
 
@@ -88,16 +86,34 @@ exports.deleteTemplate = async function deleteTemplate(templateName, requestConf
 };
 
 /**
- * delete index in elastic.
+ * Upsert a index template component
  *
- * @param {string} indexName - index name.
- * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
- *
- * @return {Promise<ApiResponse<IndicesDeleteResponse>>} index.
+ * @param {ClusterPutComponentTemplateRequest} body - The content
+ * @param {TransportRequestOptions} [requestConfig] Request config
+ * @returns {Promise<ApiResponse<ClusterGetComponentTemplateResponse>>}
  */
-exports.delete = async function deleteIndex(indexName, requestConfig) {
-  return elastic.indices.delete({
+exports.upsertTemplateComponent = async function upsertTemplateComponent(
+  body,
+  requestConfig,
+) {
+  return elastic.cluster.putComponentTemplate(body, requestConfig);
+};
+
+/**
+ * Create an alias in elastic.
+ *
+ * @param {string} aliasName The name of the alias
+ * @param {string} indexName The name of the index targeted by the alias
+ * @param {object} [filter] The filter for the alias
+ * @param {TransportRequestOptions} [requestConfig] - Request config (timeouts, headers, ignore...)
+ *
+ * @returns {Promise<ESResponse<IndicesPutAliasResponse>>} alias created
+ */
+exports.upsertAlias = async function upsertAlias(aliasName, indexName, filter, requestConfig) {
+  return elastic.indices.putAlias({
+    name: aliasName,
     index: indexName,
+    body: filter ? { filter } : undefined,
   }, requestConfig);
 };
 

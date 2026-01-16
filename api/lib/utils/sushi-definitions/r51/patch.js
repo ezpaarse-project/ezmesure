@@ -47,6 +47,24 @@ function fixPeriodDateFormat(...schemas) {
 }
 
 /**
+ * Fix Exception having Severity (coming from R5)
+ *
+ * Update by reference
+ *
+ * @param  {...object} schemas to fix
+ */
+function fixSeverityException(...schemas) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const schema of schemas) {
+    if (schema.type === 'object' && !!schema.properties) {
+      schema.properties.Severity = {
+        type: 'string',
+      };
+    }
+  }
+}
+
+/**
  * Fix performances needing at least 2 properties in schema
  * while actually needing one given the case
  *
@@ -64,6 +82,35 @@ function fixPerfMinProperties(...schemas) {
     }
   }
 }
+/**
+ * Fix ISBN format by removing the need of having hyphens
+ *
+ * Update by reference
+ *
+ * @deprecated should be fixed by R5.1.1
+ *
+ * @param  {...object} schemas to fix
+ */
+function fixISBNHyphens(...schemas) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const schema of schemas) {
+    if (schema.type === 'object' && !!schema.properties?.ISBN) {
+      schema.properties.ISBN = {
+        oneOf: [
+          // Keep original validation
+          schema.properties.ISBN,
+          // Add un-hyphened validation
+          {
+            type: 'string',
+            pattern: '^97[89][0-9]+$',
+            minLength: 13,
+            maxLength: 13,
+          },
+        ],
+      };
+    }
+  }
+}
 
 // Patches application
 
@@ -76,9 +123,37 @@ fixPeriodDateFormat(
   defSchema.definitions.Base_Report_Filters,
 );
 
+fixSeverityException(
+  defSchema.definitions.Exception,
+  defSchema.definitions.Exception_0,
+  defSchema.definitions['Exception_1-999'],
+  defSchema.definitions.Exception_1000,
+  defSchema.definitions.Exception_1010,
+  defSchema.definitions.Exception_1011,
+  defSchema.definitions.Exception_1020,
+  defSchema.definitions.Exception_1030,
+  defSchema.definitions.Exception_2000,
+  defSchema.definitions.Exception_2010,
+  defSchema.definitions.Exception_2011,
+  defSchema.definitions.Exception_2020,
+  defSchema.definitions.Exception_3020,
+  defSchema.definitions.Exception_3030,
+  defSchema.definitions.Exception_3031,
+  defSchema.definitions.Exception_3032,
+  defSchema.definitions.Exception_3040,
+  defSchema.definitions.Exception_3050,
+  defSchema.definitions.Exception_3060,
+  defSchema.definitions.Exception_3061,
+  defSchema.definitions.Exception_3062,
+  defSchema.definitions.Exception_3063,
+  defSchema.definitions.Exception_3070,
+);
+
 fixPerfMinProperties(
   defSchema.definitions.TR_Performance,
   defSchema.definitions.TR_B2_Performance,
 );
+
+fixISBNHyphens(defSchema.definitions.Item_ID);
 
 module.exports = defSchema;
