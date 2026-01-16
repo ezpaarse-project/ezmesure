@@ -63,7 +63,7 @@ async function sendCounterReadyChangeMail(data) {
 
     return sendMail({
       to: admins,
-      subject: data.sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
+      subject: data.sushiReadySince ? 'Fin de saisie d\'identifiant COUNTER' : 'Reprise de saisie d\'identifiant COUNTER',
       ...generateMail('sushi-ready-change', data),
     });
   } catch (err) {
