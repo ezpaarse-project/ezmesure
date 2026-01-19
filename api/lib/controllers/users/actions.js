@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const { add } = require('date-fns');
 
 const UsersService = require('../../entities/users.service');
 const { sendActivateUserMail } = require('../auth/mail');
@@ -20,6 +21,7 @@ exports.standardQueryParams = standardQueryParams;
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
+const { deleteDurationDays } = config.get('users');
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -79,7 +81,7 @@ exports.list = async (ctx) => {
         AND: [
           prismaQuery.where.memberships ?? {},
           { every: { roles: { none: {} } } },
-        ]
+        ],
       };
     } else {
       const operator = hasSomeRoles ? 'OR' : 'AND';
@@ -293,10 +295,34 @@ exports.updateUser = async (ctx) => {
 
 exports.deleteUser = async (ctx) => {
   const { username } = ctx.request.params;
+  const { force } = ctx.query;
 
   const usersService = new UsersService();
-  const found = !!(await usersService.delete({ where: { username } }));
-  appLogger.verbose(`User [${username}] is deleted`);
+  const found = !!await usersService.findUnique({ where: { username } });
+
+  if (!found) {
+    ctx.status = 200;
+    ctx.body = { found };
+    return;
+  }
+
+  if (force) {
+    await usersService.delete({ where: { username } });
+    appLogger.verbose(`User [${username}] is deleted`);
+
+    ctx.status = 200;
+    ctx.body = { found };
+    return;
+  }
+
+  const deletedAt = add(new Date(), { days: deleteDurationDays });
+
+  await usersService.update({
+    where: { username },
+    data: { deletedAt },
+  });
+
+  appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
 
   ctx.status = 200;
   ctx.body = { found };

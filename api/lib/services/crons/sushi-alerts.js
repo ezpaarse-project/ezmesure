@@ -1,8 +1,9 @@
+// @ts-check
 const { CronJob } = require('cron');
 const config = require('config');
 
-const { appLogger } = require('./logger');
-const SushiAlertsService = require('../entities/sushi-alerts.service');
+const { appLogger } = require('../logger');
+const SushiAlertsService = require('../../entities/sushi-alerts.service');
 
 const {
   harvestedButUnsupported: harvestedButUnsupportedConfig,
@@ -101,15 +102,17 @@ async function startUpdateEndpointAlerts() {
 
 // #endregion HARVESTED_BUT_UNSUPPORTED
 
-async function startCron() {
+async function startFetchCron() {
   harvestButUnsupportedJob.start();
   endpointJob.start();
 }
 
 module.exports = {
+  startFetchCron,
+  // Cron state getters
   getUpdateHarvestButUnsupportedAlerts,
-  startUpdateHarvestButUnsupportedAlerts,
   getUpdateEndpointAlerts,
+  // Cron state actions
+  startUpdateHarvestButUnsupportedAlerts,
   startUpdateEndpointAlerts,
-  startCron,
 };

@@ -1,15 +1,14 @@
 // @ts-check
-
 const { CronJob } = require('cron');
 const config = require('config');
 
-const { appLogger } = require('./logger');
-const { deleteByQuery, getTask } = require('./elastic/tasks');
-const { client: prisma } = require('./prisma');
+const { appLogger } = require('../logger');
+const { deleteByQuery, getTask } = require('../elastic/tasks');
+const { client: prisma } = require('../prisma');
 
 /* eslint-disable max-len */
-/** @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials */
-/** @typedef {import('../.prisma/client.mts').Repository} Repository */
+/** @typedef {import('../../.prisma/client.mts').SushiCredentials} SushiCredentials */
+/** @typedef {import('../../.prisma/client.mts').Repository} Repository */
 /* eslint-enable max-len */
 
 const deleteConfig = config.get('counter.deleteSushi');
@@ -89,7 +88,7 @@ function watchJob(taskId) {
     try {
       await updateCredentialsDeletionProgression(taskId);
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(error);
+      const err = error instanceof Error ? error : new Error(`${error}`);
       appLogger.error(`[delete-sushi][${taskId}] Failed to update credentials deletion progression: ${err.message}`);
       unwatchJob(taskId);
     }
@@ -174,7 +173,7 @@ async function startCredentialsDeletions() {
       // eslint-disable-next-line no-await-in-loop
       await startCredentialsDataDeletion(credentials, indexPattern);
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(error);
+      const err = error instanceof Error ? error : new Error(`${error}`);
       appLogger.error(`[delete-sushi] Data of credentials for [${institutionId}] cannot be deleted from elastic: ${err.message}`);
     }
   }
@@ -208,7 +207,7 @@ async function resumeCredentialsDeletions() {
       }
       // Watch if task is still in elastic
       watchJob(`${body.task}`);
-    } catch (error) {
+    } catch {
       // Task is not in elastic, restart it
       tasksToRestart.push(task);
     }
@@ -221,7 +220,7 @@ async function resumeCredentialsDeletions() {
       // eslint-disable-next-line no-await-in-loop
       await startCredentialsDataDeletion(task.credentials, task.indexPattern, task.id);
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(error);
+      const err = error instanceof Error ? error : new Error(`${error}`);
       appLogger.error(`[delete-sushi][${task.id}] Data of credentials cannot be deleted from elastic: ${err.message}`);
     }
   }
@@ -235,7 +234,7 @@ async function deleteMarkedCredentials() {
   appLogger.verbose('[delete-sushi] Credentials deletions ended');
 }
 
-async function startCron() {
+async function startDeletionCron() {
   const job = CronJob.from({
     cronTime: deleteConfig.schedule,
     runOnInit: true,
@@ -248,6 +247,5 @@ async function startCron() {
 }
 
 module.exports = {
-  startCredentialsDataDeletion,
-  startCron,
+  startDeletionCron,
 };

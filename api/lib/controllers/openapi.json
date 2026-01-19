@@ -6715,6 +6715,25 @@
           }
         },
         "operationId": "getProfile"
+      },
+      "delete": {
+        "tags": ["Authentication"],
+        "summary": "Delete profile",
+        "description": "delete the profile associated with the JWT token.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success response"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "deleteProfile"
       }
     },
     "/profile/memberships": {

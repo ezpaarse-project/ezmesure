@@ -54,20 +54,28 @@ exports.getInstitutionMembers = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   prismaQuery.where.institutionId = ctx.state.institution.id;
 
-  // Hide emails if not admin and institution is an onboarding one (if user is requested)
-  if (!ctx.state.user.isAdmin && prismaQuery.include?.user && ctx.state.institution.onboarding) {
-    prismaQuery.include.user = {
-      select: {
-        // Select everything by default
-        ...Object.fromEntries(
-          Object.keys(prisma.user.fields).map((key) => [key, true]),
-        ),
-        // Add requested (sub) includes
-        ...(typeof prismaQuery.include.user === 'object' ? prismaQuery.include.user.include : {}),
-        // Remove email
-        email: false,
-      },
+  if (!ctx.state.user.isAdmin) {
+    // Hide users that are soft deleted
+    prismaQuery.where.user = {
+      ...prismaQuery.where.user,
+      deletedAt: { equals: null },
     };
+
+    // Hide emails if not admin and institution is an onboarding one (if user is requested)
+    if (prismaQuery.include?.user && ctx.state.institution.onboarding) {
+      prismaQuery.include.user = {
+        select: {
+          // Select everything by default
+          ...Object.fromEntries(
+            Object.keys(prisma.user.fields).map((key) => [key, true]),
+          ),
+          // Add requested (sub) includes
+          ...(typeof prismaQuery.include.user === 'object' ? prismaQuery.include.user.include : {}),
+          // Remove email
+          email: false,
+        },
+      };
+    }
   }
 
   const membershipsService = new MembershipsService();

@@ -76,6 +76,12 @@ myspace:
   repos: Mes entrepôts
   spaces: Mes espaces
   roles: 'Mes rôles :'
+  profile:
+    actions:
+      delete:
+        title: Supprimer le compte
+        confirm:
+          text: Votre compte et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion annulera cette suppression. Souhaitez-vous continuer ?
   settings:
     notifications:
       title: Mes notifications
@@ -90,6 +96,7 @@ myspace:
         institution: Notifications d'un établissement
         contact: Notifications en cas de contact
         counter: Notifications liées à COUNTER
+        user: Notifications liées à un utilisateur
         app: Notifications de l'application
       types:
         institution:validated:
@@ -106,6 +113,10 @@ myspace:
           admin: Un rôle a été assigné à un utilisateur
         institution:counter_ready_change:
           admin: Un établissement est prêt à être moissonné
+        user:request_deletion:
+          admin: Un utilisateur à demandé la suppression de ses données
+        user:auto_deleted:
+          admin: Un utilisateur à été supprimé automatiquement
         contact:form:
           admin: Un mail a été envoyé via le formulaire de contact
         counter:new_data_available:
@@ -999,6 +1010,23 @@ users:
     permissions: Permissions
     no_permissions: Aucune permission
     no_institution: Aucun établissement
+    deletedAt: À demandé sa suppression
+    deletedAt:tooltip: Cet utilisateur à demandé sa suppression, elle sera effective le {date}
+  actions:
+    disable:
+      title: Désactiver
+      confirm:
+        text: Les comptes et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion de l'un de ces utilisateurs annulera sa suppression. Souhaitez-vous continuer ?
+        agree: Désactiver
+      error: Une erreur est survenue lors de la désactivation de l'utilisateur {id}
+      success: 1 utilisateur a été désactivé|{n} utilisateurs ont été désactivés
+    restore:
+      title: Restaurer
+      confirm:
+        text: Restaurer les utilisateurs annulera leur suppression prochaine. Souhaitez vous continuer ?
+        agree: Restaurer
+      error: Une erreur est survenue lors de la restauration de l'utilisateur {id}
+      success: 1 utilisateur a été restauré|{n} utilisateurs ont été restaurés
 report:
   title: Mes rapports
   health: État de santé

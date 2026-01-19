@@ -25,6 +25,9 @@ const passwordResetValidity = config.get('passwordResetValidity');
 /* eslint-enable max-len */
 
 module.exports = class UsersService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<UsersService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {string} username
    * @param {string} password

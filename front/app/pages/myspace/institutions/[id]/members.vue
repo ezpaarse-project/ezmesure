@@ -39,12 +39,15 @@
     <v-data-table-server
       v-model="selectedMembers"
       :headers="headers"
+      :row-props="({ item }) => ({ class: item.user.deletedAt && 'bg-grey-lighten-4 text-grey' })"
       show-select
       return-object
       v-bind="vDataTableOptions"
     >
       <template #[`item.user.fullName`]="{ value, item }">
         <div class="d-flex">
+          <UserSoftDeleteIcon :model-value="item.user" />
+
           {{ value }}
 
           <v-spacer />

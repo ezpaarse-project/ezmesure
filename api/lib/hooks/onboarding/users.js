@@ -3,7 +3,7 @@ const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 const { client: prisma } = require('../../services/prisma');
-const { syncUser: syncElasticUser } = require('../../services/sync/elastic');
+const { syncUser: syncElasticUser } = require('../../services/sync/elastic/users');
 const { upsertFromUser: syncEzrUser } = require('../../services/ezreeport/users');
 
 const { FEATURES } = require('../../entities/memberships.dto');
@@ -114,13 +114,13 @@ const onUserUpsert = async (user) => {
   // Manual sync
   try {
     await syncElasticUser(user);
-    appLogger.error(`[onboarding][hooks] User [${user.username}] is synced to elastic`);
+    appLogger.verbose(`[onboarding][hooks] User [${user.username}] is synced to elastic`);
   } catch (error) {
     appLogger.error(`[onboarding][hooks] User [${user.username}] cannot be synced to elastic:\n${error}`);
   }
   try {
     await syncEzrUser(user);
-    appLogger.error(`[onboarding][hooks] User [${user.username}] is synced to ezreeport`);
+    appLogger.verbose(`[onboarding][hooks] User [${user.username}] is synced to ezreeport`);
   } catch (error) {
     appLogger.error(`[onboarding][hooks] User [${user.username}] cannot be synced to ezreeport:\n${error}`);
   }

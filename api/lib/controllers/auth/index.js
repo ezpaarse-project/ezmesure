@@ -11,6 +11,7 @@ const {
   getToken,
   getUser,
   getResetToken,
+  deleteUser,
   resetPassword,
   changePassword,
   changeExcludeNotifications,
@@ -72,6 +73,13 @@ router.route({
 });
 
 router.get('/', getUser);
+
+router.route({
+  method: 'DELETE',
+  path: '/',
+  handler: deleteUser,
+});
+
 router.get('/reporting_token', getReportingToken);
 router.route({
   method: 'GET',

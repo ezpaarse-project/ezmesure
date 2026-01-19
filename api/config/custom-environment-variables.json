@@ -117,6 +117,12 @@
       }
     }
   },
+  "users": {
+    "clean": {
+      "schedule": "EZMESURE_USERS_CLEAN_SCHEDULE"
+    },
+    "deleteDurationDays": "EZMESURE_USERS_DELETE_DURATION_DAYS"
+  },
   "testUsers": {
     "lifespan": {
       "max": "EZMESURE_TEST_USERS_MAX_LIFESPAN",

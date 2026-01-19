@@ -27,6 +27,9 @@ const ADMIN_NOTIFICATION_TYPES = applyModifier({
 
   counterReadyChange: 'institution:counter_ready_change',
 
+  userRequestDeletion: 'user:request_deletion',
+  userDeleted: 'user:auto_deleted',
+
   contactForm: 'contact:form',
 
   appRecentActivity: 'app:recent_activity',

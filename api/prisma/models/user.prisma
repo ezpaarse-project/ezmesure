@@ -10,6 +10,8 @@ model User {
   createdAt            DateTime      @default(now())
   /// Latest update date
   updatedAt            DateTime      @updatedAt
+  /// When item was marked for deletion
+  deletedAt            DateTime?
   /// Whether the user has admin access or not
   isAdmin              Boolean       @default(false)
   /// Arbitrary metadata
@@ -19,7 +21,7 @@ model User {
   /// User additional roles specific to elastic
   elasticRoles         ElasticRole[]
   /// Notifications that the user doesnt want to receive
-  excludeNotifications String[]     @default([])
+  excludeNotifications String[]      @default([])
   /// Actions that were triggered by the user
   actions              Action[]
 }

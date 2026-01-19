@@ -76,6 +76,12 @@ myspace:
   repos: My repositories
   spaces: My spaces
   roles: "My roles:"
+  profile:
+    actions:
+      delete:
+        title: Delete account
+        confirm:
+          text: Your account and all related data will be deleted in {duration}. Any attempt to log in will cancel this deletion. Do you wish to continue?
   settings:
     notifications:
       title: My notifications
@@ -90,6 +96,7 @@ myspace:
         institution: Notifications about one institution
         contact: Notifications if contacted
         counter: Notifications related to COUNTER
+        user: Notifications related to a user
         app: Notifications from application
       types:
         institution:validated:
@@ -106,6 +113,10 @@ myspace:
           admin: A role has been assigned to a user
         institution:counter_ready_change:
           admin: An institution is ready to be harvested
+        user:request_deletion:
+          admin: A user requested the deletion of their data
+        user:auto_deleted:
+          admin: A user was deleted automatically
         contact:form:
           admin: An email has been sent through the contact form
         counter:new_data_available:
@@ -989,6 +1000,23 @@ users:
     permissions: Permissions
     no_permissions: No permissions
     no_institution: No institutions
+    deletedAt: Asked for it's deletion
+    deletedAt:tooltip: This user asked for it's deletion, it'll be effective on the {date}
+  actions:
+    disable:
+      title: Disable
+      confirm:
+        text: The accounts and their related data will be deleted in {duration}. Any attempt to log in from one of the users will cancel his deletion. Do you want to continue ?
+        agree: Disable
+      error: An error occured while disabling user {id}
+      success: 1 user has been disabled|{n} users has been disabled
+    restore:
+      title: Restore
+      confirm:
+        text: Restoring users will cancel their deletion. Do you want to continue ?
+        agree: Restore
+      error: An error occured while restoring user {id}
+      success: 1 user has been restored|{n} users has been restored
 report:
   title: My reports
   health: Health status

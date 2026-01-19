@@ -118,6 +118,9 @@ const NOTIFICATION_TYPES = [
 const ADMIN_NOTIFICATION_TYPES = [
   'institution:counter_ready_change',
 
+  'user:request_deletion',
+  'user:auto_deleted',
+
   'contact:form',
 
   'app:recent_activity',
@@ -127,7 +130,7 @@ const { getSession, data: user } = useAuth();
 const { t } = useI18n();
 
 const currentTab = shallowRef('user');
-const openedScopes = ref(['institution', 'contact', 'counter', 'app']);
+const openedScopes = ref(['institution', 'user', 'contact', 'counter', 'app']);
 const loading = shallowRef(false);
 const data = ref({});
 const success = shallowRef(false);

@@ -1,24 +1,36 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { addHours, isBefore, parseISO } = require('date-fns');
-const elastic = require('../../services/elastic');
+const {
+  add,
+  isBefore,
+  parseISO,
+  format,
+} = require('date-fns');
 
-const usersElastic = require('../../services/elastic/users');
-const ezrUsers = require('../../services/ezreeport/users');
+const { fr } = require('date-fns/locale');
+
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 const UsersService = require('../../entities/users.service');
 const MembershipsService = require('../../entities/memberships.service');
 const ElasticRoleService = require('../../entities/elastic-roles.service');
 
+const usersElastic = require('../../services/elastic/users');
+const elastic = require('../../services/elastic');
+const ezrUsers = require('../../services/ezreeport/users');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { appLogger } = require('../../services/logger');
-const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
+const { sendMail, generateMail } = require('../../services/mail');
 
 const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
 const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
 
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
+
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
+const { deleteDurationDays } = config.get('users');
 
 const resetPasswordSecret = `${secret}_password_reset`;
 
@@ -85,6 +97,7 @@ exports.renaterLogin = async (ctx) => {
       persistentId: headers['persistent-id'] || headers['targeted-id'],
       affiliation: headers.affiliation,
     },
+    deletedAt: null,
   };
 
   const { username } = userProps;
@@ -127,6 +140,11 @@ exports.renaterLogin = async (ctx) => {
   } else {
     ctx.action = 'user/connection';
     ctx.metadata = { username };
+
+    await usersService.update({
+      where: { username },
+      data: { deletedAt: null },
+    });
   }
 
   const token = generateToken(user);
@@ -171,7 +189,13 @@ exports.elasticLogin = async (ctx) => {
 
   if (!user) {
     ctx.throw(401);
+    return;
   }
+
+  await usersService.update({
+    where: { username },
+    data: { deletedAt: null },
+  });
 
   const token = generateToken(user);
   ctx.metadata = { username };
@@ -268,7 +292,7 @@ exports.getResetToken = async (ctx) => {
   const origin = ctx.get('origin');
 
   const currentDate = new Date();
-  const expiresAt = addHours(currentDate, config.passwordResetValidity);
+  const expiresAt = add(currentDate, { hours: config.passwordResetValidity });
   const token = jwt.sign({
     username: user.username,
     createdAt: currentDate,
@@ -403,6 +427,42 @@ exports.getUser = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = user;
+};
+
+exports.deleteUser = async (ctx) => {
+  const { username, email } = ctx.state.user;
+
+  const deletedAt = add(new Date(), { days: deleteDurationDays });
+
+  const usersService = new UsersService();
+
+  await usersService.update({
+    where: { username },
+    data: { deletedAt },
+  });
+
+  appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
+
+  try {
+    const admins = await getNotificationRecipients(
+      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
+      [email],
+    );
+
+    await sendMail({
+      to: email,
+      bcc: admins,
+      subject: 'Votre demande de suppression à bien été prise en compte',
+      ...generateMail('user-deletion-requested', {
+        deletedAt: format(deletedAt, 'PPPp', { locale: fr }),
+        isFromUser: true,
+      }),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send mail to ${email}: ${err}`);
+  }
+
+  ctx.status = 204;
 };
 
 exports.getToken = async (ctx) => {

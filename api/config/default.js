@@ -118,6 +118,12 @@ module.exports = {
       },
     },
   },
+  users: {
+    clean: {
+      schedule: '0 0 0 * * *',
+    },
+    deleteDurationDays: 7,
+  },
   testUsers: {
     lifespan: {
       max: 24 * 60,

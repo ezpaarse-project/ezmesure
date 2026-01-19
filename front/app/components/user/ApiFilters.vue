@@ -32,6 +32,14 @@
           />
         </v-col>
 
+        <v-col cols="12" sm="6">
+          <ApiFiltersButtonsGroup
+            v-model="deletedFilter"
+            :label="$t('users.user.deletedAt')"
+            prepend-icon="mdi-delete"
+          />
+        </v-col>
+
         <v-col cols="12">
           <ApiFiltersSelect
             v-model="filters.permissions"
@@ -68,6 +76,8 @@
 </template>
 
 <script setup>
+import { format, startOfDay } from 'date-fns';
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -88,6 +98,13 @@ const {
   resetFilters,
 } = useFilters(() => props.modelValue, emit);
 
+const {
+  data: roleItems,
+  status: rolesStatus,
+} = await useFetch('/api/roles', { lazy: true });
+
+const loadingRoles = computed(() => rolesStatus.value === 'pending');
+
 const permissionsItems = computed(() => {
   const scopes = [
     'institution',
@@ -107,12 +124,25 @@ const permissionsItems = computed(() => {
   ));
 });
 
-const {
-  data: roleItems,
-  status: rolesStatus,
-} = await useFetch('/api/roles', { lazy: true });
+const deletedFilter = computed({
+  get: () => {
+    if (filters['deletedAt:from'] === '') {
+      return false;
+    }
 
-const loadingRoles = computed(() => rolesStatus.value === 'pending');
+    return filters['deletedAt:from'] ? true : undefined;
+  },
+  set: (value) => {
+    if (value === true) {
+      const date = startOfDay(new Date());
+      filters['deletedAt:from'] = format(date, 'yyyy-MM-dd');
+      return;
+    }
+
+    // filters resolves `emptySymbol` as `""` but resolves `""` as `undefined`
+    filters['deletedAt:from'] = value === false ? emptySymbol : undefined;
+  },
+});
 
 function clearFilters() {
   resetFilters({ search: '', source: '*' });

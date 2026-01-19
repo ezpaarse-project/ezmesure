@@ -100,6 +100,7 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
       },
     },
     where: {
+      deletedAt: { equals: null },
       email: { endsWith: `@${domain}` },
       memberships: {
         some: getNotificationMembershipWhere(NOTIFICATION_TYPES.newUserMatchingInstitution),

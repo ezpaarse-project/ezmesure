@@ -1,8 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 const config = require('config');
-const { CronJob } = require('cron');
-const { format, isValid } = require('date-fns');
 const { fr } = require('date-fns/locale');
+const { format, isValid } = require('date-fns');
 
 const { getNotificationRecipients } = require('../utils/notifications');
 const { ADMIN_NOTIFICATION_TYPES } = require('../utils/notifications/constants');
@@ -11,10 +10,7 @@ const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 const { appLogger } = require('./logger');
 
-const {
-  cron,
-  sendEmptyActivity,
-} = config.get('notifications');
+const { sendEmptyActivity } = config.get('notifications');
 
 /**
  * Change a timestamp into a locale date
@@ -190,15 +186,5 @@ async function sendNotifications(logger = appLogger) {
 }
 
 module.exports = {
-  getNotificationRecipients,
-
-  start(logger = appLogger) {
-    const job = new CronJob(cron, () => {
-      sendNotifications(logger).catch((err) => {
-        logger.error(`Failed to broadcast recent activity : ${err}`);
-      });
-    });
-
-    job.start();
-  },
+  sendNotifications,
 };

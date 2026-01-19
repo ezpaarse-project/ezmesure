@@ -141,13 +141,30 @@
       <v-row>
         <v-col>
           <v-card :title="$t('myspace.title')">
-            <template v-if="refreshShibUrl" #append>
-              <v-btn :href="refreshShibUrl" variant="text">
-                <v-icon left>
-                  mdi-refresh
-                </v-icon>
-                {{ $t('refreshShib') }}
-              </v-btn>
+            <template #append>
+              <ConfirmPopover
+                :agree="() => deleteAccount()"
+                :text="$t('myspace.profile.actions.delete.confirm.text', { duration: deleteDuration })"
+                max-width="600"
+              >
+                <template #activator="{ props: confirm }">
+                  <v-btn
+                    :text="$t('myspace.profile.actions.delete.title')"
+                    prepend-icon="mdi-delete"
+                    color="red"
+                    variant="text"
+                    v-bind="confirm"
+                  />
+                </template>
+              </ConfirmPopover>
+
+              <v-btn
+                v-if="refreshShibUrl"
+                :text="$t('refreshShib')"
+                :href="refreshShibUrl"
+                prepend-icon="mdi-refresh"
+                variant="text"
+              />
             </template>
 
             <template #text>
@@ -170,6 +187,7 @@
 </template>
 
 <script setup>
+import { millisecondsInDay } from 'date-fns/constants';
 import { getErrorMessage } from '@/lib/errors';
 
 definePageMeta({
@@ -178,9 +196,10 @@ definePageMeta({
 });
 
 const { public: config } = useRuntimeConfig();
-const { data: user } = useAuthState();
+const { data: apiConfig } = await useApiConfig();
+const { data: user, signOut } = useAuth();
 const { openInTab } = useSingleTabLinks('profile');
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { spacesPermissions } = storeToRefs(useCurrentUserStore());
 
@@ -192,6 +211,11 @@ const password = shallowRef('');
 const passwordRepeat = shallowRef('');
 const showPassword = shallowRef(false);
 const errorMessage = ref(undefined);
+
+const deleteDuration = computed(() => {
+  const deleteDurationDays = apiConfig?.value?.users?.deleteDurationDays;
+  return timeAgo(deleteDurationDays * millisecondsInDay, locale.value) ?? '...';
+});
 
 const refreshShibUrl = computed(() => {
   if (config.shibbolethDisabled) {
@@ -245,5 +269,18 @@ async function replacePassword() {
     }
   }
   loading.value = false;
+}
+
+async function deleteAccount() {
+  await $fetch('/api/profile', {
+    method: 'DELETE',
+  });
+
+  if (!config.shibbolethDisabled) {
+    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
+    return;
+  }
+
+  await signOut({ callbackUrl: '/' });
 }
 </script>

@@ -14,6 +14,7 @@ const { client: prisma } = require('../../services/prisma');
  * @returns The query to get users from Prisma
  */
 const getNotificationUserWhere = (type) => ({
+  deletedAt: { equals: null },
   NOT: {
     excludeNotifications: { has: type },
   },

@@ -15,6 +15,7 @@ const schema = {
   username: Joi.string().min(1),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
 
   fullName: Joi.string().allow(''),
   email: Joi.string().email(),
@@ -35,6 +36,7 @@ const immutableFields = [
   'username',
   'updatedAt',
   'createdAt',
+  'deletedAt',
   'memberships',
   'historyEntries',
   'elasticRoles',
@@ -71,6 +73,7 @@ const adminCreateSchema = withModifiers(
 const adminUpdateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
+  { deletedAt: () => schema.deletedAt },
 );
 
 /**
