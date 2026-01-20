@@ -55,7 +55,7 @@ jobs:
 
           commit-message: "build(api): updated isbn3 groups data[skip ci]"
 
-          title: 'build(api): bumping `isbn3` to `${{ steps.isbn3.outputs.tag }}`'
+          title: 'build(api): bumping `isbn3` to `${{ steps.isbn3.outputs.version }}`'
           body: |
             > [!NOTE]
             > Changes are made by GitHub Actions, please review changes carefully before merging
