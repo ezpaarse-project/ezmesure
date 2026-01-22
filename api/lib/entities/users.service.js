@@ -2,6 +2,7 @@
 const config = require('config');
 const jwt = require('jsonwebtoken');
 const { addHours } = require('date-fns');
+
 const BasePrismaService = require('./base-prisma.service');
 const elasticUsers = require('../services/elastic/users');
 const usersPrisma = require('../services/prisma/users');
@@ -24,6 +25,9 @@ const passwordResetValidity = config.get('passwordResetValidity');
 /* eslint-enable max-len */
 
 module.exports = class UsersService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<UsersService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {string} username
    * @param {string} password

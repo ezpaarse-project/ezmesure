@@ -1,23 +1,23 @@
-const config = require('config');
-
 const { sendMail, generateMail } = require('../../services/mail');
-
-const sender = config.get('notifications.sender');
-const supportRecipients = config.get('notifications.supportRecipients');
 
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
 
-const { MEMBER_ROLES } = require('../../entities/memberships.dto');
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
-function sendValidateInstitution(receivers) {
+async function sendValidateInstitution(receivers) {
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.institutionValidated,
+    receivers,
+  );
+
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supportRecipients,
+    bcc: admins,
     subject: 'Votre établissement a été validé',
-    ...generateMail('validated-institution'),
+    ...generateMail('validate-institution'),
   });
 }
 
@@ -39,10 +39,11 @@ exports.validateInstitution = async (ctx) => {
   if (!wasValidated && validated === true) {
     let contacts = await usersService.findMany({
       where: {
+        deletedAt: { equals: null },
         memberships: {
           some: {
             institutionId: institution.id,
-            roles: { hasSome: [MEMBER_ROLES.docContact, MEMBER_ROLES.techContact] },
+            ...getNotificationMembershipWhere(NOTIFICATION_TYPES.institutionValidated),
           },
         },
       },

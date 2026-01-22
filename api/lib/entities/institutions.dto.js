@@ -83,6 +83,8 @@ const immutableFields = [
 const includableFields = [
   'parentInstitution',
   'memberships',
+  'memberships.roles',
+  'memberships.roles.role',
   'spaces',
   'historyEntries',
   'sushiCredentials',

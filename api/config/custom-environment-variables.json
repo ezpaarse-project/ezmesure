@@ -33,18 +33,29 @@
   "smtp": {
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT",
-    "secure": { "__name": "EZMESURE_SMTP_SECURE", "__format": "boolean" },
-    "ignoreTLS": { "__name": "EZMESURE_SMTP_IGNORE_TLS", "__format": "boolean" },
+    "secure": {
+      "__name": "EZMESURE_SMTP_SECURE",
+      "__format": "boolean"
+    },
+    "ignoreTLS": {
+      "__name": "EZMESURE_SMTP_IGNORE_TLS",
+      "__format": "boolean"
+    },
     "tls": {
-      "rejectUnauthorized": { "__name": "EZMESURE_SMTP_REJECT_UNAUTHORIZED", "__format": "boolean" }
+      "rejectUnauthorized": {
+        "__name": "EZMESURE_SMTP_REJECT_UNAUTHORIZED",
+        "__format": "boolean"
+      }
     }
   },
   "notifications": {
     "cron": "EZMESURE_NOTIFICATIONS_CRON",
     "sender": "EZMESURE_NOTIFICATIONS_SENDER",
-    "recipients": "EZMESURE_NOTIFICATIONS_RECIPIENTS",
-    "supportRecipients": "EZMESURE_NOTIFICATIONS_SUPPORT_RECIPIENTS",
-    "sendEmptyActivity": { "__name": "EZMESURE_SEND_EMPTY_ACTIVITY", "__format": "boolean" }
+    "replyTo": "EZMESURE_NOTIFICATIONS_REPLY_TO",
+    "sendEmptyActivity": {
+      "__name": "EZMESURE_SEND_EMPTY_ACTIVITY",
+      "__format": "boolean"
+    }
   },
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
@@ -78,9 +89,18 @@
   },
   "ezpaarse": {
     "upload": {
-      "bulkSize": { "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_SIZE", "__format": "number" },
-      "bulkMaxTries": { "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_MAX_TRIES", "__format": "number" },
-      "bulkBaseRetryDelay": { "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_BASE_RETRY_DELAY", "__format": "number" }
+      "bulkSize": {
+        "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_SIZE",
+        "__format": "number"
+      },
+      "bulkMaxTries": {
+        "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_MAX_TRIES",
+        "__format": "number"
+      },
+      "bulkBaseRetryDelay": {
+        "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_BASE_RETRY_DELAY",
+        "__format": "number"
+      }
     }
   },
   "jobs": {
@@ -113,6 +133,12 @@
         "schedule": "EZMESURE_SUSHI_ALERT_ENDPOINT_SCHEDULE"
       }
     }
+  },
+  "users": {
+    "clean": {
+      "schedule": "EZMESURE_USERS_CLEAN_SCHEDULE"
+    },
+    "deleteDurationDays": "EZMESURE_USERS_DELETE_DURATION_DAYS"
   },
   "testUsers": {
     "lifespan": {

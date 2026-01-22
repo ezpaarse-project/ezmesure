@@ -1,8 +1,7 @@
-const config = require('config');
-
-const sender = config.get('notifications.sender');
-const supports = config.get('notifications.supportRecipients');
 const { sendMail, generateMail } = require('../../../services/mail');
+
+const { getNotificationRecipients } = require('../../../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
 
 /**
  * Sends an email to a newly created user where there is a link to create his password
@@ -18,14 +17,11 @@ const { sendMail, generateMail } = require('../../../services/mail');
  *
  * @returns {Promise<void>}
  */
-exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink) {
-  return sendMail({
-    from: sender,
-    to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('activate-user', { username: user.username, activateLink }),
-  });
-};
+exports.sendActivateUserMail = (user, activateLink) => sendMail({
+  to: user.email,
+  subject: 'Bienvenue sur ezMESURE !',
+  ...generateMail('activate-user', { username: user.username, activateLink }),
+});
 
 /**
  * Sends an email to the contacts of the user who has just activated his account according
@@ -37,11 +33,15 @@ exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink)
  *
  * @returns {Promise<void>}
  */
-exports.sendNewUserToContacts = function sendNewUserToContacts(receivers, data) {
+exports.sendNewUserToContacts = async (receivers, data) => {
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.newUserMatchingInstitution,
+    receivers,
+  );
+
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supports,
+    bcc: admins,
     subject: `${data.newUser} s'est inscrit sur ezMESURE`,
     ...generateMail('new-account', { data }),
   });

@@ -81,6 +81,12 @@ exports.loginCallback = async (ctx) => {
 
   if (user) {
     ctx.action = 'user/connection';
+
+    await usersService.update({
+      where: { username: user.username },
+      data: { deletedAt: null },
+    });
+
     next();
     return;
   }
@@ -103,7 +109,7 @@ exports.logout = async (ctx) => {
   try {
     await openid.revokeUserToken(ctx.state.jwtData.token);
   } catch (err) {
-    appLogger.error(`Failed to revoke token for ${ctx.state.user.username}: ${err}`)
+    appLogger.error(`Failed to revoke token for ${ctx.state.user.username}: ${err}`);
   }
 
   ctx.cookies.set(cookie, '', { httpOnly: true });

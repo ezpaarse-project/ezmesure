@@ -1,13 +1,14 @@
+// @ts-check
 const { subDays, endOfDay, formatDistanceToNow } = require('date-fns');
 const { CronJob } = require('cron');
 const config = require('config');
 
-const { HarvestJobStatus } = require('../.prisma/client.mts');
-const HarvestsService = require('../entities/harvest.service');
-const HarvestJobsService = require('../entities/harvest-job.service');
+const { HarvestJobStatus } = require('../../.prisma/client.mts');
+const HarvestsService = require('../../entities/harvest.service');
+const HarvestJobsService = require('../../entities/harvest-job.service');
 
-const { harvestQueue } = require('./jobs');
-const { appLogger } = require('./logger');
+const { harvestQueue } = require('../jobs');
+const { appLogger } = require('../logger');
 
 const harvestConfig = config.get('jobs.harvest');
 

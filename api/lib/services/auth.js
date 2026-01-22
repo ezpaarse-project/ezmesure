@@ -13,10 +13,6 @@ const SpacesService = require('../entities/spaces.service');
 
 const { triggerHooks } = require('../hooks/hookEmitter');
 
-const { MEMBER_ROLES } = require('../entities/memberships.dto');
-
-const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
-
 /**
  * Get JWT data of cookie using OpenID provider
  *
@@ -311,25 +307,6 @@ function fetchModel(modelName, opts = {}) {
 }
 
 /**
- * Middleware that checks that user is either admin or institution contact
- * Assumes that ctx.state contains institution and user
- */
-function requireContact() {
-  return (ctx, next) => {
-    const { user, institution } = ctx.state;
-
-    if (user?.isAdmin) { return next(); }
-
-    const membership = institution?.memberships?.find?.((m) => m?.username === user?.username);
-    const isContact = membership?.roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
-    if (isContact) { return next(); }
-
-    ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
-    return undefined;
-  };
-}
-
-/**
  * Middleware that checks that user has a sufficient permission level on a feature
  * Assumes that ctx.state contains institution and user
  */
@@ -377,7 +354,6 @@ module.exports = {
   requireAdmin,
   requireTermsOfUse,
   requireAnyRole,
-  requireContact,
   requireMemberPermissions,
   requireValidatedInstitution,
   fetchModel,

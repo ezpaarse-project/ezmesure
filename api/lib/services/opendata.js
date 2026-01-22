@@ -1,13 +1,11 @@
 const config = require('config');
 const Axios = require('axios');
 const Papa = require('papaparse');
-const { isValid: dateIsValid, isBefore: dateIsBefore } = require('date-fns');
-const { CronJob } = require('cron');
 
 const elastic = require('./elastic');
 const { opendata: indexTemplate } = require('../utils/index-templates');
 
-const { cron, index } = config.get('opendata');
+const { index } = config.get('opendata');
 
 const axios = Axios.create({
   baseURL: 'https://data.enseignementsup-recherche.gouv.fr/api/',
@@ -271,56 +269,7 @@ async function reloadIndex(datasets, appLogger) {
   appLogger.info('[OpenData] Datasets refreshed');
 }
 
-async function startCron(appLogger) {
-  let indexExists = true;
-
-  try {
-    const { body } = await elastic.indices.exists({ index });
-    indexExists = body;
-  } catch (e) {
-    appLogger.error(`[OpenData] Failed to check the index '${index}' exists: ${e.message}`);
-  }
-
-  const job = CronJob.from({
-    cronTime: cron,
-    runOnInit: !indexExists,
-    onTick: async () => {
-      let needRefresh;
-      let datasets;
-
-      try {
-        datasets = await getDatasetsMetadata();
-        const indexCreationDate = await getIndexCreationDate();
-
-        if (!dateIsValid(indexCreationDate)) {
-          appLogger.info('[OpenData] Index does not exist');
-          needRefresh = true;
-        } else {
-          appLogger.info('[OpenData] Looking for dataset updates');
-          needRefresh = datasets.some((dataset) => {
-            const updatedAt = new Date(dataset && dataset.metas && dataset.metas.modified);
-            return !dateIsValid(updatedAt) || dateIsBefore(indexCreationDate, updatedAt);
-          });
-        }
-      } catch (e) {
-        appLogger.error(`[OpenData] Failed to check OpenData status: ${e.message}`);
-        return;
-      }
-
-      if (!needRefresh) {
-        appLogger.info('[OpenData] Index is up-to-date');
-        return;
-      }
-
-      await reloadIndex(datasets, appLogger);
-    },
-  });
-
-  job.start();
-}
-
 module.exports = {
-  startCron,
   reloadIndex,
   getDatasetsMetadata,
   getIndexCreationDate,

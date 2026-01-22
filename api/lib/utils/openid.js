@@ -163,6 +163,7 @@ module.exports.getUserFromInfo = (userInfo) => {
       org: userInfo.organisation,
       unit: userInfo.unit,
     },
+    deletedAt: null,
   };
 };
 

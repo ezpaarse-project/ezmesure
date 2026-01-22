@@ -1,6 +1,3 @@
-const config = require('config');
-
-const sender = config.get('notifications.sender');
 const { sendMail, generateMail } = require('../../services/mail');
 
 /**
@@ -14,7 +11,6 @@ const { sendMail, generateMail } = require('../../services/mail');
  */
 exports.sendWelcomeMail = function sendWelcomeMail(user) {
   return sendMail({
-    from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
     ...generateMail('welcome', { username: user.username }),

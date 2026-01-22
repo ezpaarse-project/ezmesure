@@ -26,44 +26,71 @@
                 prepend-icon="mdi-tag"
                 variant="outlined"
               >
-                <template #text>
-                  <v-checkbox
-                    :model-value="roles.has('guest')"
-                    :label="$t('institutions.members.roleNames.guest')"
-                    :append-icon="roleColors.get('guest').icon"
-                    :disabled="loading || !canEdit"
-                    density="comfortable"
-                    hide-details
-                    @click="toggleRole('guest')"
-                  />
-
-                  <div class="ml-2">
-                    <div class="text-subtitle-2">
-                      {{ $t('institutions.members.correspondent') }}
-                    </div>
-
-                    <div class="ml-2">
-                      <v-checkbox
-                        :model-value="roles.has('contact:doc')"
-                        :label="$t('institutions.members.documentary')"
-                        :append-icon="roleColors.get('contact:doc').icon"
-                        :disabled="loading || !canEdit || !user?.isAdmin"
+                <template #append>
+                  <v-menu
+                    v-if="canEdit"
+                    location="bottom right"
+                    offset="5"
+                    :close-on-content-click="false"
+                  >
+                    <template #activator="{ props: menuProps }">
+                      <v-btn
+                        v-bind="menuProps"
+                        prepend-icon="mdi-plus"
                         density="comfortable"
-                        hide-details
-                        @click="toggleRole('contact:doc')"
+                        variant="text"
+                        color="primary"
+                        :text="$t('add')"
+                        @click="addRoleDialog = true"
                       />
-                      <v-checkbox
-                        :model-value="roles.has('contact:tech')"
-                        :label="$t('institutions.members.technical')"
-                        :append-icon="roleColors.get('contact:tech').icon"
-                        :disabled="loading || !canEdit || !user?.isAdmin"
-                        density="comfortable"
-                        hide-details
-                        @click="toggleRole('contact:tech')"
-                      />
-                    </div>
-                  </div>
+                    </template>
+
+                    <RolePicker
+                      :model-value="roleIds"
+                      :disabled-items="rolesBeingSaved"
+                      :hide-restricted="!user.value?.isAdmin"
+                      :loading="rolesBeingSaved.size > 0"
+                      min-width="400"
+                      @click:select="onRoleSelected($event)"
+                    />
+                  </v-menu>
                 </template>
+
+                <v-empty-state
+                  v-if="roles.length === 0"
+                  color="grey"
+                  :text="$t('institutions.members.memberHasNoRole')"
+                />
+
+                <v-list v-else>
+                  <v-list-item
+                    v-for="role in roles"
+                    :key="role.id"
+                    :title="role.label"
+                    :subtitle="role.description"
+                  >
+                    <template #prepend>
+                      <v-icon
+                        :icon="role.icon ?? 'mdi-tag-outline'"
+                        :color="role.color"
+                      />
+                    </template>
+
+                    <template v-if="canEdit" #append>
+                      <v-btn
+                        v-if="user.isAdmin || !role.restricted"
+                        :prepend-icon="$vuetify.display.smAndUp ? 'mdi-close' : undefined"
+                        :icon="$vuetify.display.xs ? 'mdi-close' : undefined"
+                        density="default"
+                        variant="tonal"
+                        :text="$t('delete')"
+                        size="small"
+                        :loading="rolesBeingSaved.has(role.id)"
+                        @click="removeRole(role)"
+                      />
+                    </template>
+                  </v-list-item>
+                </v-list>
               </v-card>
             </v-col>
           </v-row>
@@ -236,14 +263,9 @@
 
 <script setup>
 import { featureScopes, permissionLevelEnum } from '@/lib/permissions/utils';
-import presets from '@/lib/permissions/presets';
 
 const props = defineProps({
   modelValue: {
-    type: Object,
-    required: true,
-  },
-  institution: {
     type: Object,
     required: true,
   },
@@ -261,8 +283,6 @@ const snacks = useSnacksStore();
 const loading = shallowRef(false);
 const comment = ref(props.modelValue?.comment ?? '');
 const locked = ref(props.modelValue?.locked ?? false);
-/** @type {Ref<Set<string>>} */
-const roles = ref(new Set(props.modelValue?.roles ?? []));
 /** @type {Ref<Map<string, string>>} */
 const permissions = ref(new Map());
 /** @type {Ref<Map<string, string>>} */
@@ -273,6 +293,12 @@ const repositoryAliasPermissions = ref(new Map());
 const spacePermissions = ref(new Map());
 
 const formRef = useTemplateRef('formRef');
+
+const roles = ref((props.modelValue.roles ?? []).map((role) => role.role));
+const rolesBeingSaved = ref(new Set());
+
+const institution = computed(() => props.modelValue.institution);
+const roleIds = computed(() => roles.value.map((r) => r.id));
 
 /**
  * If current member is locked
@@ -291,7 +317,7 @@ const canEdit = computed(() => {
   if (user.value?.isAdmin) {
     return true;
   }
-  return !isLocked.value && hasPermission(props.institution.id, 'memberships:write', { throwOnNoMembership: true });
+  return !isLocked.value && hasPermission(institution.value.id, 'memberships:write', { throwOnNoMembership: true });
 });
 
 /**
@@ -301,7 +327,7 @@ const {
   data: spaces,
   status: spaceStatus,
   error: spaceError,
-} = await useFetch(`/api/institutions/${props.institution.id}/spaces`, {
+} = await useFetch(`/api/institutions/${institution.value.id}/spaces`, {
   lazy: true,
   query: {
     size: 0,
@@ -315,7 +341,7 @@ const {
   data: repositories,
   status: repoStatus,
   error: repoError,
-} = await useFetch(`/api/institutions/${props.institution.id}/repositories`, {
+} = await useFetch(`/api/institutions/${institution.value.id}/repositories`, {
   lazy: true,
   query: {
     size: 0,
@@ -329,7 +355,7 @@ const {
   data: repositoryAliases,
   status: aliasesStatus,
   error: aliasesError,
-} = await useFetch(`/api/institutions/${props.institution.id}/repository-aliases`, {
+} = await useFetch(`/api/institutions/${institution.value.id}/repository-aliases`, {
   lazy: true,
   query: {
     size: 0,
@@ -341,12 +367,13 @@ const {
  * Subtitle of the form
  */
 const subtitle = computed(() => {
-  let { name } = props.institution;
-  if (props.institution.acronym) {
-    name += ` - ${props.institution.acronym}`;
+  let { name } = institution.value;
+  if (institution.value.acronym) {
+    name += ` - ${institution.value.acronym}`;
   }
   return name;
 });
+
 /**
  * Available features
  */
@@ -379,6 +406,7 @@ function mapRepoPermissions(perms, map) {
     map.set(perm.repositoryPattern, perm.readonly ? 'read' : 'write');
   }
 }
+
 /**
  * Map alias permissions from API
  */
@@ -389,6 +417,7 @@ function mapAliasPermissions(perms, map) {
     map.set(perm.aliasPattern, 'read');
   }
 }
+
 /**
  * Map space permissions from API
  */
@@ -399,6 +428,7 @@ function mapSpacePermissions(perms, map) {
     map.set(perm.spaceId, perm.readonly ? 'read' : 'write');
   }
 }
+
 /**
  * Save membership data
  */
@@ -411,10 +441,9 @@ function saveMembership() {
     return res;
   });
 
-  return $fetch(`/api/institutions/${props.institution.id}/memberships/${props.modelValue.username}`, {
+  return $fetch(`/api/institutions/${institution.value.id}/memberships/${props.modelValue.username}`, {
     method: 'PUT',
     body: {
-      roles: Array.from(roles.value),
       comment: comment.value || '',
       locked: user.value?.isAdmin ? locked.value : undefined,
       permissions: perms.flat(),
@@ -431,7 +460,7 @@ function saveRepoPermissions() {
 
   const promises = [...repositoryPermissions.value, ...oldRepoPerms]
     .map(([pattern, level]) => {
-      const url = `/api/institutions/${props.institution.id}/repositories/${pattern}/permissions/${props.modelValue.username}`;
+      const url = `/api/institutions/${institution.value.id}/repositories/${pattern}/permissions/${props.modelValue.username}`;
 
       // If new or modified
       if (oldRepoPerms.get(pattern) !== level) {
@@ -459,7 +488,7 @@ function saveAliasPermissions() {
 
   const promises = [...repositoryAliasPermissions.value, ...oldAliasPerms]
     .map(([pattern, access]) => {
-      const url = `/api/institutions/${props.institution.id}/repository-aliases/${pattern}/permissions/${props.modelValue.username}`;
+      const url = `/api/institutions/${institution.value.id}/repository-aliases/${pattern}/permissions/${props.modelValue.username}`;
 
       // If new or modified
       if (oldAliasPerms.get(pattern) !== access) {
@@ -532,50 +561,96 @@ async function save(actions) {
  *
  * @param {string} role The role name
  */
-function toggleRole(role) {
-  const actions = [];
+function applyRolePreset(role) {
+  const preset = role.permissionsPreset;
+  if (!preset) { return; }
 
-  const oldSize = roles.value.size;
-  if (roles.value.has(role)) {
-    roles.value.delete(role);
-  } else {
-    roles.value.add(role);
-  }
-  actions.push(saveMembership);
+  const actions = [saveMembership];
 
-  const preset = presets.get(role);
-  // If it's the first role added, apply preset
-  if (roles.value.size !== 1 || oldSize !== 0 || !preset) {
-    save(actions);
-    return;
-  }
+  permissions.value = new Map([
+    ['institution', preset.institution ?? 'none'],
+    ['memberships', preset.memberships ?? 'none'],
+    ['reporting', preset.reporting ?? 'none'],
+    ['sushi', preset.sushi ?? 'none'],
+  ]);
 
-  // Apply permissions as defined in preset
-  if (preset.features) {
-    permissions.value = new Map(preset.features);
-    // `saveMembership` is already in actions so no need to add it
-  }
   if (preset.repositories) {
     repositoryPermissions.value = new Map(
-      (repositories.value ?? []).map((r) => [r.pattern, preset.repositories]),
+      (repositories.value ?? []).map((r) => [r.pattern, preset.repositories ?? 'none']),
     );
-    actions.push(saveRepoPermissions);
-  }
-  if (preset.repositoryAliases) {
+
+    const aliasLevel = preset.repositories === 'write' ? 'read' : preset.repositories;
+
     repositoryAliasPermissions.value = new Map(
-      (repositoryAliases.value ?? []).map((a) => [a.pattern, preset.repositoryAliases]),
+      (repositoryAliases.value ?? []).map((a) => [a.pattern, aliasLevel ?? 'none']),
     );
+
+    actions.push(saveRepoPermissions);
     actions.push(saveAliasPermissions);
   }
+
   if (preset.spaces) {
-    spacePermissions.value = new Map((spaces.value ?? []).map((s) => [s.id, preset.spaces]));
+    spacePermissions.value = new Map((spaces.value ?? []).map((s) => [s.id, preset.spaces ?? 'none']));
     actions.push(saveSpacePermissions);
   }
 
-  locked.value = preset.locked;
+  locked.value = !!preset.locked;
 
   save(actions);
 }
+
+const addRole = async (role) => {
+  if (!role?.id) { return; }
+  if (roles.value.some((r) => r.id === role.id)) { return; }
+
+  rolesBeingSaved.value.add(role.id);
+
+  try {
+    await $fetch(`/api/institutions/${institution.value.id}/memberships/${props.modelValue.username}/roles/${role.id}`, {
+      method: 'PUT',
+    });
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+    return;
+  } finally {
+    rolesBeingSaved.value.delete(role.id);
+  }
+
+  const isFirstRole = roles.value.length === 0;
+  roles.value.push(role);
+
+  // If it's the first role added, apply preset
+  if (isFirstRole) {
+    applyRolePreset(role);
+  }
+};
+
+const removeRole = async (role) => {
+  if (!role?.id) { return; }
+
+  rolesBeingSaved.value.add(role.id);
+
+  try {
+    await $fetch(`/api/institutions/${institution.value.id}/memberships/${props.modelValue.username}/roles/${role.id}`, {
+      method: 'DELETE',
+    });
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+    return;
+  } finally {
+    rolesBeingSaved.value.delete(role.id);
+  }
+
+  roles.value = roles.value.filter((r) => r.id !== role.id);
+};
+
+const onRoleSelected = (event) => {
+  if (event?.value) {
+    return addRole(event.role);
+  }
+
+  return removeRole(event.role);
+};
 
 /* eslint-disable vue/max-len */
 mapPermissions(props.modelValue?.permissions ?? [], permissions.value);

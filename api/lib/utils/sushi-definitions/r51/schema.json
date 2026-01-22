@@ -1,6 +1,17 @@
 {
+  "openapi": "3.1.0",
   "info": {
-    "version": "5.1.0.1"
+    "title": "COUNTER API",
+    "version": "5.1.0.1",
+    "summary": "COUNTER API for Release 5.1.0.1",
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "contact": {
+      "name": "COUNTER Executive Director",
+      "email": "code@countermetrics.org"
+    }
   },
   "definitions": {
     "Status": {

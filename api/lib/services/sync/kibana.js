@@ -1,5 +1,4 @@
 const config = require('config');
-const { CronJob } = require('cron');
 
 const prisma = require('../prisma');
 const { appLogger } = require('../logger');
@@ -20,7 +19,7 @@ const {
 
 const { execThrottledPromises } = require('../promises');
 
-const { syncSchedule, dateFormat } = config.get('kibana');
+const { dateFormat } = config.get('kibana');
 
 /**
  * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
@@ -325,41 +324,15 @@ async function unmountCustomRole(roleName) {
   }
 }
 
-const sync = async () => {
-  await syncSpaces();
-  await syncCustomRoles();
-};
-
-/**
- * Start cron to periodically sync Kibana to ezMESURE
- */
-const startCron = async () => {
-  const job = CronJob.from({
-    cronTime: syncSchedule,
-    runOnInit: true,
-    onTick: async () => {
-      appLogger.verbose('[kibana] Starting synchronization');
-      try {
-        await sync();
-        appLogger.info('[kibana] Synchronized');
-      } catch (e) {
-        const message = e?.response?.data?.content?.message || e.message;
-        appLogger.error(`[kibana] Failed to synchronize: ${message}`);
-      }
-    },
-  });
-
-  job.start();
-};
-
 module.exports = {
-  startCron,
-  sync,
   getSpaceLogo,
+
   syncIndexPatterns,
+
   syncSpace,
   syncSpaces,
   unmountSpace,
+
   syncCustomRole,
   syncCustomRoles,
   unmountCustomRole,

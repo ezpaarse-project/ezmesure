@@ -395,6 +395,8 @@
       ref="globalHarvestMatrixRef"
       :endpoint="endpoint"
     />
+
+    <InstitutionEmailsCopyDialog ref="emailsCopyDialogRef" />
   </div>
 </template>
 
@@ -427,6 +429,7 @@ const globalHarvestMatrixRef = useTemplateRef('globalHarvestMatrixRef');
 const reportsRef = useTemplateRef('reportsRef');
 const filesRef = useTemplateRef('filesRef');
 const historyRef = useTemplateRef('historyRef');
+const emailsCopyDialogRef = useTemplateRef('emailsCopyDialogRef');
 
 const debouncedSearch = useDebounce(search, 500);
 
@@ -448,7 +451,7 @@ const {
     connection: computed(() => filters.value.connection),
     active: computed(() => filters.value.active),
     archived: computed(() => filters.value.archived),
-    include: ['harvests', 'institution.memberships.user'],
+    include: ['harvests', 'institution'],
     sort: 'institution.name',
     order: 'asc',
     size: 0,
@@ -613,25 +616,7 @@ async function copyMailListOfInstitutions(ids) {
     return;
   }
 
-  const addresses = selectedInstitutions.value.flatMap(
-    (id) => {
-      const institution = institutionsMap.value.get(id);
-      if (!institution) {
-        return undefined;
-      }
-      return institution.memberships
-        .filter((m) => m.roles?.some((r) => /^contact:/i.test(r)) || false)
-        .map((m) => m.user.email);
-    },
-  ).filter((v) => !!v);
-
-  try {
-    await copy(addresses.join('; '));
-  } catch (err) {
-    snacks.error(t('clipboard.unableToCopy'), err);
-    return;
-  }
-  snacks.info(t('emailsCopied'));
+  emailsCopyDialogRef.value.open(toCopy);
 }
 
 /**

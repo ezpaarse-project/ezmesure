@@ -69,7 +69,7 @@ model Membership {
   /// The institution
   institution                Institution                 @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// Roles of the member inside the institution
-  roles                      String[]
+  roles                      MembershipRole[]
   /// Permissions of the user for the institution (members management, SUSHI, ezREEPORT...)
   permissions                String[]
   /// Permissions of the user for the institution spaces

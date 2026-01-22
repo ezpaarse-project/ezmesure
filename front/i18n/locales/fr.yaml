@@ -1,48 +1,55 @@
 menu:
-  homepage: Page d'accueil ezMESURE
-  home: Accueil
-  dashboard: Tableau de bord
-  documentation: Documentation
-  myspace: Mon compte
-  partners: Nos partenaires
-  api: API
-  guide: Guide d'utilisation
-  navigateTo: Naviguer vers
-  myDeposits: Mes dépôts
-  credentials: Informations de connexion
-  authentificationToken: Token d'authentification
-  administration: Administration
-  myInstitution: Mon établissement
-  myInstitutions: Mes établissements
-  myForeignAccess: Partagé avec vous
-  institutions: Établissements
-  sushiEndpoints: Points d'accès COUNTER
-  activity: Activité
-  actions:
-    title: Actions
-    tooltip: Nouvelle version de l'activité, les actions seront mises en place progressivement
-  profile: Profil
-  members: Membres
-  users: Utilisateurs
-  shares: Partages
-  logout: Déconnexion
-  contact: Contact
   report: Rapports
-  adminReport: ezREEPORT
-  repositories: Entrepôts
-  repositoryAliases:
-    group: Alias d'entrepôts
-    aliases: Alias
-    templates: Modèles
-    orphans: Orphelins
-  spaces: Espaces
-  harvest:
-    group: Moissonnage
+
+  bar:
+    homepage: Page d'accueil ezMESURE
+    documentation:
+      title: Documentation
+      entries:
+        user: Guide d'utilisation
+        api: API
+    partners: Nos partenaires
+    contact: Contact
+    dashboard: Tableau de bord
+    myspace: Mon compte
+    administration: Administration
+
+  myspace:
+    institutions: Mes établissements
+    deposits: Mes dépôts
+    foreignAccess: Partagé avec vous
+    credentials: Informations de connexion
+    authentificationToken: Token d'authentification
+    settings: Mes paramètres
+    logout: Déconnexion
+
+  admin:
     institutions: Établissements
-    sessions: Sessions
-    alerts: Alertes
-  sync: Synchronisation
-  customFields: Champs personnalisés
+    repositories: Entrepôts
+    repositoryAliases:
+      title: Alias d'entrepôts
+      entries:
+        aliases: Alias
+        templates: Modèles
+        orphans: Orphelins
+    spaces: Espaces
+    users: Utilisateurs
+    roles: Rôles
+    shares: Partages
+    sushiEndpoints: Points d'accès COUNTER
+    customFields: Champs personnalisés
+    harvest:
+      title: Moissonnage
+      entries:
+        institutions: Établissements
+        sessions: Sessions
+        alerts: Alertes
+    report: ezREEPORT
+    sync: Synchronisation
+    actions:
+      title: Actions
+      tooltip: Nouvelle version de l'activité, les actions seront mises en place progressivement
+    activity: Activité
 home:
   whatDoesEzMESURE: Qu'est-ce qu'ezMESURE ?
   supportedBy: Ce service est soutenu par
@@ -70,6 +77,59 @@ myspace:
   repos: Mes entrepôts
   spaces: Mes espaces
   roles: 'Mes rôles :'
+  profile:
+    actions:
+      delete:
+        title: Supprimer le compte
+        confirm:
+          text: Votre compte et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion annulera cette suppression. Souhaitez-vous continuer ?
+  settings:
+    notifications:
+      title: Mes notifications
+      description:
+        text: Sélectionnez les notifications que vous souhaitez recevoir. Ces notifications vous seront envoyées par mail à l'adresse liée à votre compte. Vous pouvez consulter cette adresse dans votre espace "{credentialsLink}".
+        parts:
+          credentialsLink: '@:menu.myspace.credentials'
+      modifiers:
+        user: General
+        admin: Administrateur
+      scopes:
+        institution: Notifications d'un établissement
+        contact: Notifications en cas de contact
+        counter: Notifications liées à COUNTER
+        user: Notifications liées à un utilisateur
+        app: Notifications de l'application
+      types:
+        institution:validated:
+          user: Un de vos établissements a été validé
+          admin: Un établissement a été validé
+        institution:new_user_matching_institution:
+          user: Un utilisateur faisant partie de l'un de vos établissements s'est inscrit
+          admin: Un utilisateur faisant partie d'un établissement s'est inscrit
+        institution:membership_request:
+          user: Un utilisateur demande à rejoindre l'un de vos établissements
+          admin: Un utilisateur demande à rejoindre un établissement
+        institution:role_assigned:
+          user: Un rôle vous a été assigné
+          admin: Un rôle a été assigné à un utilisateur
+        institution:counter_ready_change:
+          admin: Un établissement est prêt à être moissonné
+        user:request_deletion:
+          admin: Un utilisateur à demandé la suppression de ses données
+        user:auto_deleted:
+          admin: Un utilisateur à été supprimé automatiquement
+        contact:form:
+          admin: Un mail a été envoyé via le formulaire de contact
+        counter:new_data_available:
+          user: Un de vos établissements a été moissonné
+          admin: Un établissement a été moissonné
+        app:recent_activity:
+          admin: Activité récente de l'application
+      alerts:
+        updated:
+          title: Vos paramètres de notifications ont été appliqués
+      buttons:
+        save: '@:save'
 files:
   title: Mes dépôts
   manageN: >
@@ -288,6 +348,11 @@ endpoints:
 institutions:
   toolbarTitle: Établissements ({count})
   title: Établissement
+  all: Tous les établissements
+  count: >
+    Aucun établissement
+    |{count} établissement
+    |{count} établissements
   updateInstitution: Mettre à jour l'établissement
   validateSwitch: Valider/Invalider
   validateNbInstitutions: Vous allez valider ou invalider {count} établissement.
@@ -395,6 +460,9 @@ institutions:
     propertyName: Nom de propriété
     noCustomProps: Aucune propriété personnalisée
     addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite
+    customPropsContact:
+      text: Si vous remarquez une erreur dans les propriétés non éditables, vous pouvez {contact-us} via le formulaire de contact.
+      contact-us: contacter l'équipe d'administration
     tags: Étiquettes
     tagsDescription: Les étiquettes permettent d'organiser les établissements en leur associant des mots-clés.
   members:
@@ -439,15 +507,14 @@ institutions:
     accessRights: Droits d'accès
     institutionManagement: Gestion de l'établissement
     roles: Rôles
-    roleNames:
-      contact:doc: Contact documentaire
-      contact:tech: Contact technique
-      guest: Invité
+    memberHasNoRole: Ce membre n'a pas de rôle assigné
     featureLabels:
       institution: Fiche établissement
       memberships: Membres
       sushi: ezCOUNTER
       reporting: ezREEPORT
+      repositories: Entrepôts
+      spaces: Espaces Kibana
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
@@ -532,7 +599,7 @@ institutions:
       non-harvestable: Non moissonnable
       selectable: Sélectionnable
       harvested: Déjà moissonné
-    members: Contacts documentaire
+    members: Contacts
     repositories: '@:repositories.repositories COUNTER'
     spaces: '@:spaces.spaces COUNTER'
     settings: Paramètres de recherche
@@ -842,27 +909,63 @@ password:
   length: Le mot de passe doit contenir au moins 6 caractères
   update: Mettre à jour votre mot de passe
 contact:
-  contactUs: Nous contacter
-  email: Adresse électronique
-  subject: Objet
-  content: Contenu du message
-  sendNavigatorVersion: Envoyer la version de mon navigateur
-  emailSent: Votre demande de contact vient d'être envoyée à l'équipe.
-  failed: L'envoi du formulaire de contact a échoué.
-  requestInformation: Demande d'information
-  bugReport: Rapporter un bug
-  declareSushiEndpoint: Déclarer un point d'accès COUNTER
-  emailIsRequired: L'adresse électronique est requise
-  emailMustBeValid: L'adresse électronique doit être valide
-  sushiIsRequired: Des identifiants COUNTER sont requis
-  contentIsRequired: Un message est requis
-  subjectIsRequired: L'objet est requis
-  endpointVendor: Nom du fournisseur
-  endpointUrl: URL du point d'accès COUNTER
-  pleaseEnterFullVendorName: Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)
-  sushiDetails: Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER5.
-  endpointDetails: Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.
-  additionalInformation: Informations complémentaires
+  title: Nous contacter
+  fields:
+    email: Adresse électronique
+    subject: Objet
+    content: Contenu du message
+  rules:
+    email:
+      required: L'adresse électronique est requise
+      valid: L'adresse électronique doit être valide
+    subject:
+      required: L'objet est requis
+    content:
+      required: Un message est requis
+  types:
+    informations:
+      title: Demande d'information
+    bugs:
+      title: Rapporter un bug
+      fields:
+        browser: Envoyer la version de mon navigateur
+    sushi-endpoint:
+      title: Déclarer un point d'accès COUNTER
+      fields:
+        content: Informations complémentaires
+        endpoint:
+          title: '@:endpoints.endpoint'
+          fields:
+            vendor:
+              label: Nom du fournisseur
+              hint: Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)
+            url: URL du point d'accès COUNTER
+        credentials:
+          title: '@:sushi.auth'
+          text: Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER.
+          fields:
+            customerId: '@:institutions.sushi.customerId'
+            requestorId: '@:institutions.sushi.requestorId'
+            apiKey: '@:institutions.sushi.apiKey'
+      rules:
+        credentials:
+          required: Des identifiants COUNTER sont requis
+    wrong-custom-properties:
+      title: Rapporter une erreur dans les champs personnalisés d'un établissement
+      fields:
+        content: Informations complémentaires
+        institution:
+          label: Établissement concerné
+          emptySearch: Aucun établissement ne correspond à la recherche.
+          noMemberships: Vous n'êtes membre d'aucun établissement.
+        property: Propriété concernée
+        value:
+          label: Valeur souhaitée|Valeurs souhaitées
+          diff:removed: Valeurs supprimées
+          diff:added: Valeurs ajoutées
+  snacks:
+    success: Votre demande de contact vient d'être envoyée à l'équipe.
+    failed: L'envoi du formulaire de contact a échoué.
 errors:
   '404': La page demandée n'a pas été trouvée
   '500': Une erreur interne est survenue
@@ -912,6 +1015,23 @@ users:
     permissions: Permissions
     no_permissions: Aucune permission
     no_institution: Aucun établissement
+    deletedAt: À demandé sa suppression
+    deletedAt:tooltip: Cet utilisateur à demandé sa suppression, elle sera effective le {date}
+  actions:
+    disable:
+      title: Désactiver
+      confirm:
+        text: Les comptes et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion de l'un de ces utilisateurs annulera sa suppression. Souhaitez-vous continuer ?
+        agree: Désactiver
+      error: Une erreur est survenue lors de la désactivation de l'utilisateur {id}
+      success: 1 utilisateur a été désactivé|{n} utilisateurs ont été désactivés
+    restore:
+      title: Restaurer
+      confirm:
+        text: Restaurer les utilisateurs annulera leur suppression prochaine. Souhaitez vous continuer ?
+        agree: Restaurer
+      error: Une erreur est survenue lors de la restauration de l'utilisateur {id}
+      success: 1 utilisateur a été restauré|{n} utilisateurs ont été restaurés
 report:
   title: Mes rapports
   health: État de santé
@@ -963,6 +1083,11 @@ repositories:
                 date:
                   title: Date
                   tooltip: Ajoute un sous-champ ".date" transformant la valeur au type "Date"
+    settings:
+      title: Paramètres de l'entrepôt
+      form:
+        defaultPipeline: Pipeline par défaut
+        finalPipeline: Pipeline finale
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type
@@ -1150,6 +1275,32 @@ harvest:
     unableToDelete: Impossible de supprimer la tâche de moissonnage
     counterVersionTooltip: Moissonne un rapport COUNTER {version}
     noData: Aucune donnée dans le rapport moissonné
+roles:
+  toolbarTitle: Rôles ({count})
+  pageDesc: Entrez ici les rôles que vous souhaitez pouvoir attribuer aux membres des établissements.
+  newRole: Nouveau rôle
+  editRole: Mise à jour du rôle
+  manageRoles: >
+    Gérer les rôles
+    |Gérer {count} rôles
+  restricted: Restreint
+  onlyAdmins: Assignable uniquement par les administrateurs
+  notOnlyAdmins: Assignable par les utilisateurs
+  exposeMembers: Exposer sur la page des partenaires
+  notifyUserWhen: Notifications reçues par l'utilisateur
+  autoAssignWhen: Assigner automatiquement lorsque
+  assignments: Assignations
+  definePermissionsPreset: Définir des permissions par défaut
+  notificationTypes:
+    'institution:validated': Son établissement a été validé
+    'institution:role_assigned': Le rôle lui a été assigné
+    'institution:new_user_matching_institution': Un utilisateur faisant partie de l'établissement s'est inscrit
+    'institution:membership_request': Un utilisateur demande à rejoindre l'établissement
+    'counter:new_data_available': De nouvelles données COUNTER sont disponibles
+  eventTypes:
+    'institution:self_join': L'utilisateur rejoint par lui-même un établissement en accès ouvert
+    'institution:user_onboarded': L'utilisateur est ajouté dans un établissement de bienvenue
+    'institution:declared': L'utilisateur déclare un établissement
 shares:
   toolbarTitle: Partages ({count})
   pageDesc: Dans cette page, vous pouvez accorder des droits d'accès spécifiques à des utilisateurs ou des établissements. Les droits accordés ici ne sont pas modifiables par les membres des établissements.
@@ -1218,8 +1369,8 @@ customFields:
   multivalued: Multivalué
   helpUrl: URL d'aide
   itemUrl: URL de la page de l'établissement
-  labelFr: Label en français
-  labelEn: Label en anglais
+  labelFr: Libellé en français
+  labelEn: Libellé en anglais
   descriptionFr: Description en français
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
@@ -1247,7 +1398,9 @@ value: Valeur
 status: Statut
 date: Date
 duration: Durée
-label: Label
+label: Libellé
+icon: Icône
+color: Couleur
 properties: Propriétés
 description: Description
 initials: Initiales
@@ -1313,6 +1466,7 @@ reason: 'Raison : {reason}'
 groupBy: Regrouper par
 indeterminate: indéterminée
 noMatchFor: Aucune correspondance pour "{search}". Appuyez sur {key} pour l'ajouter.
+noMatch: Aucune correspondance
 enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide
@@ -1333,9 +1487,6 @@ deletedSince: Supprimé depuis le {date}
 cantCancel: Cette action est irreversible
 version: Version
 back: Retour
-<<<<<<< HEAD
-=======
 select: Sélectionner
 all: Tous
->>>>>>> develop
 pleaseWait: Veuillez patienter...
