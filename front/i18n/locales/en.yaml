@@ -375,6 +375,10 @@ institutions:
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the contacts of this institution to let them know.
   joinInstitutionOpen: This institution is open to self registration, your membership will take effect immediately.
+  leave: Leave
+  leaveSuccess: You have left the institution
+  leaveInstitution: Leave this institution
+  leaveInstitutionConfirm: You are about to leave {institution}. You will no longer have access to the data of this institution.
   createMailContactList: Copy the emails of the contacts
   modify: Modify my institution
   reports:
