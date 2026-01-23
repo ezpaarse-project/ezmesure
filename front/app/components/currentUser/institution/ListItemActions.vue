@@ -90,6 +90,17 @@
           </v-list-item>
         </v-list>
       </template>
+
+      <v-divider class="mt-1 mb-2" />
+
+      <v-list density="compact" class="pa-0">
+        <v-list-item
+          :title="$t('institutions.leaveInstitution')"
+          color="primary"
+          prepend-icon="mdi-logout"
+          @click="leaveInstitution()"
+        />
+      </v-list>
     </v-card-text>
   </v-card>
 </template>
@@ -112,6 +123,10 @@ const props = defineProps({
 
 const { data: user } = useAuthState();
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
+const { openConfirm } = useDialogStore();
+const { fetchMemberships } = useCurrentUserStore();
+const { t } = useI18n();
+const snacks = useSnacksStore();
 
 const spaces = computed(() => props.spacePermissions?.map(({ space }) => space));
 
@@ -136,4 +151,21 @@ const allowedActions = computed(() => {
     reports: perms.has('reporting:read') || perms.has('reporting:write'),
   };
 });
+
+async function leaveInstitution() {
+  await openConfirm({
+    text: `${t('institutions.leaveInstitutionConfirm', { institution: props.institution.name })}`,
+    agreeText: t('institutions.leave'),
+    agreeIcon: 'mdi-logout',
+    onAgree: async () => {
+      try {
+        await $fetch(`/api/institutions/${props.institution.id}/_leave`, { method: 'POST' });
+        await fetchMemberships();
+        snacks.info(t('institutions.leaveSuccess'));
+      } catch (err) {
+        snacks.error(t('anErrorOccurred'), err);
+      }
+    },
+  });
+}
 </script>
