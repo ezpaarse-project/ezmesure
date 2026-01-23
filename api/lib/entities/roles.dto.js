@@ -10,6 +10,8 @@ const {
 
 const roleIdPattern = /^[a-z0-9_-]+$/i;
 
+const permissionLevel = Joi.string().valid('read', 'write', 'none');
+
 /**
  * Base schema
  * @type {Record<string, import('joi').AnySchema>}
@@ -29,7 +31,14 @@ const schema = {
   notifications: Joi.array().items(Joi.string().trim().min(1)),
   autoAssign: Joi.array().items(Joi.string().trim().min(1)),
 
-  permissionsPreset: Joi.object().allow(null),
+  permissionsPreset: Joi.object({
+    institution: permissionLevel,
+    memberships: permissionLevel,
+    sushi: permissionLevel,
+    reporting: permissionLevel,
+    spaces: permissionLevel,
+    repositories: permissionLevel,
+  }).allow(null),
 
   membershipRoles: Joi.array().items(Joi.object()),
 };
