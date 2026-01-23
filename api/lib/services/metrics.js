@@ -131,6 +131,7 @@ async function migrateIndex() {
 }
 
 const migrationState = { migrating: false, promise: Promise.resolve(undefined) };
+
 async function ensureIndex() {
   const { body: exists } = await elastic.indices.exists({ index });
   if (exists) {
@@ -140,7 +141,7 @@ async function ensureIndex() {
   if (!migrationState.migrating) {
     migrationState.migrating = true;
     migrationState.promise = migrateIndex()
-      .then(() => { migrationState.migrating = false; });
+      .finally(() => { migrationState.migrating = false; });
   }
 
   await migrationState.promise;
