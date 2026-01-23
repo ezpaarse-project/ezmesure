@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer v-model="isOpen" width="300" color="grey-lighten-3">
     <v-list-item
-      :title="$t('menu.myInstitutions')"
+      :title="$t('menu.myspace.institutions')"
       to="/myspace"
       prepend-icon="mdi-domain"
       class="text-grey-darken-3"
@@ -11,7 +11,7 @@
     <CurrentUserInstitutionList />
 
     <v-list-item
-      :title="$t('menu.myDeposits')"
+      :title="$t('menu.myspace.deposits')"
       to="/myspace/files"
       prepend-icon="mdi-file-upload"
       class="text-grey-darken-3"
@@ -19,7 +19,7 @@
 
     <template v-if="foreignSpacesPermissions.length > 0">
       <v-list-item
-        :title="$t('menu.myForeignAccess')"
+        :title="$t('menu.myspace.foreignAccess')"
         prepend-icon="mdi-tab-plus"
         class="text-grey-darken-3"
       />
@@ -49,9 +49,16 @@
       <v-divider />
 
       <v-list-item
-        :title="$t('menu.credentials')"
+        :title="$t('menu.myspace.credentials')"
         to="/myspace/profile"
         prepend-icon="mdi-account-key"
+        class="text-grey-darken-3"
+      />
+
+      <v-list-item
+        :title="$t('menu.myspace.settings')"
+        to="/myspace/settings"
+        prepend-icon="mdi-cog"
         class="text-grey-darken-3"
       />
 
@@ -63,7 +70,7 @@
       >
         <template #append>
           <v-btn
-            :title="$t('menu.logout')"
+            :title="$t('menu.myspace.logout')"
             icon="mdi-logout"
             size="small"
             color="red"

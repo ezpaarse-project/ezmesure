@@ -57,13 +57,15 @@ model ApiKeyRepositoryPermission {
 /// A alias permission for an ApiKey
 model ApiKeyRepositoryAliasPermission {
   /// ID of the key
-  apiKeyId     String
+  apiKeyId                  String
   /// The related ApiKey
-  apiKey       ApiKey          @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  apiKey                    ApiKey                   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   // Pattern of the alias
-  aliasPattern String
+  aliasPattern              String
   /// The alias
-  alias        RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+  alias                     RepositoryAlias          @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+  RepositoryAliasTemplate   RepositoryAliasTemplate? @relation(fields: [repositoryAliasTemplateId], references: [id])
+  repositoryAliasTemplateId String?
 
   @@id([apiKeyId, aliasPattern])
 }

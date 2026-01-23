@@ -33,6 +33,7 @@ async function getOIDCConfig() {
         authorization_endpoint: config.uris.authorization,
         token_endpoint: config.uris.token,
         userinfo_endpoint: config.uris.userinfo,
+        revocation_endpoint: config.uris.revocation,
       },
       config.client.id,
       { client_secret: config.client.secret },
@@ -134,7 +135,7 @@ module.exports.getUserInfo = async (accessToken, subject) => {
  *
  * @param {openid.UserInfoResponse} userInfo
  *
- * @returns {Omit<import('@prisma/client').User, 'createdAt' | 'updatedAt' | 'lastActivity'>}
+ * @returns {Omit<import('../../.prisma/client.mjs').User, 'createdAt' | 'updatedAt' | 'lastActivity'>}
  */
 module.exports.getUserFromInfo = (userInfo) => {
   if (!userInfo.email) {
@@ -162,6 +163,7 @@ module.exports.getUserFromInfo = (userInfo) => {
       org: userInfo.organisation,
       unit: userInfo.unit,
     },
+    deletedAt: null,
   };
 };
 
@@ -176,4 +178,17 @@ module.exports.getTokenInfo = async (accessToken) => {
   const oidc = await getOIDCConfig();
 
   return openid.tokenIntrospection(oidc, accessToken);
+};
+
+/**
+ * Get info about access token
+ *
+ * @param {string} accessToken  - The access token
+ *
+ * @returns {Promise<void>}
+ */
+module.exports.revokeUserToken = async (accessToken) => {
+  const oidc = await getOIDCConfig();
+
+  return openid.tokenRevocation(oidc, accessToken);
 };

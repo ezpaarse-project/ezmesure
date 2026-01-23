@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     public: {
       supportMail: 'ezteam@couperin.org',
       currentInstance: '',
+      oidcProfileUri: '',
       counterRegistryUrl: 'https://registry.countermetrics.org',
     },
   },
@@ -23,10 +24,6 @@ export default defineNuxtConfig({
   ],
 
   i18n: i18nOptions,
-
-  pinia: {
-    storesDirs: ['./store/**'],
-  },
 
   auth: authOptions,
 

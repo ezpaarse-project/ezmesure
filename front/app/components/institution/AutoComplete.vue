@@ -25,7 +25,6 @@
 
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
-        :title="item.name"
         :subtitle="item.city"
         lines="two"
         v-bind="listItem"

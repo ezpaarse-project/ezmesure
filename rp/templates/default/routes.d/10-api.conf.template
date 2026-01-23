@@ -1,5 +1,7 @@
-location /api {
+location /api/ {
   rewrite     ^/api(/.*)$ $1 break;
 
   proxy_pass  http://api_server;
+
+  client_max_body_size 0;
 }

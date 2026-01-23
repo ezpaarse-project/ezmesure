@@ -2,15 +2,15 @@
 const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient */
-/** @typedef {import('@prisma/client').ApiKeyRepositoryPermission} ApiKeyRepositoryPermission */
-/** @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionUpdateArgs} ApiKeyRepositoryPermissionUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionUpsertArgs} ApiKeyRepositoryPermissionUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionCountArgs} ApiKeyRepositoryPermissionCountArgs */
-/** @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionFindUniqueArgs} ApiKeyRepositoryPermissionFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionFindManyArgs} ApiKeyRepositoryPermissionFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionCreateArgs} ApiKeyRepositoryPermissionCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionDeleteArgs} ApiKeyRepositoryPermissionDeleteArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient */
+/** @typedef {import('../../.prisma/client.mjs').ApiKeyRepositoryPermission} ApiKeyRepositoryPermission */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionUpdateArgs} ApiKeyRepositoryPermissionUpdateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionUpsertArgs} ApiKeyRepositoryPermissionUpsertArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionCountArgs} ApiKeyRepositoryPermissionCountArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionFindUniqueArgs} ApiKeyRepositoryPermissionFindUniqueArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionFindManyArgs} ApiKeyRepositoryPermissionFindManyArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionCreateArgs} ApiKeyRepositoryPermissionCreateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionDeleteArgs} ApiKeyRepositoryPermissionDeleteArgs */
 /* eslint-enable max-len */
 
 /**

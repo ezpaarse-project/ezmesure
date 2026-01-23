@@ -4,12 +4,12 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 
 const elasticUsers = require('../../services/elastic/users');
-const { syncApiKey } = require('../../services/sync/elastic');
+const { syncApiKey } = require('../../services/sync/elastic/api-keys');
 const { generateUsernameFromApiKey } = require('../utils');
 
 /**
- * @typedef {import('@prisma/client').ApiKey} ApiKey
- * @typedef {import('@prisma/client').ElasticRole} ElasticRole
+ * @typedef {import('../../.prisma/client.mjs').ApiKey} ApiKey
+ * @typedef {import('../../.prisma/client.mjs').ElasticRole} ElasticRole
  */
 
 /**

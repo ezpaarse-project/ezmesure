@@ -15,10 +15,12 @@ const schema = {
   username: Joi.string().min(1),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
 
   fullName: Joi.string().allow(''),
   email: Joi.string().email(),
   isAdmin: Joi.boolean(),
+  excludeNotifications: Joi.array().items(Joi.string()),
 
   metadata: Joi.object(),
   lastActivity: Joi.date(),
@@ -36,6 +38,7 @@ const immutableFields = [
   'updatedAt',
   'createdAt',
   'lastActivity',
+  'deletedAt',
   'memberships',
   'historyEntries',
   'elasticRoles',
@@ -47,6 +50,8 @@ const immutableFields = [
 const includableFields = [
   'memberships',
   'memberships.institution',
+  'memberships.roles',
+  'memberships.roles.role',
   'historyEntries',
   'elasticRoles',
 ];
@@ -70,6 +75,7 @@ const adminCreateSchema = withModifiers(
 const adminUpdateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
+  { deletedAt: () => schema.deletedAt },
 );
 
 /**

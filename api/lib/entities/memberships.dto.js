@@ -6,12 +6,6 @@ const {
   requireFields,
 } = require('./schema.utils');
 
-const MEMBER_ROLES = {
-  docContact: 'contact:doc',
-  techContact: 'contact:tech',
-  guest: 'guest',
-};
-
 const FEATURES = {
   institution: {
     read: 'institution:read',
@@ -48,12 +42,12 @@ const schema = {
   institutionId: Joi.string().trim(),
   institution: Joi.object(),
 
-  roles: Joi.array().items(Joi.string().valid(...Object.values(MEMBER_ROLES))),
   permissions: Joi.array().items(Joi.string().valid(...PERMISSIONS)),
 
   locked: Joi.boolean(),
   comment: Joi.string().allow(''),
 
+  roles: Joi.array().items(Joi.object()),
   repositoryPermissions: Joi.array().items(Joi.object()),
   repositoryAliasPermissions: Joi.array().items(Joi.object()),
   spacePermissions: Joi.array().items(Joi.object()),
@@ -67,6 +61,7 @@ const immutableFields = [
   'user',
   'institutionId',
   'institution',
+  'roles',
   'repositoryPermissions',
   'repositoryAliasPermissions',
   'spacePermissions',
@@ -95,6 +90,8 @@ const includableFields = [
   'institution.elasticRoles.repositoryAliasPermissions',
   'institution.elasticRoles.repositoryAliasPermissions.alias',
   'institution.elasticRoles.repositoryAliasPermissions.alias.repository',
+  'roles',
+  'roles.role',
 ];
 
 /**
@@ -124,7 +121,6 @@ const adminUpsertSchema = withModifiers(
 );
 
 module.exports = {
-  MEMBER_ROLES,
   FEATURES,
   PERMISSIONS,
   schema,

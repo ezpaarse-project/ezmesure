@@ -1,9 +1,10 @@
 const { CronJob } = require('cron');
-const { getMetrics } = require('./metrics');
+
+const { getMetrics } = require('../metrics');
 
 const job = CronJob.from({
   cronTime: '0 0 0 * * *',
-  onTick: getMetrics,
+  onTick: () => getMetrics(true),
   runOnInit: true,
 });
 

@@ -11,7 +11,7 @@
     <div v-else>
       <ezr-task-activity-table
         v-model:items-per-page="itemsPerPage"
-        :title-prefix="`${$t('menu.adminReport')} / `"
+        :title-prefix="`${$t('menu.admin.report')} / `"
         :items-per-page-options="itemsPerPageOptions"
       >
         <template #prepend>
@@ -33,5 +33,7 @@ definePageMeta({
 
 const { toggle } = useDrawerStore();
 
-const { error, itemsPerPage, itemsPerPageOptions, refresh } = await useEzr();
+const {
+  error, itemsPerPage, itemsPerPageOptions, refresh,
+} = await useEzr();
 </script>

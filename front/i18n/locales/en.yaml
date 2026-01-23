@@ -1,49 +1,56 @@
 menu:
-  homepage: ezMESURE homepage
-  home: Home
-  dashboard: Dashboard
-  documentation: Documentation
-  myspace: My space
-  partners: Partners
-  api: API
-  guide: User guide
-  navigateTo: Navigate to
-  myDeposits: My deposits
-  credentials: Login information
-  authentificationToken: Authentification token
-  administration: Administration
-  myInstitution: My institution
-  myInstitutions: My institutions
-  myForeignAccess: Shared with you
-  institutions: Institutions
-  sushiEndpoints: COUNTER endpoints
-  activity: Activity
-  actions:
-    title: Actions
-    tooltip: New version of the activity, actions will being rolled out progressively
-  profile: Profile
-  members: Members
-  users: Users
-  shares: Shares
-  logout: Logout
-  contact: Contact
-  report: Reports
-  adminReport: ezREEPORT
-  repositories: Repositories
-  repositoryAliases:
-    group: Repository aliases
-    aliases: Aliases
-    templates: Templates
-    orphans: Orphans
-  spaces: Spaces
-  harvest:
-    group: Harvest
+  report: Rapports
+
+  bar:
+    homepage: ezMESURE homepage
+    documentation:
+      title: Documentation
+      entries:
+        user: User guide
+        api: API
+    partners: Partners
+    contact: Contact
+    dashboard: Dashboard
+    myspace: My space
+    administration: Administration
+
+  myspace:
+    institutions: My institutions
+    deposits: My deposits
+    foreignAccess: Shared with you
+    credentials: Login information
+    authentificationToken: Authentification token
+    settings: My settings
+    logout: Logout
+
+  admin:
     institutions: Institutions
-    sessions: Sessions
-    alerts: Alertes
-  sync: Synchronisation
-  customFields: Custom fields
-  api-keys: API keys
+    repositories: Repositories
+    repositoryAliases:
+      title: Repository aliases
+      entries:
+        aliases: Aliases
+        templates: Templates
+        orphans: Orphans
+    spaces: Spaces
+    users: Users
+    roles: Roles
+    shares: Shares
+    sushiEndpoints: COUNTER endpoints
+    customFields: Custom fields
+    harvest:
+      title: Harvest
+      entries:
+        institutions: Institutions
+        sessions: Sessions
+        alerts: Alertes
+    report: ezREEPORT
+    sync: Synchronisation
+    actions:
+      title: Actions
+      tooltip: New version of the activity, actions will being rolled out progressively
+    activity: Activity
+    api-keys: API keys
 home:
   whatDoesEzMESURE: What does ezMESURE ?
   supportedBy: This service is supported by
@@ -58,6 +65,7 @@ myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
   determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE contact in your institution, or use the menu to your left to {join}.
+  iamAccount: Go to profile settings
   ezmesureTeam: ezMESURE team
   name: Name
   mail: Mail
@@ -70,6 +78,59 @@ myspace:
   repos: My repositories
   spaces: My spaces
   roles: "My roles:"
+  profile:
+    actions:
+      delete:
+        title: Delete account
+        confirm:
+          text: Your account and all related data will be deleted in {duration}. Any attempt to log in will cancel this deletion. Do you wish to continue?
+  settings:
+    notifications:
+      title: My notifications
+      description:
+        text: Select which notifications you want to receive. These notifications will be sent to you by email to the address linked to your account. You can check this address in your "{credentialsLink}" area.
+        parts:
+          credentialsLink: '@:menu.myspace.credentials'
+      modifiers:
+        user: General
+        admin: Administrator
+      scopes:
+        institution: Notifications about one institution
+        contact: Notifications if contacted
+        counter: Notifications related to COUNTER
+        user: Notifications related to a user
+        app: Notifications from application
+      types:
+        institution:validated:
+          user: One of your institutions has been validated
+          admin: One institution has been validated
+        institution:new_user_matching_institution:
+          user: A user that is member of one of your institutions registered
+          admin: A user that is member of an institution registered
+        institution:membership_request:
+          user: A user asks to join one of your institutions
+          admin: A user asks to join an institution
+        institution:role_assigned:
+          user: A role has been assigned to you
+          admin: A role has been assigned to a user
+        institution:counter_ready_change:
+          admin: An institution is ready to be harvested
+        user:request_deletion:
+          admin: A user requested the deletion of their data
+        user:auto_deleted:
+          admin: A user was deleted automatically
+        contact:form:
+          admin: An email has been sent through the contact form
+        counter:new_data_available:
+          user: One of your institutions has been harvested
+          admin: An institution has been harvested
+        app:recent_activity:
+          admin: Recent activity on application
+      alerts:
+        updated:
+          title: Your notification settings has been applied
+      buttons:
+        save: '@:save'
 files:
   title: My Deposits
   manageN: >
@@ -287,6 +348,11 @@ endpoints:
 institutions:
   toolbarTitle: Institutions ({count})
   title: Institution
+  all: All institutions
+  count: >
+    No institution
+    |{count} institution
+    |{count} institutions
   validateSwitch: Validate/Invalidate
   validateNbInstitutions: You are about to validate or invalidate {count} institution.
   updateInstitution: Update institution
@@ -394,6 +460,9 @@ institutions:
     propertyName: Property name
     noCustomProps: No custom properties
     addNewCustomProp: Add a new one by clicking on the + in the top right corner
+    customPropsContact:
+      text: If you notice an error in the non-editable properties, you can {contact-us} via the contact form.
+      contact-us: contact the administration team
     tags: Tags
     tagsDescription: Tags allow you to organize institutions by associating them with keywords.
   members:
@@ -440,15 +509,14 @@ institutions:
     accessRights: Access rights
     institutionManagement: Institution management
     roles: Roles
-    roleNames:
-      contact:doc: Documentary contact
-      contact:tech: Technical contact
-      guest: Guest
+    memberHasNoRole: This member has no role assigned
     featureLabels:
       institution: Institution card
       memberships: Members
       sushi: COUNTER credentials
       reporting: ezREEPORT
+      repositories: Repositories
+      spaces: Kibana spaces
       api-keys: API keys
   sushi:
     title: COUNTER credentials ({count})
@@ -532,7 +600,7 @@ institutions:
       non-harvestable: Non harvestable
       selectable: Selectable
       harvested: Already harvested
-    members: "@:institutions.members.roleNames.contact:doc{'s'}"
+    members: Contacts
     repositories: 'COUNTER @:repositories.repositories'
     spaces: 'COUNTER @:spaces.spaces'
     settings: Search settings
@@ -836,29 +904,65 @@ password:
   length: The password must be at least 6 characters long
   update: Update your password
 contact:
-  contactUs: Contact us
-  email: Email address
-  subject: Subject
-  content: Message content
-  sendNavigatorVersion: Send my browser version
-  emailSent: Your contact request has just been sent to the team.
-  failed: Sending the contact form failed.
-  requestInformation: Information request
-  bugReport: Bug report
-  declareSushiEndpoint: Declare a COUNTER endpoint
-  emailIsRequired: The email address is required
-  emailMustBeValid: The email address must be valid
-  contentIsRequired: A message is required
-  subjectIsRequired: Subject is required
-  sushiIsRequired: COUNTER credentials are required
-  endpointVendor: Vendor name
-  endpointUrl: URL of the COUNTER endpoint
-  pleaseEnterFullVendorName: Please enter the full name (possibly with its acronym)
-  sushiDetails: Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER5 compliant.
-  endpointDetails: If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.
-  additionalInformation: Additional information
+  title: Contact us
+  fields:
+    email: Email address
+    subject: Subject
+    content: Message content
+  rules:
+    email:
+      required: The email address is required
+      valid: The email address must be valid
+    subject:
+      required: Subject is required
+    content:
+      required: A message is required
+  types:
+    informations:
+      title: Information request
+    bugs:
+      title: Bug report
+      fields:
+        browser: Send my browser version
+    sushi-endpoint:
+      title: Declare a COUNTER endpoint
+      fields:
+        content: Additional information
+        endpoint:
+          title: '@:endpoints.endpoint'
+          fields:
+            vendor:
+              label: Vendor name
+              hint: Please enter the full name (possibly with its acronym)
+            url: URL of the COUNTER endpoint
+        credentials:
+          title: '@:sushi.auth'
+          text: Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER compliant.
+          fields:
+            customerId: '@:institutions.sushi.customerId'
+            requestorId: '@:institutions.sushi.requestorId'
+            apiKey: '@:institutions.sushi.apiKey'
+      rules:
+        credentials:
+          required: COUNTER credentials are required
+    wrong-custom-properties:
+      title: Report an error in the custom properties of an institution
+      fields:
+        content: Additional information
+        institution:
+          label: Affected institution
+          emptySearch: No institution matches the search.
+          noMemberships: You are not a member of any institution.
+        property: Affected property
+        value:
+          label: Desired value|Desired values
+          diff:removed: Deleted values
+          diff:added: Added values
+  snacks:
+    success: Your contact request has just been sent to the team.
+    failed: Sending the contact form failed.
 errors:
-  "404": La page demandée n'a pas été trouvée
+  "404": The requested page wasn't found
   "500": An internal error occurred
   generic: An unexpected error has occurred
 account:
@@ -907,6 +1011,23 @@ users:
     permissions: Permissions
     no_permissions: No permissions
     no_institution: No institutions
+    deletedAt: Asked for it's deletion
+    deletedAt:tooltip: This user asked for it's deletion, it'll be effective on the {date}
+  actions:
+    disable:
+      title: Disable
+      confirm:
+        text: The accounts and their related data will be deleted in {duration}. Any attempt to log in from one of the users will cancel his deletion. Do you want to continue ?
+        agree: Disable
+      error: An error occured while disabling user {id}
+      success: 1 user has been disabled|{n} users has been disabled
+    restore:
+      title: Restore
+      confirm:
+        text: Restoring users will cancel their deletion. Do you want to continue ?
+        agree: Restore
+      error: An error occured while restoring user {id}
+      success: 1 user has been restored|{n} users has been restored
 report:
   title: My reports
   health: Health status
@@ -955,6 +1076,11 @@ repositories:
                 date:
                   title: Date
                   tooltip: Adds a sub field ".date" that transforms the value to the "Date" type
+    settings:
+      title: Repository settings
+      form:
+        defaultPipeline: Default pipeline
+        finalPipeline: Final pipeline
   manageRepositories: >
     Manage repositories
     |Manage {count} repositories
@@ -1142,6 +1268,32 @@ harvest:
     unableToDelete: Unable to delete the harvesting task
     counterVersionTooltip: Harvest a COUNTER {version} report
     noData: No data in the harvested report
+roles:
+  toolbarTitle: Roles ({count})
+  pageDesc: Enter here the roles that you want to be able to assign to institution members.
+  newRole: New role
+  editRole: Update role
+  manageRoles: >
+    Manage roles
+    |Manage {count} roles
+  restricted: Restricted
+  onlyAdmins: Only assignable by administrators
+  notOnlyAdmins: Assignable by users
+  exposeMembers: Expose on the partner page
+  notifyUserWhen: Notifications received by the user
+  autoAssignWhen: Assign automatically when
+  assignments: Assignments
+  definePermissionsPreset: Define permissions presets
+  notificationTypes:
+    'institution:validated': His institution has been validated
+    'institution:role_assigned': The role has been assigned to him
+    'institution:new_user_matching_institution': A user who is part of the institution has signed up
+    'institution:membership_request': A user has requested to join the institution
+    'counter:new_data_available': New COUNTER data is available
+  eventTypes:
+    'institution:self_join': User joins an open institution by himself
+    'institution:user_onboarded': User is added to an onboarding institution
+    'institution:declared': User declares an institution
 shares:
   toolbarTitle: Shares ({count})
   pageDesc: In this page, you can grant specific rights to users or institutions. The rights granted here cannot be modified by institution members.
@@ -1267,6 +1419,8 @@ status: Status
 date: Date
 duration: Duration
 label: Label
+icon: Icon
+color: Color
 properties: Properties
 description: Description
 initials: Initials
@@ -1332,6 +1486,7 @@ reason: "Reason: {reason}"
 groupBy: Group by
 indeterminate: indeterminate
 noMatchFor: No results matching "{search}". Press {key} to add it.
+noMatch: No results
 enterKey: enter
 general: General
 enterValidUrl: Please enter a valid URL
@@ -1352,7 +1507,7 @@ deletedSince: Deleted since {date}
 cantCancel: This operation cannot be undone.
 version: Version
 back: Back
-pleaseWait: Please wait...
-never: Never
 select: Select
 all: All
+pleaseWait: Please wait...
+never: Never

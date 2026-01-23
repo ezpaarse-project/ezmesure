@@ -25,8 +25,6 @@ exports.login = async (ctx) => {
 };
 
 exports.loginCallback = async (ctx) => {
-  // TODO: Better errors
-
   const stateKey = ctx.query.nonce ? `nonce:${ctx.query.nonce}` : `state:${ctx.query.state}`;
 
   const state = loginState.get(stateKey);
@@ -83,6 +81,12 @@ exports.loginCallback = async (ctx) => {
 
   if (user) {
     ctx.action = 'user/connection';
+
+    await usersService.update({
+      where: { username: user.username },
+      data: { deletedAt: null },
+    });
+
     next();
     return;
   }
@@ -102,8 +106,12 @@ exports.loginCallback = async (ctx) => {
 };
 
 exports.logout = async (ctx) => {
+  try {
+    await openid.revokeUserToken(ctx.state.jwtData.token);
+  } catch (err) {
+    appLogger.error(`Failed to revoke token for ${ctx.state.user.username}: ${err}`);
+  }
+
   ctx.cookies.set(cookie, '', { httpOnly: true });
   ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
-
-  // TODO: logout from OIDC provider
 };

@@ -3,17 +3,12 @@ const config = require('config');
 const { CronJob } = require('cron');
 const { appLogger } = require('../../logger');
 
-const {
-  syncRepositories,
-  syncRepository,
-  unmountRepository,
-  syncRepositoryIndexTemplates,
-} = require('./repositories');
-const { syncRepositoryAlias, syncRepositoryAliases, unmountAlias } = require('./alias');
-const { syncUser, syncUsers } = require('./users');
-const { syncApiKey, syncApiKeys } = require('./api-keys');
-
 const { syncSchedule } = config.get('elasticsearch');
+
+const { syncRepositories } = require('../../sync/elastic/repositories');
+const { syncRepositoryAliases } = require('../../sync/elastic/alias');
+const { syncUsers } = require('../../sync/elastic/users');
+const { syncApiKeys } = require('../../sync/elastic/api-keys');
 
 const sync = async () => {
   await syncRepositories();
@@ -25,7 +20,7 @@ const sync = async () => {
 /**
  * Start cron to periodically sync Elastic to ezMESURE
  */
-const startCron = async () => {
+const startSyncCron = async () => {
   const job = CronJob.from({
     cronTime: syncSchedule,
     runOnInit: false,
@@ -45,17 +40,5 @@ const startCron = async () => {
 };
 
 module.exports = {
-  startCron,
-  sync,
-  syncRepository,
-  unmountRepository,
-  syncRepositories,
-  syncRepositoryAlias,
-  unmountAlias,
-  syncRepositoryAliases,
-  syncRepositoryIndexTemplates,
-  syncUser,
-  syncUsers,
-  syncApiKey,
-  syncApiKeys,
+  startSyncCron,
 };

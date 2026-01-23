@@ -124,6 +124,7 @@ errors:
   role:
     notFound: Role [%s] not found
     alreadyExists: Role [%s] already exists
+    restricted: Role [%s] is only assignable by administrators
 
   space:
     notFound: Space [%s] not found

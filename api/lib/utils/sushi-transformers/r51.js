@@ -1,15 +1,40 @@
 // @ts-check
-
 const { format } = require('date-fns');
+const { asIsbn13 } = require('isbn3');
+
 const { appLogger } = require('../../services/logger');
 
 /**
  * Check if value is an record
  *
- * @param {unknown} val The value to check
+ * @param {unknown} val - The value to check
  * @returns {val is Record<string, unknown>}
  */
 const isRecord = (val) => !!val && typeof val === 'object' && !Array.isArray(val);
+
+/**
+ * Format Item_ID into human readable entries
+ *
+ * @param {Record<string, string> | undefined} ids - The Item_ID object
+ *
+ * @returns {Record<string, string | undefined> | undefined} A human readable Item_ID
+ */
+function formatItemID(ids) {
+  if (!ids) {
+    return undefined;
+  }
+
+  /** @type {Record<string, string | undefined>} */
+  const result = { ...ids };
+
+  if (ids?.ISBN) {
+    // We want to show the hyphened version of ISBN13
+    // @ts-expect-error - Types are missing the second parameter
+    result.ISBN = asIsbn13(ids.ISBN, true) || undefined;
+  }
+
+  return result;
+}
 
 module.exports = function prepareC51Transformer(report) {
   // Extract report header
@@ -63,7 +88,7 @@ module.exports = function prepareC51Transformer(report) {
           // If parent item exists
           if (parent.Item_ID) {
             itemParent = {
-              Item_ID: parent.Item_ID,
+              Item_ID: formatItemID(parent.Item_ID),
               Publication_Date: parent.Publication_Date,
 
               Item_Name: parent.Title,
@@ -78,13 +103,22 @@ module.exports = function prepareC51Transformer(report) {
         for (const reportItem of items) {
           // ? Handle reportItem.Components
 
+          // Prepare identifiers
+          let identifiers = [];
+          if (isRecord(report.Item_ID)) {
+            // Extract item identifiers
+            identifiers = Object.entries(report.Item_ID)
+              .map(([key, value]) => `${key}:${value}`)
+              .sort();
+          }
+
           // Prepare base item
           /** @type {Record<string, any>} */
           const baseItem = {
             Report_Header: reportHeader,
             Item_Parent: itemParent,
 
-            Item_ID: reportItem.Item_ID,
+            Item_ID: formatItemID(reportItem.Item_ID),
             Publication_Date: reportItem.Publication_Date,
             Publisher_ID: reportItem.Publisher_ID,
 
@@ -96,14 +130,6 @@ module.exports = function prepareC51Transformer(report) {
             Authors: reportItem.Authors,
             Article_Version: reportItem.Article_Version,
           };
-
-          let identifiers = [];
-          if (isRecord(baseItem.Item_ID)) {
-            // Extract item identifiers
-            identifiers = Object.entries(baseItem.Item_ID)
-              .map(([key, value]) => `${key}:${value}`)
-              .sort();
-          }
 
           const attributes = Array.isArray(reportItem?.Attribute_Performance)
             ? reportItem.Attribute_Performance
@@ -140,7 +166,7 @@ module.exports = function prepareC51Transformer(report) {
 
               // eslint-disable-next-line no-restricted-syntax
               for (const [instanceDate, instance] of instances) {
-              // eslint-disable-next-line no-continue
+                // eslint-disable-next-line no-continue
                 if (!instanceDate) { continue; }
 
                 const date = new Date(instanceDate);
@@ -156,7 +182,6 @@ module.exports = function prepareC51Transformer(report) {
                       item.YOP,
                       item.Access_Method,
                       item.Access_Type,
-                      item.Section_Type,
                       item.Data_Type,
                       item.Platform,
                       item.Publisher,

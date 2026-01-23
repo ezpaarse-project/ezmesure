@@ -14,3 +14,9 @@ export const featureScopes = [
   'reporting',
   'api-keys',
 ];
+
+export const presetScopes = [
+  ...featureScopes,
+  'repositories',
+  'spaces',
+];

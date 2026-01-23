@@ -10,7 +10,7 @@ const { upsertUser } = require('../../elastic/users');
 
 /**
  * @typedef {import('../../promises').ThrottledPromisesResult} ThrottledPromisesResult
- * @typedef {import('@prisma/client').ApiKey} ApiKey
+ * @typedef {import('../../.prisma/client.mjs').ApiKey} ApiKey
  * @typedef {import('@elastic/elasticsearch').estypes.SecurityUser} ElasticUser
  */
 

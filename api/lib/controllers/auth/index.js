@@ -1,16 +1,21 @@
 const router = require('koa-joi-router')();
+const { Joi } = require('koa-joi-router');
+const { bodyParser } = require('@koa/bodyparser');
 
 const { requireJwt, requireUser } = require('../../services/auth');
+
+const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
 
 const {
   standardMembershipsQueryParams,
   standardElasticRolesQueryParams,
-
   getCurrentUser,
   getCurrentUserAppToken,
   getCurrentUserReportingToken,
   getCurrentUserMemberships,
   getCurrentUserElasticRoles,
+  deleteCurrentUser,
+  changeExcludeNotifications,
 } = require('./actions');
 
 // Sub routes
@@ -34,6 +39,14 @@ router.route({
   path: '/',
   handler: [
     getCurrentUser,
+  ],
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/',
+  handler: [
+    deleteCurrentUser,
   ],
 });
 
@@ -70,6 +83,21 @@ router.route({
   handler: getCurrentUserElasticRoles,
   validate: {
     query: standardElasticRolesQueryParams.manyValidation,
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/excludeNotifications',
+  handler: [
+    bodyParser(),
+    changeExcludeNotifications,
+  ],
+  validate: {
+    type: 'json',
+    body: Joi.array().items(
+      Joi.string().valid(...NOTIFICATION_KEYS),
+    ),
   },
 });
 

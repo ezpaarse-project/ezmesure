@@ -5,7 +5,7 @@ const { appLogger } = require('../../services/logger');
 const { client: prisma } = require('../../services/prisma');
 
 /**
- * @typedef {import('@prisma/client').ApiKey} ApiKey
+ * @typedef {import('../../.prisma/client.mjs').ApiKey} ApiKey
  */
 
 /**

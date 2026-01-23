@@ -6,7 +6,7 @@ const {
   startUpdateEndpointAlerts,
   getUpdateHarvestButUnsupportedAlerts,
   startUpdateHarvestButUnsupportedAlerts,
-} = require('../../services/sushi-alerts');
+} = require('../../services/crons/sushi-alerts');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 

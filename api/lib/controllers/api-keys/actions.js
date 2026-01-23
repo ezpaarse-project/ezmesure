@@ -11,11 +11,11 @@ const { prepareStandardQueryParams } = require('../../services/std-query');
 /**
  * @typedef {import('koa').Context} KoaContext
  *
- * @typedef {import('@prisma/client').Prisma.ApiKeyCreateInput} ApiKeyCreateInput
- * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionCreateInput} ApiKeyRepositoryPermissionCreateInput
- * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryAliasPermissionCreateInput} ApiKeyRepositoryAliasPermissionCreateInput
- * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionCreateOrConnectWithoutApiKeyInput} ApiKeyRepositoryPermissionCreateOrConnectWithoutApiKeyInput
- * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryAliasPermissionCreateOrConnectWithoutApiKeyInput} ApiKeyRepositoryAliasPermissionCreateOrConnectWithoutApiKeyInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyCreateInput} ApiKeyCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionCreateInput} ApiKeyRepositoryPermissionCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryAliasPermissionCreateInput} ApiKeyRepositoryAliasPermissionCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionCreateOrConnectWithoutApiKeyInput} ApiKeyRepositoryPermissionCreateOrConnectWithoutApiKeyInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryAliasPermissionCreateOrConnectWithoutApiKeyInput} ApiKeyRepositoryAliasPermissionCreateOrConnectWithoutApiKeyInput
  */
 /* eslint-enable max-len */
 

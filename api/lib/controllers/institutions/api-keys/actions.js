@@ -12,11 +12,11 @@ const { prepareStandardQueryParams } = require('../../../services/std-query');
 /**
  * @typedef {import('koa').Context} KoaContext
  *
- * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
- * @typedef {import('@prisma/client').RepositoryAliasPermission} RepositoryAliasPermission
- * @typedef {import('@prisma/client').Prisma.ApiKeyCreateInput} ApiKeyCreateInput
- * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryPermissionCreateInput} ApiKeyRepositoryPermissionCreateInput
- * @typedef {import('@prisma/client').Prisma.ApiKeyRepositoryAliasPermissionCreateInput} ApiKeyRepositoryAliasPermissionCreateInput
+ * @typedef {import('../../.prisma/client.mjs').RepositoryPermission} RepositoryPermission
+ * @typedef {import('../../.prisma/client.mjs').RepositoryAliasPermission} RepositoryAliasPermission
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyCreateInput} ApiKeyCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryPermissionCreateInput} ApiKeyRepositoryPermissionCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.ApiKeyRepositoryAliasPermissionCreateInput} ApiKeyRepositoryAliasPermissionCreateInput
  */
 /* eslint-enable max-len */
 

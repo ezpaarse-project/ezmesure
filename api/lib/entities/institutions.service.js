@@ -192,14 +192,6 @@ module.exports = class InstitutionsService extends BasePrismaService {
   }
 
   /**
-   * @param {string} institutionId
-   * @returns
-   */
-  getContacts(institutionId) {
-    return institutionsPrisma.getContacts(institutionId, this.prisma);
-  }
-
-  /**
    * Get institutions matching given conditions
    * @param {Filter[] | JsonValue[]} conditions
    * @returns {Promise<Institution[]>}

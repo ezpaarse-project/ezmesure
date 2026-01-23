@@ -1,12 +1,10 @@
 // @ts-check
 const { appLogger } = require('../logger');
 
-const {
-  syncRepositories,
-  syncRepositoryAliases,
-  syncUsers,
-  syncApiKeys,
-} = require('./elastic');
+const { syncRepositories } = require('./elastic/repositories');
+const { syncRepositoryAliases } = require('./elastic/alias');
+const { syncUsers } = require('./elastic/users');
+const { syncApiKeys } = require('./elastic/api-keys');
 
 const {
   syncSpaces,

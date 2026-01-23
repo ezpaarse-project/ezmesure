@@ -1,18 +1,47 @@
 <template>
   <div>
-    <SkeletonPageBar :title="$t('menu.credentials')" />
+    <SkeletonPageBar :title="$t('menu.myspace.credentials')" />
 
     <v-container>
       <v-row>
         <v-col>
           <v-card :title="$t('myspace.title')">
             <template #append>
-              <v-btn :href="refreshProfileURL" variant="text">
-                <v-icon left>
-                  mdi-refresh
-                </v-icon>
-                {{ $t('refreshShib') }}
-              </v-btn>
+              <v-btn
+                v-if="oidcProfileUri"
+                :text="$t('myspace.iamAccount')"
+                :href="oidcProfileUri"
+                target="_blank"
+                rel="noopener noreferrer"
+                prepend-icon="mdi-key"
+                append-icon="mdi-open-in-new"
+                color="primary"
+                variant="tonal"
+                class="mr-2"
+              />
+
+              <ConfirmPopover
+                :agree="() => deleteAccount()"
+                :text="$t('myspace.profile.actions.delete.confirm.text', { duration: deleteDuration })"
+                max-width="600"
+              >
+                <template #activator="{ props: confirm }">
+                  <v-btn
+                    :text="$t('myspace.profile.actions.delete.title')"
+                    prepend-icon="mdi-delete"
+                    color="red"
+                    variant="text"
+                    v-bind="confirm"
+                  />
+                </template>
+              </ConfirmPopover>
+
+              <v-btn
+                :text="$t('refreshShib')"
+                :href="refreshProfileURL"
+                prepend-icon="mdi-refresh"
+                variant="text"
+              />
             </template>
 
             <template #text>
@@ -306,6 +335,7 @@
 
 <script setup>
 import { isAfter } from 'date-fns';
+import { millisecondsInDay } from 'date-fns/constants';
 
 import { getErrorMessage } from '@/lib/errors';
 
@@ -314,13 +344,11 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms'],
 });
 
+const { oidcProfileUri } = useRuntimeConfig().public;
+const { data: apiConfig } = await useApiConfig();
+const { data: user, signOut } = useAuth();
 const { t, locale } = useI18n();
-const { data: user } = useAuthState();
-const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
-const snacks = useSnacksStore();
 
-const showToken = shallowRef(false);
 const selectedKeys = ref([]);
 const apiKeyActiveLoadingMap = ref(new Map());
 
@@ -360,6 +388,11 @@ const {
   async: {
     deep: true,
   },
+});
+
+const deleteDuration = computed(() => {
+  const deleteDurationDays = apiConfig?.value?.users?.deleteDurationDays;
+  return timeAgo(deleteDurationDays * millisecondsInDay, locale.value) ?? '...';
 });
 
 const refreshProfileURL = computed(() => {
@@ -542,5 +575,18 @@ async function copyKeyId({ id }) {
     return;
   }
   snacks.info(t('clipboard.textCopied'));
+}
+
+async function deleteAccount() {
+  await $fetch('/api/profile', {
+    method: 'DELETE',
+  });
+
+  if (!config.shibbolethDisabled) {
+    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
+    return;
+  }
+
+  await signOut({ callbackUrl: '/' });
 }
 </script>

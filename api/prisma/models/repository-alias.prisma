@@ -1,53 +1,54 @@
 /// A repository alias template (used to generate repository aliases)
 model RepositoryAliasTemplate {
   /// ID
-  id         String            @id
+  id                String                            @id
   /// Creation date
-  createdAt  DateTime          @default(now())
+  createdAt         DateTime                          @default(now())
   /// Latest update date
-  updatedAt  DateTime          @updatedAt
+  updatedAt         DateTime                          @updatedAt
   /// The alias pattern (ex: x-alias-istex-{id}-ezpaarse)
-  pattern    String
+  pattern           String
   /// The repository's pattern targeted by alias
-  target     String
+  target            String
   /// Whether the template is active or not
-  active     Boolean           @default(true)
+  active            Boolean                           @default(true)
   /// The repository
-  repository Repository        @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  repository        Repository                        @relation(fields: [target], references: [pattern], onDelete: Cascade)
   /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
-  filters    Json[]
+  filters           Json[]
   /// Conditions for creating a new alias (format: [{ "field": "foo", "value": "bar" }])
-  conditions Json[]
+  conditions        Json[]
   /// The aliases that were generated with this template
-  aliases    RepositoryAlias[]
+  aliases           RepositoryAlias[]
   /// Permissions granted by api keys for this alias
-  apiKeyPermissions      ApiKeyRepositoryAliasPermission[]
+  apiKeyPermissions ApiKeyRepositoryAliasPermission[]
 }
 
 /// A repository alias (alias for a section of elasticsearch)
 model RepositoryAlias {
   /// ID of the template
-  templateId             String?
+  templateId                      String?
   /// The template of the alias
-  template               RepositoryAliasTemplate?               @relation(fields: [templateId], onUpdate: Cascade, onDelete: Cascade, references: [id])
+  template                        RepositoryAliasTemplate?               @relation(fields: [templateId], onUpdate: Cascade, onDelete: Cascade, references: [id])
   /// The institution this repository is associated to
-  institutions           Institution[]
+  institutions                    Institution[]
   /// Creation date
-  createdAt              DateTime                               @default(now())
+  createdAt                       DateTime                               @default(now())
   /// Latest update date
-  updatedAt              DateTime                               @updatedAt
+  updatedAt                       DateTime                               @updatedAt
   /// The alias pattern (ex: b-bibcnrs)
-  pattern                String                                 @id
+  pattern                         String                                 @id
   /// The repository's pattern targeted by alias
-  target                 String
+  target                          String
   /// The repository
-  repository             Repository                             @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  repository                      Repository                             @relation(fields: [target], references: [pattern], onDelete: Cascade)
   /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
-  filters                Json?
+  filters                         Json?
   /// Member permissions associated to this alias
-  permissions            RepositoryAliasPermission[]
+  permissions                     RepositoryAliasPermission[]
   /// Permissions granted by role for this alias
-  elasticRolePermissions ElasticRoleRepositoryAliasPermission[]
+  elasticRolePermissions          ElasticRoleRepositoryAliasPermission[]
+  ApiKeyRepositoryAliasPermission ApiKeyRepositoryAliasPermission[]
 }
 
 /// A alias permission (access rights of a member for a specific alias)

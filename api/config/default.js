@@ -134,6 +134,12 @@ module.exports = {
       },
     },
   },
+  users: {
+    clean: {
+      schedule: '0 0 0 * * *',
+    },
+    deleteDurationDays: 7,
+  },
   testUsers: {
     lifespan: {
       max: 24 * 60,
@@ -145,10 +151,9 @@ module.exports = {
   },
   notifications: {
     sender: 'ezMESURE',
+    replyTo: '',
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,
-    recipients: ['exemple@exemple.fr'],
-    supportRecipients: ['ezcounter-support@exemple.fr'],
   },
   depositors: {
     index: 'depositors',

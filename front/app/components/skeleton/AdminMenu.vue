@@ -2,13 +2,13 @@
   <v-navigation-drawer v-model="isOpen" color="grey-lighten-3" width="300">
     <v-list density="compact" class="text-grey-darken-3 pa-0">
       <v-list-item
-        :title="$t('menu.institutions')"
+        :title="$t('menu.admin.institutions')"
         to="/admin/institutions"
         prepend-icon="mdi-domain"
       />
 
       <v-list-item
-        :title="$t('menu.repositories')"
+        :title="$t('menu.admin.repositories')"
         to="/admin/repositories"
         prepend-icon="mdi-database"
       />
@@ -16,63 +16,69 @@
       <v-list-group value="aliases">
         <template #activator="{ props }">
           <v-list-item
-            :title="$t('menu.repositoryAliases.group')"
+            :title="$t('menu.admin.repositoryAliases.title')"
             prepend-icon="mdi-database-eye"
             v-bind="props"
           />
         </template>
 
         <v-list-item
-          :title="$t('menu.repositoryAliases.aliases')"
+          :title="$t('menu.admin.repositoryAliases.entries.aliases')"
           to="/admin/repository-aliases"
           prepend-icon="mdi-database-eye"
         />
 
         <v-list-item
-          :title="$t('menu.repositoryAliases.templates')"
+          :title="$t('menu.admin.repositoryAliases.entries.templates')"
           to="/admin/repository-aliases/templates"
           prepend-icon="mdi-view-grid"
         />
 
         <v-list-item
-          :title="$t('menu.repositoryAliases.orphans')"
+          :title="$t('menu.admin.repositoryAliases.entries.orphans')"
           to="/admin/repository-aliases/orphans"
           prepend-icon="mdi-bell-outline"
         />
       </v-list-group>
 
       <v-list-item
-        :title="$t('menu.spaces')"
+        :title="$t('menu.admin.spaces')"
         to="/admin/spaces"
         prepend-icon="mdi-tab"
       />
 
       <v-list-item
-        :title="$t('menu.users')"
+        :title="$t('menu.admin.users')"
         to="/admin/users"
         prepend-icon="mdi-account-multiple"
       />
 
       <v-list-item
-        :title="$t('menu.shares')"
+        :title="$t('menu.admin.roles')"
+        to="/admin/roles"
+        prepend-icon="mdi-account-group"
+      />
+
+      <v-list-item
+        :title="$t('menu.admin.shares')"
         to="/admin/elastic-roles"
         prepend-icon="mdi-account-tag"
       />
 
       <v-list-item
-        :title="$t('menu.api-keys')"
+        :title="$t('menu.admin.api-keys')"
         to="/admin/api-keys"
         prepend-icon="mdi-lock-open"
       />
 
       <v-list-item
-        :title="$t('menu.sushiEndpoints')"
+        :title="$t('menu.admin.sushiEndpoints')"
         to="/admin/endpoints"
         prepend-icon="mdi-api"
       />
 
       <v-list-item
-        :title="$t('menu.customFields')"
+        :title="$t('menu.admin.customFields')"
         to="/admin/custom-fields"
         prepend-icon="mdi-tag-outline"
       />
@@ -80,28 +86,28 @@
       <v-list-group value="harvests">
         <template #activator="{ props }">
           <v-list-item
-            :title="$t('menu.harvest.group')"
+            :title="$t('menu.admin.harvest.title')"
             prepend-icon="mdi-tractor"
             v-bind="props"
           />
         </template>
 
         <v-list-item
-          :title="$t('menu.harvest.institutions')"
+          :title="$t('menu.admin.harvest.entries.institutions')"
           to="/admin/harvests/institutions"
           prepend-icon="mdi-domain"
           exact
         />
 
         <v-list-item
-          :title="$t('menu.harvest.sessions')"
+          :title="$t('menu.admin.harvest.entries.sessions')"
           to="/admin/harvests"
           prepend-icon="mdi-file-tree"
           exact
         />
 
         <v-list-item
-          :title="$t('menu.harvest.alerts')"
+          :title="$t('menu.admin.harvest.entries.alerts')"
           to="/admin/harvests/alerts"
           prepend-icon="mdi-bell-outline"
         />
@@ -110,7 +116,7 @@
       <v-list-group value="ezREEPORT">
         <template #activator="{ props }">
           <v-list-item
-            :title="$t('menu.adminReport')"
+            :title="$t('menu.admin.report')"
             prepend-icon="mdi-file-chart-outline"
             v-bind="props"
           />
@@ -148,14 +154,14 @@
       </v-list-group>
 
       <v-list-item
-        :title="$t('menu.sync')"
+        :title="$t('menu.admin.sync')"
         to="/admin/sync"
         prepend-icon="mdi-sync"
       />
 
       <v-list-item
-        v-tooltip="$t('menu.actions.tooltip')"
-        :title="$t('menu.actions.title')"
+        v-tooltip="$t('menu.admin.actions.tooltip')"
+        :title="$t('menu.admin.actions.title')"
         to="/admin/actions"
         prepend-icon="mdi-history"
       >
@@ -165,7 +171,7 @@
       </v-list-item>
 
       <v-list-item
-        :title="$t('menu.activity')"
+        :title="$t('menu.admin.activity')"
         to="/admin/activity"
         prepend-icon="mdi-history"
       />

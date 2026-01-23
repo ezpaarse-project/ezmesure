@@ -12,7 +12,7 @@ const {
  */
 const schema = {
   id: Joi.string().trim(),
-  deletedAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 

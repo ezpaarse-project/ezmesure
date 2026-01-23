@@ -1,0 +1,30 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>La suppression de votre compte est maintenant effective</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Cher·e utilisateur·ice,</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      <p>
+        Conformément à votre demande, vos données utilisateur liées à ezMESURE ont bien été supprimées.
+      </p>
+    </mj-text>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

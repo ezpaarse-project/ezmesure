@@ -180,17 +180,23 @@
     >
       <template #actions>
         <v-list-item
-          :title="$t('delete')"
-          prepend-icon="mdi-delete"
-          @click="deleteInstitutions()"
+          :title="$t('users.createMailUserList', 2)"
+          prepend-icon="mdi-email-multiple"
+          @click="copyMailList()"
         />
-
-        <v-divider />
 
         <v-list-item
           :title="$t('institutions.validateSwitch')"
           prepend-icon="mdi-check"
           @click="toggleInstitutions()"
+        />
+
+        <v-divider />
+
+        <v-list-item
+          :title="$t('delete')"
+          prepend-icon="mdi-delete"
+          @click="deleteInstitutions()"
         />
       </template>
     </SelectionMenu>
@@ -219,6 +225,10 @@
       ref="institutionSpacesDialogRef"
       @update:model-value="refresh()"
     />
+
+    <InstitutionEmailsCopyDialog
+      ref="emailsCopyDialogRef"
+    />
   </div>
 </template>
 
@@ -241,6 +251,7 @@ const institutionComponentsDialogRef = useTemplateRef('institutionComponentsDial
 const institutionRepositoriesDialogRef = useTemplateRef('institutionRepositoriesDialogRef');
 const institutionAliasesDialogRef = useTemplateRef('institutionAliasesDialogRef');
 const institutionSpacesDialogRef = useTemplateRef('institutionSpacesDialogRef');
+const emailsCopyDialogRef = useTemplateRef('emailsCopyDialogRef');
 
 const {
   refresh, // Refresh the data
@@ -455,6 +466,18 @@ function toggleInstitutions(items) {
       await refresh();
     },
   });
+}
+
+/**
+ * Put users email into clipboard
+ */
+async function copyMailList(ids) {
+  const toCopy = ids || selectedInstitutions.value.map((i) => i.id);
+  if (toCopy.length <= 0) {
+    return;
+  }
+
+  emailsCopyDialogRef.value.open(toCopy);
 }
 
 /**
