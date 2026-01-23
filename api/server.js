@@ -147,6 +147,9 @@ app.on('error', (err, ctx = {}) => {
 app.use(mount('/', controller));
 
 function start() {
+  metrics.ensureIndex()
+    .catch((err) => appLogger.error(`Couldn't ensure index for metrics: ${err}`));
+
   notifications.startBroadcastCron();
   opendata.startRefreshCron();
   ezreeportSync.startSyncCron();
