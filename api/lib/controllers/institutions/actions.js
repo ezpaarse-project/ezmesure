@@ -6,6 +6,7 @@ const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
 const RolesService = require('../../entities/roles.service');
 
+const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES, EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
@@ -335,6 +336,130 @@ exports.updateInstitutionSushiReady = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = updatedInstitution;
+};
+
+exports.joinInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  const institution = await (new InstitutionsService()).findUnique({
+    where: { id: institutionId },
+    select: {
+      openAccess: true,
+      memberships: {
+        where: { username: user.username },
+        select: { username: true },
+      },
+      spaces: {
+        select: { id: true },
+      },
+      repositories: {
+        select: { pattern: true },
+      },
+      repositoryAliases: {
+        select: { pattern: true },
+      },
+    },
+  });
+
+  if (!institution) {
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
+  }
+  if (institution.memberships.length > 0) {
+    ctx.throw(403, ctx.$t('errors.institution.join.alreadyMember', institution.name));
+  }
+  if (institution.openAccess !== true) {
+    ctx.throw(403, ctx.$t('errors.institution.join.notOpen', institution.name));
+  }
+
+  const selfRegisterRoles = await (new RolesService()).findMany({
+    select: { id: true, permissionsPreset: true },
+    where: {
+      autoAssign: { has: EVENT_TYPES.selfJoinInstitution },
+    },
+  });
+
+  const mergedPreset = mergePresets(
+    selfRegisterRoles.map((role) => role.permissionsPreset),
+    { keepNone: false },
+  );
+
+  await (new MembershipsService()).create({
+    data: {
+      institutionId,
+      username: user.username,
+      roles: {
+        createMany: {
+          data: selfRegisterRoles.map((role) => ({ roleId: role.id })),
+        },
+      },
+      permissions: {
+        set: getPermissionsFromPreset(mergedPreset),
+      },
+      spacePermissions: !mergedPreset.spaces ? undefined : {
+        createMany: {
+          data: institution.spaces.map((space) => ({
+            spaceId: space.id,
+            readonly: mergedPreset.spaces !== 'write',
+          })),
+        },
+      },
+      repositoryPermissions: !mergedPreset.repositories ? undefined : {
+        createMany: {
+          data: institution.repositories.map((repo) => ({
+            repositoryPattern: repo.pattern,
+            readonly: mergedPreset.repositories !== 'write',
+          })),
+        },
+      },
+      repositoryAliasPermissions: !mergedPreset.repositories ? undefined : {
+        createMany: {
+          data: institution.repositoryAliases.map((alias) => ({
+            aliasPattern: alias.pattern,
+          })),
+        },
+      },
+    },
+  });
+
+  ctx.status = 204;
+};
+
+exports.leaveInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  const membership = await (new MembershipsService()).findUnique({
+    where: {
+      username_institutionId: {
+        institutionId,
+        username: user.username,
+      },
+    },
+    select: {
+      locked: true,
+    },
+  });
+
+  if (!membership) {
+    ctx.status = 204;
+    return;
+  }
+
+  if (membership?.locked) {
+    ctx.throw(403, ctx.$t('errors.institution.leave.locked'));
+  }
+
+  await (new MembershipsService()).delete({
+    where: {
+      username_institutionId: {
+        institutionId,
+        username: user.username,
+      },
+    },
+  });
+
+  ctx.status = 204;
 };
 
 exports.importInstitutions = async (ctx) => {
