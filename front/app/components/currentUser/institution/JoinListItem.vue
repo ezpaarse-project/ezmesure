@@ -55,6 +55,15 @@
               <template #prepend>
                 <InstitutionAvatar :institution="item" />
               </template>
+
+              <template v-if="item.openAccess" #append>
+                <v-chip
+                  :text="$t('institutions.institution.openAccess.title')"
+                  prepend-icon="mdi-lock-open-outline"
+                  color="success"
+                  size="small"
+                />
+              </template>
             </v-list-item>
           </template>
         </v-autocomplete>
@@ -68,6 +77,7 @@ defineEmits({
   'click:create': () => true,
 });
 
+const { fetchMemberships } = useCurrentUserStore();
 const { memberships } = storeToRefs(useCurrentUserStore());
 const { t } = useI18n();
 const { openConfirm } = useConfirmStore();
@@ -90,7 +100,29 @@ const {
 
 const membershipIds = computed(() => new Set(memberships.value.map((m) => m.institutionId)));
 
+async function joinOpenInstitution(institution) {
+  await openConfirm({
+    text: `${t('institutions.joinInstitution', { institution: institution.name })} ${t('institutions.joinInstitutionOpen')}`,
+    agreeText: t('institutions.join'),
+    onAgree: async () => {
+      try {
+        await $fetch(`/api/institutions/${institution.id}/_join`, { method: 'POST' });
+        await fetchMemberships();
+        snacks.info(t('institutions.joinSuccess'));
+        isOpen.value = false;
+      } catch (err) {
+        snacks.error(t('anErrorOccurred'), err);
+      }
+    },
+  });
+}
+
 async function askToJoinAnInstitution(institution) {
+  if (institution.openAccess) {
+    await joinOpenInstitution(institution);
+    return;
+  }
+
   await openConfirm({
     text: `${t('institutions.joinInstitution', { institution: institution.name })} ${t('institutions.joinInstitutionEmail')}`,
     agreeText: t('yes'),

@@ -374,8 +374,11 @@ institutions:
   sendMailToJoin: Un message sera envoyé aux contact de l'établissement pour les prévenir.
   askToJoinAnInstitution: Rejoindre un établissement
   searchForInstitution: Rechercher votre établissement
+  join: Rejoindre
+  joinSuccess: Vous avez rejoint l'établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
   joinInstitutionEmail: Un email sera envoyé aux contacts de cet établissement afin qu'ils puissent vous ajouter.
+  joinInstitutionOpen: L'accès à cet établissement est libre, votre adhésion prendra effet immédiatement.
   createMailContactList: Copier les adresses mails des contacts
   modify: Modifier mon établissement
   reports:

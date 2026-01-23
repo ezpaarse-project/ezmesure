@@ -370,8 +370,11 @@ institutions:
   sendMailToJoin: An email has been sent to the institution's contacts
   askToJoinAnInstitution: Join an institution
   searchForInstitution: Look for your institution
+  join: Join
+  joinSuccess: You have joined the institution
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the contacts of this institution to let them know.
+  joinInstitutionOpen: This institution is open to self registration, your membership will take effect immediately.
   createMailContactList: Copy the emails of the contacts
   modify: Modify my institution
   reports:
