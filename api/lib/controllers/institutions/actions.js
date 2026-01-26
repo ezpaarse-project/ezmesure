@@ -348,7 +348,6 @@ exports.joinInstitution = async (ctx) => {
       openAccess: true,
       memberships: {
         where: { username: user.username },
-        select: { username: true },
       },
       spaces: {
         select: { id: true },
@@ -366,7 +365,9 @@ exports.joinInstitution = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.institution.notFound'));
   }
   if (institution.memberships.length > 0) {
-    ctx.throw(403, ctx.$t('errors.institution.join.alreadyMember', institution.name));
+    ctx.status = 200;
+    ctx.body = institution.memberships.at(0);
+    return;
   }
   if (institution.openAccess !== true) {
     ctx.throw(403, ctx.$t('errors.institution.join.notOpen', institution.name));
@@ -384,7 +385,8 @@ exports.joinInstitution = async (ctx) => {
     { keepNone: false },
   );
 
-  await (new MembershipsService()).create({
+  ctx.status = 201;
+  ctx.body = await (new MembershipsService()).create({
     data: {
       institutionId,
       username: user.username,
@@ -421,8 +423,6 @@ exports.joinInstitution = async (ctx) => {
       },
     },
   });
-
-  ctx.status = 204;
 };
 
 exports.leaveInstitution = async (ctx) => {
