@@ -48,7 +48,7 @@
                     <RolePicker
                       :model-value="roleIds"
                       :disabled-items="rolesBeingSaved"
-                      :hide-restricted="!user.value?.isAdmin"
+                      :hide-restricted="!user?.isAdmin"
                       :loading="rolesBeingSaved.size > 0"
                       min-width="400"
                       @click:select="onRoleSelected($event)"
