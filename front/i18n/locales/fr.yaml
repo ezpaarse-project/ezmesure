@@ -374,8 +374,15 @@ institutions:
   sendMailToJoin: Un message sera envoyé aux contact de l'établissement pour les prévenir.
   askToJoinAnInstitution: Rejoindre un établissement
   searchForInstitution: Rechercher votre établissement
+  join: Rejoindre
+  joinSuccess: Vous avez rejoint l'établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
   joinInstitutionEmail: Un email sera envoyé aux contacts de cet établissement afin qu'ils puissent vous ajouter.
+  joinInstitutionOpen: L'accès à cet établissement est libre, votre adhésion prendra effet immédiatement.
+  leave: Quitter
+  leaveSuccess: Vous avez quité l'établissement
+  leaveInstitution: Quitter cet établissement
+  leaveInstitutionConfirm: Vous êtes sur le point de quitter {institution}. Vous n'aurez plus accès aux données de cet établissement.
   createMailContactList: Copier les adresses mails des contacts
   modify: Modifier mon établissement
   reports:
@@ -431,7 +438,10 @@ institutions:
     hidePartner: Ne pas afficher comme partenaire
     onboarding:
       title: Établissement "bienvenue"
-      description: Cet établissement sera ajouté à tout nouvel utilisateur d'ezMESURE, et sera retiré dès que cet utilisateur rejoindra un autre établissement.
+      description: Les nouveaux utilisateurs seront automatiquement ajoutés dans cet établissement.
+    openAccess:
+      title: Accès libre
+      description: Les utilisateurs peuvent rejoindre librement l'établissement.
     failedToUpdateValidation: Impossible de mettre à jour la validation
     attachedDomains: Domaines rattachés
     noAttachedDomains: Il n'y a pas de domaine rattaché à cet établissement pour le moment.

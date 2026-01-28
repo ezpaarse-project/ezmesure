@@ -22,6 +22,8 @@ const {
   updateInstitution,
   updateInstitutionSushiReady,
   harvestableInstitutions,
+  joinInstitution,
+  leaveInstitution,
 } = require('./actions');
 
 const memberships = require('./memberships');
@@ -72,6 +74,18 @@ router.route({
       harvestedMonth: Joi.string(),
     },
   },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_join',
+  handler: joinInstitution,
+});
+
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_leave',
+  handler: leaveInstitution,
 });
 
 router.route({
