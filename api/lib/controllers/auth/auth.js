@@ -30,7 +30,7 @@ const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
-const { deleteDurationDays } = config.get('users');
+const { deleteDurationDays = 7 } = config.get('users');
 
 const resetPasswordSecret = `${secret}_password_reset`;
 

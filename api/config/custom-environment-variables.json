@@ -121,7 +121,10 @@
     "clean": {
       "schedule": "EZMESURE_USERS_CLEAN_SCHEDULE"
     },
-    "deleteDurationDays": "EZMESURE_USERS_DELETE_DURATION_DAYS"
+    "deleteDurationDays": {
+      "__name": "EZMESURE_USERS_DELETE_DURATION_DAYS",
+      "__format": "number"
+    }
   },
   "testUsers": {
     "lifespan": {

@@ -21,7 +21,7 @@ exports.standardQueryParams = standardQueryParams;
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
-const { deleteDurationDays } = config.get('users');
+const { deleteDurationDays = 7 } = config.get('users');
 
 function generateToken(user) {
   if (!user) { return null; }
