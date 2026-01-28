@@ -5,7 +5,12 @@ const parse = require('co-busboy');
 const zlib = require('zlib');
 const config = require('config');
 
-const { isValid: dateIsValid, format: formatDate, formatISO: formatDateISO } = require('date-fns');
+const {
+  isValid: dateIsValid,
+  format: formatDate,
+  formatISO: formatDateISO,
+  parseISO: parseDateISO,
+} = require('date-fns');
 
 const validator = require('../../services/validator');
 const elastic = require('../../services/elastic');
@@ -400,8 +405,8 @@ module.exports = async function upload(ctx) {
     }
 
     // Resoling min and max dates
-    metadata.minDate = Math.min(result.metadata.minDate, new Date(metadata.minDate));
-    metadata.maxDate = Math.max(result.metadata.maxDate, new Date(metadata.maxDate));
+    metadata.minDate = Math.min(parseDateISO(result.metadata.minDate), metadata.minDate);
+    metadata.maxDate = Math.max(parseDateISO(result.metadata.maxDate), metadata.maxDate);
 
     total += result.total;
     inserted += result.inserted;
