@@ -48,7 +48,7 @@
                     <RolePicker
                       :model-value="roleIds"
                       :disabled-items="rolesBeingSaved"
-                      :hide-restricted="!user.value?.isAdmin"
+                      :hide-restricted="!user?.isAdmin"
                       :loading="rolesBeingSaved.size > 0"
                       min-width="400"
                       @click:select="onRoleSelected($event)"
@@ -78,7 +78,7 @@
 
                     <template v-if="canEdit" #append>
                       <v-btn
-                        v-if="user.isAdmin || !role.restricted"
+                        v-if="user.isAdmin || (canEdit && !role.restricted)"
                         :prepend-icon="$vuetify.display.smAndUp ? 'mdi-close' : undefined"
                         :icon="$vuetify.display.xs ? 'mdi-close' : undefined"
                         density="default"
