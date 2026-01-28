@@ -429,7 +429,9 @@ exports.leaveInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
   const { user } = ctx.state;
 
-  const membership = await (new MembershipsService()).findUnique({
+  const memberships = new MembershipsService();
+
+  const membership = await memberships.findUnique({
     where: {
       username_institutionId: {
         institutionId,
@@ -450,7 +452,7 @@ exports.leaveInstitution = async (ctx) => {
     ctx.throw(403, ctx.$t('errors.institution.leave.locked'));
   }
 
-  await (new MembershipsService()).delete({
+  await memberships.delete({
     where: {
       username_institutionId: {
         institutionId,
