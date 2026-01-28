@@ -454,7 +454,7 @@ exports.deleteUser = async (ctx) => {
       bcc: admins,
       subject: 'Votre demande de suppression à bien été prise en compte',
       ...generateMail('user-deletion-requested', {
-        deletedAt: format(deletedAt, 'PPPp', { locale: fr }),
+        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
         isFromUser: true,
       }),
     });

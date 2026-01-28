@@ -1,7 +1,7 @@
 // @ts-check
 const { CronJob } = require('cron');
 const config = require('config');
-const { isAfter, isValid, startOfDay } = require('date-fns');
+const { isValid, startOfDay } = require('date-fns');
 
 const { getNotificationRecipients } = require('../../utils/notifications');
 const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
@@ -18,8 +18,7 @@ const { sendMail, generateMail } = require('../mail');
 const clean = config.get('users.clean');
 
 async function deleteMarkedUsers() {
-  // Removing 1ms to include the users that should be deleted on the same day
-  const date = startOfDay(new Date()).getTime() - 1;
+  const date = startOfDay(new Date()).getTime();
 
   appLogger.verbose('[user-deletion] Checking for users to delete...');
 
@@ -32,7 +31,7 @@ async function deleteMarkedUsers() {
     /** @type {(Promise<User | Error> | undefined)[]} */
     const promises = usersToDelete.map((user) => {
       const hasExpired = user.deletedAt && isValid(user.deletedAt)
-        ? isAfter(startOfDay(user.deletedAt), date)
+        ? startOfDay(user.deletedAt).getTime() <= date
         : undefined;
 
       if (hasExpired) {
