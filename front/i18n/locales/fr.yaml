@@ -84,7 +84,7 @@ myspace:
           text: Votre compte et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion annulera cette suppression. Souhaitez-vous continuer ?
   settings:
     notifications:
-      title: Mes notifications
+      title: Mes notifications mail
       description:
         text: Sélectionnez les notifications que vous souhaitez recevoir. Ces notifications vous seront envoyées par mail à l'adresse liée à votre compte. Vous pouvez consulter cette adresse dans votre espace "{credentialsLink}".
         parts:
