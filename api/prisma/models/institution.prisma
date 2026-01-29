@@ -38,6 +38,8 @@ model Institution {
   sushiReadySince     DateTime?
   /// Is a onboarding institution (will be added for new users and removed when a membership is created)
   onboarding          Boolean               @default(false)
+  /// Whether users can freely join an institution or not
+  openAccess          Boolean               @default(false)
   /// Institution members
   memberships         Membership[]
   /// Additional roles to give to each member
