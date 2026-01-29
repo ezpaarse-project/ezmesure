@@ -178,7 +178,7 @@ const emit = defineEmits({
 const { t, locale } = useI18n();
 const snacks = useSnacksStore();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 
 const isCredentialsMenuOpen = shallowRef(false);
 const isReportsMenuOpen = shallowRef(false);

@@ -178,7 +178,7 @@ const { t } = useI18n();
 const { data: user } = useAuthState();
 const { hasPermission } = useCurrentUserStore();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedMembers = ref([]);
