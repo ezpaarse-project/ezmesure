@@ -84,7 +84,7 @@ myspace:
           text: Your account and all related data will be deleted in {duration}. Any attempt to log in will cancel this deletion. Do you wish to continue?
   settings:
     notifications:
-      title: My notifications
+      title: My mail notifications
       description:
         text: Select which notifications you want to receive. These notifications will be sent to you by email to the address linked to your account. You can check this address in your "{credentialsLink}" area.
         parts:

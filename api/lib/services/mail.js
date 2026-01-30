@@ -25,7 +25,7 @@ const images = fs.readdirSync(imagesDir);
  */
 module.exports.sendMail = (mailOptions) => {
   const options = {
-    sender: notifications.sender,
+    from: notifications.sender,
     replyTo: notifications.replyTo || undefined,
     attachments: [],
     ...mailOptions,
