@@ -1,12 +1,19 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { add } = require('date-fns');
+const { add, format } = require('date-fns');
+const { fr } = require('date-fns/locale');
+
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
+const { appLogger } = require('../../services/logger');
+const { sendMail, generateMail } = require('../../services/mail');
 
 const UsersService = require('../../entities/users.service');
-const { sendActivateUserMail } = require('../auth/mail');
-const { appLogger } = require('../../services/logger');
-const { activateUserLink } = require('../auth/password');
 const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
+
+const { sendActivateUserMail } = require('../auth/mail');
+const { activateUserLink } = require('../auth/password');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');
@@ -298,11 +305,11 @@ exports.deleteUser = async (ctx) => {
   const { force } = ctx.query;
 
   const usersService = new UsersService();
-  const found = !!await usersService.findUnique({ where: { username } });
+  const user = await usersService.findUnique({ where: { username } });
 
-  if (!found) {
+  if (!user) {
     ctx.status = 200;
-    ctx.body = { found };
+    ctx.body = { found: false };
     return;
   }
 
@@ -311,7 +318,7 @@ exports.deleteUser = async (ctx) => {
     appLogger.verbose(`User [${username}] is deleted`);
 
     ctx.status = 200;
-    ctx.body = { found };
+    ctx.body = { found: true };
     return;
   }
 
@@ -324,8 +331,26 @@ exports.deleteUser = async (ctx) => {
 
   appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
 
+  try {
+    const admins = await getNotificationRecipients(
+      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
+      [user.email],
+    );
+
+    await sendMail({
+      to: user.email,
+      bcc: admins,
+      subject: "Un administrateur d'ezMESURE a effectué une action sur votre compte",
+      ...generateMail('user-deletion-requested', {
+        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
+      }),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send mail to ${user.email}: ${err}`);
+  }
+
   ctx.status = 200;
-  ctx.body = { found };
+  ctx.body = { found: true };
 };
 
 exports.impersonateUser = async (ctx) => {

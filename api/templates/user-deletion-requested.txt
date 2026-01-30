@@ -1,8 +1,12 @@
+{% if isFromUser %}
 Votre demande de suppression à bien été prise en compte
+{% else %}
+Un administrateur d'ezMESURE a effectué une action sur votre compte
+{% endif %}
 
 Cher·e utilisateur·ice,
 
-Vous avez demandé la suppression de vos données utilisateur liées à ezMESURE, elle sera effective le {{ deletedAt }}.
+{% if isFromUser %}Vous avez demandé{% else %}Un administrateur d'ezMESURE a programmé{% endif %} la suppression de votre compte sur ezMESURE, elle sera effective le {{ deletedAt }}.
 
 Si vous souhaitez annuler cette opération, il suffit de vous connectez à ezMESURE.
 
