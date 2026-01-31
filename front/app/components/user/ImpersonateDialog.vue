@@ -5,7 +5,7 @@
     @update:model-value="close()"
   >
     <UserImpersonate
-      :user="user"
+      :user="props.user"
       show-user
     >
       <template #actions>
@@ -20,20 +20,17 @@
 </template>
 
 <script setup>
-const isOpen = shallowRef(false);
-/** @type {Ref<object | undefined>} */
-const user = ref(undefined);
+const isOpen = defineModel({ type: Boolean, default: false });
 
-async function open(s) {
-  user.value = s;
-  isOpen.value = true;
-}
+const props = defineProps({
+  user: {
+    type: Object,
+    required: true,
+  },
+});
 
 function close() {
   isOpen.value = false;
 }
 
-defineExpose({
-  open,
-});
 </script>
