@@ -134,7 +134,6 @@ const props = defineProps({
 
 const { data: user } = useAuthState();
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
-const { openConfirm } = useDialogStore();
 const { fetchMemberships } = useCurrentUserStore();
 const { t } = useI18n();
 const snacks = useSnacksStore();
