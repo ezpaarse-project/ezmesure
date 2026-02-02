@@ -94,12 +94,23 @@
       <v-divider class="mt-1 mb-2" />
 
       <v-list density="compact" class="pa-0">
-        <v-list-item
-          :title="$t('institutions.leaveInstitution')"
-          color="primary"
-          prepend-icon="mdi-logout"
-          @click="leaveInstitution()"
-        />
+        <ConfirmPopover
+          :text="$t('institutions.leaveInstitutionConfirm', { institution: props.institution.name })"
+          :agree-text="$t('institutions.leave')"
+          :agree="() => leaveInstitution()"
+          agree-icon="mdi-logout"
+          location="end"
+          max-width="400"
+        >
+          <template #activator="{ props: confirm }">
+            <v-list-item
+              v-bind="confirm"
+              :title="$t('institutions.leaveInstitution')"
+              color="primary"
+              prepend-icon="mdi-logout"
+            />
+          </template>
+        </ConfirmPopover>
       </v-list>
     </v-card-text>
   </v-card>
@@ -153,19 +164,12 @@ const allowedActions = computed(() => {
 });
 
 async function leaveInstitution() {
-  await openConfirm({
-    text: `${t('institutions.leaveInstitutionConfirm', { institution: props.institution.name })}`,
-    agreeText: t('institutions.leave'),
-    agreeIcon: 'mdi-logout',
-    onAgree: async () => {
-      try {
-        await $fetch(`/api/institutions/${props.institution.id}/_leave`, { method: 'POST' });
-        await fetchMemberships();
-        snacks.info(t('institutions.leaveSuccess'));
-      } catch (err) {
-        snacks.error(t('anErrorOccurred'), err);
-      }
-    },
-  });
+  try {
+    await $fetch(`/api/institutions/${props.institution.id}/_leave`, { method: 'POST' });
+    await fetchMemberships();
+    snacks.info(t('institutions.leaveSuccess'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+  }
 }
 </script>
