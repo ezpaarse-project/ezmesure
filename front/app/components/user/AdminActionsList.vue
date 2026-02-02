@@ -48,7 +48,7 @@ import { millisecondsInDay } from 'date-fns/constants';
 import UserFormDialog from '~/components/user/FormDialog.vue';
 import ImpersonateDialog from '~/components/user/ImpersonateDialog.vue';
 
-const { data: apiConfig } = await useApiConfig();
+const { data: apiConfig } = useApiConfig();
 const { openDialog } = useDialogStore();
 const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
