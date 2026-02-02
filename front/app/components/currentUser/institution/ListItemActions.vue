@@ -164,7 +164,7 @@ const allowedActions = computed(() => {
 
 async function leaveInstitution() {
   try {
-    await $fetch(`/api/institutions/${props.institution.id}/_leave`, { method: 'POST' });
+    await $fetch(`/api/profile/memberships/${props.institution.id}`, { method: 'DELETE' });
     await fetchMemberships();
     snacks.info(t('institutions.leaveSuccess'));
   } catch (err) {

@@ -4232,21 +4232,22 @@
         "tags": ["Institutions", "Sushi"]
       }
     },
-    "/institutions/{id}/_join": {
+    "/profile/memberships/{id}": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
           "name": "id",
+          "description": "ID of the institution",
           "in": "path",
           "required": true
         }
       ],
-      "post": {
+      "put": {
         "summary": "Join an institution",
         "description": "Join an institution. The institution must be open to self registrations.",
-        "operationId": "post-institutions-id-join",
+        "operationId": "put-profile-memberships-id",
         "tags": ["Institutions"],
         "security": [
           {
@@ -4284,23 +4285,11 @@
             "description": "Not Found"
           }
         }
-      }
-    },
-    "/institutions/{id}/_leave": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
+      },
+      "delete": {
         "summary": "Leave an institution",
         "description": "Leave an institution.",
-        "operationId": "post-institutions-id-leave",
+        "operationId": "delete-profile-memberships-id-",
         "tags": ["Institutions"],
         "security": [
           {

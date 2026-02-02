@@ -106,7 +106,7 @@ async function joinOpenInstitution(institution) {
     agreeText: t('institutions.join'),
     onAgree: async () => {
       try {
-        await $fetch(`/api/institutions/${institution.id}/_join`, { method: 'POST' });
+        await $fetch(`/api/profile/memberships/${institution.id}`, { method: 'PUT' });
         await fetchMemberships();
         snacks.info(t('institutions.joinSuccess'));
         isOpen.value = false;
