@@ -16,6 +16,8 @@ const {
   changePassword,
   changeExcludeNotifications,
   getMemberships,
+  joinInstitution,
+  leaveInstitution,
   getElasticRoles,
   getReportingToken,
   activate,
@@ -81,6 +83,7 @@ router.route({
 });
 
 router.get('/reporting_token', getReportingToken);
+
 router.route({
   method: 'GET',
   path: '/memberships',
@@ -89,6 +92,19 @@ router.route({
     query: standardMembershipsQueryParams.manyValidation,
   },
 });
+
+router.route({
+  method: 'PUT',
+  path: '/memberships/:institutionId',
+  handler: joinInstitution,
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/memberships/:institutionId',
+  handler: leaveInstitution,
+});
+
 router.route({
   method: 'GET',
   path: '/elastic-roles',

@@ -370,8 +370,15 @@ institutions:
   sendMailToJoin: An email has been sent to the institution's contacts
   askToJoinAnInstitution: Join an institution
   searchForInstitution: Look for your institution
+  join: Join
+  joinSuccess: You have joined the institution
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the contacts of this institution to let them know.
+  joinInstitutionOpen: This institution is open to self registration, your membership will take effect immediately.
+  leave: Leave
+  leaveSuccess: You have left the institution
+  leaveInstitution: Leave this institution
+  leaveInstitutionConfirm: You are about to leave {institution}. You will no longer have access to the data of this institution.
   createMailContactList: Copy the emails of the contacts
   modify: Modify my institution
   reports:
@@ -429,7 +436,10 @@ institutions:
     hidePartner: Do not show as partner
     onboarding:
       title: '"Onboarding" institution'
-      description: This institution will be added to any new user of ezMESURE, and will be removed once this user will join any other institution.
+      description: Any new user of ezMESURE will be added to this institution.
+    openAccess:
+      title: Open access
+      description: Users can freely join the institution.
     failedToUpdateValidation: Failed to update validation
     attachedDomains: Attached domains
     noAttachedDomains: There's no domain attached to this institution yet.
