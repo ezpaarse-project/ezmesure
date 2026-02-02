@@ -9,9 +9,12 @@ const {
 
 const { fr } = require('date-fns/locale');
 
+const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
 const { getNotificationRecipients } = require('../../utils/notifications');
-const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
+const InstitutionsService = require('../../entities/institutions.service');
+const RolesService = require('../../entities/roles.service');
 const UsersService = require('../../entities/users.service');
 const MembershipsService = require('../../entities/memberships.service');
 const ElasticRoleService = require('../../entities/elastic-roles.service');
@@ -495,4 +498,130 @@ exports.getElasticRoles = async (ctx) => {
 exports.logout = async (ctx) => {
   ctx.cookies.set(cookie, null, { httpOnly: true });
   ctx.redirect(decodeURIComponent('/myspace'));
+};
+
+exports.joinInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  const institution = await (new InstitutionsService()).findUnique({
+    where: { id: institutionId },
+    select: {
+      openAccess: true,
+      memberships: {
+        where: { username: user.username },
+      },
+      spaces: {
+        select: { id: true },
+      },
+      repositories: {
+        select: { pattern: true },
+      },
+      repositoryAliases: {
+        select: { pattern: true },
+      },
+    },
+  });
+
+  if (!institution) {
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
+  }
+  if (institution.memberships.length > 0) {
+    ctx.status = 200;
+    ctx.body = institution.memberships.at(0);
+    return;
+  }
+  if (institution.openAccess !== true) {
+    ctx.throw(403, ctx.$t('errors.institution.join.notOpen', institution.name));
+  }
+
+  const selfRegisterRoles = await (new RolesService()).findMany({
+    select: { id: true, permissionsPreset: true },
+    where: {
+      autoAssign: { has: EVENT_TYPES.selfJoinInstitution },
+    },
+  });
+
+  const mergedPreset = mergePresets(
+    selfRegisterRoles.map((role) => role.permissionsPreset),
+    { keepNone: false },
+  );
+
+  ctx.status = 201;
+  ctx.body = await (new MembershipsService()).create({
+    data: {
+      institutionId,
+      username: user.username,
+      roles: {
+        createMany: {
+          data: selfRegisterRoles.map((role) => ({ roleId: role.id })),
+        },
+      },
+      permissions: {
+        set: getPermissionsFromPreset(mergedPreset),
+      },
+      spacePermissions: !mergedPreset.spaces ? undefined : {
+        createMany: {
+          data: institution.spaces.map((space) => ({
+            spaceId: space.id,
+            readonly: mergedPreset.spaces !== 'write',
+          })),
+        },
+      },
+      repositoryPermissions: !mergedPreset.repositories ? undefined : {
+        createMany: {
+          data: institution.repositories.map((repo) => ({
+            repositoryPattern: repo.pattern,
+            readonly: mergedPreset.repositories !== 'write',
+          })),
+        },
+      },
+      repositoryAliasPermissions: !mergedPreset.repositories ? undefined : {
+        createMany: {
+          data: institution.repositoryAliases.map((alias) => ({
+            aliasPattern: alias.pattern,
+          })),
+        },
+      },
+    },
+  });
+};
+
+exports.leaveInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  const memberships = new MembershipsService();
+
+  const membership = await memberships.findUnique({
+    where: {
+      username_institutionId: {
+        institutionId,
+        username: user.username,
+      },
+    },
+    select: {
+      locked: true,
+    },
+  });
+
+  if (!membership) {
+    ctx.status = 204;
+    return;
+  }
+
+  if (membership?.locked) {
+    ctx.throw(403, ctx.$t('errors.institution.leave.locked'));
+  }
+
+  await memberships.delete({
+    where: {
+      username_institutionId: {
+        institutionId,
+        username: user.username,
+      },
+    },
+  });
+
+  ctx.status = 204;
 };

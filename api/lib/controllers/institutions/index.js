@@ -77,18 +77,6 @@ router.route({
 });
 
 router.route({
-  method: 'POST',
-  path: '/:institutionId/_join',
-  handler: joinInstitution,
-});
-
-router.route({
-  method: 'POST',
-  path: '/:institutionId/_leave',
-  handler: leaveInstitution,
-});
-
-router.route({
   method: 'GET',
   path: '/:institutionId',
   handler: getInstitution,
