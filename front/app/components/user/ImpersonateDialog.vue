@@ -5,7 +5,7 @@
     @update:model-value="close()"
   >
     <UserImpersonate
-      :user="props.user"
+      :user="user"
       show-user
     >
       <template #actions>
@@ -22,7 +22,7 @@
 <script setup>
 const isOpen = defineModel({ type: Boolean, default: false });
 
-const props = defineProps({
+defineProps({
   user: {
     type: Object,
     required: true,
