@@ -1,14 +1,7 @@
-import {
-  useFetch,
-  useNuxtApp,
-} from '#imports';
+import { useFetch } from '#imports';
 
 export default function useApiConfig() {
-  const nuxtApp = useNuxtApp();
-
   return useFetch('/api/config', {
-    getCachedData(key) {
-      return nuxtApp.payload.data[key] ?? nuxtApp.static.data[key];
-    },
+    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
   });
 }
