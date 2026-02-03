@@ -80,7 +80,7 @@ defineEmits({
 const { fetchMemberships } = useCurrentUserStore();
 const { memberships } = storeToRefs(useCurrentUserStore());
 const { t } = useI18n();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const isOpen = shallowRef(false);

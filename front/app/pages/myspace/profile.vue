@@ -196,7 +196,7 @@ definePageMeta({
 });
 
 const { public: config } = useRuntimeConfig();
-const { data: apiConfig } = await useApiConfig();
+const { data: apiConfig } = useApiConfig();
 const { data: user, signOut } = useAuth();
 const { openInTab } = useSingleTabLinks('profile');
 const { t, locale } = useI18n();

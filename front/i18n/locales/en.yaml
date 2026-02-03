@@ -1016,17 +1016,30 @@ users:
     disable:
       title: Disable
       confirm:
-        text: The accounts and their related data will be deleted in {duration}. Any attempt to log in from one of the users will cancel his deletion. Do you want to continue ?
+        text: >
+          The account and all related data will be deleted in {duration}. Any attempt to log in from the user will cancel his deletion. Do you want to continue ?
+          |The accounts and their related data will be deleted in {duration}. Any attempt to log in from one of the users will cancel his deletion. Do you want to continue ?
         agree: Disable
       error: An error occured while disabling user {id}
       success: 1 user has been disabled|{n} users has been disabled
     restore:
       title: Restore
       confirm:
-        text: Restoring users will cancel their deletion. Do you want to continue ?
+        text: >
+          Restoring the user will cancel his deletion. Do you want to continue ?
+          |Restoring users will cancel their deletion. Do you want to continue ?
         agree: Restore
       error: An error occured while restoring user {id}
       success: 1 user has been restored|{n} users has been restored
+    delete:
+      title: Delete
+      confirm:
+        text: >
+          You are about to delete the user. The associated indices, spaces and roles will not be affected. Do you want to continue ?
+          |You are about to delete {number} users. The associated indices, spaces and roles will not be affected. Do you want to continue ?
+        agree: Delete
+      error: An error occured while deleting user {id}
+      success: 1 user has been deleted|{n} users has been deleted
 report:
   title: My reports
   health: Health status
@@ -1386,6 +1399,7 @@ idCopied: ID copied in the clipboard
 emailsCopied: Emails copied in the clipboard
 advancedSettings: Advanced settings
 actions: Actions
+moreActions: More actions
 name: Name
 value: Value
 status: Status
