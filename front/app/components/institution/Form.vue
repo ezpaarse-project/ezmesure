@@ -421,6 +421,28 @@
                       </template>
                     </v-checkbox>
                   </v-col>
+
+                  <v-col cols="12" sm="6">
+                    <v-checkbox
+                      v-model="institution.openAccess"
+                      density="compact"
+                      color="primary"
+                      hide-details
+                    >
+                      <template #label>
+                        {{ $t('institutions.institution.openAccess.title') }}
+
+                        <v-icon
+                          v-tooltip:right="$t('institutions.institution.openAccess.description')"
+                          icon="mdi-information-outline"
+                          size="x-small"
+                          color="info"
+                          end
+                          style="vertical-align: baseline;"
+                        />
+                      </template>
+                    </v-checkbox>
+                  </v-col>
                 </v-row>
               </template>
             </v-card>

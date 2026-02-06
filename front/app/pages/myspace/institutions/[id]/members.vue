@@ -134,6 +134,25 @@
               prepend-icon="mdi-shield"
               @click="membershipFormDialogRef.open(item, { institution })"
             />
+
+            <template v-if="user?.isAdmin">
+              <v-divider />
+
+              <v-list-group @click.stop>
+                <template #activator="{ props }">
+                  <v-list-item
+                    v-bind="props"
+                    :title="$t('moreActions')"
+                    prepend-icon="mdi-account-cog"
+                  />
+                </template>
+
+                <UserAdminActionsList
+                  :model-value="item.user"
+                  :on-change="refresh"
+                />
+              </v-list-group>
+            </template>
           </v-list>
         </v-menu>
       </template>
@@ -178,7 +197,7 @@ const { t } = useI18n();
 const { data: user } = useAuthState();
 const { hasPermission } = useCurrentUserStore();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedMembers = ref([]);

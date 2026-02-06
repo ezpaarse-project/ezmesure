@@ -374,8 +374,15 @@ institutions:
   sendMailToJoin: Un message sera envoyé aux contact de l'établissement pour les prévenir.
   askToJoinAnInstitution: Rejoindre un établissement
   searchForInstitution: Rechercher votre établissement
+  join: Rejoindre
+  joinSuccess: Vous avez rejoint l'établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
   joinInstitutionEmail: Un email sera envoyé aux contacts de cet établissement afin qu'ils puissent vous ajouter.
+  joinInstitutionOpen: L'accès à cet établissement est libre, votre adhésion prendra effet immédiatement.
+  leave: Quitter
+  leaveSuccess: Vous avez quité l'établissement
+  leaveInstitution: Quitter cet établissement
+  leaveInstitutionConfirm: Vous êtes sur le point de quitter {institution}. Vous n'aurez plus accès aux données de cet établissement.
   createMailContactList: Copier les adresses mails des contacts
   modify: Modifier mon établissement
   reports:
@@ -431,7 +438,10 @@ institutions:
     hidePartner: Ne pas afficher comme partenaire
     onboarding:
       title: Établissement "bienvenue"
-      description: Cet établissement sera ajouté à tout nouvel utilisateur d'ezMESURE, et sera retiré dès que cet utilisateur rejoindra un autre établissement.
+      description: Les nouveaux utilisateurs seront automatiquement ajoutés dans cet établissement.
+    openAccess:
+      title: Accès libre
+      description: Les utilisateurs peuvent rejoindre librement l'établissement.
     failedToUpdateValidation: Impossible de mettre à jour la validation
     attachedDomains: Domaines rattachés
     noAttachedDomains: Il n'y a pas de domaine rattaché à cet établissement pour le moment.
@@ -1016,17 +1026,30 @@ users:
     disable:
       title: Désactiver
       confirm:
-        text: Les comptes et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion de l'un de ces utilisateurs annulera sa suppression. Souhaitez-vous continuer ?
+        text: >
+          Le compte et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion de l'utilisateur annulera sa suppression. Souhaitez-vous continuer ?
+          |Les comptes et toutes les données qui y sont liées seront supprimées dans {duration}. Toute tentative de connexion de l'un de ces utilisateurs annulera sa suppression. Souhaitez-vous continuer ?
         agree: Désactiver
       error: Une erreur est survenue lors de la désactivation de l'utilisateur {id}
       success: 1 utilisateur a été désactivé|{n} utilisateurs ont été désactivés
     restore:
       title: Restaurer
       confirm:
-        text: Restaurer les utilisateurs annulera leur suppression prochaine. Souhaitez vous continuer ?
+        text: >
+          Restaurer l'utilisateur annulera sa suppression prochaine. Souhaitez-vous continuer ?
+          |Restaurer les utilisateurs annulera leur suppression prochaine. Souhaitez-vous continuer ?
         agree: Restaurer
       error: Une erreur est survenue lors de la restauration de l'utilisateur {id}
       success: 1 utilisateur a été restauré|{n} utilisateurs ont été restaurés
+    delete:
+      title: Supprimer
+      confirm:
+        text: >
+          Vous allez supprimer l'utilisateur. Les index, espaces, et rôles associés ne seront pas affectés.
+          |Vous allez supprimer {count} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.
+        agree: Supprimer
+      error: Une erreur est survenue lors de la supression de l'utilisateur {id}
+      success: 1 utilisateur a été supprimé|{n} utilisateurs ont été supprimés
 report:
   title: Mes rapports
   health: État de santé
@@ -1388,6 +1411,7 @@ idCopied: ID copié dans le presse-papier
 emailsCopied: Emails copiés dans le presse-papier
 advancedSettings: Paramètres avancés
 actions: Actions
+moreActions: Plus d'actions
 name: Nom
 value: Valeur
 status: Statut
