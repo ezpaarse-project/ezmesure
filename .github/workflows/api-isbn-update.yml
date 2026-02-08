@@ -52,7 +52,7 @@ jobs:
 
           commit-message: "build(api): updated isbn3 groups data[skip ci]"
 
-          title: 'build(api): bumping `isbn3` to `${{ steps.isbn3.outputs.version }}`'
+          title: 'build(api): bumping `isbn3`'
           body: |
             > [!NOTE]
             > Changes are made by GitHub Actions, please review changes carefully before merging
@@ -62,6 +62,6 @@ jobs:
             # API
 
             - [x] Updated to latest patch of `isbn3`
-              - See [auto-update groups data](https://github.com/inventaire/isbn3/issues/5#issuecomment-667523086) on `isbn3` repo for more details
+              - See issue 5 about auto-update groups data on [`isbn3`](https://github.com/inventaire/isbn3) repo for more details
 
           maintainer-can-modify: false
