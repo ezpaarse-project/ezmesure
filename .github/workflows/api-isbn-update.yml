@@ -1,12 +1,13 @@
 name: Auto-patch isbn3
 
 on:
-  schedule:
+  workflow_dispatch:
+  # schedule:
     # Every 3rd of the month at 10:00, 72h after isbn3 updates
     # See :
     # - https://github.com/inventaire/isbn3/issues/5#issuecomment-667523086
     # - https://github.com/inventaire/isbn3/blob/main/.github/workflows/auto_update_groups_data.yml
-    - cron: "0 10 3 * *"
+  #  - cron: "0 10 3 * *"
 
 env:
   BRANCH_NAME: build/auto-update-isbn3
