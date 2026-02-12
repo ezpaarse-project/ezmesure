@@ -380,7 +380,7 @@ institutions:
   joinInstitutionEmail: Un email sera envoyé aux contacts de cet établissement afin qu'ils puissent vous ajouter.
   joinInstitutionOpen: L'accès à cet établissement est libre, votre adhésion prendra effet immédiatement.
   leave: Quitter
-  leaveSuccess: Vous avez quité l'établissement
+  leaveSuccess: Vous avez quitté l'établissement
   leaveInstitution: Quitter cet établissement
   leaveInstitutionConfirm: Vous êtes sur le point de quitter {institution}. Vous n'aurez plus accès aux données de cet établissement.
   createMailContactList: Copier les adresses mails des contacts
