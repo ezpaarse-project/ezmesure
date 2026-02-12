@@ -14,14 +14,13 @@
       </template>
 
       <v-btn
-        v-if="userFormDialogRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
         class="mr-2"
-        @click="userFormDialogRef.open()"
+        @click="createNewUser()"
       />
     </SkeletonPageBar>
 
@@ -103,11 +102,6 @@
       </template>
     </SelectionMenu>
 
-    <UserFormDialog
-      ref="userFormDialogRef"
-      @submit="refresh()"
-    />
-
     <UserMembershipsDialog
       ref="membershipsDialogRef"
       @update:model-value="refresh()"
@@ -117,6 +111,8 @@
 
 <script setup>
 import { millisecondsInDay } from 'date-fns/constants';
+
+import UserFormDialog from '~/components/user/FormDialog.vue';
 
 /**
  * @typedef {import('~/stores/confirm').ConfirmData} DialogData
@@ -131,11 +127,11 @@ const { data: apiConfig } = await useApiConfig();
 const { t, locale } = useI18n();
 const { copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
+const { openDialog } = useDialogStore();
 const snacks = useSnacksStore();
 
 const selectedUsers = ref([]);
 
-const userFormDialogRef = useTemplateRef('userFormDialogRef');
 const membershipsDialogRef = useTemplateRef('membershipsDialogRef');
 
 const deleteDuration = computed(() => {
@@ -326,6 +322,19 @@ async function restoreUsers(items) {
   if (!items) {
     selectedUsers.value = [];
   }
+}
+
+/**
+ * Open a dialog to create a new user
+ */
+function createNewUser() {
+  openDialog({
+    component: UserFormDialog,
+    data: {},
+    listeners: {
+      submit: () => refresh(),
+    },
+  });
 }
 
 /**
