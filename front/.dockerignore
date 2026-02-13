@@ -1,6 +1,7 @@
-# Docker volumes
-uploads
+# Dev tools
+.zed
+.vscode
 # Dependencies
 node_modules
 # Built files
-.prisma
+.nuxt
