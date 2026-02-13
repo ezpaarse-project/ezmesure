@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-const dialogStore = useDialogStore();
+const dialogStore = useConfirmStore();
 
 const disagreeLoading = shallowRef(false);
 const agreeLoading = shallowRef(false);

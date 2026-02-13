@@ -14,14 +14,13 @@
       </template>
 
       <v-btn
-        v-if="userFormDialogRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
         class="mr-2"
-        @click="userFormDialogRef.open()"
+        @click="createNewUser()"
       />
     </SkeletonPageBar>
 
@@ -64,48 +63,10 @@
             />
           </template>
 
-          <v-list>
-            <v-list-item
-              v-if="userFormDialogRef"
-              :title="$t('modify')"
-              prepend-icon="mdi-pencil"
-              @click="userFormDialogRef.open(item)"
-            />
-            <v-list-item
-              v-if="!!item.deletedAt"
-              :title="$t('delete')"
-              prepend-icon="mdi-delete"
-              @click="deleteUsers([item])"
-            />
-            <v-list-item
-              v-else
-              :title="$t('users.actions.disable.title')"
-              :disabled="!!item.deletedAt"
-              prepend-icon="mdi-account-cancel"
-              @click="disableUsers([item])"
-            />
-
-            <v-divider />
-
-            <v-list-item
-              :title="$t('users.actions.restore.title')"
-              :disabled="!item.deletedAt"
-              prepend-icon="mdi-account-check"
-              @click="restoreUsers([item])"
-            />
-
-            <v-list-item
-              :title="$t('authenticate.impersonate')"
-              prepend-icon="mdi-login"
-              @click="impersonateDialogRef?.open(item)"
-            />
-            <v-list-item
-              v-if="clipboard"
-              :title="$t('users.createMailUserList')"
-              prepend-icon="mdi-email"
-              @click="copyUserUsername(item)"
-            />
-          </v-list>
+          <UserAdminActionsList
+            :model-value="item"
+            :on-change="refresh"
+          />
         </v-menu>
       </template>
     </v-data-table-server>
@@ -141,17 +102,9 @@
       </template>
     </SelectionMenu>
 
-    <UserFormDialog
-      ref="userFormDialogRef"
-      @submit="refresh()"
-    />
-
     <UserMembershipsDialog
       ref="membershipsDialogRef"
       @update:model-value="refresh()"
-    />
-    <UserImpersonateDialog
-      ref="impersonateDialogRef"
     />
   </div>
 </template>
@@ -159,8 +112,10 @@
 <script setup>
 import { millisecondsInDay } from 'date-fns/constants';
 
+import UserFormDialog from '~/components/user/FormDialog.vue';
+
 /**
- * @typedef {import('~/stores/dialog').DialogData} DialogData
+ * @typedef {import('~/stores/confirm').ConfirmData} DialogData
  */
 
 definePageMeta({
@@ -170,15 +125,14 @@ definePageMeta({
 
 const { data: apiConfig } = await useApiConfig();
 const { t, locale } = useI18n();
-const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { copy } = useClipboard();
+const { openConfirm } = useConfirmStore();
+const { openDialog } = useDialogStore();
 const snacks = useSnacksStore();
 
 const selectedUsers = ref([]);
 
-const userFormDialogRef = useTemplateRef('userFormDialogRef');
 const membershipsDialogRef = useTemplateRef('membershipsDialogRef');
-const impersonateDialogRef = useTemplateRef('impersonateDialogRef');
 
 const deleteDuration = computed(() => {
   const deleteDurationDays = apiConfig?.value?.users?.deleteDurationDays;
@@ -371,22 +325,16 @@ async function restoreUsers(items) {
 }
 
 /**
- * Put user ID into clipboard
- *
- * @param {object} param0 User
+ * Open a dialog to create a new user
  */
-async function copyUserUsername({ username }) {
-  if (!username) {
-    return;
-  }
-
-  try {
-    await copy(username);
-  } catch (err) {
-    snacks.error(t('clipboard.unableToCopy'), err);
-    return;
-  }
-  snacks.info(t('clipboard.textCopied'));
+function createNewUser() {
+  openDialog({
+    component: UserFormDialog,
+    data: {},
+    listeners: {
+      submit: () => refresh(),
+    },
+  });
 }
 
 /**

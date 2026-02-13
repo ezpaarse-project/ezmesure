@@ -9,7 +9,6 @@ const {
   isValid: dateIsValid,
   format: formatDate,
   formatISO: formatDateISO,
-  parseISO: parseDateISO,
 } = require('date-fns');
 
 const validator = require('../../services/validator');
@@ -43,6 +42,18 @@ async function createIndex(index) {
   return body;
 }
 
+function calcDateLimits(date, previous) {
+  let { minDate, maxDate } = previous;
+
+  minDate = Math.min(minDate ?? Number.POSITIVE_INFINITY, date);
+  maxDate = Math.max(maxDate ?? Number.NEGATIVE_INFINITY, date);
+
+  return {
+    minDate,
+    maxDate,
+  };
+}
+
 /**
  * Read a CSV stream and insert rows in elastic search
  * @param  {stream}   stream
@@ -60,9 +71,8 @@ function readStream(stream, index, username, splittedFields) {
     errors: [],
 
     metadata: {
-      // Setting default values that will be override after the first ec
-      minDate: Number.POSITIVE_INFINITY,
-      maxDate: Number.NEGATIVE_INFINITY,
+      minDate: undefined,
+      maxDate: undefined,
     },
   };
 
@@ -93,10 +103,6 @@ function readStream(stream, index, username, splittedFields) {
       // eslint-disable-next-line no-use-before-define
       bulkInsert((err) => {
         if (err) { return reject(err); }
-
-        // Transforming dates into human readable string
-        result.metadata.minDate = formatDateISO(result.metadata.minDate);
-        result.metadata.maxDate = formatDateISO(result.metadata.maxDate);
 
         resolve(result);
       });
@@ -158,8 +164,10 @@ function readStream(stream, index, username, splittedFields) {
         }
 
         // Keeping min and max date
-        result.metadata.minDate = Math.min(result.metadata.minDate, date);
-        result.metadata.maxDate = Math.max(result.metadata.maxDate, date);
+        result.metadata = {
+          ...result.metadata,
+          ...calcDateLimits(date, result.metadata),
+        };
 
         ec.date = formatDate(date, 'yyyy-MM-dd');
 
@@ -344,6 +352,11 @@ module.exports = async function upload(ctx) {
 
     try {
       const { metadata, ...result } = await readStream(stream, index, username, splittedFields);
+
+      // Transforming dates into human readable string
+      metadata.minDate = metadata.minDate && formatDateISO(metadata.minDate);
+      metadata.maxDate = metadata.maxDate && formatDateISO(metadata.maxDate);
+
       ctx.body = result;
       ctx.metadata = metadata;
 
@@ -369,8 +382,8 @@ module.exports = async function upload(ctx) {
 
   const metadata = {
     // Setting default values that will be override after the first result
-    minDate: Number.POSITIVE_INFINITY,
-    maxDate: Number.NEGATIVE_INFINITY,
+    minDate: undefined,
+    maxDate: undefined,
   };
 
   const parts = parse(ctx);
@@ -404,9 +417,9 @@ module.exports = async function upload(ctx) {
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
 
-    // Resoling min and max dates
-    metadata.minDate = Math.min(parseDateISO(result.metadata.minDate), metadata.minDate);
-    metadata.maxDate = Math.max(parseDateISO(result.metadata.maxDate), metadata.maxDate);
+    // Resolving min and max dates
+    metadata.minDate = calcDateLimits(result.metadata.minDate, metadata).minDate;
+    metadata.maxDate = calcDateLimits(result.metadata.maxDate, metadata).maxDate;
 
     total += result.total;
     inserted += result.inserted;
@@ -422,9 +435,10 @@ module.exports = async function upload(ctx) {
 
   ctx.type = 'json';
   ctx.metadata = {
+    ...metadata,
     // Transforming dates into human readable string
-    minDate: formatDateISO(metadata.minDate),
-    maxDate: formatDateISO(metadata.maxDate),
+    minDate: metadata.minDate && formatDateISO(metadata.minDate),
+    maxDate: metadata.maxDate && formatDateISO(metadata.maxDate),
   };
   ctx.body = {
     took: Math.ceil(Number((endTime - startTime) / 1000000n)),
