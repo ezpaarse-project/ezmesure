@@ -16,168 +16,210 @@
         v-model="valid"
         @submit.prevent="save()"
       >
-        <v-card
-          :title="$t('repositories.updateForm.mapping.properties.title')"
-          prepend-icon="mdi-map-legend"
-          variant="outlined"
-        >
-          <template #append>
-            <v-menu
-              v-model="showPropertyMenu"
-              location="left center"
-              :offset="10"
-              :close-on-content-click="false"
-              width="250px"
+        <v-row>
+          <v-col>
+            <v-card
+              :title="$t('repositories.updateForm.mapping.properties.title')"
+              prepend-icon="mdi-map-legend"
+              variant="outlined"
             >
-              <template #activator="{ props: menu }">
-                <v-btn
-                  v-tooltip="showPropertyMenu ? $t('close') : $t('add')"
-                  :icon="showPropertyMenu ? 'mdi-close' : 'mdi-plus'"
-                  variant="tonal"
-                  :color="showPropertyMenu ? undefined : 'green'"
-                  density="comfortable"
-                  v-bind="menu"
-                />
+              <template #append>
+                <v-menu
+                  v-model="showPropertyMenu"
+                  location="left center"
+                  :offset="10"
+                  :close-on-content-click="false"
+                  width="250px"
+                >
+                  <template #activator="{ props: menu }">
+                    <v-btn
+                      v-tooltip="showPropertyMenu ? $t('close') : $t('add')"
+                      :icon="showPropertyMenu ? 'mdi-close' : 'mdi-plus'"
+                      :color="showPropertyMenu ? undefined : 'green'"
+                      variant="tonal"
+                      density="comfortable"
+                      v-bind="menu"
+                    />
+                  </template>
+
+                  <v-form
+                    id="propertyForm"
+                    v-model="propertyFormValid"
+                    @submit.prevent="addProperty()"
+                  >
+                    <div class="d-flex align-center ga-2">
+                      <v-text-field
+                        v-model="property"
+                        :label="$t('repositories.updateForm.mapping.properties.form.label')"
+                        :rules="rules.property.label"
+                        variant="outlined"
+                        density="compact"
+                        class="flex-grow-1"
+                        return-object
+                        autofocus
+                        hide-details
+                        auto-select-first
+                      />
+
+                      <v-btn
+                        :disabled="!propertyFormValid"
+                        icon="mdi-check"
+                        color="primary"
+                        density="comfortable"
+                        variant="tonal"
+                        type="submit"
+                        form="propertyForm"
+                      />
+                    </div>
+                  </v-form>
+                </v-menu>
               </template>
 
-              <v-form
-                id="propertyForm"
-                v-model="propertyFormValid"
-                @submit.prevent="addProperty()"
-              >
-                <div class="d-flex align-center ga-2">
-                  <v-text-field
-                    v-model="property"
-                    :label="$t('repositories.updateForm.mapping.properties.form.label')"
-                    :rules="rules.property.label"
-                    variant="outlined"
-                    density="compact"
-                    class="flex-grow-1"
-                    return-object
-                    autofocus
-                    hide-details
-                    auto-select-first
-                  />
-
-                  <v-btn
-                    :disabled="!propertyFormValid"
-                    icon="mdi-check"
-                    color="primary"
-                    density="comfortable"
-                    variant="tonal"
-                    type="submit"
-                    form="propertyForm"
-                  />
-                </div>
-              </v-form>
-            </v-menu>
-          </template>
-
-          <template #text>
-            <v-row>
-              <v-col>
-                <div v-if="properties.length <= 0" class="text-secondary">
-                  {{ $t('repositories.updateForm.mapping.properties.emptyText') }}
-                </div>
-
-                <v-sheet
-                  v-for="[key, definition] in properties"
-                  v-else
-                  :key="key"
-                  rounded
-                  class="bg-surface-light py-1 px-4 mb-2"
-                >
-                  <div class="d-flex align-center py-2">
-                    <div class="w-50">
-                      {{ key }}
+              <template #text>
+                <v-row>
+                  <v-col>
+                    <div v-if="properties.length <= 0" class="text-secondary">
+                      {{ $t('repositories.updateForm.mapping.properties.emptyText') }}
                     </div>
 
-                    <v-select
-                      v-model="definition.type"
-                      :label="$t('repositories.updateForm.mapping.properties.form.type.label')"
-                      :items="typesOptions"
-                      :rules="rules.property.type"
-                      density="comfortable"
-                      variant="underlined"
-                      hide-details
-                    />
-
-                    <v-btn
-                      icon="mdi-delete"
-                      color="red"
-                      density="comfortable"
-                      variant="tonal"
-                      class="ml-2"
-                      @click="removeProperty(key)"
-                    />
-                  </div>
-
-                  <v-expansion-panels variant="accordion" color="secondary" static class="mb-2">
-                    <v-expansion-panel :title="$t('repositories.updateForm.mapping.properties.form.settings.title')">
-                      <template #text>
-                        <div class="text-secondary" style="font-size: 0.9em;">
-                          {{ $t('repositories.updateForm.mapping.properties.form.settings.subFields.label') }}
+                    <v-sheet
+                      v-for="[key, definition] in properties"
+                      v-else
+                      :key="key"
+                      rounded
+                      class="bg-surface-light py-1 px-4 mb-2"
+                    >
+                      <div class="d-flex align-center py-2">
+                        <div class="w-50">
+                          {{ key }}
                         </div>
 
-                        <v-chip-group
-                          v-model="definition.subFields"
-                          selected-class="text-primary"
-                          multiple
-                          class="mb-3"
-                        >
-                          <v-chip
-                            v-for="field in subfieldsOptions"
-                            :key="field"
-                            v-tooltip:bottom="{ text: field.tooltip, disabled: !field.tooltip }"
-                            :text="field.title"
-                            :value="field.value"
-                            density="compact"
-                            size="small"
-                          />
-                        </v-chip-group>
-
-                        <v-text-field
-                          v-if="definition.type === 'date' || definition.subFields?.includes('date')"
-                          v-model="definition.format"
-                          :label="$t('repositories.updateForm.mapping.properties.form.settings.format')"
+                        <v-select
+                          v-model="definition.type"
+                          :label="$t('repositories.updateForm.mapping.properties.form.type.label')"
+                          :items="typesOptions"
+                          :rules="rules.property.type"
+                          density="comfortable"
                           variant="underlined"
-                          density="compact"
-                        >
-                          <template #details>
-                            <div class="d-flex align-center">
-                              <i18n-t keypath="repositories.updateForm.mapping.properties.form.settings.format:hint">
-                                <template #link>
-                                  <a
-                                    href="https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="mx-1"
-                                  >
-                                    Unicode Technical Standard #35
-                                  </a>
-
-                                  <v-icon icon="mdi-open-in-new" x-small />
-                                </template>
-                              </i18n-t>
-                            </div>
-                          </template>
-                        </v-text-field>
-
-                        <v-checkbox
-                          v-model="definition.ignoreMalformed"
-                          :label="$t('repositories.updateForm.mapping.properties.form.settings.ignoreMalformed')"
-                          density="compact"
-                          color="primary"
                           hide-details
                         />
-                      </template>
-                    </v-expansion-panel>
-                  </v-expansion-panels>
-                </v-sheet>
-              </v-col>
-            </v-row>
-          </template>
-        </v-card>
+
+                        <v-btn
+                          icon="mdi-delete"
+                          color="red"
+                          density="comfortable"
+                          variant="tonal"
+                          class="ml-2"
+                          @click="removeProperty(key)"
+                        />
+                      </div>
+
+                      <v-expansion-panels variant="accordion" color="secondary" static class="mb-2">
+                        <v-expansion-panel :title="$t('repositories.updateForm.mapping.properties.form.settings.title')">
+                          <template #text>
+                            <div class="text-secondary" style="font-size: 0.9em;">
+                              {{ $t('repositories.updateForm.mapping.properties.form.settings.subFields.label') }}
+                            </div>
+
+                            <v-chip-group
+                              v-model="definition.subFields"
+                              selected-class="text-primary"
+                              multiple
+                              class="mb-3"
+                            >
+                              <v-chip
+                                v-for="field in subfieldsOptions"
+                                :key="field"
+                                v-tooltip:bottom="{ text: field.tooltip, disabled: !field.tooltip }"
+                                :text="field.title"
+                                :value="field.value"
+                                density="compact"
+                                size="small"
+                              />
+                            </v-chip-group>
+
+                            <v-text-field
+                              v-if="definition.type === 'date' || definition.subFields?.includes('date')"
+                              v-model="definition.format"
+                              :label="$t('repositories.updateForm.mapping.properties.form.settings.format')"
+                              variant="underlined"
+                              density="compact"
+                            >
+                              <template #details>
+                                <div class="d-flex align-center">
+                                  <i18n-t keypath="repositories.updateForm.mapping.properties.form.settings.format:hint">
+                                    <template #link>
+                                      <a
+                                        href="https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="mx-1"
+                                      >
+                                        Unicode Technical Standard #35
+                                      </a>
+
+                                      <v-icon icon="mdi-open-in-new" x-small />
+                                    </template>
+                                  </i18n-t>
+                                </div>
+                              </template>
+                            </v-text-field>
+
+                            <v-checkbox
+                              v-model="definition.ignoreMalformed"
+                              :label="$t('repositories.updateForm.mapping.properties.form.settings.ignoreMalformed')"
+                              density="compact"
+                              color="primary"
+                              hide-details
+                            />
+                          </template>
+                        </v-expansion-panel>
+                      </v-expansion-panels>
+                    </v-sheet>
+                  </v-col>
+                </v-row>
+              </template>
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            <v-card
+              :title="$t('repositories.updateForm.settings.title')"
+              prepend-icon="mdi-cog"
+              variant="outlined"
+            >
+              <template #text>
+                <v-row>
+                  <v-col cols="12">
+                    <v-autocomplete
+                      v-model="repository.settings.defaultPipeline"
+                      :items="pipelineOptions"
+                      :loading="pipelineOptionsLoading"
+                      :label="$t('repositories.updateForm.settings.form.defaultPipeline')"
+                      variant="underlined"
+                      clearable
+                      hide-details
+                    />
+                  </v-col>
+
+                  <v-col cols="12">
+                    <v-autocomplete
+                      v-model="repository.settings.finalPipeline"
+                      :items="pipelineOptions"
+                      :loading="pipelineOptionsLoading"
+                      :label="$t('repositories.updateForm.settings.form.finalPipeline')"
+                      variant="underlined"
+                      clearable
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+              </template>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-form>
     </template>
 
@@ -242,6 +284,7 @@ const valid = shallowRef(false);
 const propertyFormValid = shallowRef(false);
 const repository = ref({ ...modelValue });
 const properties = ref(Object.entries(modelValue.mapping.properties ?? {}));
+const pipelineOptionsLoading = shallowRef(false);
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -280,6 +323,31 @@ const subfieldsOptions = computed(() => AVAILABLE_SUBFIELDS.map((value) => {
   };
 }));
 
+const pipelineOptions = computedAsync(
+  async (onCancel) => {
+    const controller = new AbortController();
+    onCancel(() => controller.abort());
+
+    try {
+      const pipelines = await $fetch('/api/repositories/_settings/pipelines');
+
+      return pipelines.map((pipeline) => ({
+        value: pipeline.id,
+        title: pipeline.id,
+        props: {
+          subtitle: pipeline.description,
+        },
+      }));
+    } catch (err) {
+      snacks.error(t('anErrorOccurred'), err);
+    }
+
+    return [];
+  },
+  [],
+  { evaluating: pipelineOptionsLoading },
+);
+
 function addProperty() {
   properties.value.push([property.value, {}]);
   property.value = '';
@@ -301,6 +369,7 @@ async function save() {
           ...repository.value.mapping,
           properties: Object.fromEntries(properties.value.filter(([, def]) => !!def.type)),
         },
+        settings: repository.value.settings,
       },
     });
 

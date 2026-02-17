@@ -17,6 +17,7 @@ const {
   updateOne,
   deleteOne,
   resolvePattern,
+  getAvailablePipelines,
 } = require('./actions');
 
 const {
@@ -48,6 +49,12 @@ router.get('/', {
       institutionId: Joi.string().trim(),
     }),
   },
+});
+
+router.get('/', {
+  method: 'GET',
+  path: '/_settings/pipelines',
+  handler: getAvailablePipelines,
 });
 
 router.route({

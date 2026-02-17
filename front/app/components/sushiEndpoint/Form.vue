@@ -387,7 +387,7 @@ const emit = defineEmits({
 
 const snacks = useSnacksStore();
 const { t, locale } = useI18n();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 
 const saving = shallowRef(false);
 const valid = shallowRef(false);

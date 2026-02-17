@@ -90,6 +90,28 @@
           </v-list-item>
         </v-list>
       </template>
+
+      <v-divider class="mt-1 mb-2" />
+
+      <v-list density="compact" class="pa-0">
+        <ConfirmPopover
+          :text="$t('institutions.leaveInstitutionConfirm', { institution: props.institution.name })"
+          :agree-text="$t('institutions.leave')"
+          :agree="() => leaveInstitution()"
+          agree-icon="mdi-logout"
+          location="end"
+          max-width="400"
+        >
+          <template #activator="{ props: confirm }">
+            <v-list-item
+              v-bind="confirm"
+              :title="$t('institutions.leaveInstitution')"
+              color="primary"
+              prepend-icon="mdi-logout"
+            />
+          </template>
+        </ConfirmPopover>
+      </v-list>
     </v-card-text>
   </v-card>
 </template>
@@ -112,6 +134,9 @@ const props = defineProps({
 
 const { data: user } = useAuthState();
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
+const { fetchMemberships } = useCurrentUserStore();
+const { t } = useI18n();
+const snacks = useSnacksStore();
 
 const spaces = computed(() => props.spacePermissions?.map(({ space }) => space));
 
@@ -136,4 +161,14 @@ const allowedActions = computed(() => {
     reports: perms.has('reporting:read') || perms.has('reporting:write'),
   };
 });
+
+async function leaveInstitution() {
+  try {
+    await $fetch(`/api/profile/memberships/${props.institution.id}`, { method: 'DELETE' });
+    await fetchMemberships();
+    snacks.info(t('institutions.leaveSuccess'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+  }
+}
 </script>

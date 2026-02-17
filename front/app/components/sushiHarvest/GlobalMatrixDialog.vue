@@ -20,13 +20,13 @@
         <v-tabs v-model="tab" grow>
           <v-tab
             :value="TABS.institutions"
-            :text="$t('menu.institutions')"
+            :text="$t('menu.admin.institutions')"
             prepend-icon="mdi-domain"
           />
 
           <v-tab
             :value="TABS.endpoints"
-            :text="$t('menu.sushiEndpoints')"
+            :text="$t('menu.admin.sushiEndpoints')"
             prepend-icon="mdi-api"
           />
         </v-tabs>

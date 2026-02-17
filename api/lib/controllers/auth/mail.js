@@ -1,8 +1,7 @@
-const config = require('config');
-
-const sender = config.get('notifications.sender');
-const supports = config.get('notifications.supportRecipients');
 const { sendMail, generateMail } = require('../../services/mail');
+
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /**
  * Sends an email to a newly created user where there is a link to create his password
@@ -20,7 +19,6 @@ const { sendMail, generateMail } = require('../../services/mail');
  */
 exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink) {
   return sendMail({
-    from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
     ...generateMail('activate-user', { username: user.username, activateLink }),
@@ -38,7 +36,6 @@ exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink)
  */
 exports.sendWelcomeMail = function sendWelcomeMail(user) {
   return sendMail({
-    from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
     ...generateMail('welcome', { username: user.username }),
@@ -59,7 +56,6 @@ exports.sendWelcomeMail = function sendWelcomeMail(user) {
  */
 exports.sendPasswordRecovery = function sendPasswordRecovery(user, data) {
   return sendMail({
-    from: sender,
     to: user.email,
     subject: 'Réinitialisation mot de passe ezMESURE/Kibana',
     ...generateMail('new-password', { user, ...data }),
@@ -76,11 +72,15 @@ exports.sendPasswordRecovery = function sendPasswordRecovery(user, data) {
  *
  * @returns {Promise<void>}
  */
-exports.sendNewUserToContacts = function sendNewUserToContacts(receivers, data) {
+exports.sendNewUserToContacts = async (receivers, data) => {
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.newUserMatchingInstitution,
+    receivers,
+  );
+
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supports,
+    bcc: admins,
     subject: `${data.newUser} s'est inscrit sur ezMESURE`,
     ...generateMail('new-account', { data }),
   });

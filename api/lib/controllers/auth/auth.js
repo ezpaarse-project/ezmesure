@@ -1,24 +1,39 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { addHours, isBefore, parseISO } = require('date-fns');
-const elastic = require('../../services/elastic');
+const {
+  add,
+  isBefore,
+  parseISO,
+  format,
+} = require('date-fns');
 
-const usersElastic = require('../../services/elastic/users');
-const ezrUsers = require('../../services/ezreeport/users');
+const { fr } = require('date-fns/locale');
 
+const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
+const InstitutionsService = require('../../entities/institutions.service');
+const RolesService = require('../../entities/roles.service');
 const UsersService = require('../../entities/users.service');
 const MembershipsService = require('../../entities/memberships.service');
 const ElasticRoleService = require('../../entities/elastic-roles.service');
 
+const usersElastic = require('../../services/elastic/users');
+const elastic = require('../../services/elastic');
+const ezrUsers = require('../../services/ezreeport/users');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { appLogger } = require('../../services/logger');
-const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
+const { sendMail, generateMail } = require('../../services/mail');
 
 const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
 const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
 
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
+
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
+const { deleteDurationDays = 7 } = config.get('users');
 
 const resetPasswordSecret = `${secret}_password_reset`;
 
@@ -85,6 +100,7 @@ exports.renaterLogin = async (ctx) => {
       persistentId: headers['persistent-id'] || headers['targeted-id'],
       affiliation: headers.affiliation,
     },
+    deletedAt: null,
   };
 
   const { username } = userProps;
@@ -127,6 +143,11 @@ exports.renaterLogin = async (ctx) => {
   } else {
     ctx.action = 'user/connection';
     ctx.metadata = { username };
+
+    await usersService.update({
+      where: { username },
+      data: { deletedAt: null },
+    });
   }
 
   const token = generateToken(user);
@@ -171,7 +192,13 @@ exports.elasticLogin = async (ctx) => {
 
   if (!user) {
     ctx.throw(401);
+    return;
   }
+
+  await usersService.update({
+    where: { username },
+    data: { deletedAt: null },
+  });
 
   const token = generateToken(user);
   ctx.metadata = { username };
@@ -268,7 +295,7 @@ exports.getResetToken = async (ctx) => {
   const origin = ctx.get('origin');
 
   const currentDate = new Date();
-  const expiresAt = addHours(currentDate, config.passwordResetValidity);
+  const expiresAt = add(currentDate, { hours: config.passwordResetValidity });
   const token = jwt.sign({
     username: user.username,
     createdAt: currentDate,
@@ -376,6 +403,20 @@ exports.changePassword = async (ctx) => {
   ctx.status = 204;
 };
 
+exports.changeExcludeNotifications = async (ctx) => {
+  const { body } = ctx.request;
+  const { username } = ctx.state.user;
+
+  const service = new UsersService();
+  const user = await service.update({
+    where: { username },
+    data: { excludeNotifications: body },
+  });
+
+  ctx.status = 200;
+  ctx.body = user.excludeNotifications;
+};
+
 exports.getUser = async (ctx) => {
   const usersService = new UsersService();
   const user = await usersService.findUnique({
@@ -389,6 +430,42 @@ exports.getUser = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = user;
+};
+
+exports.deleteUser = async (ctx) => {
+  const { username, email } = ctx.state.user;
+
+  const deletedAt = add(new Date(), { days: deleteDurationDays });
+
+  const usersService = new UsersService();
+
+  await usersService.update({
+    where: { username },
+    data: { deletedAt },
+  });
+
+  appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
+
+  try {
+    const admins = await getNotificationRecipients(
+      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
+      [email],
+    );
+
+    await sendMail({
+      to: email,
+      bcc: admins,
+      subject: 'Votre demande de suppression à bien été prise en compte',
+      ...generateMail('user-deletion-requested', {
+        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
+        isFromUser: true,
+      }),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send mail to ${email}: ${err}`);
+  }
+
+  ctx.status = 204;
 };
 
 exports.getToken = async (ctx) => {
@@ -421,4 +498,130 @@ exports.getElasticRoles = async (ctx) => {
 exports.logout = async (ctx) => {
   ctx.cookies.set(cookie, null, { httpOnly: true });
   ctx.redirect(decodeURIComponent('/myspace'));
+};
+
+exports.joinInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  const institution = await (new InstitutionsService()).findUnique({
+    where: { id: institutionId },
+    select: {
+      openAccess: true,
+      memberships: {
+        where: { username: user.username },
+      },
+      spaces: {
+        select: { id: true },
+      },
+      repositories: {
+        select: { pattern: true },
+      },
+      repositoryAliases: {
+        select: { pattern: true },
+      },
+    },
+  });
+
+  if (!institution) {
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
+  }
+  if (institution.memberships.length > 0) {
+    ctx.status = 200;
+    ctx.body = institution.memberships.at(0);
+    return;
+  }
+  if (institution.openAccess !== true) {
+    ctx.throw(403, ctx.$t('errors.institution.join.notOpen', institution.name));
+  }
+
+  const selfRegisterRoles = await (new RolesService()).findMany({
+    select: { id: true, permissionsPreset: true },
+    where: {
+      autoAssign: { has: EVENT_TYPES.selfJoinInstitution },
+    },
+  });
+
+  const mergedPreset = mergePresets(
+    selfRegisterRoles.map((role) => role.permissionsPreset),
+    { keepNone: false },
+  );
+
+  ctx.status = 201;
+  ctx.body = await (new MembershipsService()).create({
+    data: {
+      institutionId,
+      username: user.username,
+      roles: {
+        createMany: {
+          data: selfRegisterRoles.map((role) => ({ roleId: role.id })),
+        },
+      },
+      permissions: {
+        set: getPermissionsFromPreset(mergedPreset),
+      },
+      spacePermissions: !mergedPreset.spaces ? undefined : {
+        createMany: {
+          data: institution.spaces.map((space) => ({
+            spaceId: space.id,
+            readonly: mergedPreset.spaces !== 'write',
+          })),
+        },
+      },
+      repositoryPermissions: !mergedPreset.repositories ? undefined : {
+        createMany: {
+          data: institution.repositories.map((repo) => ({
+            repositoryPattern: repo.pattern,
+            readonly: mergedPreset.repositories !== 'write',
+          })),
+        },
+      },
+      repositoryAliasPermissions: !mergedPreset.repositories ? undefined : {
+        createMany: {
+          data: institution.repositoryAliases.map((alias) => ({
+            aliasPattern: alias.pattern,
+          })),
+        },
+      },
+    },
+  });
+};
+
+exports.leaveInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  const memberships = new MembershipsService();
+
+  const membership = await memberships.findUnique({
+    where: {
+      username_institutionId: {
+        institutionId,
+        username: user.username,
+      },
+    },
+    select: {
+      locked: true,
+    },
+  });
+
+  if (!membership) {
+    ctx.status = 204;
+    return;
+  }
+
+  if (membership?.locked) {
+    ctx.throw(403, ctx.$t('errors.institution.leave.locked'));
+  }
+
+  await memberships.delete({
+    where: {
+      username_institutionId: {
+        institutionId,
+        username: user.username,
+      },
+    },
+  });
+
+  ctx.status = 204;
 };

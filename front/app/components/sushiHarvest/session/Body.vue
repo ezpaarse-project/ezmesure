@@ -167,7 +167,7 @@ const unDeletableStatus = new Set(['running']);
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 
 const historyRef = useTemplateRef('historyRef');
 const globalHarvestMatrixRef = useTemplateRef('globalHarvestMatrixRef');

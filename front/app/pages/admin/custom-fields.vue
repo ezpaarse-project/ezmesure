@@ -121,7 +121,7 @@ definePageMeta({
 });
 
 const { t, locale } = useI18n();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedCustomField = ref([]);

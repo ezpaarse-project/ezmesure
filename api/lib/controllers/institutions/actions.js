@@ -1,11 +1,13 @@
-const config = require('config');
-
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
+const RolesService = require('../../entities/roles.service');
+
+const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES, EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /* eslint-disable max-len */
 /**
@@ -39,25 +41,34 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-const {
-  PERMISSIONS,
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('../../entities/memberships.dto');
+const { PERMISSIONS } = require('../../entities/memberships.dto');
 
-const sender = config.get('notifications.sender');
-const supportRecipients = config.get('notifications.supportRecipients');
+async function sendValidateInstitutionMail(receivers, data) {
+  const admins = await getNotificationRecipients(
+    ADMIN_NOTIFICATION_TYPES.institutionValidated,
+    receivers,
+  );
 
-function sendValidateInstitution(receivers, data) {
   return sendMail({
-    from: sender,
     to: receivers,
-    cc: supportRecipients,
+    bcc: admins,
     subject: 'Votre établissement a été validé',
     ...generateMail('validate-institution', data),
   });
+}
+
+async function sendCounterReadyChangeMail(data) {
+  try {
+    const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.counterReadyChange);
+
+    return sendMail({
+      to: admins,
+      subject: data.sushiReadySince ? 'Fin de saisie d\'identifiant COUNTER' : 'Reprise de saisie d\'identifiant COUNTER',
+      ...generateMail('sushi-ready-change', data),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+  }
 }
 
 exports.getInstitutions = async (ctx) => {
@@ -118,12 +129,25 @@ exports.createInstitution = async (ctx) => {
   if (error) { ctx.throw(error); }
 
   if (!isAdmin || addAsMember !== false) {
+    const rolesService = new RolesService();
+
+    const roles = await rolesService.findMany({
+      select: { id: true },
+      where: {
+        autoAssign: { has: EVENT_TYPES.declareInstitution },
+      },
+    });
+
     memberships = {
       create: [{
         username,
         permissions: [...PERMISSIONS],
-        roles: [DOC_CONTACT, TECH_CONTACT],
         locked: true,
+        roles: {
+          createMany: {
+            data: roles.map((role) => ({ roleId: role.id })),
+          },
+        },
       }],
     };
   }
@@ -242,9 +266,7 @@ exports.updateInstitution = async (ctx) => {
     const contactMemberships = await membershipsService.findMany({
       where: {
         institutionId: ctx.state.institution.id,
-        roles: {
-          hasSome: [DOC_CONTACT, TECH_CONTACT],
-        },
+        ...getNotificationMembershipWhere(NOTIFICATION_TYPES.institutionValidated),
       },
       include: { user: true },
     });
@@ -253,7 +275,7 @@ exports.updateInstitution = async (ctx) => {
 
     if (Array.isArray(contacts) && contacts.length > 0) {
       try {
-        await sendValidateInstitution(contacts, {
+        await sendValidateInstitutionMail(contacts, {
           manageMemberLink: `${origin}/myspace/institutions/${institution.id}/memberships`,
           manageSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         });
@@ -268,17 +290,10 @@ exports.updateInstitution = async (ctx) => {
     || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
-    sendMail({
-      from: sender,
-      to: supportRecipients,
-      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
-      ...generateMail('sushi-ready-change', {
-        institutionName: institution.name,
-        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
-        sushiReadySince,
-      }),
-    }).catch((err) => {
-      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    sendCounterReadyChangeMail({
+      institutionName: institution.name,
+      institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
+      sushiReadySince,
     });
   }
 
@@ -311,17 +326,10 @@ exports.updateInstitutionSushiReady = async (ctx) => {
     || (!wasSushiReady && sushiReadySince);
 
   if (sushiReadyChanged) {
-    sendMail({
-      from: sender,
-      to: supportRecipients,
-      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
-      ...generateMail('sushi-ready-change', {
-        institutionName: institution.name,
-        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
-        sushiReadySince,
-      }),
-    }).catch((err) => {
-      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    sendCounterReadyChangeMail({
+      institutionName: institution.name,
+      institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
+      sushiReadySince,
     });
   }
 
@@ -445,12 +453,32 @@ exports.importInstitutions = async (ctx) => {
               },
             },
             create: {
-              ...(membership ?? {}),
+              ...membership,
               username: undefined,
               institutionId: undefined,
 
               user: {
                 connect: { username: membership?.username },
+              },
+
+              roles: {
+                connectOrCreate: membership?.roles?.map?.(
+                  (role) => ({
+                    where: {
+                      username_institutionId_roleId: {
+                        // For legacy roles, replace : by _ (ex: contact:doc => contact_doc)
+                        roleId: typeof role === 'string' ? role.replace(':', '_') : role?.roleId,
+                        username: membership?.username,
+                        institutionId: item.id,
+                      },
+                    },
+                    create: typeof role === 'string' ? { roleId: role.replace(':', '_') } : {
+                      ...role,
+                      username: undefined,
+                      institutionId: undefined,
+                    },
+                  }),
+                ),
               },
 
               spacePermissions: {
@@ -554,8 +582,10 @@ exports.harvestableInstitutions = async (ctx) => {
         select: {
           spaces: { where: { type: 'counter5' } },
           repositories: { where: { type: 'counter5' } },
-          memberships: { where: { roles: { has: 'contact:doc' } } },
           sushiCredentials: { where: SushiCredentialsService.enabledCredentialsQuery },
+          memberships: {
+            where: getNotificationMembershipWhere(NOTIFICATION_TYPES.newCounterDataAvailable),
+          },
         },
       },
     },

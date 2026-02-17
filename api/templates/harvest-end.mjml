@@ -48,7 +48,7 @@
     </mj-text>
 
     {% if spaceURL %}
-    <mj-button 
+    <mj-button
       href="{{ spaceURL }}"
       font-family="Helvetica"
       background-color="#9c27b0"
@@ -61,8 +61,8 @@
     <mj-text>
       Si vous remarquez des données qui vous paraissent manquantes ou non valides,
       merci de nous contacter rapidement
-      {% if recipients %}
-      à <a href="mailto:{{ recipients }}">{{ recipients }}</a>
+      {% if REPLY_TO %}
+      à <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a>
       {% endif %}
       pour nous permettre de le signaler aux éditeurs.
     </mj-text>

@@ -14,24 +14,30 @@
       </template>
 
       <v-btn
-        v-if="userFormDialogRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
         class="mr-2"
-        @click="userFormDialogRef.open()"
+        @click="createNewUser()"
       />
     </SkeletonPageBar>
 
     <v-data-table-server
       v-model="selectedUsers"
       :headers="headers"
+      :row-props="({ item }) => ({ class: item.deletedAt && 'bg-grey-lighten-4 text-grey' })"
       show-select
       return-object
       v-bind="vDataTableOptions"
     >
+      <template #[`item.fullName`]="{ value, item }">
+        <UserSoftDeleteIcon :model-value="item" />
+
+        {{ value }}
+      </template>
+
       <template #[`item.memberships`]="{ value, item }">
         <v-chip
           :text="`${value.length}`"
@@ -57,33 +63,10 @@
             />
           </template>
 
-          <v-list>
-            <v-list-item
-              v-if="userFormDialogRef"
-              :title="$t('modify')"
-              prepend-icon="mdi-pencil"
-              @click="userFormDialogRef.open(item)"
-            />
-            <v-list-item
-              :title="$t('delete')"
-              prepend-icon="mdi-delete"
-              @click="deleteUsers([item])"
-            />
-
-            <v-divider />
-
-            <v-list-item
-              :title="$t('authenticate.impersonate')"
-              prepend-icon="mdi-login"
-              @click="impersonateDialogRef?.open(item)"
-            />
-            <v-list-item
-              v-if="clipboard"
-              :title="$t('users.createMailUserList')"
-              prepend-icon="mdi-email"
-              @click="copyUserUsername(item)"
-            />
-          </v-list>
+          <UserAdminActionsList
+            :model-value="item"
+            :on-change="refresh"
+          />
         </v-menu>
       </template>
     </v-data-table-server>
@@ -104,40 +87,57 @@
           prepend-icon="mdi-delete"
           @click="deleteUsers()"
         />
+
+        <v-list-item
+          :title="$t('users.actions.disable.title')"
+          prepend-icon="mdi-account-cancel"
+          @click="disableUsers()"
+        />
+
+        <v-list-item
+          :title="$t('users.actions.restore.title')"
+          prepend-icon="mdi-account-check"
+          @click="restoreUsers()"
+        />
       </template>
     </SelectionMenu>
-
-    <UserFormDialog
-      ref="userFormDialogRef"
-      @submit="refresh()"
-    />
 
     <UserMembershipsDialog
       ref="membershipsDialogRef"
       @update:model-value="refresh()"
     />
-    <UserImpersonateDialog
-      ref="impersonateDialogRef"
-    />
   </div>
 </template>
 
 <script setup>
+import { millisecondsInDay } from 'date-fns/constants';
+
+import UserFormDialog from '~/components/user/FormDialog.vue';
+
+/**
+ * @typedef {import('~/stores/confirm').ConfirmData} DialogData
+ */
+
 definePageMeta({
   layout: 'admin',
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
-const { t } = useI18n();
-const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { data: apiConfig } = await useApiConfig();
+const { t, locale } = useI18n();
+const { copy } = useClipboard();
+const { openConfirm } = useConfirmStore();
+const { openDialog } = useDialogStore();
 const snacks = useSnacksStore();
 
 const selectedUsers = ref([]);
 
-const userFormDialogRef = useTemplateRef('userFormDialogRef');
 const membershipsDialogRef = useTemplateRef('membershipsDialogRef');
-const impersonateDialogRef = useTemplateRef('impersonateDialogRef');
+
+const deleteDuration = computed(() => {
+  const deleteDurationDays = apiConfig?.value?.users?.deleteDurationDays;
+  return timeAgo(deleteDurationDays * millisecondsInDay, locale.value) ?? '...';
+});
 
 const {
   refresh,
@@ -215,41 +215,39 @@ const toolbarTitle = computed(() => {
 const debouncedRefresh = useDebounceFn(refresh, 250);
 
 /**
- * Delete multiple users
- *
- * @param {Object[]} [items] List of items to delete, if none it'll fall back to selected
+ * @typedef {Object} BulkActionData
+ * @property {(item: Object) => Promise<unknown>} action - The action
+ * @property {(item: Object) => string} error - Triggered on error, can return error message
+ * @property {() => string} success - Triggered when all actions succeed, can return success message
  */
-function deleteUsers(items) {
-  const toDelete = items || selectedUsers.value;
-  if (toDelete.length <= 0) {
+
+/**
+ * Do an action on given items, or selected users
+ *
+ * @param {Object[] | undefined} items - List of items
+ * @param {DialogData & BulkActionData} options
+ */
+async function bulkActionWithConfirm(items, options) {
+  if (items.length <= 0) {
     return;
   }
 
-  openConfirm({
+  await openConfirm({
     title: t('areYouSure'),
-    text: t(
-      'users.deleteNbUsers',
-      toDelete.length,
-    ),
-    agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    ...options,
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map(
-          (item) => $fetch(`/api/users/${item.username}`, { method: 'DELETE' })
+        items.map(
+          (item) => options.action(item)
             .catch((err) => {
-              snacks.error(t('cannotDeleteItem', { id: item.username }), err);
+              snacks.error(options.error(item), err);
               return null;
             }),
         ),
       );
 
       if (!results.some((r) => !r)) {
-        snacks.success(t('itemsDeleted', { count: toDelete.length }));
-      }
-
-      if (!items) {
-        selectedUsers.value = [];
+        snacks.success(options.success());
       }
 
       await refresh();
@@ -258,22 +256,85 @@ function deleteUsers(items) {
 }
 
 /**
- * Put user ID into clipboard
+ * Delete multiple users
  *
- * @param {object} param0 User
+ * @param {Object[]} [items] List of items to delete, if none it'll fall back to selected
  */
-async function copyUserUsername({ username }) {
-  if (!username) {
-    return;
-  }
+async function deleteUsers(items) {
+  const toDelete = items || selectedUsers.value;
 
-  try {
-    await copy(username);
-  } catch (err) {
-    snacks.error(t('clipboard.unableToCopy'), err);
-    return;
+  await bulkActionWithConfirm(toDelete, {
+    text: t('users.deleteNbUsers', toDelete.length),
+    agreeText: t('delete'),
+    agreeIcon: 'mdi-delete',
+
+    action: (item) => $fetch(`/api/users/${item.username}`, { method: 'DELETE', query: { force: true } }),
+    error: (item) => t('cannotDeleteItem', { id: item.username }),
+    success: () => t('itemsDeleted', { count: toDelete.length }),
+  });
+
+  if (!items) {
+    selectedUsers.value = [];
   }
-  snacks.info(t('clipboard.textCopied'));
+}
+
+/**
+ * Disable multiple users
+ *
+ * @param {Object[]} [items] List of items to disable, if none it'll fall back to selected
+ */
+async function disableUsers(items) {
+  const toDisable = items || selectedUsers.value;
+
+  await bulkActionWithConfirm(toDisable, {
+    text: t('users.actions.disable.confirm.text', { duration: deleteDuration.value }),
+    agreeText: t('users.actions.disable.confirm.agree'),
+    agreeIcon: 'mdi-account-cancel',
+
+    action: (item) => $fetch(`/api/users/${item.username}`, { method: 'DELETE' }),
+    error: (item) => t('users.actions.disable.error', { id: item.username }),
+    success: () => t('users.actions.disable.success', toDisable.length),
+  });
+
+  if (!items) {
+    selectedUsers.value = [];
+  }
+}
+
+/**
+ * Cancel deletion of multiple users
+ *
+ * @param {Object[]} [items] List of items to cancel, if none it'll fall back to selected
+ */
+async function restoreUsers(items) {
+  const toRestore = items || selectedUsers.value;
+
+  await bulkActionWithConfirm(toRestore, {
+    text: t('users.actions.restore.confirm.text', toRestore.length),
+    agreeText: t('users.actions.restore.confirm.agree'),
+    agreeIcon: 'mdi-account-check',
+
+    action: (item) => $fetch(`/api/users/${item.username}`, { method: 'PATCH', body: { deletedAt: null } }),
+    error: (item) => t('users.actions.restore.error', { id: item.username }),
+    success: () => t('users.actions.restore.success', toRestore.length),
+  });
+
+  if (!items) {
+    selectedUsers.value = [];
+  }
+}
+
+/**
+ * Open a dialog to create a new user
+ */
+function createNewUser() {
+  openDialog({
+    component: UserFormDialog,
+    data: {},
+    listeners: {
+      submit: () => refresh(),
+    },
+  });
 }
 
 /**

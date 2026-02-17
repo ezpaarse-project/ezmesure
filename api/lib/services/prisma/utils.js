@@ -8,6 +8,7 @@ const sushiCredentials = require('./sushi-credentials');
 const sushiEndpoints = require('./sushi-endpoints');
 const users = require('./users');
 const customFields = require('./custom-fields');
+const roles = require('./roles');
 
 async function resetDatabase() {
   if (process.env.NODE_ENV !== 'dev') { return null; }
@@ -22,6 +23,7 @@ async function resetDatabase() {
   await sushiEndpoints.removeAll();
   await users.removeAll();
   await customFields.removeAll();
+  await roles.removeAll();
 }
 
 module.exports = {

@@ -33,16 +33,15 @@
 
         <div>{{ $t('myspace.roles') }}</div>
 
-        <v-chip
-          v-for="role in membership.roles"
-          :key="role"
-          :text="$t(`institutions.members.roleNames.${role}`)"
-          :prepend-icon="roleColors.get(role)?.icon"
-          :color="roleColors.get(role)?.color"
-          size="small"
-          label
-          class="ml-1"
-        />
+        <div class="d-flex flex-wrap ga-1 ml-1">
+          <RoleChip
+            v-for="role in membership.roles"
+            :key="role.roleId"
+            :role="role.role"
+            size="small"
+            label
+          />
+        </div>
       </template>
     </v-card-subtitle>
 

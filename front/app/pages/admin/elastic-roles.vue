@@ -117,7 +117,7 @@
             <v-divider />
 
             <v-list-item
-              :title="$t('menu.users')"
+              :title="$t('menu.admin.users')"
               prepend-icon="mdi-account-multiple"
               @click="usersDialogRef?.open(item)"
             />
@@ -198,7 +198,7 @@ definePageMeta({
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedRoles = ref([]);
@@ -242,7 +242,7 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('menu.users'),
+    title: t('menu.admin.users'),
     value: 'users',
     align: 'center',
     sortable: true,

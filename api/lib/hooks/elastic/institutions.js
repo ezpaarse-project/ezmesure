@@ -3,7 +3,7 @@ const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 const { client: prisma } = require('../../services/prisma');
-const { syncUser } = require('../../services/sync/elastic');
+const { syncUser } = require('../../services/sync/elastic/users');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').Institution} Institution

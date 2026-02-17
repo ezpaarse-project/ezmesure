@@ -1,7 +1,4 @@
 // @ts-check
-
-const config = require('config');
-const { CronJob } = require('cron');
 const ezrAxios = require('../ezreeport/axios');
 const reportingUsers = require('../ezreeport/reportingUsers');
 
@@ -9,8 +6,6 @@ const { appLogger } = require('../logger');
 
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
-
-const { syncSchedule } = config.get('ezreeport');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').Institution} Institution
@@ -138,33 +133,7 @@ async function syncNamespaces() {
   };
 }
 
-async function sync() {
-  await syncUsers();
-  await syncNamespaces();
-}
-
-async function startCron() {
-  const job = CronJob.from({
-    cronTime: syncSchedule,
-    runOnInit: false,
-    onTick: async () => {
-      appLogger.verbose('[ezreeport] Starting synchronization');
-      try {
-        await sync();
-        appLogger.info('[ezreeport] Synchronized');
-      } catch (e) {
-        const message = e?.response?.data?.content?.message || e.message;
-        appLogger.error(`[ezreeport] Failed to synchronize: ${message}`);
-      }
-    },
-  });
-
-  job.start();
-}
-
 module.exports = {
   syncUsers,
   syncNamespaces,
-  startCron,
-  sync,
 };

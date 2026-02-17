@@ -2,8 +2,8 @@
   <v-app-bar color="primary" app fixed clipped-left>
     <template #prepend>
       <nuxt-link
-        :title="$t('menu.homepage')"
-        :aria-label="$t('menu.homepage')"
+        :title="$t('menu.bar.homepage')"
+        :aria-label="$t('menu.bar.homepage')"
         to="/"
         class="pl-4"
       >

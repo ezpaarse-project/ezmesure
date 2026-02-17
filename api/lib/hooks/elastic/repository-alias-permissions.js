@@ -4,7 +4,7 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 
 const elasticUsers = require('../../services/elastic/users');
-const { syncUser } = require('../../services/sync/elastic');
+const { syncUser } = require('../../services/sync/elastic/users');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').RepositoryPermission} RepositoryPermission

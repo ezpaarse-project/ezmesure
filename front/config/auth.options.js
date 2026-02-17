@@ -22,6 +22,7 @@ export default {
         createdAt: 'string',
         updatedAt: 'string',
         isAdmin: 'boolean',
+        excludeNotifications: 'string[]',
         metadata: '{ acceptedTerms?: boolean }?',
       },
     },

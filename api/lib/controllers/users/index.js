@@ -91,6 +91,9 @@ router.route({
     params: {
       username: Joi.string().trim().required(),
     },
+    query: {
+      force: Joi.boolean(),
+    },
   },
 });
 
@@ -100,7 +103,7 @@ router.route({
   handler: importUsers,
   validate: {
     type: 'json',
-    params: {
+    query: {
       overwrite: Joi.boolean().default(false),
     },
     body: Joi.array(),

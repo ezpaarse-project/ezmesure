@@ -1,14 +1,23 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const { add, format } = require('date-fns');
+const { fr } = require('date-fns/locale');
+
+const { getNotificationRecipients } = require('../../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
+const { appLogger } = require('../../services/logger');
+const { sendMail, generateMail } = require('../../services/mail');
 
 const UsersService = require('../../entities/users.service');
-const { sendActivateUserMail } = require('../auth/mail');
-const { appLogger } = require('../../services/logger');
-const { activateUserLink } = require('../auth/password');
 const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
+
+const { sendActivateUserMail } = require('../auth/mail');
+const { activateUserLink } = require('../auth/password');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');
+const { stringToArray } = require('../../services/utils');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -19,6 +28,7 @@ exports.standardQueryParams = standardQueryParams;
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
+const { deleteDurationDays = 7 } = config.get('users');
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -51,7 +61,7 @@ exports.getUser = async (ctx) => {
 exports.list = async (ctx) => {
   const {
     source = 'fullName,username',
-    roles,
+    roles: rolesParam,
     'roles:loose': hasSomeRoles,
     permissions,
     'permissions:loose': hasSomePermissions,
@@ -59,13 +69,41 @@ exports.list = async (ctx) => {
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
-  if (roles != null || permissions != null) {
+  if (permissions != null) {
     prismaQuery.where.memberships = {
-      some: {
-        roles: arrayFilter(roles, hasSomeRoles),
-        permissions: arrayFilter(permissions, hasSomePermissions),
+      ...prismaQuery.where.memberships ?? {},
+      ...{
+        some: {
+          permissions: arrayFilter(permissions, hasSomePermissions),
+        },
       },
     };
+  }
+
+  if (rolesParam != null) {
+    const roles = stringToArray(rolesParam);
+
+    if (roles.length === 0) {
+      prismaQuery.where.memberships = {
+        AND: [
+          prismaQuery.where.memberships ?? {},
+          { every: { roles: { none: {} } } },
+        ],
+      };
+    } else {
+      const operator = hasSomeRoles ? 'OR' : 'AND';
+
+      prismaQuery.where[operator] = [
+        ...(prismaQuery.where[operator] ?? []),
+        ...roles.map((role) => ({
+          memberships: {
+            some: {
+              roles: { some: { roleId: role } },
+            },
+          },
+        })),
+      ];
+    }
   }
 
   prismaQuery.select = Object.assign(
@@ -264,13 +302,55 @@ exports.updateUser = async (ctx) => {
 
 exports.deleteUser = async (ctx) => {
   const { username } = ctx.request.params;
+  const { force } = ctx.query;
 
   const usersService = new UsersService();
-  const found = !!(await usersService.delete({ where: { username } }));
-  appLogger.verbose(`User [${username}] is deleted`);
+  const user = await usersService.findUnique({ where: { username } });
+
+  if (!user) {
+    ctx.status = 200;
+    ctx.body = { found: false };
+    return;
+  }
+
+  if (force) {
+    await usersService.delete({ where: { username } });
+    appLogger.verbose(`User [${username}] is deleted`);
+
+    ctx.status = 200;
+    ctx.body = { found: true };
+    return;
+  }
+
+  const deletedAt = add(new Date(), { days: deleteDurationDays });
+
+  await usersService.update({
+    where: { username },
+    data: { deletedAt },
+  });
+
+  appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
+
+  try {
+    const admins = await getNotificationRecipients(
+      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
+      [user.email],
+    );
+
+    await sendMail({
+      to: user.email,
+      bcc: admins,
+      subject: "Un administrateur d'ezMESURE a effectué une action sur votre compte",
+      ...generateMail('user-deletion-requested', {
+        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
+      }),
+    });
+  } catch (err) {
+    appLogger.error(`Failed to send mail to ${user.email}: ${err}`);
+  }
 
   ctx.status = 200;
-  ctx.body = { found };
+  ctx.body = { found: true };
 };
 
 exports.impersonateUser = async (ctx) => {

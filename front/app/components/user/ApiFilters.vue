@@ -32,6 +32,14 @@
           />
         </v-col>
 
+        <v-col cols="12" sm="6">
+          <ApiFiltersButtonsGroup
+            v-model="deletedFilter"
+            :label="$t('users.user.deletedAt')"
+            prepend-icon="mdi-delete"
+          />
+        </v-col>
+
         <v-col cols="12">
           <ApiFiltersSelect
             v-model="filters.permissions"
@@ -51,8 +59,11 @@
             v-model="filters.roles"
             v-model:loose="filters['roles:loose']"
             :empty-symbol="emptySymbol"
-            :items="rolesItems"
+            :items="roleItems"
             :label="$t('users.user.roles')"
+            :loading="loadingRoles"
+            item-title="label"
+            item-value="id"
             prepend-icon="mdi-tag"
             chips
             closable-chips
@@ -65,6 +76,8 @@
 </template>
 
 <script setup>
+import { format, startOfDay } from 'date-fns';
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -85,6 +98,13 @@ const {
   resetFilters,
 } = useFilters(() => props.modelValue, emit);
 
+const {
+  data: roleItems,
+  status: rolesStatus,
+} = await useFetch('/api/roles', { lazy: true });
+
+const loadingRoles = computed(() => rolesStatus.value === 'pending');
+
 const permissionsItems = computed(() => {
   const scopes = [
     'institution',
@@ -103,15 +123,25 @@ const permissionsItems = computed(() => {
     }),
   ));
 });
-const rolesItems = computed(() => {
-  const roles = Array.from(roleColors.entries());
-  return roles.map(([role, { icon }]) => ({
-    value: role,
-    title: t(`institutions.members.roleNames.${role}`),
-    props: {
-      appendIcon: icon,
-    },
-  }));
+
+const deletedFilter = computed({
+  get: () => {
+    if (filters['deletedAt:from'] === '') {
+      return false;
+    }
+
+    return filters['deletedAt:from'] ? true : undefined;
+  },
+  set: (value) => {
+    if (value === true) {
+      const date = startOfDay(new Date());
+      filters['deletedAt:from'] = format(date, 'yyyy-MM-dd');
+      return;
+    }
+
+    // filters resolves `emptySymbol` as `""` but resolves `""` as `undefined`
+    filters['deletedAt:from'] = value === false ? emptySymbol : undefined;
+  },
 });
 
 function clearFilters() {

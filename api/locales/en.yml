@@ -93,6 +93,13 @@ errors:
     import:
       alreadyExists: Institution [%s] already exists
 
+    join:
+      notOpen: The institution [%s] is not open to self registrations
+      alreadyMember: You are already a member of the institution [%s]
+
+    leave:
+      locked: You can't leave an institution with locked membership
+
   member:
     notFound: Member not found
 
@@ -118,6 +125,7 @@ errors:
   role:
     notFound: Role [%s] not found
     alreadyExists: Role [%s] already exists
+    restricted: Role [%s] is only assignable by administrators
 
   space:
     notFound: Space [%s] not found

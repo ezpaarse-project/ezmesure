@@ -32,9 +32,14 @@
         <v-list-item
           v-for="user in users"
           :key="user.username"
-          :title="user.fullName"
           :subtitle="user.email"
         >
+          <template #title>
+            <UserSoftDeleteIcon :model-value="user" />
+
+            {{ user.fullName }}
+          </template>
+
           <template #append>
             <v-btn
               v-tooltip="$t('revoke')"

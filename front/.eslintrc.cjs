@@ -14,7 +14,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: 'store/**/*.js',
+      files: 'app/stores/**/*.js',
       rules: {
         'import/prefer-default-export': 'off',
       },

@@ -1,6 +1,6 @@
 <template>
   <div style="position: relative;">
-    <SkeletonPageBar :title="$t('menu.myInstitutions')" />
+    <SkeletonPageBar :title="$t('menu.myspace.institutions')" />
 
     <v-container>
       <v-row v-if="!hasMemberships">

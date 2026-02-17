@@ -11,13 +11,19 @@ const {
   getToken,
   getUser,
   getResetToken,
+  deleteUser,
   resetPassword,
   changePassword,
+  changeExcludeNotifications,
   getMemberships,
+  joinInstitution,
+  leaveInstitution,
   getElasticRoles,
   getReportingToken,
   activate,
 } = require('./auth');
+
+const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
 
 router.route({
   method: 'POST',
@@ -69,7 +75,15 @@ router.route({
 });
 
 router.get('/', getUser);
+
+router.route({
+  method: 'DELETE',
+  path: '/',
+  handler: deleteUser,
+});
+
 router.get('/reporting_token', getReportingToken);
+
 router.route({
   method: 'GET',
   path: '/memberships',
@@ -78,6 +92,19 @@ router.route({
     query: standardMembershipsQueryParams.manyValidation,
   },
 });
+
+router.route({
+  method: 'PUT',
+  path: '/memberships/:institutionId',
+  handler: joinInstitution,
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/memberships/:institutionId',
+  handler: leaveInstitution,
+});
+
 router.route({
   method: 'GET',
   path: '/elastic-roles',
@@ -100,6 +127,20 @@ router.route({
       actualPassword: Joi.string().required().trim().min(1),
       password: Joi.string().trim().min(6).required(),
     }),
+  },
+});
+router.route({
+  method: 'PUT',
+  path: '/excludeNotifications',
+  handler: [
+    bodyParser(),
+    changeExcludeNotifications,
+  ],
+  validate: {
+    type: 'json',
+    body: Joi.array().items(
+      Joi.string().valid(...NOTIFICATION_KEYS),
+    ),
   },
 });
 

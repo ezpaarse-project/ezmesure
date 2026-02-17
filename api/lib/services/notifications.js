@@ -2,17 +2,15 @@
 const config = require('config');
 const { fr } = require('date-fns/locale');
 const { format, isValid } = require('date-fns');
-const { CronJob } = require('cron');
+
+const { getNotificationRecipients } = require('../utils/notifications');
+const { ADMIN_NOTIFICATION_TYPES } = require('../utils/notifications/constants');
+
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 const { appLogger } = require('./logger');
 
-const {
-  sender,
-  recipients,
-  cron,
-  sendEmptyActivity,
-} = config.get('notifications');
+const { sendEmptyActivity } = config.get('notifications');
 
 /**
  * Change a timestamp into a locale date
@@ -157,9 +155,14 @@ async function sendNotifications(logger = appLogger) {
     return;
   }
 
+  const to = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.appRecentActivity);
+  if (to.length === 0) {
+    logger.info('No admins to send recent activity');
+    return;
+  }
+
   await sendMail({
-    from: sender,
-    to: recipients,
+    to,
     subject: '[Admin] Activité ezMESURE',
     ...generateMail('recent-activity', {
       noActions: actions.length === 0,
@@ -183,17 +186,5 @@ async function sendNotifications(logger = appLogger) {
 }
 
 module.exports = {
-  start(logger = appLogger) {
-    const job = new CronJob(cron, () => {
-      sendNotifications(logger).catch((err) => {
-        logger.error(`Failed to broadcast recent activity : ${err}`);
-      });
-    });
-
-    if (recipients) {
-      job.start();
-    } else {
-      logger.warn('No recipient configured, notifications will be disabled');
-    }
-  },
+  sendNotifications,
 };

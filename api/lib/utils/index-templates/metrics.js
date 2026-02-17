@@ -3,6 +3,11 @@ module.exports = {
     number_of_shards: 1,
   },
   mappings: {
+    _meta: {
+      // Change this whenever you update the mapping,
+      // it'll trigger a migration when ezMESURE start
+      version: 1,
+    },
     dynamic_templates: [
       {
         strings_as_keywords: {
@@ -45,6 +50,8 @@ module.exports = {
         properties: {
           status: { type: 'integer' },
           body: {
+            dynamic: false,
+            // Add properties that needs to be indexed
             properties: {
               error: { type: 'keyword' },
               errors: { type: 'keyword' },
@@ -58,9 +65,12 @@ module.exports = {
         },
       },
       metadata: {
+        dynamic: false,
+        // Add properties that needs to be indexed
         properties: {
-          username: { type: 'keyword' },
-          path: { type: 'keyword' },
+          broadcasted: {
+            type: 'date',
+          },
         },
       },
     },

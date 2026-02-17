@@ -1,0 +1,7 @@
+# Dev tools
+.zed
+.vscode
+# Dependencies
+node_modules
+# Built files
+.nuxt

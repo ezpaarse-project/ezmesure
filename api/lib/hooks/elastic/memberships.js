@@ -4,7 +4,7 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 
 const UsersService = require('../../entities/users.service');
-const { syncUser } = require('../../services/sync/elastic');
+const { syncUser } = require('../../services/sync/elastic/users');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').User} User

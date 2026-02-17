@@ -1,0 +1,54 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>
+  {% if isFromUser %}
+  Votre demande de suppression à bien été prise en compte
+  {% else %}
+  Un administrateur d'ezMESURE a effectué une action sur votre compte
+  {% endif %}
+</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Cher·e utilisateur·ice,</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      <p>
+        {% if isFromUser %}
+        Vous avez demandé
+        {% else %}
+        Un administrateur d'ezMESURE a programmé
+        {% endif %}
+        la suppression de votre compte sur ezMESURE, elle sera effective le {{ deletedAt }}.
+      </p>
+
+      <p>
+        Si vous souhaitez annuler cette opération, il suffit de <strong>vous connectez à ezMESURE</strong>.
+      </p>
+    </mj-text>
+
+    <mj-button
+      href="{{ loginURL }}"
+      font-family="Helvetica"
+      background-color="#9c27b0"
+      color="white"
+    >
+      Se connecter
+    </mj-button>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

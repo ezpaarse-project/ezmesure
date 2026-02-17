@@ -173,7 +173,7 @@ definePageMeta({
 const { t, locale } = useI18n();
 const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedEndpoints = ref([]);

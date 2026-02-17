@@ -1,17 +1,154 @@
 const elastic = require('./elastic');
+
 const { metrics: indexTemplate } = require('../utils/index-templates');
 
-const index = '.ezmesure-metrics';
+const { appLogger } = require('./logger');
 
-exports.save = async (ctx) => {
-  const { body: exists } = await elastic.indices.exists({ index });
+// eslint-disable-next-line no-underscore-dangle
+const indexTemplateVersion = indexTemplate.mappings._meta.version;
 
-  if (!exists) {
-    await elastic.indices.create({
-      index,
-      body: indexTemplate,
-    });
+const alias = '.ezmesure-metrics';
+const index = `${alias}.${indexTemplateVersion}`;
+
+const calcMetrics = async () => {
+  appLogger.info('[metric]: Get metric is started');
+  let result;
+  try {
+    result = await elastic.search({
+      body: {
+        size: 0,
+        track_total_hits: true,
+        aggs: {
+          indices: { cardinality: { field: '_index' } },
+          titles: { cardinality: { field: 'publication_title' } },
+          platforms: { cardinality: { field: 'platform' } },
+          maxDate: { max: { field: 'datetime' } },
+          minDate: { min: { field: 'datetime' } },
+        },
+      },
+    }, { requestTimeout: '600s' });
+  } catch (err) {
+    appLogger.error('[metric]: updated global metrics');
+    appLogger.error(err.message);
+    return;
   }
+
+  const {
+    took,
+    hits = {},
+    aggregations = {},
+  } = result.body;
+
+  const {
+    titles = {},
+    platforms = {},
+    indices = {},
+    minDate = {},
+    maxDate = {},
+  } = aggregations;
+
+  let days = 0;
+
+  if (minDate.value && maxDate.value) {
+    days = Math.ceil((maxDate.value - minDate.value) / (24 * 60 * 60 * 1000));
+  }
+
+  const metrics = {
+    took,
+    docs: hits.total && hits.total.value,
+    dateCoverage: {
+      min: minDate.value,
+      max: maxDate.value,
+    },
+    metrics: {
+      days,
+      titles: titles.value,
+      platforms: platforms.value,
+      indices: indices.value,
+    },
+  };
+  appLogger.info(`docs: ${metrics.docs} | titles: ${metrics.metrics.titles} | platforms: ${metrics.metrics.platforms} | indices: ${metrics.metrics.indices}`);
+
+  return metrics;
+};
+
+let metricsPromise;
+async function getMetrics(refresh = false) {
+  if (!metricsPromise || refresh) {
+    metricsPromise = calcMetrics();
+  }
+
+  return metricsPromise;
+}
+
+async function migrateIndex() {
+  // Resolve indices behind alias
+  const { body: aliasesPerIndex } = await elastic.indices.getAlias({ index: `${alias}*` });
+  const oldIndices = Object.keys(aliasesPerIndex);
+  appLogger.verbose(`[metric] Found old indices: [${oldIndices}]`);
+
+  // Create index with new mapping
+  await elastic.indices.create({
+    index,
+    body: indexTemplate,
+  });
+  appLogger.info(`[metric] Created index: [${index}]`);
+
+  if (oldIndices.length <= 0) {
+    // Add alias to created index
+    await elastic.indices.putAlias({ index, name: alias });
+    appLogger.verbose(`[metric] Created alias [${alias}]`);
+
+    return;
+  }
+
+  // Reindex old indices into new one
+  await elastic.reindex({
+    wait_for_completion: true,
+    body: {
+      source: { index: oldIndices },
+      dest: { index },
+    },
+  });
+  appLogger.verbose('[metric] Migrated metrics');
+
+  // Check if an index exists in place of alias, and delete it
+  const { body: aliasAsIndex } = await elastic.indices.exists({ index: alias });
+  if (aliasAsIndex) {
+    await elastic.indices.delete({ index: alias });
+    appLogger.info(`[metric] Deleted index: [${alias}]`);
+  }
+
+  // Add alias to created index
+  await elastic.indices.putAlias({ index, name: alias });
+  appLogger.verbose(`[metric] Created alias [${alias}]`);
+
+  // Delete old indices
+  if (!aliasAsIndex) {
+    await elastic.indices.delete({ index: oldIndices });
+    appLogger.info(`[metric] Deleted indices: [${oldIndices}]`);
+  }
+}
+
+const migrationState = { migrating: false, promise: Promise.resolve(undefined) };
+
+async function ensureIndex() {
+  const { body: exists } = await elastic.indices.exists({ index });
+  if (exists) {
+    return;
+  }
+
+  if (!migrationState.migrating) {
+    migrationState.migrating = true;
+    migrationState.promise = migrateIndex()
+      .finally(() => { migrationState.migrating = false; });
+  }
+
+  await migrationState.promise;
+}
+
+async function save(ctx) {
+  await ensureIndex();
 
   const metric = {
     datetime: ctx.startTime,
@@ -58,8 +195,16 @@ exports.save = async (ctx) => {
     };
   }
 
-  return elastic.index({
+  const { body } = await elastic.index({
     index,
     body: metric,
-  }).then((res) => res.body);
+  });
+
+  return body;
+}
+
+module.exports = {
+  getMetrics,
+  ensureIndex,
+  save,
 };
