@@ -43,6 +43,7 @@ module.exports = {
   logs: {
     sse: {
       maxPoolSize: 20,
+      heartbeatInterval: 10000,
     },
     app: {
       Console: {

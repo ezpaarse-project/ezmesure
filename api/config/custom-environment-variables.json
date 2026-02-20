@@ -148,6 +148,10 @@
       "maxPoolSize": {
         "__name": "EZMESURE_SSE_LOGS_MAX_POOL_SIZE",
         "__format": "number"
+      },
+      "heartbeatInterval": {
+        "__name": "EZMESURE_SSE_LOGS_HEARTBEAT_INTERVAL",
+        "__format": "number"
       }
     },
     "app": {
