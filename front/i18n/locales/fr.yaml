@@ -1402,6 +1402,11 @@ images:
   dropImageHere: Déposez votre image ici
   invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : {accept}'
   imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : {size}'
+admin:
+  logs:
+    title: Journaux applicatifs
+    connecting: Connexion...
+    connectionError: Erreur de connexion
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type

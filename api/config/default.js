@@ -41,12 +41,22 @@ module.exports = {
     apiKey: '00000000-0000-0000-0000-000000000000',
   },
   logs: {
+    sse: {
+      maxPoolSize: 20,
+      heartbeatInterval: 10000,
+    },
     app: {
       Console: {
         format: format.combine(
           format.colorize(),
           format.timestamp(),
           format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`),
+        ),
+      },
+      Buffered: {
+        size: 500,
+        format: format.combine(
+          format.timestamp(),
         ),
       },
     },
