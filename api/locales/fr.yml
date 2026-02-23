@@ -171,3 +171,6 @@ errors:
 
   metric:
     notFound: Métrique [%s] introuvable
+
+  logs:
+    tooManySSEConnections: Trop de connexions SSE en cours

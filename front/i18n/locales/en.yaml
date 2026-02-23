@@ -1390,6 +1390,11 @@ images:
   dropImageHere: Drop your image here
   invalidImageFile: "Invalid image file. Accepted file types: {accept}"
   imageTooLarge: "Image is too large. Maximum allowed size: {size}"
+admin:
+  logs:
+    title: Application logs
+    connecting: Connecting...
+    connectionError: Connection error
 anErrorOccurred: An error occurred
 url: URL
 type: Type

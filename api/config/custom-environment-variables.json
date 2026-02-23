@@ -144,9 +144,26 @@
     "secret": "EZMESURE_ENCRYPTION_SECRET"
   },
   "logs": {
+    "sse": {
+      "maxPoolSize": {
+        "__name": "EZMESURE_SSE_LOGS_MAX_POOL_SIZE",
+        "__format": "number"
+      },
+      "heartbeatInterval": {
+        "__name": "EZMESURE_SSE_LOGS_HEARTBEAT_INTERVAL",
+        "__format": "number"
+      }
+    },
     "app": {
       "Console": {
         "level": "EZMESURE_LOG_LEVEL"
+      },
+      "Buffered": {
+        "level": "EZMESURE_LOG_LEVEL",
+        "bufferSize": {
+          "__name": "EZMESURE_LOG_BUFFER_SIZE",
+          "__format": "number"
+        }
       }
     }
   },

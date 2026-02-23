@@ -177,3 +177,6 @@ errors:
 
   metric:
     notFound: Metric [%s] not found
+
+  logs:
+    tooManySSEConnections: Too many SSE connections
