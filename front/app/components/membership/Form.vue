@@ -134,7 +134,8 @@
                       v-model="repositoryPermissions"
                       :repository="repo"
                       :readonly="!canEdit"
-                      @update:model-value="save([saveRepoPermissions])"
+                      :disabled="loading"
+                      @update:model-value="saveRepoPermission(repo.pattern)"
                     />
                   </v-list>
                 </template>
@@ -166,7 +167,7 @@
                       v-model="repositoryAliasPermissions"
                       :alias="alias"
                       :readonly="!canEdit"
-                      @update:model-value="save([saveAliasPermissions])"
+                      @update:model-value="saveAliasPermission(alias.pattern)"
                     />
                   </v-list>
                 </template>
@@ -198,7 +199,7 @@
                       v-model="spacePermissions"
                       :space="space"
                       :readonly="!canEdit"
-                      @update:model-value="save([saveSpacePermissions])"
+                      @update:model-value="saveSpacePermission(space.id)"
                     />
                   </v-list>
                 </template>
@@ -451,88 +452,64 @@ function saveMembership() {
   });
 }
 /**
- * Save repository permissions
+ * Save permissions for a single repository
  */
-function saveRepoPermissions() {
-  /** @type {Map<string, string>} */
-  const oldRepoPerms = new Map();
-  mapRepoPermissions(props.modelValue?.repositoryPermissions ?? [], oldRepoPerms);
+async function saveRepoPermission(pattern) {
+  const url = `/api/institutions/${institution.value.id}/repositories/${pattern}/permissions/${props.modelValue.username}`;
+  const level = repositoryPermissions.value.get(pattern);
 
-  const promises = [...repositoryPermissions.value, ...oldRepoPerms]
-    .map(([pattern, level]) => {
-      const url = `/api/institutions/${institution.value.id}/repositories/${pattern}/permissions/${props.modelValue.username}`;
+  if (!level) {
+    await $fetch(url, { method: 'DELETE' });
+    return;
+  }
 
-      // If new or modified
-      if (oldRepoPerms.get(pattern) !== level) {
-        return $fetch(url, { method: 'PUT', body: { readonly: level === 'read' } });
-      }
-
-      // If deleted
-      if (!repositoryPermissions.value.has(pattern)) {
-        return $fetch(url, { method: 'DELETE' });
-      }
-
-      return null;
-    })
-    .filter((p) => p !== null);
-
-  return Promise.all(promises);
+  await $fetch(url, { method: 'PUT', body: { readonly: level === 'read' } });
 }
 /**
- * Save repository alias permissions
+ * Save permissions for all repositories
  */
-function saveAliasPermissions() {
-  /** @type {Map<string, boolean>} */
-  const oldAliasPerms = new Map();
-  mapAliasPermissions(props.modelValue?.repositoryAliasPermissions ?? [], oldAliasPerms);
-
-  const promises = [...repositoryAliasPermissions.value, ...oldAliasPerms]
-    .map(([pattern, access]) => {
-      const url = `/api/institutions/${institution.value.id}/repository-aliases/${pattern}/permissions/${props.modelValue.username}`;
-
-      // If new or modified
-      if (oldAliasPerms.get(pattern) !== access) {
-        return $fetch(url, { method: 'PUT', body: {} });
-      }
-
-      // If deleted
-      if (!repositoryAliasPermissions.value.has(pattern)) {
-        return $fetch(url, { method: 'DELETE' });
-      }
-
-      return null;
-    })
-    .filter((p) => p !== null);
-
-  return Promise.all(promises);
+function saveAllRepoPermissions() {
+  return Promise.all(repositories.value.map(({ pattern }) => saveRepoPermission(pattern)));
 }
 /**
- * Save space permissions
+ * Save permissions for a single repository alias
  */
-function saveSpacePermissions() {
-  /** @type {Map<string, string>} */
-  const oldSpacePerms = new Map();
-  mapSpacePermissions(props.modelValue?.spacePermissions ?? [], oldSpacePerms);
+async function saveAliasPermission(pattern) {
+  const url = `/api/institutions/${institution.value.id}/repository-aliases/${pattern}/permissions/${props.modelValue.username}`;
+  const level = repositoryAliasPermissions.value.get(pattern);
 
-  const promises = [...spacePermissions.value, ...oldSpacePerms]
-    .map(([spaceId, level]) => {
-      const url = `/api/kibana-spaces/${spaceId}/permissions/${props.modelValue.username}`;
+  if (!level) {
+    await $fetch(url, { method: 'DELETE' });
+    return;
+  }
 
-      // If new or modified
-      if (oldSpacePerms.get(spaceId) !== level) {
-        return $fetch(url, { method: 'PUT', body: { readonly: level === 'read' } });
-      }
+  await $fetch(url, { method: 'PUT', body: { } });
+}
+/**
+ * Save permissions for all repository alias
+ */
+function saveAllAliasPermissions() {
+  return Promise.all(repositoryAliases.value.map(({ pattern }) => saveAliasPermission(pattern)));
+}
+/**
+ * Save permissions for a single space
+ */
+async function saveSpacePermission(spaceId) {
+  const url = `/api/kibana-spaces/${spaceId}/permissions/${props.modelValue.username}`;
+  const level = spacePermissions.value.get(spaceId);
 
-      // If deleted
-      if (!spacePermissions.value.has(spaceId)) {
-        return $fetch(url, { method: 'DELETE' });
-      }
+  if (!level) {
+    await $fetch(url, { method: 'DELETE' });
+    return;
+  }
 
-      return null;
-    })
-    .filter((p) => p !== null);
-
-  return Promise.all(promises);
+  await $fetch(url, { method: 'PUT', body: { readonly: level === 'read' } });
+}
+/**
+ * Save permissions for all spaces
+ */
+function saveAllSpacePermissions() {
+  return Promise.all(spaces.value.map(({ pattern }) => saveAliasPermission(pattern)));
 }
 /**
  * Save the form
@@ -542,10 +519,12 @@ function saveSpacePermissions() {
 async function save(actions) {
   loading.value = true;
 
-  let toDo = actions;
-  if (!actions) {
-    toDo = [saveMembership, saveRepoPermissions, saveAliasPermissions, saveSpacePermissions];
-  }
+  const toDo = actions || [
+    saveMembership,
+    saveAllRepoPermissions,
+    saveAllAliasPermissions,
+    saveAllSpacePermissions,
+  ];
 
   try {
     await Promise.all(toDo.map((action) => action()));
@@ -585,13 +564,13 @@ function applyRolePreset(role) {
       (repositoryAliases.value ?? []).map((a) => [a.pattern, aliasLevel ?? 'none']),
     );
 
-    actions.push(saveRepoPermissions);
-    actions.push(saveAliasPermissions);
+    actions.push(saveAllRepoPermissions);
+    actions.push(saveAllAliasPermissions);
   }
 
   if (preset.spaces) {
     spacePermissions.value = new Map((spaces.value ?? []).map((s) => [s.id, preset.spaces ?? 'none']));
-    actions.push(saveSpacePermissions);
+    actions.push(saveAllSpacePermissions);
   }
 
   locked.value = !!preset.locked;
