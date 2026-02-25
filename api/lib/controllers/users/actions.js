@@ -26,6 +26,7 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
+const publicUrl = config.get('publicUrl');
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const { deleteDurationDays = 7 } = config.get('users');
@@ -342,6 +343,7 @@ exports.deleteUser = async (ctx) => {
       bcc: admins,
       subject: "Un administrateur d'ezMESURE a effectué une action sur votre compte",
       ...generateMail('user-deletion-requested', {
+        loginURL: new URL('/authenticate', publicUrl).href,
         deletedAt: format(deletedAt, 'PPP', { locale: fr }),
       }),
     });
