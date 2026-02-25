@@ -353,7 +353,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    * @param {HarvestSession} session - The session to check
    */
   static isActive(session) {
-    return session.status === 'starting' || session.status === 'running';
+    return (session.status === 'starting' && !session.error) || session.status === 'running';
   }
 
   /* eslint-disable max-len */
