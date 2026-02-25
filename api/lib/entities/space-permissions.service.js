@@ -78,6 +78,10 @@ module.exports = class SpacePermissionsService extends BasePrismaService {
    */
   async delete(params) {
     const spacePermission = await spacePermissionsPrisma.remove(params, this.prisma);
+    if (!spacePermission) {
+      return null;
+    }
+
     this.triggerHooks('space_permission:delete', spacePermission);
     return spacePermission;
   }
