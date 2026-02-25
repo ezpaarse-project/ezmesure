@@ -18,9 +18,9 @@ const HarvestJobsService = require('./harvest-job.service');
 const RepositoriesService = require('./repositories.service');
 const SushiEndpointsService = require('./sushi-endpoints.service');
 const SushiCredentialsService = require('./sushi-credentials.service');
-const HTTPError = require('../models/HTTPError');
 
 const { queryToPrismaFilter } = require('../services/std-query/prisma-query');
+const { Prisma } = require('../services/prisma');
 const { appLogger } = require('../services/logger');
 
 /* eslint-disable max-len */
@@ -70,13 +70,29 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     let endDate = eD && parseDate(eD, format, now);
 
     if (beginDate && !isValidDate(beginDate)) {
-      throw new HTTPError(400, 'errors.harvest.invalidDate', [bD]);
+      throw new Error('The begin date is invalid', {
+        cause: {
+          type: 'invalidDate',
+          date: bD,
+        },
+      });
     }
     if (endDate && !isValidDate(endDate)) {
-      throw new HTTPError(400, 'errors.harvest.invalidDate', [eD]);
+      throw new Error('The end date is invalid', {
+        cause: {
+          type: 'invalidDate',
+          date: eD,
+        },
+      });
     }
     if (beginDate && endDate && isBefore(endDate, beginDate)) {
-      throw new HTTPError(400, 'errors.harvest.invalidPeriod', [bD, eD]);
+      throw new Error('The period is invalid', {
+        cause: {
+          type: 'invalidPeriod',
+          beginDate: bD,
+          endDate: bD,
+        },
+      });
     }
 
     if (!bD && !eD) {
@@ -190,7 +206,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    */
   async getCredentials(session, options = {}) {
     if (!session.credentialsQuery || typeof session.credentialsQuery !== 'object' || Array.isArray(session.credentialsQuery)) {
-      throw new HTTPError(400, 'errors.harvest.invalidQuery', [session.id]);
+      throw new Error('The query to get credentials is invalid', {
+        cause: { type: 'invalidQuery' },
+      });
     }
 
     const sushiCredentialsService = new SushiCredentialsService(this);
@@ -643,7 +661,12 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         );
 
         if (!index || !pattern) {
-          throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
+          throw new Error('No target index found for institution', {
+            cause: {
+              type: 'noTarget',
+              institutionId: institution.id,
+            },
+          });
         }
 
         appLogger.verbose(`[harvest-start][${session.id}] Found index [${index}] for [${institution.id}]`);
@@ -698,14 +721,14 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   async* start({ id }, options = {}) {
     const session = await this.findUnique({ where: { id } });
     if (!session) {
-      throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
+      throw new Error('The session was deleted before it started');
     }
 
     // Changing status to starting as we'll resolve endpoints, versions, etc.
     if (!options.dryRun) {
       await this.update({
         where: { id: session.id },
-        data: { status: 'starting' },
+        data: { status: 'starting', error: Prisma.DbNull },
       });
     }
 
@@ -826,7 +849,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
     const session = await this.findUnique({ where: { id } });
     if (!session) {
-      throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
+      throw new Error('The session was deleted before it stopped');
     }
 
     await this.update({
