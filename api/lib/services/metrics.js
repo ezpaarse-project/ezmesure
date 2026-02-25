@@ -3,6 +3,7 @@ const elastic = require('./elastic');
 const { metrics: indexTemplate } = require('../utils/index-templates');
 
 const { appLogger } = require('./logger');
+const { followTask } = require('./elastic/utils');
 
 // eslint-disable-next-line no-underscore-dangle
 const indexTemplateVersion = indexTemplate.mappings._meta.version;
@@ -103,17 +104,33 @@ async function migrateIndex() {
   }
 
   // Reindex old indices into new one
-  await elastic.reindex({
-    wait_for_completion: true,
+  const reindex = await elastic.reindex({
+    wait_for_completion: false,
     body: {
       source: { index: oldIndices },
       dest: { index },
     },
   });
+  if (!reindex.body.task) {
+    throw new Error("Can't reindex data: No task id in response");
+  }
+
+  // Wait for reindex to complete
+  await new Promise((resolve, reject) => {
+    const task = followTask(reindex.body.task);
+    task.on('progress', ({ status }) => {
+      const done = (status?.created || 0) + (status?.updated || 0);
+      const progress = Math.floor((done / (status?.total || 1)) * 100);
+      appLogger.verbose(`[metric] Migrated ${progress}% of metrics`);
+    });
+
+    task.on('end', () => resolve());
+    task.on('error', (error) => reject(error));
+  });
   appLogger.verbose('[metric] Migrated metrics');
 
   // Check if an index exists in place of alias, and delete it
-  const { body: aliasAsIndex } = await elastic.indices.exists({ index: alias });
+  const aliasAsIndex = oldIndices.some((indexName) => indexName === alias);
   if (aliasAsIndex) {
     await elastic.indices.delete({ index: alias });
     appLogger.info(`[metric] Deleted index: [${alias}]`);
