@@ -74,13 +74,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  modelValue: {
-    type: Object,
-    required: true,
-  },
-});
-
-const error = computed(() => props.modelValue.error);
+const session = defineModel({ type: Object, required: true });
+const error = computed(() => session.value.error);
 const cause = computed(() => error.value?.cause);
 </script>
