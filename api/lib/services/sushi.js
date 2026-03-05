@@ -63,7 +63,7 @@ const axios = createAxios({
  * @returns
  */
 function getSushiURL({ sushiUrl }, version = '5') {
-  const versionPrefixRegex = /(\/?r51?)?\/*$/i;
+  const versionPrefixRegex = /(\/?[rv]51?)?\/*$/i;
   const domain = sushiUrl.trim().replace(versionPrefixRegex, '');
   const versionPrefix = versionPrefixRegex.exec(sushiUrl)?.[1];
 
