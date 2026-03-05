@@ -1236,6 +1236,20 @@ harvest:
         prepared: Pas encore lancé
         starting: Démarrage en cours
         stopped: Arrété
+      errors:
+        title: Une erreur est survenue
+        types:
+          noTarget: Un établissement concerné ne possède pas d'entrepôt de type "COUNTER".
+          invalidDate: L'une des dates de la période demandée est invalide.
+          invalidPeriod: La période demandée est invalide.
+        causes:
+          beginDate: 'Date de début: {n}'
+          endDate: 'Date de fin: {n}'
+          institution: Voir la page établissement
+        api:
+          title: Message de l'API
+        actions:
+          restart: Après avoir corrigé le problème (à ce stade, vous pouvez éditer la session), veuillez redémarrer la session.
     form:
       title:add: Créer une session de moissonnage
       title:update: Éditer une session de moissonnage
