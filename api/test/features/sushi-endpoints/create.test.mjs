@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -49,13 +51,12 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
     describe('Create new sushi-endpoint', () => {
       let sushiEndpointId;
       it('#01 Should create sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/sushi-endpoints', {
           method: 'POST',
-          url: '/sushi-endpoints',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
         });
 
         // Test API
@@ -115,13 +116,12 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
 
     describe('Create new sushi-endpoint', () => {
       it('#02 Should not create sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/sushi-endpoints', {
           method: 'POST',
-          url: '/sushi-endpoints',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
         });
 
         // Test API
@@ -140,10 +140,9 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
   describe('Without random token', () => {
     describe('Create new sushi-endpoint', () => {
       it('#03 Should not create sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/sushi-endpoints', {
           method: 'POST',
-          url: '/sushi-endpoints',
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -161,10 +160,9 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
   describe('Without token', () => {
     describe('Create new sushi-endpoint', () => {
       it('#04 Should not create sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/sushi-endpoints', {
           method: 'POST',
-          url: '/sushi-endpoints',
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
         });
 
         // Test API

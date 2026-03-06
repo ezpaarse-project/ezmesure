@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -88,13 +90,12 @@ describe('[repository permission]: Test create features', () => {
             await membershipsPrisma.create({ data: membershipUserTest });
           });
           it('#01 Should create repository permission', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/institutions/${institutionId}/repositories/${pattern}/permissions/${userTest.username}`, {
               method: 'PUT',
-              url: `/institutions/${institutionId}/repositories/${pattern}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
-              data: permissionTest,
+              body: permissionTest,
             });
 
             // Test API

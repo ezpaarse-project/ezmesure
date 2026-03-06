@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -58,13 +60,12 @@ describe('[repositories]: Test update features', () => {
       });
 
       it(`#01 Should Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}] with [${updateRepositoryConfig.pattern}]`, async () => {
-        const res = await ezmesure({
+        const res = await ezmesure(`/repositories/${pattern}`, {
           method: 'PATCH',
-          url: `/repositories/${pattern}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: updateRepositoryConfig,
+          body: updateRepositoryConfig,
         });
 
         // Test API
@@ -109,13 +110,12 @@ describe('[repositories]: Test update features', () => {
       });
 
       it('#02 Should not update repository', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure(`/repositories/${pattern}`, {
           method: 'PATCH',
-          url: `/repositories/${pattern}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: updateRepositoryConfig,
+          body: updateRepositoryConfig,
         });
 
         // Test API
@@ -148,10 +148,9 @@ describe('[repositories]: Test update features', () => {
       });
 
       it('#03 Should not update repository', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure(`/repositories/${pattern}`, {
           method: 'PATCH',
-          url: `/repositories/${pattern}`,
-          data: updateRepositoryConfig,
+          body: updateRepositoryConfig,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -184,10 +183,9 @@ describe('[repositories]: Test update features', () => {
       });
 
       it('#04 Should not update repository', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure(`/repositories/${pattern}`, {
           method: 'PATCH',
-          url: `/repositories/${pattern}`,
-          data: updateRepositoryConfig,
+          body: updateRepositoryConfig,
         });
 
         // Test API

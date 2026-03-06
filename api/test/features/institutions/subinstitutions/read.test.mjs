@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -69,9 +71,8 @@ describe('[institutions - subinstitution]: Test read features', () => {
 
     describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#01 Should get subinstitution', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions`, {
           method: 'GET',
-          url: `/institutions/${masterInstitutionId}/subinstitutions`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -102,9 +103,8 @@ describe('[institutions - subinstitution]: Test read features', () => {
     });
     describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#02 Should not get subinstitution', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions`, {
           method: 'GET',
-          url: `/institutions/${masterInstitutionId}/subinstitutions`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -128,9 +128,8 @@ describe('[institutions - subinstitution]: Test read features', () => {
     });
     describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#03 Should not get subinstitution', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions`, {
           method: 'GET',
-          url: `/institutions/${masterInstitutionId}/subinstitutions`,
         });
 
         // Test API

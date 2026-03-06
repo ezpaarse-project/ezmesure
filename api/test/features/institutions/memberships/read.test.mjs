@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -76,9 +78,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#01 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -109,9 +110,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#02 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -154,9 +154,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#03 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -185,9 +184,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#04 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -212,9 +210,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#05 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -248,9 +245,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#06 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -275,9 +271,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#07 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -302,9 +297,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#08 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -334,9 +328,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#09 Should not get membership of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -359,9 +352,8 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#10 Should not get membership of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
         });
 
         // Test API

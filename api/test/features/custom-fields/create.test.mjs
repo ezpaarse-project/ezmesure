@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -46,10 +48,9 @@ describe('[custom-fields]: Test create features', () => {
 
     describe('Create new custom field', () => {
       it('#01 Should be able to create a custom field', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/custom-fields/${baseFieldData.id}`, {
           method: 'PUT',
-          url: `/custom-fields/${baseFieldData.id}`,
-          data: baseFieldData,
+          body: baseFieldData,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -85,10 +86,9 @@ describe('[custom-fields]: Test create features', () => {
 
     describe('Create new custom field', () => {
       it('#02 Should not be able to create a custom field', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/custom-fields/${baseFieldData.id}`, {
           method: 'PUT',
-          url: `/custom-fields/${baseFieldData.id}`,
-          data: baseFieldData,
+          body: baseFieldData,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -107,10 +107,9 @@ describe('[custom-fields]: Test create features', () => {
   describe('With invalid token', () => {
     describe('Create new custom field', () => {
       it('#03 Should not be able to create a custom field', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/custom-fields/${baseFieldData.id}`, {
           method: 'PUT',
-          url: `/custom-fields/${baseFieldData.id}`,
-          data: baseFieldData,
+          body: baseFieldData,
           headers: {
             Authorization: 'Bearer: some-invalid-token',
           },
@@ -129,10 +128,9 @@ describe('[custom-fields]: Test create features', () => {
   describe('Without token', () => {
     describe('Create new custom field', () => {
       it('#04 Should not be able to create a custom field', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/custom-fields/${baseFieldData.id}`, {
           method: 'PUT',
-          url: `/custom-fields/${baseFieldData.id}`,
-          data: baseFieldData,
+          body: baseFieldData,
         });
 
         // Check API response

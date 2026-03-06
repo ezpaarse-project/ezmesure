@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -28,10 +30,9 @@ describe('[users]: Test login users features', () => {
   });
   describe('Login with admin account', () => {
     it('#01 Should get auth token', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/login/local', {
         method: 'POST',
-        url: '/login/local',
-        data: {
+        body: {
           username: adminUsername,
           password: adminPassword,
         },
@@ -50,10 +51,9 @@ describe('[users]: Test login users features', () => {
     });
 
     it('#02 Should get auth token', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/login/local', {
         method: 'POST',
-        url: '/login/local',
-        data: {
+        body: {
           username: userTest.username,
           password: userPassword,
         },
@@ -75,10 +75,9 @@ describe('[users]: Test login users features', () => {
     });
 
     it('#03 Should get auth token', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/login/local', {
         method: 'POST',
-        url: '/login/local',
-        data: {
+        body: {
           username: userTest.username,
           password: userPassword,
         },
@@ -94,10 +93,9 @@ describe('[users]: Test login users features', () => {
 
   describe('Someone not registered', () => {
     it('#04 Should not get auth token', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/login/local', {
         method: 'POST',
-        url: '/login/local',
-        data: {
+        body: {
           username: 'toto',
           password: 'titi',
         },

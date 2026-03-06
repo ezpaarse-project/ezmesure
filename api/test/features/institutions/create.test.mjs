@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -37,13 +39,12 @@ describe('[institutions]: Test create features', () => {
   describe('As admin', () => {
     let institutionId;
     it(`#01 Should create new institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'POST',
-        url: '/institutions',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
-        data: institutionTest,
+        body: institutionTest,
       });
 
       institutionId = httpAppResponse?.data?.id;
@@ -106,10 +107,9 @@ describe('[institutions]: Test create features', () => {
       userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
     it(`#02 Should create new institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'POST',
-        url: '/institutions',
-        data: institutionTest,
+        body: institutionTest,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -175,10 +175,9 @@ describe('[institutions]: Test create features', () => {
   });
   describe('With random token', () => {
     it(`#03 Should no create institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'POST',
-        url: '/institutions',
-        data: institutionTest,
+        body: institutionTest,
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -198,10 +197,9 @@ describe('[institutions]: Test create features', () => {
   });
   describe('Without token', () => {
     it(`#04 Should no create institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'POST',
-        url: '/institutions',
-        data: institutionTest,
+        body: institutionTest,
       });
 
       // Test API

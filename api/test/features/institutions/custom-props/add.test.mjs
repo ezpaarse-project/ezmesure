@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -60,10 +62,9 @@ describe('[institutions - custom-props] Add', () => {
     });
 
     it('#01 Should be able to add a custom prop', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [customProp],
         },
@@ -104,10 +105,9 @@ describe('[institutions - custom-props] Add', () => {
     });
 
     it('#02 Should not be able to add a custom prop', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [customProp],
         },

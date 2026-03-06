@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import path from 'path';
 import fs from 'fs-extra';
 import config from 'config';
@@ -39,10 +41,9 @@ describe('[logs]: Test insert features', () => {
       it(`#01 Should upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(logDir, 'wiley.csv');
 
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
           method: 'POST',
-          url: `/logs/${indexName}`,
-          data: await fs.readFile(pathFile, 'utf-8'),
+          body: await fs.readFile(pathFile, 'utf-8'),
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -83,10 +84,9 @@ describe('[logs]: Test insert features', () => {
       it(`#02 Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(logDir, 'wiley.csv');
 
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
           method: 'POST',
-          url: `/logs/${indexName}`,
-          data: await fs.readFile(pathFile, 'utf-8'),
+          body: await fs.readFile(pathFile, 'utf-8'),
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -108,10 +108,9 @@ describe('[logs]: Test insert features', () => {
       it(`#03 Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(logDir, 'wiley.csv');
 
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
           method: 'POST',
-          url: `/logs/${indexName}`,
-          data: await fs.readFile(pathFile, 'utf-8'),
+          body: await fs.readFile(pathFile, 'utf-8'),
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -136,10 +135,9 @@ describe('[logs]: Test insert features', () => {
     it(`#04 Should not upload ec in index [${indexName}]`, async () => {
       const pathFile = path.resolve(logDir, 'wiley.csv');
 
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
         method: 'POST',
-        url: `/logs/${indexName}`,
-        data: await fs.readFile(pathFile, 'utf-8'),
+        body: await fs.readFile(pathFile, 'utf-8'),
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -160,10 +158,9 @@ describe('[logs]: Test insert features', () => {
     it(`#05 Should not upload ec in index [${indexName}]`, async () => {
       const pathFile = path.resolve(logDir, 'wiley.csv');
 
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
         method: 'POST',
-        url: `/logs/${indexName}`,
-        data: await fs.readFile(pathFile, 'utf-8'),
+        body: await fs.readFile(pathFile, 'utf-8'),
       });
 
       expect(httpAppResponse).toHaveProperty('status', 401);

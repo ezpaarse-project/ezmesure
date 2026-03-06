@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -43,9 +45,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#01 Should get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'GET',
-        url: '/institutions',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -74,9 +75,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it(`#02 Should get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -122,9 +122,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#03 Should get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'GET',
-        url: '/institutions',
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -154,9 +153,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it(`#04 GET Should get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -198,9 +196,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#05 Should not get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'GET',
-        url: '/institutions',
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -210,9 +207,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it(`#06 Should not get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
       });
 
       expect(httpAppResponse).toHaveProperty('status', 401);
@@ -230,18 +226,16 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#07 Should not get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/institutions', {
         method: 'GET',
-        url: '/institutions',
       });
 
       expect(httpAppResponse).toHaveProperty('status', 401);
     });
 
     it(`#08 Should not get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
       });
 
       expect(httpAppResponse).toHaveProperty('status', 401);

@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -27,9 +29,8 @@ describe('[indices]: Test create features', () => {
   });
   describe('As admin', () => {
     it(`#01 Should create new index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
         method: 'PUT',
-        url: `/indices/${indexName}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -56,9 +57,8 @@ describe('[indices]: Test create features', () => {
     });
 
     it(`#02 Should not create index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
         method: 'PUT',
-        url: `/indices/${indexName}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -76,9 +76,8 @@ describe('[indices]: Test create features', () => {
   });
   describe('With random token', () => {
     it(`#03 Should not create index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
         method: 'PUT',
-        url: `/indices/${indexName}`,
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -96,9 +95,8 @@ describe('[indices]: Test create features', () => {
   });
   describe('Without token', () => {
     it(`#04 Should not create index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
         method: 'PUT',
-        url: `/indices/${indexName}`,
       });
       expect(httpAppResponse).toHaveProperty('status', 401);
 

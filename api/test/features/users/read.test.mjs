@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -32,9 +34,8 @@ describe('[users]: Test read users features', () => {
   describe('As admin', () => {
     describe('Get all users', () => {
       it('#01 Should get all users', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/users', {
           method: 'GET',
-          url: '/users',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -56,9 +57,8 @@ describe('[users]: Test read users features', () => {
       });
 
       it(`#02 Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
           method: 'GET',
-          url: `/users/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -81,9 +81,8 @@ describe('[users]: Test read users features', () => {
     describe('Get user that does not exist', () => {
       const usernameNotExist = 'random';
       it(`#03 GET /users/random - Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/users/random', {
           method: 'GET',
-          url: '/users/random',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -112,9 +111,8 @@ describe('[users]: Test read users features', () => {
 
     describe('Get all users', () => {
       it('#04 Should get all users', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/users', {
           method: 'GET',
-          url: '/users',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -132,9 +130,8 @@ describe('[users]: Test read users features', () => {
 
     describe(`Get user with username [${userTest.username}]`, () => {
       it(`#05 Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
           method: 'GET',
-          url: `/users/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -166,9 +163,8 @@ describe('[users]: Test read users features', () => {
     });
     describe('Get all users', () => {
       it('#06 Should not get users', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/users', {
           method: 'GET',
-          url: '/users',
           headers: {
             Authorization: 'Bearer random',
           },
@@ -191,9 +187,8 @@ describe('[users]: Test read users features', () => {
 
     describe(`Get user with username [${userTest.username}]`, () => {
       it(`#07 Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
           method: 'GET',
-          url: `/users/${userTest.username}`,
           headers: {
             Authorization: 'Bearer random',
           },

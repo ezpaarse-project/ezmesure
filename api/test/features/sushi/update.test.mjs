@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -125,13 +127,12 @@ describe('[sushi]: Test update sushi credential features', () => {
         });
 
         it('#01 Should update sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'PATCH',
-            url: `/sushi/${sushiId}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
-            data: sushiUpdatedTest,
+            body: sushiUpdatedTest,
           });
 
           // Test API
@@ -200,13 +201,12 @@ describe('[sushi]: Test update sushi credential features', () => {
         });
 
         it('#02 Should update sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'PATCH',
-            url: `/sushi/${sushiId}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
-            data: sushiUpdatedTest,
+            body: sushiUpdatedTest,
           });
 
           // Test API
@@ -284,13 +284,12 @@ describe('[sushi]: Test update sushi credential features', () => {
         });
 
         it('#03 Should not update sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'PATCH',
-            url: `/sushi/${sushiId}`,
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
-            data: sushiUpdatedTest,
+            body: sushiUpdatedTest,
           });
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 403);
@@ -329,13 +328,12 @@ describe('[sushi]: Test update sushi credential features', () => {
           });
 
           it('#04 Should update sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'PATCH',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiUpdatedTest,
+              body: sushiUpdatedTest,
             });
 
             // Test API
@@ -400,13 +398,12 @@ describe('[sushi]: Test update sushi credential features', () => {
           });
 
           it('#05 Should not update sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'PATCH',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiUpdatedTest,
+              body: sushiUpdatedTest,
             });
 
             // Test API
@@ -460,13 +457,12 @@ describe('[sushi]: Test update sushi credential features', () => {
           });
 
           it('#06 Should not update sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'PATCH',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiUpdatedTest,
+              body: sushiUpdatedTest,
             });
 
             // Test API
@@ -496,13 +492,12 @@ describe('[sushi]: Test update sushi credential features', () => {
           });
 
           it('#07 Should not update sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'PATCH',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiUpdatedTest,
+              body: sushiUpdatedTest,
             });
 
             // Test API
@@ -544,10 +539,9 @@ describe('[sushi]: Test update sushi credential features', () => {
         });
 
         it('#08 Should not update sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'PATCH',
-            url: `/sushi/${sushiId}`,
-            data: sushiUpdatedTest,
+            body: sushiUpdatedTest,
             headers: {
               Authorization: 'Bearer: random',
             },
@@ -581,10 +575,9 @@ describe('[sushi]: Test update sushi credential features', () => {
         });
 
         it('#09 Should not update sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'PATCH',
-            url: `/sushi/${sushiId}`,
-            data: sushiUpdatedTest,
+            body: sushiUpdatedTest,
           });
           expect(httpAppResponse).toHaveProperty('status', 401);
         });

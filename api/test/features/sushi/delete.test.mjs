@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -108,10 +110,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
         });
 
         it('#01 Should delete sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'DELETE',
-            url: `/sushi/${sushiId}`,
-            data: { reason: 'Some very pertinent reason' },
+            body: { reason: 'Some very pertinent reason' },
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -153,10 +154,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
         });
 
         it('#02 Should delete sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'DELETE',
-            url: `/sushi/${sushiId}`,
-            data: { reason: 'Some very pertinent reason' },
+            body: { reason: 'Some very pertinent reason' },
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -209,10 +209,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
         });
 
         it('#03 Should not delete sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'DELETE',
-            url: `/sushi/${sushiId}`,
-            data: { reason: 'Some very pertinent reason' },
+            body: { reason: 'Some very pertinent reason' },
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
@@ -271,10 +270,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
           });
 
           it('#04 Should delete sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'DELETE',
-              url: `/sushi/${sushiId}`,
-              data: { reason: 'Some very pertinent reason' },
+              body: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -312,10 +310,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
           });
 
           it('#05 Should not delete sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'DELETE',
-              url: `/sushi/${sushiId}`,
-              data: { reason: 'Some very pertinent reason' },
+              body: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -390,10 +387,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
           });
 
           it('#06 Should not delete sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'DELETE',
-              url: `/sushi/${sushiId}`,
-              data: { reason: 'Some very pertinent reason' },
+              body: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -444,10 +440,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
           });
 
           it('#07 Should not delete sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'DELETE',
-              url: `/sushi/${sushiId}`,
-              data: { reason: 'Some very pertinent reason' },
+              body: { reason: 'Some very pertinent reason' },
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -510,10 +505,9 @@ describe('[sushi]: Test delete sushi credential features', () => {
         });
 
         it('#08 Should not delete sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'DELETE',
-            url: `/sushi/${sushiId}`,
-            data: { reason: 'Some very pertinent reason' },
+            body: { reason: 'Some very pertinent reason' },
           });
 
           // Test API

@@ -94,9 +94,8 @@ describe('[roles] Assign features', () => {
     });
 
     it('#01 Should be able to assign a restricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -123,9 +122,8 @@ describe('[roles] Assign features', () => {
     });
 
     it('#02 Should be able to assign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -160,9 +158,8 @@ describe('[roles] Assign features', () => {
     });
 
     it('#03 Should be able to assign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -189,9 +186,8 @@ describe('[roles] Assign features', () => {
     });
 
     it('#04 Should not be able to assign a restricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -214,9 +210,8 @@ describe('[roles] Assign features', () => {
     });
 
     it('#04 Should not be able to assign a restricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -231,9 +226,8 @@ describe('[roles] Assign features', () => {
     });
 
     it('#04 Should not be able to assign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -250,9 +244,8 @@ describe('[roles] Assign features', () => {
 
   describe('An unauthenticated user', () => {
     it('#04 Should not be able to assign a restricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`,
       });
 
       // Test API
@@ -264,9 +257,8 @@ describe('[roles] Assign features', () => {
     });
 
     it('#04 Should not be able to assign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'PUT',
-        url: `/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`,
       });
 
       // Test API

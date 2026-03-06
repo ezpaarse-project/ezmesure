@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 
 import ezmesure from '../../setup/ezmesure';
 
@@ -37,9 +39,8 @@ describe('[users]: Test activate users features', () => {
       });
 
       it(`#01 Should activate user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/profile/_activate', {
           method: 'POST',
-          url: '/profile/_activate',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },

@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -47,9 +49,8 @@ describe('[repositories]: Test delete features', () => {
         pattern = repository.pattern;
       });
       it(`#01 Should delete repository of type [${ezpaarseRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}]`, async () => {
-        const res = await ezmesure({
+        const res = await ezmesure(`/repositories/${pattern}`, {
           method: 'DELETE',
-          url: `/repositories/${pattern}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -86,9 +87,8 @@ describe('[repositories]: Test delete features', () => {
       });
 
       it('#02 Should not delete repository', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure(`/repositories/${pattern}`, {
           method: 'DELETE',
-          url: `/repositories/${pattern}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -125,9 +125,8 @@ describe('[repositories]: Test delete features', () => {
       });
 
       it('#03 Should not delete repository', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure(`/repositories/${pattern}`, {
           method: 'DELETE',
-          url: `/repositories/${pattern}`,
         });
 
         // Test API

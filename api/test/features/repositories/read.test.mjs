@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -52,9 +54,8 @@ describe('[repositories]: Test read features', () => {
       });
 
       it(`#01 Should get repository of type [${ezcounterRepositoryConfig.type}] and pattern [${ezcounterRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
           method: 'GET',
-          url: `/repositories/${pattern}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -93,9 +94,8 @@ describe('[repositories]: Test read features', () => {
       });
 
       it('#02 Should not get repository', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
           method: 'GET',
-          url: `/repositories/${pattern}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -123,9 +123,8 @@ describe('[repositories]: Test read features', () => {
       });
 
       it('#03 Should not get repository', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
           method: 'GET',
-          url: `/repositories/${pattern}`,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -150,9 +149,8 @@ describe('[repositories]: Test read features', () => {
       });
 
       it('#04 Should not get repository', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
           method: 'GET',
-          url: `/repositories/${pattern}`,
         });
 
         expect(httpAppResponse).toHaveProperty('status', 401);

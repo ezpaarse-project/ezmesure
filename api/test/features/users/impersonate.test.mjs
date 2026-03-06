@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -52,9 +54,8 @@ describe('[users]: Test impersonation features', () => {
 
   describe('An admin', () => {
     it('#01 Should be able to impersonate another user', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/users/target.user/_impersonate', {
         method: 'POST',
-        url: '/users/target.user/_impersonate',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -68,9 +69,8 @@ describe('[users]: Test impersonation features', () => {
       const cookieHeader = httpAppResponse.headers['set-cookie'];
       const targetUserToken = tokenPattern.exec(cookieHeader)?.[1];
 
-      const profileResponse = await ezmesure({
+      const profileResponse = await ezmesure('/profile', {
         method: 'GET',
-        url: '/profile',
         headers: {
           Authorization: `Bearer ${targetUserToken}`,
         },
@@ -83,9 +83,8 @@ describe('[users]: Test impersonation features', () => {
 
   describe('A regular user', () => {
     it('#02 Should not be able to impersonate another user', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/users/target.user/_impersonate', {
         method: 'POST',
-        url: '/users/target.user/_impersonate',
         headers: {
           Authorization: `Bearer ${regularUserToken}`,
         },
@@ -97,9 +96,8 @@ describe('[users]: Test impersonation features', () => {
 
   describe('An anonymous user', () => {
     it('#03 Should not be able to impersonate another user', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure('/users/target.user/_impersonate', {
         method: 'POST',
-        url: '/users/target.user/_impersonate',
         headers: {
           Authorization: `Bearer ${regularUser}`,
         },

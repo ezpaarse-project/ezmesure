@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -49,10 +51,9 @@ describe('[repositories]: Test create features', () => {
       let pattern;
 
       it(`#01 Should create repository of type [${ezpaarseRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/repositories', {
           method: 'POST',
-          url: '/repositories',
-          data: ezpaarseRepositoryConfig,
+          body: ezpaarseRepositoryConfig,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -85,13 +86,12 @@ describe('[repositories]: Test create features', () => {
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       let pattern;
       it(`#02 Should create repository of type [${ezcounterRepositoryConfig.type}] and pattern [${ezcounterRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/repositories', {
           method: 'POST',
-          url: '/repositories',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: ezcounterRepositoryConfig,
+          body: ezcounterRepositoryConfig,
         });
 
         pattern = httpAppResponse?.data?.pattern;
@@ -123,13 +123,12 @@ describe('[repositories]: Test create features', () => {
     describe(`Create new repository of type [${randomRepositoryConfig.type}]`, () => {
       let pattern;
       it(`#03 Should create repositories of type [${randomRepositoryConfig.type}] and pattern  [${randomRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/repositories', {
           method: 'POST',
-          url: '/repositories',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: randomRepositoryConfig,
+          body: randomRepositoryConfig,
         });
 
         pattern = httpAppResponse?.data?.pattern;
@@ -169,10 +168,9 @@ describe('[repositories]: Test create features', () => {
 
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#04 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/repositories', {
           method: 'POST',
-          url: '/repositories',
-          data: ezcounterRepositoryConfig,
+          body: ezcounterRepositoryConfig,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -188,10 +186,9 @@ describe('[repositories]: Test create features', () => {
     });
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#05 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/repositories', {
           method: 'POST',
-          url: '/repositories',
-          data: ezcounterRepositoryConfig,
+          body: ezcounterRepositoryConfig,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -214,10 +211,9 @@ describe('[repositories]: Test create features', () => {
   describe('With random token', () => {
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#06 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/repositories', {
           method: 'POST',
-          url: '/repositories',
-          data: ezcounterRepositoryConfig,
+          body: ezcounterRepositoryConfig,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -235,10 +231,9 @@ describe('[repositories]: Test create features', () => {
   describe('Without token', () => {
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#07 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/repositories', {
           method: 'POST',
-          url: '/repositories',
-          data: ezcounterRepositoryConfig,
+          body: ezcounterRepositoryConfig,
         });
 
         // Test API

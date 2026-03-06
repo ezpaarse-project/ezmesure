@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -109,9 +111,8 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         it('#01 Should get sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'GET',
-            url: `/sushi/${sushiId}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -164,9 +165,8 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         it('#02 Should get sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'GET',
-            url: `/sushi/${sushiId}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -228,9 +228,8 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         it('#03 Should not get sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'GET',
-            url: `/sushi/${sushiId}`,
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
@@ -275,9 +274,8 @@ describe('[sushi]: Test read sushi credential features', () => {
           });
 
           it('#04 Should get sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'GET',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -326,9 +324,8 @@ describe('[sushi]: Test read sushi credential features', () => {
           });
 
           it('#05 Should get sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'GET',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -375,9 +372,8 @@ describe('[sushi]: Test read sushi credential features', () => {
           });
 
           it('#06 Should not get sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'GET',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -432,9 +428,8 @@ describe('[sushi]: Test read sushi credential features', () => {
           });
 
           it('#07 Should not get sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'GET',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -466,9 +461,8 @@ describe('[sushi]: Test read sushi credential features', () => {
           });
 
           it('#08 Should not get sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
               method: 'GET',
-              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
@@ -513,9 +507,8 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         it('#09 Should not get sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'GET',
-            url: `/sushi/${sushiId}`,
             headers: {
               Authorization: 'Bearer: random',
             },
@@ -548,9 +541,8 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         it('#10 Should not get sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/sushi/${sushiId}`, {
             method: 'GET',
-            url: `/sushi/${sushiId}`,
           });
 
           // Test API

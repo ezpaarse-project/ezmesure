@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -92,9 +94,8 @@ describe('[repository permission]: Test delete features', () => {
             await repositoryPermissionsPrisma.create({ data: permissionTest });
           });
           it('#01 Should delete repository permission', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure(`/institutions/${institutionId}/repositories/${pattern}/permissions/${userTest.username}`, {
               method: 'DELETE',
-              url: `/institutions/${institutionId}/repositories/${pattern}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },

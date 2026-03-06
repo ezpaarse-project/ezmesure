@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -75,9 +77,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         await membershipsPrisma.create({ data: membershipUserTest });
       });
       it(`#01 Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'DELETE',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -103,9 +104,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         await membershipsPrisma.create({ data: membershipUserTest });
       });
       it(`#02 Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'DELETE',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -146,9 +146,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         });
 
         it('#03 Should delete membership', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'DELETE',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -174,9 +173,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         });
 
         it('#04 Should delete membership', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'DELETE',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -200,9 +198,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         });
 
         it('#05 Should delete membership', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'DELETE',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -235,9 +232,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         });
 
         it('#06 Should not delete membership', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'DELETE',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
             },
@@ -268,9 +264,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         await membershipsPrisma.create({ data: membershipUserTest });
       });
       it('#07 Should not delete membership', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'DELETE',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
         });
 
         // Test API
@@ -299,9 +294,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         await membershipsPrisma.create({ data: membershipUserTest });
       });
       it('#08 Should not delete membership', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'DELETE',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
         });
 
         // Test API

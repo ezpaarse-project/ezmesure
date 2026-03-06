@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -109,13 +111,12 @@ describe('[sushi]: Test create sushi credential features', () => {
         });
 
         it('#01 Should create sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure('/sushi', {
             method: 'POST',
-            url: '/sushi',
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
-            data: sushiTest,
+            body: sushiTest,
           });
 
           // Test API
@@ -181,13 +182,12 @@ describe('[sushi]: Test create sushi credential features', () => {
         });
 
         it('#02 Should create sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure('/sushi', {
             method: 'POST',
-            url: '/sushi',
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
-            data: sushiTest,
+            body: sushiTest,
           });
 
           // Test API
@@ -262,13 +262,12 @@ describe('[sushi]: Test create sushi credential features', () => {
         });
 
         it('#03 Should not create sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure('/sushi', {
             method: 'POST',
-            url: '/sushi',
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
-            data: sushiTest,
+            body: sushiTest,
           });
 
           // Test API
@@ -306,13 +305,12 @@ describe('[sushi]: Test create sushi credential features', () => {
           });
 
           it('#04 Should create sushi', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure('/sushi', {
               method: 'POST',
-              url: '/sushi',
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiTest,
+              body: sushiTest,
             });
 
             // Test API
@@ -373,13 +371,12 @@ describe('[sushi]: Test create sushi credential features', () => {
           });
 
           it('#05 Should not create sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure('/sushi', {
               method: 'POST',
-              url: '/sushi',
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiTest,
+              body: sushiTest,
             });
 
             // Test API
@@ -430,13 +427,12 @@ describe('[sushi]: Test create sushi credential features', () => {
           });
 
           it('#06 Should not create sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure('/sushi', {
               method: 'POST',
-              url: '/sushi',
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiTest,
+              body: sushiTest,
             });
 
             // Test API
@@ -465,13 +461,12 @@ describe('[sushi]: Test create sushi credential features', () => {
           });
 
           it('#07 Should not create sushi credential', async () => {
-            const httpAppResponse = await ezmesure({
+            const httpAppResponse = await ezmesure('/sushi', {
               method: 'POST',
-              url: '/sushi',
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiTest,
+              body: sushiTest,
             });
 
             // Test API
@@ -512,10 +507,9 @@ describe('[sushi]: Test create sushi credential features', () => {
         });
 
         it('#08 Should not create sushi credential', async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure('/sushi', {
             method: 'POST',
-            url: '/sushi',
-            data: sushiTest,
+            body: sushiTest,
           });
 
           // Test API

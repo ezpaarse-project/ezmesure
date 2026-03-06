@@ -53,13 +53,12 @@ describe('[space]: Test create spaces features', () => {
     describe(`Create new space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       let spaceId;
       it('#01 Should create space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/kibana-spaces/', {
           method: 'POST',
-          url: '/kibana-spaces/',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: spaceConfig,
+          body: spaceConfig,
         });
 
         // Test API
@@ -97,13 +96,12 @@ describe('[space]: Test create spaces features', () => {
     });
     describe(`Create new space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       it('#02 Should not create space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/kibana-spaces/', {
           method: 'POST',
-          url: '/kibana-spaces/',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: spaceConfig,
+          body: spaceConfig,
         });
 
         // Test API
@@ -126,10 +124,9 @@ describe('[space]: Test create spaces features', () => {
       });
 
       it('#03 Should not create space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/kibana-spaces/', {
           method: 'POST',
-          url: '/kibana-spaces/',
-          data: spaceConfig,
+          body: spaceConfig,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -155,10 +152,9 @@ describe('[space]: Test create spaces features', () => {
       });
 
       it('#04 Should not create space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure('/kibana-spaces/', {
           method: 'POST',
-          url: '/kibana-spaces/',
-          data: spaceConfig,
+          body: spaceConfig,
         });
 
         // Test API

@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -33,13 +35,12 @@ describe('[users]: Test create users features', () => {
       });
 
       it(`#01 Should create new user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
           method: 'PUT',
-          url: `/users/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: userTest,
+          body: userTest,
         });
 
         // Test API
@@ -64,10 +65,9 @@ describe('[users]: Test create users features', () => {
   describe('With random token', () => {
     describe('Create new user', () => {
       it(`#02 Should not create new user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
           method: 'PUT',
-          url: `/users/${userTest.username}`,
-          data: userTest,
+          body: userTest,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -87,10 +87,9 @@ describe('[users]: Test create users features', () => {
   describe('Without token', () => {
     describe('Create new user', () => {
       it(`#03 Should not create new user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
           method: 'PUT',
-          url: `/users/${userTest.username}`,
-          data: userTest,
+          body: userTest,
         });
 
         // Test API

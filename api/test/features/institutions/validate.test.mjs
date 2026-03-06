@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -42,10 +44,9 @@ describe('[institutions]: Test validate institution features', () => {
       institutionId = institution.id;
     });
     it(`#01 Should validate institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}/validated`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}/validated`,
-        data: { value: true },
+        body: { value: true },
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -63,10 +64,9 @@ describe('[institutions]: Test validate institution features', () => {
 
     // TODO start with invalidate institution
     it(`#02 Should invalidate institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}/validated`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}/validated`,
-        data: { value: false },
+        body: { value: false },
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -103,10 +103,9 @@ describe('[institutions]: Test validate institution features', () => {
       });
 
       it(`#03 Should not validate institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/validated`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/validated`,
-          data: { value: true },
+          body: { value: true },
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -123,10 +122,9 @@ describe('[institutions]: Test validate institution features', () => {
       // TODO start with invalidate institution
 
       it(`#04 Should not invalidate institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/validated`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/validated`,
-          data: { value: true },
+          body: { value: true },
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -143,10 +141,9 @@ describe('[institutions]: Test validate institution features', () => {
 
     describe('Institution created by other', () => {
       it(`#05 Should not validate institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/validated`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/validated`,
-          data: { value: true },
+          body: { value: true },
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -163,10 +160,9 @@ describe('[institutions]: Test validate institution features', () => {
       // TODO start with invalidate institution
 
       it(`#06 Should not invalidate institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/validated`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/validated`,
-          data: { value: false },
+          body: { value: false },
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -193,10 +189,9 @@ describe('[institutions]: Test validate institution features', () => {
       institutionId = institution.id;
     });
     it(`#07 Should not validate institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}`,
-        data: { value: true },
+        body: { value: true },
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -212,10 +207,9 @@ describe('[institutions]: Test validate institution features', () => {
 
     // TODO start with invalidate institution
     it(`#08 Should not invalidate institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}`,
-        data: { value: false },
+        body: { value: false },
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -240,10 +234,9 @@ describe('[institutions]: Test validate institution features', () => {
       institutionId = institution.id;
     });
     it(`#09 Should not validate institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}`,
-        data: { value: true },
+        body: { value: true },
       });
 
       // Test API
@@ -256,10 +249,9 @@ describe('[institutions]: Test validate institution features', () => {
 
     // TODO start with invalidate institution
     it(`#10 Should not invalidate institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure(`/institutions/${institutionId}`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}`,
-        data: { value: false },
+        body: { value: false },
       });
 
       // Test API
