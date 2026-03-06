@@ -31,6 +31,7 @@ const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields
 
 const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
+const publicUrl = config.get('publicUrl');
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const { deleteDurationDays = 7 } = config.get('users');
@@ -457,6 +458,7 @@ exports.deleteUser = async (ctx) => {
       bcc: admins,
       subject: 'Votre demande de suppression à bien été prise en compte',
       ...generateMail('user-deletion-requested', {
+        loginURL: new URL('/authenticate', publicUrl).href,
         deletedAt: format(deletedAt, 'PPP', { locale: fr }),
         isFromUser: true,
       }),

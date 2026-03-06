@@ -1,6 +1,7 @@
 // @ts-check
 
 const elastic = require('../../../elastic');
+const { followTask } = require('../../../elastic/utils');
 
 const HarvestError = require('../HarvestError');
 
@@ -21,37 +22,22 @@ const waitUntilTaskComplete = (esTaskId, step, steps, timeout) => {
   }
   const { data } = s;
 
-  let timeoutId;
-  const intervalMs = 5000;
+  const task = followTask(esTaskId);
 
-  return new Promise((resolve) => {
-    const handler = async () => {
-      const { body } = await elastic.tasks.get({ task_id: esTaskId });
-      if (!body) {
-        throw new Error('No task found');
-      }
-
-      const { task, completed } = body;
-
-      data.deletedItems = (task.status.deleted || 0);
-      data.progress = Math.floor(((task.status.deleted || 0) / (task.status.total || 1)) * 100);
+  return new Promise((resolve, reject) => {
+    task.on('progress', ({ status }) => {
+      data.deletedItems = (status?.deleted || 0);
+      data.progress = Math.floor(((status?.deleted || 0) / (status?.total || 1)) * 100);
 
       steps.update(s); // not awaited to avoid issues with timeout
 
-      if (completed) {
-        clearTimeout(timeoutId);
-        resolve(task);
-        return;
-      }
-
-      timeoutId = setTimeout(handler, intervalMs);
-
-      if ((task.status.deleted || 0) !== data.deletedItems) {
+      if ((status?.deleted || 0) !== data.deletedItems) {
         timeout.reset();
       }
-    };
+    });
 
-    timeoutId = setTimeout(handler, intervalMs);
+    task.on('end', (taskData) => resolve(taskData));
+    task.on('error', (error) => reject(error));
   });
 };
 
