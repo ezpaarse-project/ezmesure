@@ -2,7 +2,7 @@ const { addDays, isAfter } = require('date-fns');
 const config = require('config');
 const InstitutionService = require('../../entities/institutions.service');
 
-const ezrAxios = require('../../services/ezreeport/axios');
+const $fetchEzr = require('../../services/ezreeport/http');
 const { appLogger } = require('../../services/logger');
 
 const { username } = config.get('admin');
@@ -16,7 +16,7 @@ const reportingCache = new Map();
 
 const getTokenOfAdmin = async () => {
   if (!reportingAdminToken) {
-    const { data: { content: adminUser } } = await ezrAxios.get(`/admin/users/${username}`);
+    const { content: adminUser } = await $fetchEzr(`/admin/users/${username}`);
     reportingAdminToken = adminUser.token;
   }
   return reportingAdminToken;
@@ -26,10 +26,11 @@ const getTokenOfAdmin = async () => {
  * Checks if institution is using ezREEPORT
  *
  * @param {string} institutionId Institution id
+ * @param {string} adminToken The token of the ezREEPORT admin
  *
  * @returns Is the institution have an enabled report in ezREEPORT
  */
-const institutionHasReport = async (institutionId) => {
+const institutionHasReport = async (institutionId, adminToken) => {
   const now = new Date();
   const cacheEntry = reportingCache.get(institutionId);
   if (cacheEntry && isAfter(addDays(cacheEntry.date, 1), now)) {
@@ -39,9 +40,9 @@ const institutionHasReport = async (institutionId) => {
   let found = false;
 
   try {
-    const { data: { content } } = await ezrAxios.get('/tasks', {
+    const { content } = await $fetchEzr('/tasks', {
       params: { namespaceId: institutionId, enabled: true },
-      headers: { Authorization: `Bearer ${await getTokenOfAdmin()}` },
+      headers: { Authorization: `Bearer ${adminToken}` },
     });
     found = content.length > 0;
   } catch (error) {
@@ -53,6 +54,8 @@ const institutionHasReport = async (institutionId) => {
 };
 
 exports.list = async (ctx) => {
+  const ezrAdminToken = await getTokenOfAdmin();
+
   const institutionService = new InstitutionService();
   const partners = await institutionService.findMany({
     where: {
@@ -111,7 +114,7 @@ exports.list = async (ctx) => {
         }
 
         // search for enabled ezreeport
-        servicesEnabled.ezreeport = await institutionHasReport(i.id);
+        servicesEnabled.ezreeport = await institutionHasReport(i.id, ezrAdminToken);
 
         // mapping contacts
         const contacts = i.memberships.map(
