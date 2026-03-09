@@ -126,9 +126,8 @@ async function getAvailableReports(sushi, version = '5') {
   const allowedScopes = [undefined, 'all', 'report_list'];
   const params = getSushiParams(sushi, allowedScopes);
 
-  const response = await $fetch.raw({
+  const response = await $fetch.raw(`${baseUrl}/reports`, {
     method: 'get',
-    url: `${baseUrl}/reports`,
     responseType: 'json',
     params,
   });
