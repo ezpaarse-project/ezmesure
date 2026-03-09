@@ -46,7 +46,7 @@ describe('[users]: Test update users features', () => {
         });
 
         it(`#01 Should update user [${userTest.username}]`, async () => {
-          const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
             method: 'PUT',
             headers: {
               Authorization: `Bearer ${adminToken}`,
@@ -81,7 +81,7 @@ describe('[users]: Test update users features', () => {
         });
 
         it(`#02 Should not update [${userTest.username}]`, async () => {
-          const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
             method: 'PUT',
             body: userTestUpdated,
             headers: {
@@ -116,7 +116,7 @@ describe('[users]: Test update users features', () => {
         });
 
         it(`#03 Should not update [${userTest.username}]`, async () => {
-          const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
             method: 'PUT',
             body: userTestUpdated,
           });

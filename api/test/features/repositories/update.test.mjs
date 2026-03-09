@@ -60,7 +60,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       it(`#01 Should Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}] with [${updateRepositoryConfig.pattern}]`, async () => {
-        const res = await ezmesure(`/repositories/${pattern}`, {
+        const res = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -71,7 +71,7 @@ describe('[repositories]: Test update features', () => {
         // Test API
         expect(res).toHaveProperty('status', 200);
 
-        const repository = res?.data;
+        const { _data: repository } = res;
 
         expect(repository?.createdAt).not.toBeNull();
         expect(repository?.updatedAt).not.toBeNull();
@@ -110,7 +110,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       it('#02 Should not update repository', async () => {
-        const res = await ezmesure(`/repositories/${pattern}`, {
+        const res = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -148,7 +148,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       it('#03 Should not update repository', async () => {
-        const res = await ezmesure(`/repositories/${pattern}`, {
+        const res = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'PATCH',
           body: updateRepositoryConfig,
           headers: {
@@ -183,7 +183,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       it('#04 Should not update repository', async () => {
-        const res = await ezmesure(`/repositories/${pattern}`, {
+        const res = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'PATCH',
           body: updateRepositoryConfig,
         });

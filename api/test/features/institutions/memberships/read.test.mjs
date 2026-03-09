@@ -78,7 +78,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#01 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -88,7 +88,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const membershipFromResponse = httpAppResponse.data;
+        const { _data: membershipFromResponse } = httpAppResponse;
 
         expect(membershipFromResponse).toHaveProperty('username', userTest.username);
         expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -110,7 +110,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#02 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -120,7 +120,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const membershipFromResponse = httpAppResponse.data;
+        const { _data: membershipFromResponse } = httpAppResponse;
 
         expect(membershipFromResponse).toHaveProperty('username', userTest.username);
         expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -154,7 +154,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#03 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
@@ -164,7 +164,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -184,7 +184,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#04 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
@@ -194,7 +194,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -210,7 +210,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#05 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
@@ -220,7 +220,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -245,7 +245,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#06 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
@@ -255,7 +255,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -271,7 +271,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#07 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
@@ -281,7 +281,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -297,7 +297,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         });
 
         it(`#08 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${userManagerToken}`,
@@ -307,7 +307,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -328,7 +328,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#09 Should not get membership of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
           headers: {
             Authorization: 'Bearer: random',
@@ -352,7 +352,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       it(`#10 Should not get membership of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'GET',
         });
 

@@ -71,7 +71,7 @@ describe('[institutions - subinstitution]: Test read features', () => {
 
     describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#01 Should get subinstitution', async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -81,7 +81,7 @@ describe('[institutions - subinstitution]: Test read features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const subInstitutionsFromResponse = httpAppResponse?.data;
+        const { _data: subInstitutionsFromResponse } = httpAppResponse;
 
         const [subInstitutionFromResponse] = subInstitutionsFromResponse;
 
@@ -103,7 +103,7 @@ describe('[institutions - subinstitution]: Test read features', () => {
     });
     describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#02 Should not get subinstitution', async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -128,7 +128,7 @@ describe('[institutions - subinstitution]: Test read features', () => {
     });
     describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#03 Should not get subinstitution', async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions`, {
           method: 'GET',
         });
 

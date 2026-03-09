@@ -49,7 +49,7 @@ describe('[repositories]: Test delete features', () => {
 
     describe('Delete custom field', () => {
       it('#01 Should be able to delete a custom field', async () => {
-        const res = await ezmesure(`/custom-fields/${customFieldData.id}`, {
+        const res = await ezmesure.raw(`/custom-fields/${customFieldData.id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -77,7 +77,7 @@ describe('[repositories]: Test delete features', () => {
 
     describe('Delete custom field', () => {
       it('#02 Should not be able to delete a custom field', async () => {
-        const res = await ezmesure(`/custom-fields/${customFieldData.id}`, {
+        const res = await ezmesure.raw(`/custom-fields/${customFieldData.id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -97,7 +97,7 @@ describe('[repositories]: Test delete features', () => {
   describe('Without token', () => {
     describe('Delete custom field', () => {
       it('#03 Should not be able to delete a custom field', async () => {
-        const res = await ezmesure(`/custom-fields/${customFieldData.id}`, {
+        const res = await ezmesure.raw(`/custom-fields/${customFieldData.id}`, {
           method: 'DELETE',
         });
 

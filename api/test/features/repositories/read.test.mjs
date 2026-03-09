@@ -54,7 +54,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       it(`#01 Should get repository of type [${ezcounterRepositoryConfig.type}] and pattern [${ezcounterRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
+        const httpAppResponse = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -64,7 +64,7 @@ describe('[repositories]: Test read features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const repository = httpAppResponse?.data;
+        const { _data: repository } = httpAppResponse;
 
         expect(repository?.createdAt).not.toBeNull();
         expect(repository?.updatedAt).not.toBeNull();
@@ -94,7 +94,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       it('#02 Should not get repository', async () => {
-        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
+        const httpAppResponse = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -123,7 +123,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       it('#03 Should not get repository', async () => {
-        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
+        const httpAppResponse = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'GET',
           headers: {
             Authorization: 'Bearer: random',
@@ -149,7 +149,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       it('#04 Should not get repository', async () => {
-        const httpAppResponse = await ezmesure(`/repositories/${pattern}`, {
+        const httpAppResponse = await ezmesure.raw(`/repositories/${pattern}`, {
           method: 'GET',
         });
 

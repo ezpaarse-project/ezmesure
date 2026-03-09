@@ -65,7 +65,7 @@ describe('[institutions - custom-props] Remove', () => {
     });
 
     it('#01 Should be able to remove a custom prop', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${institution.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
         body: {
           ...institutionTest,
@@ -108,7 +108,7 @@ describe('[institutions - custom-props] Remove', () => {
     });
 
     it('#02 Should not be able to remove a custom prop', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${institution.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
         body: {
           ...institutionTest,

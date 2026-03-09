@@ -63,7 +63,7 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#01 Should update space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -74,7 +74,7 @@ describe('[space]: Test update spaces features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const spaceFromResponse = httpAppResponse?.data;
+        const { _data: spaceFromResponse } = httpAppResponse;
 
         expect(spaceFromResponse).toHaveProperty('id', spaceId);
         expect(spaceFromResponse).toHaveProperty('institutionId', institutionId);
@@ -124,7 +124,7 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#02 Should not update space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -169,7 +169,7 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#03 Should not update space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
           body: spaceConfigUpdate,
           headers: {
@@ -211,7 +211,7 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#04 Should not update space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
           body: spaceConfigUpdate,
         });

@@ -69,7 +69,7 @@ describe('[institutions - subinstitution]: Test delete features', () => {
 
     describe('Delete subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#01 Should create subinstitution', async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -79,7 +79,7 @@ describe('[institutions - subinstitution]: Test delete features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const masterInstitutionFromResponse = httpAppResponse?.data;
+        const { _data: masterInstitutionFromResponse } = httpAppResponse;
 
         expect(masterInstitutionFromResponse).toHaveProperty('id', masterInstitutionId);
         expect(masterInstitutionFromResponse).toHaveProperty('parentInstitutionId', null);
@@ -100,7 +100,7 @@ describe('[institutions - subinstitution]: Test delete features', () => {
     });
     describe('Delete subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#02 Should not delete subinstitution', async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -125,7 +125,7 @@ describe('[institutions - subinstitution]: Test delete features', () => {
     });
     describe('Delete subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#03 Should not delete subinstitution', async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
           method: 'DELETE',
         });
 

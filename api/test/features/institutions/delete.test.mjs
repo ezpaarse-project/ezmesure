@@ -44,7 +44,7 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#01 Should delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure(`/institutions/${institutionId}`, {
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -74,7 +74,7 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#02 Should delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure(`/institutions/${institutionId}`, {
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -118,7 +118,7 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#03 Should not delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure(`/institutions/${institutionId}`, {
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
         headers: {
           Authorization: 'Bearer: random',
@@ -145,7 +145,7 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#04 Should not delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure(`/institutions/${institutionId}`, {
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
       });
       expect(res).toHaveProperty('status', 401);

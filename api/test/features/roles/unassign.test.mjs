@@ -110,7 +110,7 @@ describe('[roles] Assign features', () => {
     });
 
     it('#01 Should be able to unassign a restricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -130,7 +130,7 @@ describe('[roles] Assign features', () => {
     });
 
     it('#02 Should be able to unassign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -158,7 +158,7 @@ describe('[roles] Assign features', () => {
     });
 
     it('#03 Should be able to unassign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -178,7 +178,7 @@ describe('[roles] Assign features', () => {
     });
 
     it('#04 Should not be able to unassign a restricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -202,7 +202,7 @@ describe('[roles] Assign features', () => {
     });
 
     it('#05 Should not be able to unassign a restricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -218,7 +218,7 @@ describe('[roles] Assign features', () => {
     });
 
     it('#06 Should not be able to unassign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -236,7 +236,7 @@ describe('[roles] Assign features', () => {
 
   describe('An unauthenticated user', () => {
     it('#07 Should not be able to unassign a restricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${restrictedRole.id}`, {
         method: 'DELETE',
       });
 
@@ -249,7 +249,7 @@ describe('[roles] Assign features', () => {
     });
 
     it('#08 Should not be able to unassign an unrestricted role', async () => {
-      const httpAppResponse = await ezmesure(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
+      const httpAppResponse = await ezmesure.raw(`/institutions/${testInstitution.id}/memberships/${regularMember.username}/roles/${unrestrictedRole.id}`, {
         method: 'DELETE',
       });
 

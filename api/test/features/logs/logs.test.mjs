@@ -41,7 +41,7 @@ describe('[logs]: Test insert features', () => {
       it(`#01 Should upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(logDir, 'wiley.csv');
 
-        const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
+        const httpAppResponse = await ezmesure.raw(`/logs/${indexName}`, {
           method: 'POST',
           body: await fs.readFile(pathFile, 'utf-8'),
           headers: {
@@ -51,7 +51,7 @@ describe('[logs]: Test insert features', () => {
 
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const { data } = httpAppResponse;
+        const { _data: data } = httpAppResponse;
 
         expect(data).toHaveProperty('total', 6);
         expect(data).toHaveProperty('inserted', 5);
@@ -84,7 +84,7 @@ describe('[logs]: Test insert features', () => {
       it(`#02 Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(logDir, 'wiley.csv');
 
-        const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
+        const httpAppResponse = await ezmesure.raw(`/logs/${indexName}`, {
           method: 'POST',
           body: await fs.readFile(pathFile, 'utf-8'),
           headers: {
@@ -108,7 +108,7 @@ describe('[logs]: Test insert features', () => {
       it(`#03 Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(logDir, 'wiley.csv');
 
-        const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
+        const httpAppResponse = await ezmesure.raw(`/logs/${indexName}`, {
           method: 'POST',
           body: await fs.readFile(pathFile, 'utf-8'),
           headers: {
@@ -135,7 +135,7 @@ describe('[logs]: Test insert features', () => {
     it(`#04 Should not upload ec in index [${indexName}]`, async () => {
       const pathFile = path.resolve(logDir, 'wiley.csv');
 
-      const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/logs/${indexName}`, {
         method: 'POST',
         body: await fs.readFile(pathFile, 'utf-8'),
         headers: {
@@ -158,7 +158,7 @@ describe('[logs]: Test insert features', () => {
     it(`#05 Should not upload ec in index [${indexName}]`, async () => {
       const pathFile = path.resolve(logDir, 'wiley.csv');
 
-      const httpAppResponse = await ezmesure(`/logs/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/logs/${indexName}`, {
         method: 'POST',
         body: await fs.readFile(pathFile, 'utf-8'),
       });

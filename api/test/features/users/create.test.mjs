@@ -35,7 +35,7 @@ describe('[users]: Test create users features', () => {
       });
 
       it(`#01 Should create new user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'PUT',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -65,7 +65,7 @@ describe('[users]: Test create users features', () => {
   describe('With random token', () => {
     describe('Create new user', () => {
       it(`#02 Should not create new user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'PUT',
           body: userTest,
           headers: {
@@ -87,7 +87,7 @@ describe('[users]: Test create users features', () => {
   describe('Without token', () => {
     describe('Create new user', () => {
       it(`#03 Should not create new user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'PUT',
           body: userTest,
         });

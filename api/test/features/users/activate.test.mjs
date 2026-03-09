@@ -39,12 +39,12 @@ describe('[users]: Test activate users features', () => {
       });
 
       it(`#01 Should activate user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure('/profile/_activate', {
+        const httpAppResponse = await ezmesure.raw('/profile/_activate', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data,
+          body: data,
         });
 
         // Test API

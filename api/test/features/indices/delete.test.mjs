@@ -33,7 +33,7 @@ describe('[indices]: Test delete features', () => {
       await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
     it(`#01 Should delete index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -61,7 +61,7 @@ describe('[indices]: Test delete features', () => {
       await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
     it(`#02 Should not delete index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -86,7 +86,7 @@ describe('[indices]: Test delete features', () => {
       await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
     it(`#03 Should not delete index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'DELETE',
         headers: {
           Authorization: 'Bearer: random',
@@ -107,7 +107,7 @@ describe('[indices]: Test delete features', () => {
       await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
     it(`#04 Should not delete index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'DELETE',
         headers: {
           Authorization: 'Bearer: random',

@@ -55,7 +55,7 @@ describe('[space]: Test delete spaces features', () => {
       });
 
       it('#01 Should delete space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -92,7 +92,7 @@ describe('[space]: Test delete spaces features', () => {
       });
 
       it('#02 Should not delete space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -135,7 +135,7 @@ describe('[space]: Test delete spaces features', () => {
       });
 
       it('#03 Should not delete space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'DELETE',
           headers: {
             Authorization: 'Bearer: random',
@@ -175,7 +175,7 @@ describe('[space]: Test delete spaces features', () => {
       });
 
       it('#04 Should not delete space', async () => {
-        const httpAppResponse = await ezmesure(`/kibana-spaces/${spaceConfig.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'DELETE',
         });
         // Test API

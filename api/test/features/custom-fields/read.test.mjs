@@ -49,7 +49,7 @@ describe('[custom-fields]: Test read features', () => {
 
     describe('Get custom field', () => {
       it('#01 Should get custom field', async () => {
-        const httpAppResponse = await ezmesure(`/custom-fields/${customFieldData.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/custom-fields/${customFieldData.id}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -59,7 +59,7 @@ describe('[custom-fields]: Test read features', () => {
         // Check API response
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const fieldFromResponse = httpAppResponse?.data;
+        const { _data: fieldFromResponse } = httpAppResponse;
 
         expect(fieldFromResponse).toMatchObject({
           ...customFieldData,
@@ -81,7 +81,7 @@ describe('[custom-fields]: Test read features', () => {
 
     describe('Get custom field', () => {
       it('#02 Should not get custom field', async () => {
-        const httpAppResponse = await ezmesure(`/custom-fields/${customFieldData.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/custom-fields/${customFieldData.id}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -97,7 +97,7 @@ describe('[custom-fields]: Test read features', () => {
   describe('With random user', () => {
     describe('Get custom field', () => {
       it('#03 Should not get custom field', async () => {
-        const httpAppResponse = await ezmesure(`/custom-fields/${customFieldData.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/custom-fields/${customFieldData.id}`, {
           method: 'GET',
           headers: {
             Authorization: 'Bearer: random',
@@ -113,7 +113,7 @@ describe('[custom-fields]: Test read features', () => {
   describe('Without token', () => {
     describe('Get custom field', () => {
       it('#04 Should not get custom field', async () => {
-        const httpAppResponse = await ezmesure(`/custom-fields/${customFieldData.id}`, {
+        const httpAppResponse = await ezmesure.raw(`/custom-fields/${customFieldData.id}`, {
           method: 'GET',
         });
 

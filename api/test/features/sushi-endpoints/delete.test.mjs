@@ -56,7 +56,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       it('#01 Should delete sushi-endpoint', async () => {
-        const res = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -94,7 +94,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       it('#02 Should not delete sushi-endpoint', async () => {
-        const res = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -143,7 +143,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#03 Should not delete sushi-endpoint', async () => {
-        const res = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
           body: sushiEndpointTest,
           headers: {
@@ -187,7 +187,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#04 Should not delete sushi-endpoint', async () => {
-        const res = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
           body: sushiEndpointTest,
         });

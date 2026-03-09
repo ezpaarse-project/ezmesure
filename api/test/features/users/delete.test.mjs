@@ -38,8 +38,9 @@ describe('[users]: Test delete users features', () => {
       });
 
       it(`#01 Should delete [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'DELETE',
+          query: { force: true },
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -68,8 +69,9 @@ describe('[users]: Test delete users features', () => {
       });
 
       it(`#02 Should not delete [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure(`/users/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'DELETE',
+          query: { force: true },
         });
 
         // Test API

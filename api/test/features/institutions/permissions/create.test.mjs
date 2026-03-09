@@ -90,7 +90,7 @@ describe('[repository permission]: Test create features', () => {
             await membershipsPrisma.create({ data: membershipUserTest });
           });
           it('#01 Should create repository permission', async () => {
-            const httpAppResponse = await ezmesure(`/institutions/${institutionId}/repositories/${pattern}/permissions/${userTest.username}`, {
+            const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/repositories/${pattern}/permissions/${userTest.username}`, {
               method: 'PUT',
               headers: {
                 Authorization: `Bearer ${adminToken}`,
@@ -101,7 +101,7 @@ describe('[repository permission]: Test create features', () => {
             // Test API
             expect(httpAppResponse).toHaveProperty('status', 200);
 
-            const repositoryPermissionFromResponse = httpAppResponse?.data;
+            const { _data: repositoryPermissionFromResponse } = httpAppResponse;
 
             expect(repositoryPermissionFromResponse).toHaveProperty('institutionId', institutionId);
             expect(repositoryPermissionFromResponse).toHaveProperty('username', userTest.username);

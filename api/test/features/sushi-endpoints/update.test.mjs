@@ -73,7 +73,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       it('#01 Should update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -83,7 +83,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
 
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
-        const sushiEndpointFromResponse = httpAppResponse?.data;
+        const { _data: sushiEndpointFromResponse } = httpAppResponse;
         sushiEndpointId = sushiEndpointFromResponse.id;
 
         expect(sushiEndpointFromResponse?.createdAt).not.toBeNull();
@@ -144,7 +144,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       it('#02 Should not update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -193,7 +193,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#03 Should not update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
           body: sushiEndpointUpdateTest,
           headers: {
@@ -238,7 +238,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#04 Should not update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure(`/sushi-endpoints/${sushiEndpointId}`, {
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
           body: sushiEndpointUpdateTest,
         });

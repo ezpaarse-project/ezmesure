@@ -5,13 +5,15 @@ import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
 
+import { resetDatabase } from '../../../lib/services/prisma/utils';
+import { resetElastic } from '../../../lib/services/elastic/utils';
+
 import indicesPrisma from '../../../lib/services/elastic/indices';
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
 import UsersService from '../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[indices]: Test create features', () => {
   const userTest = {
@@ -24,12 +26,16 @@ describe('[indices]: Test create features', () => {
   const indexName = 'test';
 
   let adminToken;
+
   beforeAll(async () => {
-    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+    await resetDatabase();
+    await resetElastic();
+    adminToken = await (new UsersService()).generateToken(adminUsername);
   });
+
   describe('As admin', () => {
     it(`#01 Should create new index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -50,14 +56,13 @@ describe('[indices]: Test create features', () => {
     let userToken;
 
     beforeAll(async () => {
-      // TODO use service
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username);
     });
 
     it(`#02 Should not create index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -76,7 +81,7 @@ describe('[indices]: Test create features', () => {
   });
   describe('With random token', () => {
     it(`#03 Should not create index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'PUT',
         headers: {
           Authorization: 'Bearer: random',
@@ -95,7 +100,7 @@ describe('[indices]: Test create features', () => {
   });
   describe('Without token', () => {
     it(`#04 Should not create index [${indexName}]`, async () => {
-      const httpAppResponse = await ezmesure(`/indices/${indexName}`, {
+      const httpAppResponse = await ezmesure.raw(`/indices/${indexName}`, {
         method: 'PUT',
       });
       expect(httpAppResponse).toHaveProperty('status', 401);

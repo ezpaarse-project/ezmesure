@@ -77,7 +77,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       it(`#01 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
           body: {
             permissions: readPermission,
@@ -89,7 +89,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const membershipFromResponse = httpAppResponse?.data;
+        const { _data: membershipFromResponse } = httpAppResponse;
 
         expect(membershipFromResponse).toHaveProperty('username', userTest.username);
         expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -118,7 +118,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       it(`#02 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [memberships:write, memberships:read]`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
           body: {
             permissions: allPermission,
@@ -130,7 +130,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const membershipFromResponse = httpAppResponse?.data;
+        const { _data: membershipFromResponse } = httpAppResponse;
 
         expect(membershipFromResponse).toHaveProperty('username', userTest.username);
         expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -172,7 +172,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         });
 
         it(`#03 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'PUT',
             body: {
               permissions: emptyPermission,
@@ -185,7 +185,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse?.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -210,7 +210,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         });
 
         it(`#04 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'PUT',
             body: {
               permissions: readPermission,
@@ -223,7 +223,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse?.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
 
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
@@ -257,7 +257,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         });
 
         it(`#05 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
-          const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'PUT',
             body: {
               permissions: readPermission,
@@ -291,7 +291,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       it(`#06 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
           body: {
             permissions: allPermission,
@@ -326,7 +326,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       it(`#07 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
-        const httpAppResponse = await ezmesure(`/institutions/${institutionId}/memberships/${userTest.username}`, {
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
           body: {
             permissions: allPermission,

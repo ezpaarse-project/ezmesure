@@ -53,7 +53,7 @@ describe('[space]: Test create spaces features', () => {
     describe(`Create new space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       let spaceId;
       it('#01 Should create space', async () => {
-        const httpAppResponse = await ezmesure('/kibana-spaces/', {
+        const httpAppResponse = await ezmesure.raw('/kibana-spaces/', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -64,7 +64,7 @@ describe('[space]: Test create spaces features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 201);
 
-        spaceId = httpAppResponse?.data?.id;
+        const spaceId = httpAppResponse?._data?.id;
 
         // Test service
         const spaceFromService = await spacesPrisma.findByID(spaceId);
@@ -96,7 +96,7 @@ describe('[space]: Test create spaces features', () => {
     });
     describe(`Create new space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       it('#02 Should not create space', async () => {
-        const httpAppResponse = await ezmesure('/kibana-spaces/', {
+        const httpAppResponse = await ezmesure.raw('/kibana-spaces/', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -124,7 +124,7 @@ describe('[space]: Test create spaces features', () => {
       });
 
       it('#03 Should not create space', async () => {
-        const httpAppResponse = await ezmesure('/kibana-spaces/', {
+        const httpAppResponse = await ezmesure.raw('/kibana-spaces/', {
           method: 'POST',
           body: spaceConfig,
           headers: {
@@ -152,7 +152,7 @@ describe('[space]: Test create spaces features', () => {
       });
 
       it('#04 Should not create space', async () => {
-        const httpAppResponse = await ezmesure('/kibana-spaces/', {
+        const httpAppResponse = await ezmesure.raw('/kibana-spaces/', {
           method: 'POST',
           body: spaceConfig,
         });

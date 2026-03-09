@@ -48,10 +48,8 @@ describe('[repositories]: Test create features', () => {
     });
 
     describe(`Create new repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
-      let pattern;
-
       it(`#01 Should create repository of type [${ezpaarseRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure('/repositories', {
+        const httpAppResponse = await ezmesure.raw('/repositories', {
           method: 'POST',
           body: ezpaarseRepositoryConfig,
           headers: {
@@ -61,9 +59,8 @@ describe('[repositories]: Test create features', () => {
 
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 201);
-        pattern = httpAppResponse?.data?.pattern;
 
-        const repositoryFromResponse = httpAppResponse?.data;
+        const { _data: repositoryFromResponse } = httpAppResponse;
 
         expect(repositoryFromResponse?.createdAt).not.toBeNull();
         expect(repositoryFromResponse?.updatedAt).not.toBeNull();
@@ -71,6 +68,7 @@ describe('[repositories]: Test create features', () => {
         expect(repositoryFromResponse).toHaveProperty('type', ezpaarseRepositoryConfig.type);
 
         // Test service
+        const { pattern } = repositoryFromResponse;
         const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
@@ -84,9 +82,8 @@ describe('[repositories]: Test create features', () => {
       });
     });
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
-      let pattern;
       it(`#02 Should create repository of type [${ezcounterRepositoryConfig.type}] and pattern [${ezcounterRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure('/repositories', {
+        const httpAppResponse = await ezmesure.raw('/repositories', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -94,12 +91,10 @@ describe('[repositories]: Test create features', () => {
           body: ezcounterRepositoryConfig,
         });
 
-        pattern = httpAppResponse?.data?.pattern;
-
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 201);
 
-        const repositoryFromResponse = httpAppResponse?.data;
+        const { _data: repositoryFromResponse } = httpAppResponse;
 
         expect(repositoryFromResponse?.createdAt).not.toBeNull();
         expect(repositoryFromResponse?.updatedAt).not.toBeNull();
@@ -107,6 +102,7 @@ describe('[repositories]: Test create features', () => {
         expect(repositoryFromResponse).toHaveProperty('type', ezcounterRepositoryConfig.type);
 
         // Test service
+        const { pattern } = repositoryFromResponse;
         const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
@@ -121,9 +117,8 @@ describe('[repositories]: Test create features', () => {
     });
 
     describe(`Create new repository of type [${randomRepositoryConfig.type}]`, () => {
-      let pattern;
       it(`#03 Should create repositories of type [${randomRepositoryConfig.type}] and pattern  [${randomRepositoryConfig.pattern}]`, async () => {
-        const httpAppResponse = await ezmesure('/repositories', {
+        const httpAppResponse = await ezmesure.raw('/repositories', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -131,12 +126,10 @@ describe('[repositories]: Test create features', () => {
           body: randomRepositoryConfig,
         });
 
-        pattern = httpAppResponse?.data?.pattern;
-
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 201);
 
-        const repositoryFromResponse = httpAppResponse?.data;
+        const { _data: repositoryFromResponse } = httpAppResponse;
 
         expect(repositoryFromResponse?.createdAt).not.toBeNull();
         expect(repositoryFromResponse?.updatedAt).not.toBeNull();
@@ -144,6 +137,7 @@ describe('[repositories]: Test create features', () => {
         expect(repositoryFromResponse).toHaveProperty('type', randomRepositoryConfig.type);
 
         // Test service
+        const { pattern } = repositoryFromResponse;
         const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
@@ -168,7 +162,7 @@ describe('[repositories]: Test create features', () => {
 
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#04 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure('/repositories', {
+        const httpAppResponse = await ezmesure.raw('/repositories', {
           method: 'POST',
           body: ezcounterRepositoryConfig,
           headers: {
@@ -186,7 +180,7 @@ describe('[repositories]: Test create features', () => {
     });
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#05 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure('/repositories', {
+        const httpAppResponse = await ezmesure.raw('/repositories', {
           method: 'POST',
           body: ezcounterRepositoryConfig,
           headers: {
@@ -211,7 +205,7 @@ describe('[repositories]: Test create features', () => {
   describe('With random token', () => {
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#06 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure('/repositories', {
+        const httpAppResponse = await ezmesure.raw('/repositories', {
           method: 'POST',
           body: ezcounterRepositoryConfig,
           headers: {
@@ -231,7 +225,7 @@ describe('[repositories]: Test create features', () => {
   describe('Without token', () => {
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       it('#07 Should not create repository', async () => {
-        const httpAppResponse = await ezmesure('/repositories', {
+        const httpAppResponse = await ezmesure.raw('/repositories', {
           method: 'POST',
           body: ezcounterRepositoryConfig,
         });
