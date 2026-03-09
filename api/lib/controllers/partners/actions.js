@@ -54,7 +54,13 @@ const institutionHasReport = async (institutionId, adminToken) => {
 };
 
 exports.list = async (ctx) => {
-  const ezrAdminToken = await getTokenOfAdmin();
+  let ezrAdminToken;
+
+  try {
+    ezrAdminToken = await getTokenOfAdmin();
+  } catch (error) {
+    appLogger.warn(`Couldn't get ezREEPORT admin token: ${error}`);
+  }
 
   const institutionService = new InstitutionService();
   const partners = await institutionService.findMany({
@@ -114,7 +120,9 @@ exports.list = async (ctx) => {
         }
 
         // search for enabled ezreeport
-        servicesEnabled.ezreeport = await institutionHasReport(i.id, ezrAdminToken);
+        if (ezrAdminToken) {
+          servicesEnabled.ezreeport = await institutionHasReport(i.id, ezrAdminToken);
+        }
 
         // mapping contacts
         const contacts = i.memberships.map(
