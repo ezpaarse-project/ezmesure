@@ -35,7 +35,7 @@ export default async function useEzr() {
 
   if (!error.value) {
     prepareClient(
-      new URL('/report/api', window.location.origin), // ezREEPORT API url
+      URL.parse('/report/api', window.location.origin), // ezREEPORT API url
       { token: ezrProfile.value.token },
     );
   }
