@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -35,24 +37,21 @@ describe('[institutions]: Test create features', () => {
   });
 
   describe('As admin', () => {
-    let institutionId;
     it(`#01 Should create new institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'POST',
-        url: '/institutions',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
-        data: institutionTest,
+        body: institutionTest,
       });
-
-      institutionId = httpAppResponse?.data?.id;
 
       // Test API
       expect(httpAppResponse).toHaveProperty('status', 201);
 
-      const institutionFromResponse = httpAppResponse?.data;
+      const { _data: institutionFromResponse } = httpAppResponse;
 
+      expect(institutionFromResponse).toHaveProperty('id', expect.any(String));
       expect(institutionFromResponse).toHaveProperty('parentInstitutionId', null);
       expect(institutionFromResponse?.createdAt).not.toBeNull();
       expect(institutionFromResponse?.updatedAt).not.toBeNull();
@@ -69,6 +68,8 @@ describe('[institutions]: Test create features', () => {
       expect(institutionFromResponse).toHaveProperty('uai', null);
       expect(institutionFromResponse).toHaveProperty('social', null);
       expect(institutionFromResponse).toHaveProperty('sushiReadySince', null);
+
+      const institutionId = institutionFromResponse.id;
 
       // Test institution service
       const institutionFromService = await institutionsPrisma.findByID(institutionId);
@@ -98,7 +99,6 @@ describe('[institutions]: Test create features', () => {
   });
   describe('As user', () => {
     let userToken;
-    let institutionId;
 
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
@@ -106,23 +106,27 @@ describe('[institutions]: Test create features', () => {
       userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
     it(`#02 Should create new institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'POST',
-        url: '/institutions',
-        data: institutionTest,
+        body: institutionTest,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       });
 
       // Test API
-      institutionId = httpAppResponse?.data?.id;
       expect(httpAppResponse).toHaveProperty('status', 201);
+
+      const { _data: institutionFromResponse } = httpAppResponse;
+
+      expect(institutionFromResponse).toHaveProperty('id', expect.any(String));
+
+      const institutionId = institutionFromResponse.id;
 
       // Test service
       const institutionFromService = await institutionsPrisma.findByID(
         institutionId,
-        { memberships: true },
+        { memberships: { include: { roles: true } } },
       );
 
       expect(institutionFromService).toHaveProperty('id', institutionId);
@@ -162,7 +166,7 @@ describe('[institutions]: Test create features', () => {
         'reporting:write',
       ];
 
-      const defaultRoles = ['contact:doc', 'contact:tech'];
+      const defaultRoles = [];
 
       expect(permissions.sort()).toEqual(defaultPermissions.sort());
       expect(roles.sort()).toEqual(defaultRoles.sort());
@@ -175,10 +179,9 @@ describe('[institutions]: Test create features', () => {
   });
   describe('With random token', () => {
     it(`#03 Should no create institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'POST',
-        url: '/institutions',
-        data: institutionTest,
+        body: institutionTest,
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -198,10 +201,9 @@ describe('[institutions]: Test create features', () => {
   });
   describe('Without token', () => {
     it(`#04 Should no create institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'POST',
-        url: '/institutions',
-        data: institutionTest,
+        body: institutionTest,
       });
 
       // Test API

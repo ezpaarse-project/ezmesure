@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -54,13 +56,12 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       it('#01 Should delete sushi-endpoint', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
         });
 
         // Test API
@@ -93,13 +94,12 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       it('#02 Should not delete sushi-endpoint', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
         });
 
         // Test API
@@ -143,10 +143,9 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#03 Should not delete sushi-endpoint', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -188,10 +187,9 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#04 Should not delete sushi-endpoint', async () => {
-        const res = await ezmesure({
+        const res = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'DELETE',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          data: sushiEndpointTest,
+          body: sushiEndpointTest,
         });
 
         // Test API

@@ -63,19 +63,18 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#01 Should update space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
-          url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: spaceConfigUpdate,
+          body: spaceConfigUpdate,
         });
 
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const spaceFromResponse = httpAppResponse?.data;
+        const { _data: spaceFromResponse } = httpAppResponse;
 
         expect(spaceFromResponse).toHaveProperty('id', spaceId);
         expect(spaceFromResponse).toHaveProperty('institutionId', institutionId);
@@ -125,13 +124,12 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#02 Should not update space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
-          url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: spaceConfigUpdate,
+          body: spaceConfigUpdate,
         });
 
         // Test API
@@ -171,10 +169,9 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#03 Should not update space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          data: spaceConfigUpdate,
+          body: spaceConfigUpdate,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -214,10 +211,9 @@ describe('[space]: Test update spaces features', () => {
       });
 
       it('#04 Should not update space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'PATCH',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          data: spaceConfigUpdate,
+          body: spaceConfigUpdate,
         });
 
         // Test API

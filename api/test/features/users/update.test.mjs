@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -44,13 +46,12 @@ describe('[users]: Test update users features', () => {
         });
 
         it(`#01 Should update user [${userTest.username}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
             method: 'PUT',
-            url: `/users/${userTest.username}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
-            data: userTestUpdated,
+            body: userTestUpdated,
           });
 
           // Test API
@@ -80,10 +81,9 @@ describe('[users]: Test update users features', () => {
         });
 
         it(`#02 Should not update [${userTest.username}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
             method: 'PUT',
-            url: `/users/${userTest.username}`,
-            data: userTestUpdated,
+            body: userTestUpdated,
             headers: {
               Authorization: 'Bearer: random',
             },
@@ -116,10 +116,9 @@ describe('[users]: Test update users features', () => {
         });
 
         it(`#03 Should not update [${userTest.username}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
             method: 'PUT',
-            url: `/users/${userTest.username}`,
-            data: userTestUpdated,
+            body: userTestUpdated,
           });
 
           // Test API

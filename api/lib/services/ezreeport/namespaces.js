@@ -1,5 +1,5 @@
 // @ts-check
-const ezrAxios = require('./axios');
+const $fetch = require('./http');
 
 /** @typedef {import('../../.prisma/client.mjs').Institution} Institution */
 
@@ -16,9 +16,12 @@ async function upsertNamespaceFromInstitution(institution) {
     fetchLogin: { elastic: { username: `report.${institution.id}` } },
     fetchOptions: { elastic: {} },
   };
-  const { data } = await ezrAxios.put(`/admin/namespaces/${institution.id}`, body);
+  const { content } = await $fetch(`/admin/namespaces/${institution.id}`, {
+    method: 'PUT',
+    body,
+  });
 
-  return data?.content;
+  return content;
 }
 
 /**
@@ -27,7 +30,9 @@ async function upsertNamespaceFromInstitution(institution) {
  * @param {Institution} institution
  */
 async function deleteNamespaceFromInstitution(institution) {
-  await ezrAxios.delete(`/admin/namespaces/${institution.id}`);
+  await $fetch(`/admin/namespaces/${institution.id}`, {
+    method: 'DELETE',
+  });
 }
 
 module.exports = {

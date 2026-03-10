@@ -70,9 +70,8 @@ describe('[roles] Read features', () => {
     });
 
     it('#01 Should be able to list roles', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/roles', {
         method: 'GET',
-        url: '/roles',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -81,15 +80,14 @@ describe('[roles] Read features', () => {
       // Test API
       expect(httpAppResponse).toHaveProperty('status', 200);
       expect(httpAppResponse).toMatchObject({
-        data: expect.arrayContaining(testRoles.map((role) => expect.objectContaining(role))),
+        _data: expect.arrayContaining(testRoles.map((role) => expect.objectContaining(role))),
       });
-      expect(httpAppResponse?.data).toHaveLength(2);
+      expect(httpAppResponse?._data).toHaveLength(2);
     });
 
     it('#02 Should be able to get a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRoles[1].id}`, {
         method: 'GET',
-        url: `/roles/${testRoles[1].id}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -97,7 +95,7 @@ describe('[roles] Read features', () => {
 
       // Test API
       expect(httpAppResponse).toHaveProperty('status', 200);
-      expect(httpAppResponse?.data).toMatchObject(testRoles[1]);
+      expect(httpAppResponse?._data).toMatchObject(testRoles[1]);
     });
   });
 
@@ -110,9 +108,8 @@ describe('[roles] Read features', () => {
     });
 
     it('#03 Should be able to list roles', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/roles', {
         method: 'GET',
-        url: '/roles',
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -121,15 +118,14 @@ describe('[roles] Read features', () => {
       // Test API
       expect(httpAppResponse).toHaveProperty('status', 200);
       expect(httpAppResponse).toMatchObject({
-        data: expect.arrayContaining(testRoles.map((role) => expect.objectContaining(role))),
+        _data: expect.arrayContaining(testRoles.map((role) => expect.objectContaining(role))),
       });
-      expect(httpAppResponse?.data).toHaveLength(2);
+      expect(httpAppResponse?._data).toHaveLength(2);
     });
 
     it('#04 Should be able to get a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRoles[1].id}`, {
         method: 'GET',
-        url: `/roles/${testRoles[1].id}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -137,15 +133,14 @@ describe('[roles] Read features', () => {
 
       // Test API
       expect(httpAppResponse).toHaveProperty('status', 200);
-      expect(httpAppResponse?.data).toMatchObject(testRoles[1]);
+      expect(httpAppResponse?._data).toMatchObject(testRoles[1]);
     });
   });
 
   describe('An unauthenticated user', () => {
     it('#05 Should not be able to list roles', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/roles', {
         method: 'GET',
-        url: '/roles',
       });
 
       // Check API response
@@ -153,9 +148,8 @@ describe('[roles] Read features', () => {
     });
 
     it('#06 Should not be able to get a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRoles[1].id}`, {
         method: 'GET',
-        url: `/roles/${testRoles[1].id}`,
       });
 
       // Check API response
