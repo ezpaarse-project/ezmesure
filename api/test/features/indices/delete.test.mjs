@@ -5,6 +5,9 @@ import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
 
+import { resetDatabase } from '../../../lib/services/prisma/utils';
+import { resetElastic } from '../../../lib/services/elastic/utils';
+
 import indicesPrisma from '../../../lib/services/elastic/indices';
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
@@ -26,6 +29,8 @@ describe('[indices]: Test delete features', () => {
 
   let adminToken;
   beforeAll(async () => {
+    await resetDatabase();
+    await resetElastic();
     adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
