@@ -270,7 +270,7 @@ const { params } = useRoute();
 const { data: user } = useAuthState();
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const { addToCheck } = useSushiCheckQueueStore();
 const snacks = useSnacksStore();
 

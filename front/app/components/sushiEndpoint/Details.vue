@@ -89,6 +89,6 @@ const registryUrl = computed(() => {
     return undefined;
   }
 
-  return new URL(`/platform/${props.modelValue.registryId}`, counterRegistryUrl);
+  return URL.parse(`/platform/${props.modelValue.registryId}`, counterRegistryUrl);
 });
 </script>

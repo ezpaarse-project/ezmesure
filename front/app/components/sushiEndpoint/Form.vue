@@ -387,7 +387,7 @@ const emit = defineEmits({
 
 const snacks = useSnacksStore();
 const { t, locale } = useI18n();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 
 const saving = shallowRef(false);
 const valid = shallowRef(false);
@@ -434,14 +434,7 @@ const looksLikeSoapUrl = computed(() => (endpoint.value.sushiUrl || '').toLowerC
 const alert = computed(() => looksLikeSoapUrl.value);
 const sushiUrlRules = computed(() => [
   (v) => !!v || t('fieldIsRequired'),
-  (v) => {
-    try {
-      const url = new URL(v);
-      return !!url;
-    } catch {
-      return t('enterValidUrl');
-    }
-  },
+  (v) => URL.canParse(v) || t('enterValidUrl'),
 ]);
 
 async function changeSushiUrl(sushiUrl) {

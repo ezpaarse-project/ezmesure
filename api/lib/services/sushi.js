@@ -1,6 +1,7 @@
 const os = require('node:os');
 const path = require('node:path');
 const EventEmitter = require('node:events');
+const { Readable } = require('node:stream');
 
 const {
   startOfMonth,
@@ -11,7 +12,8 @@ const {
   format,
 } = require('date-fns');
 const config = require('config');
-const { create: createAxios } = require('axios');
+const { ofetch } = require('ofetch');
+const { withQuery: urlWithQuery } = require('ufo');
 const fs = require('fs-extra');
 
 const { version: appVersion } = require('../../package.json');
@@ -29,6 +31,10 @@ const storageDir = path.resolve(config.get('storage.path'), 'sushi');
 const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
 /**
+ * @typedef {import('ofetch').ResponseType} ResponseType
+ * @typedef {import('ofetch').FetchResponse<unknown>} SushiFetchResponse
+ * @typedef {import('ofetch').FetchOptions<'stream' | 'json', unknown>} SushiFetchOptions
+ *
  * @typedef {import('../.prisma/client.mts').SushiCredentials} SushiCredentials
  * @typedef {import('../.prisma/client.mts').SushiEndpoint} SushiEndpoint
  *
@@ -40,9 +46,10 @@ const tmpDir = path.resolve(os.tmpdir(), 'sushi');
  * @property {string} Help_URL
  */
 
+/** @type {Map<string, DownloadEmitter>} */
 const downloads = new Map();
 
-const axios = createAxios({
+const $fetch = ofetch.create({
   headers: {
     'User-Agent': `Mozilla/5.0 (compatible; ezMESURE/${appVersion}; +${publicUrl})`,
   },
@@ -63,7 +70,7 @@ const axios = createAxios({
  * @returns
  */
 function getSushiURL({ sushiUrl }, version = '5') {
-  const versionPrefixRegex = /(\/?r51?)?\/*$/i;
+  const versionPrefixRegex = /(\/?[rv]51?)?\/*$/i;
   const domain = sushiUrl.trim().replace(versionPrefixRegex, '');
   const versionPrefix = versionPrefixRegex.exec(sushiUrl)?.[1];
 
@@ -111,7 +118,7 @@ function getSushiParams(sushiItem, scopes = []) {
  * Get the list of available reports for a given SUSHI item
  * @param {SushiCredentials} sushi - The SUSHI item
  * @param {string} [version=5] - The COUNTER version
- * @returns {Promise<any>} The endpoint response
+ * @returns {Promise<SushiFetchResponse>} The endpoint response
  */
 async function getAvailableReports(sushi, version = '5') {
   const { baseUrl } = getSushiURL(sushi?.endpoint || {}, version);
@@ -119,9 +126,8 @@ async function getAvailableReports(sushi, version = '5') {
   const allowedScopes = [undefined, 'all', 'report_list'];
   const params = getSushiParams(sushi, allowedScopes);
 
-  const response = await axios({
+  const response = await $fetch.raw(`${baseUrl}/reports`, {
     method: 'get',
-    url: `${baseUrl}/reports`,
     responseType: 'json',
     params,
   });
@@ -132,7 +138,8 @@ async function getAvailableReports(sushi, version = '5') {
   if (response.status !== 200) {
     throw new Error(`sushi endpoint responded with status ${response.status}`);
   }
-  if (!response.data) {
+  const { _data } = response;
+  if (!_data) {
     throw new Error('sushi endpoint didn\'t return any data');
   }
 
@@ -143,7 +150,7 @@ async function getAvailableReports(sushi, version = '5') {
  * Get the status of a endpoint using a given SUSHI item
  * @param {SushiCredentials & { endpoint: SushiEndpoint }} sushi - The SUSHI item
  * @param {string} [version=5] - The COUNTER version
- * @returns {Promise<any>} The endpoint response
+ * @returns {Promise<unknwown>} The endpoint response
  */
 async function getStatus(sushi, version = '5.1') {
   const { baseUrl } = getSushiURL(sushi?.endpoint || {}, version);
@@ -151,26 +158,33 @@ async function getStatus(sushi, version = '5.1') {
   const allowedScopes = [undefined, 'all'];
   const params = getSushiParams(sushi, allowedScopes);
 
-  const response = await axios({
+  const data = await $fetch({
     method: 'get',
     url: `${baseUrl}/status`,
     responseType: 'json',
-    params,
+    query: params,
   });
 
-  if (!response) {
-    throw new Error('sushi endpoint didn\'t respond');
-  }
-  if (response.status !== 200) {
-    throw new Error(`sushi endpoint responded with status ${response.status}`);
-  }
-  if (!response.data) {
+  if (!data) {
     throw new Error('sushi endpoint didn\'t return any data');
   }
-
-  return response;
+  return data;
 }
 
+/**
+ *Get config to request a report for ofetch
+ *
+ * @param {SushiEndpoint} endpoint - The endpoint to get the report from
+ * @param {SushiCredentials} sushi - The credentials to use
+ * @param {string} version - The COUNTER version
+ * @param {object} opts - Various options
+ * @param {string} [opts.reportType] - The report to get
+ * @param {string} opts.beginDate - Start of report period
+ * @param {string} opts.endDate - End of report period
+ * @param {boolean} [opts.stream] - Should get report as a stream
+ *
+ * @returns {SushiFetchOptions & { url: string }}
+ */
 function getReportDownloadConfig(endpoint, sushi, version, opts = {}) {
   const options = opts || {};
 
@@ -223,8 +237,8 @@ function getReportDownloadConfig(endpoint, sushi, version, opts = {}) {
     method: 'get',
     url: `${baseUrl}/reports/${reportType}`,
     responseType: stream ? 'stream' : 'json',
-    validateStatus: false,
-    params,
+    ignoreResponseError: true,
+    query: params,
   };
 }
 
@@ -271,33 +285,43 @@ function getReportTmpPath(options) {
 
 /**
  * Download a report, if not found locally or currently being downloaded
- * @param {Object} options sushi
- *                         beginDate
- *                         endDate
+ * @param {Object} options
+ * @param {SushiFetchOptions & { url: string }} options.requestConfig
+ * @param {string} options.reportPath
+ * @param {string} options.tmpPath
+ *
+ * @returns {Promise<SushiFetchResponse>}
  */
 async function downloadReport(options = {}) {
   const {
-    requestConfig,
+    requestConfig: {
+      url,
+      ...requestConfig
+    },
     reportPath,
     tmpPath,
   } = options;
 
   await fs.ensureDir(path.dirname(reportPath));
   await fs.ensureFile(tmpPath);
-  const response = await axios(requestConfig);
+  const response = await $fetch.raw(url, requestConfig);
 
-  if (!response) {
-    throw new Error('sushi endpoint didn\'t respond');
-  }
-  if (!response.data) {
+  const { _data } = response;
+  if (!_data) {
     throw new Error('sushi endpoint didn\'t return any data');
   }
 
-  await new Promise((resolve, reject) => {
-    response.data.pipe(fs.createWriteStream(tmpPath))
-      .on('finish', resolve)
-      .on('error', reject);
-  });
+  if (requestConfig.responseType === 'stream') {
+    const stream = Readable.fromWeb(_data);
+
+    await new Promise((resolve, reject) => {
+      stream.pipe(fs.createWriteStream(tmpPath))
+        .on('finish', resolve)
+        .on('error', reject);
+    });
+  } else {
+    await fs.writeJSON(tmpPath, _data);
+  }
 
   await fs.move(tmpPath, reportPath, { overwrite: true });
 
@@ -309,26 +333,39 @@ function getOngoingDownload(options = {}) {
 }
 
 class DownloadEmitter extends EventEmitter {
+  /**
+   * @param {SushiFetchOptions & { url: string }} [requestConfig]
+   */
   constructor(requestConfig) {
     super();
     this.config = requestConfig || {};
   }
 
+  /**
+   * @param {object} opts
+   * @param {boolean} [opts.obfuscate]
+   * @returns {string}
+   */
   getUri(opts) {
     const obfuscate = !!opts?.obfuscate;
-    const params = { ...this.config?.params };
+    const query = { ...this.config?.query };
 
-    if (obfuscate && params?.requestor_id) { params.requestor_id = 'obfuscated'; }
-    if (obfuscate && params?.customer_id) { params.customer_id = 'obfuscated'; }
-    if (obfuscate && params?.api_key) { params.api_key = 'obfuscated'; }
+    if (obfuscate && query?.requestor_id) { query.requestor_id = 'obfuscated'; }
+    if (obfuscate && query?.customer_id) { query.customer_id = 'obfuscated'; }
+    if (obfuscate && query?.api_key) { query.api_key = 'obfuscated'; }
 
-    return this.config?.url && axios.getUri({
-      ...this.config,
-      params,
-    });
+    // Using `ufo` to mimic what ofetch did
+    return this.config?.url && urlWithQuery(this.config.url, query);
   }
 }
 
+/**
+ * Initiate a COUNTER download
+ *
+ * @param {*} options
+ *
+ * @returns {DownloadEmitter}
+ */
 function initiateDownload(options = {}) {
   const { endpoint, sushi, counterVersion } = options;
   const reportPath = getReportPath(options);

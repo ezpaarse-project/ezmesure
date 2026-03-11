@@ -7,6 +7,9 @@ module.exports = {
       Console: {
         level: 'verbose',
       },
+      Buffered: {
+        level: 'verbose',
+      },
     },
   },
 };

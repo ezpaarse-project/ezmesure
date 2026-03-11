@@ -173,7 +173,7 @@ definePageMeta({
 const { t, locale } = useI18n();
 const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedEndpoints = ref([]);
@@ -272,7 +272,7 @@ const debouncedRefresh = useDebounceFn(refresh, 250);
 /**
  * Generate COUNTER registry URL
  */
-const generateRegistryURL = (item) => new URL(`/platform/${item.registryId}`, counterRegistryUrl);
+const generateRegistryURL = (item) => URL.parse(`/platform/${item.registryId}`, counterRegistryUrl);
 
 /**
  * Toggle active states for selected endpoints

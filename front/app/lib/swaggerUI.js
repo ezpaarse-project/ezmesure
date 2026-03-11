@@ -1,7 +1,7 @@
 const SWAGGER_UI_VERSION = '5.11.0';
 
 export default function setupSwaggerUI() {
-  const openApiUrl = new URL('/api/openapi.json', window.location.origin);
+  const openApiUrl = URL.parse('/api/openapi.json', window.location.origin);
 
   return `<!DOCTYPE html>
 <html lang="en">

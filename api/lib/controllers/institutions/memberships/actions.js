@@ -44,7 +44,7 @@ async function sendNewContact(receiver, institutionName, role) {
   return sendMail({
     to: receiver,
     bcc: admins,
-    subject: `Vous êtes correspondant de ${institutionName}`,
+    subject: 'Un nouveau rôle vous a été assigné',
     ...generateMail('new-contact', { data }),
   });
 }

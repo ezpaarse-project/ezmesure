@@ -86,7 +86,7 @@ const syncIndexPatterns = async (space) => {
     }
 
     try {
-      const { data } = await kibana.createIndexPattern(space.id, {
+      const data = await kibana.createIndexPattern(space.id, {
         title: repo.pattern,
         timeFieldName: repo.type === 'counter5' ? 'X_Date_Month' : 'datetime',
       });
@@ -127,7 +127,7 @@ const syncSpace = async (space) => {
     disabledFeatures: space.disabledFeatures,
   };
 
-  const spaceExists = (await kibana.getSpace(space.id)).status !== 404;
+  const spaceExists = !!(await kibana.getSpace(space.id));
 
   if (spaceExists) {
     await kibana.updateSpace(spaceParams);

@@ -416,9 +416,10 @@ exports.getAvailableReports = async (ctx) => {
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      ({ data, headers } = await sushiService.getAvailableReports(sushi, version));
+      ({ _data: data, headers } = await sushiService.getAvailableReports(sushi, version));
     } catch (e) {
-      exceptions = sushiService.getExceptions(e?.response?.data);
+      const { _data } = e?.response ?? {};
+      exceptions = sushiService.getExceptions(_data);
 
       if (!Array.isArray(exceptions) || exceptions.length === 0) {
         reportsPerVersion.set(version, { error: e.message });
@@ -440,7 +441,7 @@ exports.getAvailableReports = async (ctx) => {
     const isValidReport = (report) => (report.Report_ID && report.Report_Name);
 
     if (!Array.isArray(data) || !data.every(isValidReport)) {
-      const contentType = /^\s*([^;\s]*)/.exec(headers['content-type'])?.[1];
+      const contentType = /^\s*([^;\s]*)/.exec(headers.get('content-type'))?.[1];
 
       if (contentType === 'application/json') {
         reportsPerVersion.set(version, { error: ctx.$t('errors.sushi.invalidResponse') });
@@ -504,7 +505,7 @@ exports.downloadReport = async (ctx) => {
     message = 'download initiated, please retry this link later';
 
     sushiService.initiateDownload(sushiData)
-      .on('finish', (response, filePath) => {
+      .on('finish', (_response, filePath) => {
         appLogger.info(`Report downloaded at ${filePath}`);
       })
       .on('error', (err) => {
@@ -638,7 +639,7 @@ const checkConnection = async (sushi, params) => {
     sushiService.getOngoingDownload(sushiData) || sushiService.initiateDownload(sushiData)
   );
 
-  /** @type {import('axios').AxiosResponse} */
+  /** @type {import('ofetch').FetchResponse<unknown>} */
   let response;
   /** @type {'unauthorized'|'failed'|'success'} */
   let status;

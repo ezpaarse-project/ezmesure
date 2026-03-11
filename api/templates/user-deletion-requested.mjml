@@ -1,7 +1,13 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Votre demande de suppression à bien été prise en compte</mj-title>
+<mj-title>
+  {% if isFromUser %}
+  Votre demande de suppression à bien été prise en compte
+  {% else %}
+  Un administrateur d'ezMESURE a effectué une action sur votre compte
+  {% endif %}
+</mj-title>
 {% endblock %}
 
 {% block content %}
@@ -16,7 +22,12 @@
   <mj-column>
     <mj-text>
       <p>
-        Vous avez demandé la suppression de vos données utilisateur liées à ezMESURE, elle sera effective le {{ deletedAt }}.
+        {% if isFromUser %}
+        Vous avez demandé
+        {% else %}
+        Un administrateur d'ezMESURE a programmé
+        {% endif %}
+        la suppression de votre compte sur ezMESURE, elle sera effective le {{ deletedAt }}.
       </p>
 
       <p>

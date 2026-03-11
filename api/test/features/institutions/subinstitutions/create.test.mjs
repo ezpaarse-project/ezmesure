@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -68,9 +70,8 @@ describe('[institutions - subinstitution]: Test create features', () => {
 
     describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#01 Should create subinstitution', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
           method: 'PUT',
-          url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -79,7 +80,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const masterInstitutionFromResponse = httpAppResponse?.data;
+        const { _data: masterInstitutionFromResponse } = httpAppResponse;
 
         expect(masterInstitutionFromResponse).toHaveProperty('id', masterInstitutionId);
         expect(masterInstitutionFromResponse).toHaveProperty('parentInstitutionId', null);
@@ -101,9 +102,8 @@ describe('[institutions - subinstitution]: Test create features', () => {
     });
     describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#02 Should not create subinstitution', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
           method: 'PUT',
-          url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -126,9 +126,8 @@ describe('[institutions - subinstitution]: Test create features', () => {
     });
     describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#03 Should not create subinstitution', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`, {
           method: 'PUT',
-          url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
         });
 
         // Test API

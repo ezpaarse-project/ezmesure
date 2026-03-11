@@ -10,11 +10,7 @@ errors:
   unauthorized: You are not authorized to access this route
 
   harvest:
-    noTarget: Please provide a target index, or associate a prefix to the institution [%s]
     taskExists: "COUNTER credentials [%s] already have an associated task (status: [%s])"
-    invalidDate: The date [%s] is invalid
-    invalidPeriod: The period [from %s to %s] is invalid
-    failedToUpdateSupportedReports: Failed to update the list of supported reports
     sessionNotFound: The session [%s] does not exist
     updateSessionAfterStart: Impossible to update the session [%s] once started
     sessionAlreadyRunning: The session [%s] is already running
@@ -93,6 +89,13 @@ errors:
     import:
       alreadyExists: Institution [%s] already exists
 
+    join:
+      notOpen: The institution [%s] is not open to self registrations
+      alreadyMember: You are already a member of the institution [%s]
+
+    leave:
+      locked: You can't leave an institution with locked membership
+
   member:
     notFound: Member not found
 
@@ -170,3 +173,6 @@ errors:
 
   metric:
     notFound: Metric [%s] not found
+
+  logs:
+    tooManySSEConnections: Too many SSE connections

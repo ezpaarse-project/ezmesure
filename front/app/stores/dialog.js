@@ -1,15 +1,15 @@
-import { defineStore, shallowRef, ref } from '#imports';
+import {
+  defineStore,
+  shallowRef,
+  ref,
+  markRaw,
+} from '#imports';
 
 /**
  * @typedef {Object} DialogData
- * @property {string} [title] Title of the dialog
- * @property {string} [text] Text of the dialog
- * @property {string} [agreeText] Text to display on the agree button. (Defaults to 'Agree')
- * @property {string} [agreeIcon] Icon to display on the agree button. (Defaults to unset)
- * @property {() => void | Promise<void>} [onAgree] Callback to execute when user agrees
- * @property {string} [disagreeText] Text to display on the disagree button (Defaults to 'Disagree')
- * @property {string} [disagreeIcon] Icon to display on the disagree button (Defaults to unset)
- * @property {() => void | Promise<void>} [onDisagree] Callback to execute when user disagrees
+ * @property {import('vue').Component} component - The dialog component to display
+ * @property {Object} [data] - The data to provide to the component
+ * @property {Object} [listeners] - Listeners for component events
  */
 
 export const useDialogStore = defineStore('dialog', () => {
@@ -19,47 +19,42 @@ export const useDialogStore = defineStore('dialog', () => {
    * @type {Ref<DialogData>}
    */
   const data = ref({});
+  const listeners = ref({});
+  const component = ref(null);
 
   /**
-   * Open dialog to confirm user action. Returns promise that resolves to `true` or `false`
-   * depending on user choice. You can use callbacks too : `true`/`opts.onAgree` when user agrees,
-   * `false`/`opts.onDisagree` when user disagrees.
-   *
-   * Callbacks allow promises, and shows loader while promise is pending.
-   *
+   * Open a dialog. Returns a promise that resolves when the dialog is closed.
    * @param {DialogData} options Data to display
-   *
    * @returns {Promise<boolean>}
    */
-  function openConfirm(options) {
-    data.value = { ...options };
+  function openDialog(options) {
+    component.value = markRaw(options.component);
+    data.value = { ...options?.data };
+    listeners.value = { ...options?.listeners };
     show.value = true;
+
     return new Promise((resolve) => {
-      close = (value) => resolve(value);
+      close = () => resolve();
     });
   }
 
   /**
    * Close current dialog
-   *
-   * @param {boolean} value Value to return: `true` when user agrees, `false` when user disagrees
-   *
-   * @return {boolean} If user agreed or disagreed
    */
-  function closeConfirm(value) {
+  function closeDialog() {
     show.value = false;
-    if (!close) {
-      return value;
-    }
 
-    close(value);
-    return value;
+    if (close) {
+      close();
+    }
   }
 
   return {
     show,
     data,
-    closeConfirm,
-    openConfirm,
+    listeners,
+    component,
+    closeDialog,
+    openDialog,
   };
 });

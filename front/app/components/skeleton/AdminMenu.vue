@@ -169,6 +169,12 @@
         to="/admin/activity"
         prepend-icon="mdi-history"
       />
+
+      <v-list-item
+        :title="$t('admin.logs.title')"
+        to="/admin/logs"
+        prepend-icon="mdi-text"
+      />
     </v-list>
   </v-navigation-drawer>
 </template>

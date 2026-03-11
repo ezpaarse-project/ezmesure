@@ -3,8 +3,13 @@ const elastic = require('./elastic');
 const { metrics: indexTemplate } = require('../utils/index-templates');
 
 const { appLogger } = require('./logger');
+const { followTask } = require('./elastic/utils');
 
-const index = '.ezmesure-metrics';
+// eslint-disable-next-line no-underscore-dangle
+const indexTemplateVersion = indexTemplate.mappings._meta.version;
+
+const alias = '.ezmesure-metrics';
+const index = `${alias}.${indexTemplateVersion}`;
 
 const calcMetrics = async () => {
   appLogger.info('[metric]: Get metric is started');
@@ -69,23 +74,98 @@ const calcMetrics = async () => {
 };
 
 let metricsPromise;
-exports.getMetrics = (refresh = false) => {
+async function getMetrics(refresh = false) {
   if (!metricsPromise || refresh) {
     metricsPromise = calcMetrics();
   }
 
   return metricsPromise;
-};
+}
 
-exports.save = async (ctx) => {
-  const { body: exists } = await elastic.indices.exists({ index });
+async function migrateIndex() {
+  // Resolve indices behind alias
+  const { body: aliasesPerIndex } = await elastic.indices.getAlias({ index: `${alias}*` });
+  const oldIndices = Object.keys(aliasesPerIndex);
+  appLogger.verbose(`[metric] Found old indices: [${oldIndices}]`);
 
-  if (!exists) {
-    await elastic.indices.create({
-      index,
-      body: indexTemplate,
-    });
+  // Create index with new mapping
+  await elastic.indices.create({
+    index,
+    body: indexTemplate,
+  });
+  appLogger.info(`[metric] Created index: [${index}]`);
+
+  if (oldIndices.length <= 0) {
+    // Add alias to created index
+    await elastic.indices.putAlias({ index, name: alias });
+    appLogger.verbose(`[metric] Created alias [${alias}]`);
+
+    return;
   }
+
+  // Reindex old indices into new one
+  const reindex = await elastic.reindex({
+    wait_for_completion: false,
+    body: {
+      source: { index: oldIndices },
+      dest: { index },
+    },
+  });
+  if (!reindex.body.task) {
+    throw new Error("Can't reindex data: No task id in response");
+  }
+
+  // Wait for reindex to complete
+  await new Promise((resolve, reject) => {
+    const task = followTask(reindex.body.task);
+    task.on('progress', ({ status }) => {
+      const done = (status?.created || 0) + (status?.updated || 0);
+      const progress = Math.floor((done / (status?.total || 1)) * 100);
+      appLogger.verbose(`[metric] Migrated ${progress}% of metrics`);
+    });
+
+    task.on('end', () => resolve());
+    task.on('error', (error) => reject(error));
+  });
+  appLogger.verbose('[metric] Migrated metrics');
+
+  // Check if an index exists in place of alias, and delete it
+  const aliasAsIndex = oldIndices.some((indexName) => indexName === alias);
+  if (aliasAsIndex) {
+    await elastic.indices.delete({ index: alias });
+    appLogger.info(`[metric] Deleted index: [${alias}]`);
+  }
+
+  // Add alias to created index
+  await elastic.indices.putAlias({ index, name: alias });
+  appLogger.verbose(`[metric] Created alias [${alias}]`);
+
+  // Delete old indices
+  if (!aliasAsIndex) {
+    await elastic.indices.delete({ index: oldIndices });
+    appLogger.info(`[metric] Deleted indices: [${oldIndices}]`);
+  }
+}
+
+const migrationState = { migrating: false, promise: Promise.resolve(undefined) };
+
+async function ensureIndex() {
+  const { body: exists } = await elastic.indices.exists({ index });
+  if (exists) {
+    return;
+  }
+
+  if (!migrationState.migrating) {
+    migrationState.migrating = true;
+    migrationState.promise = migrateIndex()
+      .finally(() => { migrationState.migrating = false; });
+  }
+
+  await migrationState.promise;
+}
+
+async function save(ctx) {
+  await ensureIndex();
 
   const metric = {
     datetime: ctx.startTime,
@@ -132,8 +212,16 @@ exports.save = async (ctx) => {
     };
   }
 
-  return elastic.index({
+  const { body } = await elastic.index({
     index,
     body: metric,
-  }).then((res) => res.body);
+  });
+
+  return body;
+}
+
+module.exports = {
+  getMetrics,
+  ensureIndex,
+  save,
 };

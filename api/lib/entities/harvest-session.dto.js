@@ -39,6 +39,7 @@ const schema = {
   params: Joi.object().pattern(Joi.string(), Joi.any()),
 
   jobs: Joi.array().items(Joi.object()),
+  error: Joi.object(),
 };
 
 /**
@@ -55,6 +56,7 @@ const immutableFields = [
   'createdAt',
   'startedAt',
   'jobs',
+  'error',
 ];
 
 /**

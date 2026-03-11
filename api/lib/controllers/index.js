@@ -1,6 +1,5 @@
 const Koa = require('koa');
 const router = require('koa-joi-router');
-const { Joi } = require('koa-joi-router');
 const serve = require('koa-static');
 const mount = require('koa-mount');
 const path = require('path');
@@ -8,6 +7,7 @@ const path = require('path');
 const config = require('./config');
 const logs = require('./logs');
 const auth = require('./auth');
+const apiLogs = require('./api-logs');
 const partners = require('./partners');
 const metrics = require('./metrics');
 const roles = require('./roles');
@@ -69,6 +69,7 @@ app.use(contact.prefix('/contact').middleware());
 
 app.use(auth.prefix('/auth').middleware());
 app.use(logs.prefix('/logs').middleware());
+app.use(apiLogs.prefix('/api-logs').middleware());
 app.use(institutions.prefix('/institutions').middleware());
 app.use(customFields.prefix('/custom-fields').middleware());
 app.use(harvests.prefix('/harvests').middleware());

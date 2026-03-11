@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -42,9 +44,8 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#01 Should delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure({
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -73,9 +74,8 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#02 Should delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure({
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -118,9 +118,8 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#03 Should not delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure({
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -146,9 +145,8 @@ describe('[institutions]: Test delete features', () => {
     });
 
     it(`#04 Should not delete institution [${institutionTest.name}]`, async () => {
-      const res = await ezmesure({
+      const res = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'DELETE',
-        url: `/institutions/${institutionId}`,
       });
       expect(res).toHaveProperty('status', 401);
 

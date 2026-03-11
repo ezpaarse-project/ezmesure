@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -83,10 +85,9 @@ describe('[institutions - custom-props] Read', () => {
     });
 
     it('#01 Should be able view all custom props', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'GET',
-        url: `/institutions/${institution.id}`,
-        params: {
+        query: {
           include: 'customProps',
         },
         headers: {
@@ -96,7 +97,7 @@ describe('[institutions - custom-props] Read', () => {
 
       // Check API response
       expect(httpAppResponse).toHaveProperty('status', 200);
-      expect(httpAppResponse.data).toHaveProperty('customProps', [
+      expect(httpAppResponse._data).toHaveProperty('customProps', [
         expect.objectContaining(visibleCustomProp),
         expect.objectContaining(invisibleCustomProp),
       ]);
@@ -124,10 +125,9 @@ describe('[institutions - custom-props] Read', () => {
     });
 
     it('#02 Should be able to view visible custom props', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'GET',
-        url: `/institutions/${institution.id}`,
-        params: {
+        query: {
           include: 'customProps',
         },
         headers: {
@@ -137,7 +137,7 @@ describe('[institutions - custom-props] Read', () => {
 
       // Check API response
       expect(httpAppResponse).toHaveProperty('status', 200);
-      expect(httpAppResponse.data).toHaveProperty('customProps', [
+      expect(httpAppResponse._data).toHaveProperty('customProps', [
         expect.objectContaining(visibleCustomProp),
       ]);
     });

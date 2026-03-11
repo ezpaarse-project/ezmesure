@@ -13,6 +13,7 @@ const HarvestService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
 
+const { Prisma } = require('../../services/prisma');
 const { harvestQueue } = require('../../services/jobs');
 
 const { schema, includableFields } = require('../../entities/harvest-session.dto');
@@ -30,7 +31,7 @@ exports.standardQueryParams = standardQueryParams;
 exports.getAll = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   prismaQuery.include = {
-    ...(prismaQuery.include || {}),
+    ...prismaQuery.include,
     _count: {
       select: {
         jobs: true,
@@ -51,7 +52,7 @@ exports.getOne = async (ctx) => {
 
   const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: harvestId });
   prismaQuery.include = {
-    ...(prismaQuery.include || {}),
+    ...prismaQuery.include,
     _count: {
       select: {
         jobs: true,
@@ -179,6 +180,9 @@ exports.upsertOne = async (ctx) => {
         ...body,
         // Provided id
         id: harvestId,
+        // Reset state
+        status: 'prepared',
+        error: Prisma.DbNull,
       };
 
       return harvestSessionService.upsert({
@@ -203,8 +207,9 @@ exports.upsertOne = async (ctx) => {
 const jobsStarted = new Map();
 
 async function startSession(session, options = {}) {
+  const service = new HarvestSessionService();
+
   try {
-    const service = new HarvestSessionService();
     const harvestJobs = service.start(session, options);
 
     const now = new Date();
@@ -215,6 +220,7 @@ async function startSession(session, options = {}) {
       jobs.push(harvestJob);
       jobsStarted.set(session.id, {
         status: 'starting',
+        error: undefined,
         jobs,
       });
 
@@ -242,10 +248,25 @@ async function startSession(session, options = {}) {
       jobs,
     });
   } catch (err) {
-    jobsStarted.set(session.id, {
+    const error = err instanceof Error ? err : new Error(`${err}`);
+
+    const data = {
       status: 'starting',
-      error: err instanceof Error ? err.message : `${err}`,
-    });
+      error: {
+        name: error.name,
+        message: error.message,
+        cause: error.cause,
+      },
+    };
+
+    jobsStarted.set(session.id, data);
+
+    if (!options.dryRun) {
+      await service.update({
+        where: { id: session.id },
+        data,
+      });
+    }
   }
 
   setTimeout(() => {
@@ -342,8 +363,9 @@ exports.deleteOne = async (ctx) => {
 const jobsStopped = new Map();
 
 async function stopSession(session) {
+  const service = new HarvestSessionService();
+
   try {
-    const service = new HarvestSessionService();
     const harvestJobs = service.stop(session);
 
     const jobs = [];
@@ -386,9 +408,22 @@ async function stopSession(session) {
       jobs,
     });
   } catch (err) {
-    jobsStopped.set(session.id, {
+    const error = err instanceof Error ? err : new Error(`${err}`);
+
+    const data = {
       status: 'stopping',
-      error: err instanceof Error ? err.message : `${err}`,
+      error: {
+        name: error.name,
+        message: error.message,
+        cause: error.cause,
+      },
+    };
+
+    jobsStopped.set(session.id, data);
+
+    await service.update({
+      where: { id: session.id },
+      data,
     });
   }
 

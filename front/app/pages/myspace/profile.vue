@@ -120,4 +120,5 @@ async function deleteAccount() {
 
   await signOut({ callbackUrl: '/' });
 }
+
 </script>

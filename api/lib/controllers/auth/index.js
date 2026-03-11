@@ -17,6 +17,8 @@ const {
   getCurrentUserElasticRoles,
   deleteCurrentUser,
   changeExcludeNotifications,
+  joinInstitution,
+  leaveInstitution,
 } = require('./actions');
 
 router.use(oauth.prefix('/oauth').middleware());
@@ -70,6 +72,18 @@ router.route({
 });
 
 router.route({
+  method: 'PUT',
+  path: '/memberships/:institutionId',
+  handler: joinInstitution,
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/memberships/:institutionId',
+  handler: leaveInstitution,
+});
+
+router.route({
   method: 'GET',
   path: '/elastic-roles',
   handler: getCurrentUserElasticRoles,
@@ -78,6 +92,20 @@ router.route({
   },
 });
 
+router.route({
+  method: 'PUT',
+  path: '/excludeNotifications',
+  handler: [
+    bodyParser(),
+    changeExcludeNotifications,
+  ],
+  validate: {
+    type: 'json',
+    body: Joi.array().items(
+      Joi.string().valid(...NOTIFICATION_KEYS),
+    ),
+  },
+});
 router.route({
   method: 'PUT',
   path: '/excludeNotifications',

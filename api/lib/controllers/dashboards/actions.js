@@ -9,7 +9,7 @@ const DEFAULT_SPACE = 'default';
  * @returns the matching index pattern
  */
 async function findIndexPattern(spaceId, patternTitle) {
-  const { data: patternsData } = await kibana.findObjects({
+  const patternsData = await kibana.findObjects({
     spaceId,
     type: 'index-pattern',
     perPage: 1000,
@@ -48,7 +48,7 @@ function patchIndexPattern(importObjects, patternId) {
 
 exports.listDashboards = async (ctx) => {
   const { space } = ctx.request.query;
-  const { data } = await kibana.findObjects({
+  const data = await kibana.findObjects({
     spaceId: space,
     type: 'dashboard',
     perPage: 1000,
@@ -70,18 +70,19 @@ exports.exportDashboard = async (ctx) => {
   const dashboardIds = Array.isArray(dashboardId) ? dashboardId : [dashboardId];
 
   for (let i = 0; i < dashboardIds.length; i += 1) {
-    const { status } = await kibana.getObject({ // eslint-disable-line no-await-in-loop
+    // eslint-disable-next-line no-await-in-loop
+    const objectExists = !!(await kibana.getObject({
       type: 'dashboard',
       id: dashboardIds[i],
       spaceId,
-    });
+    }));
 
-    if (status === 404) {
+    if (!objectExists) {
       ctx.throw(404, ctx.$t('errors.dashboard.notFound', dashboardIds[i]));
     }
   }
 
-  const { data } = await kibana.exportDashboard({
+  const data = await kibana.exportDashboard({
     dashboardId: dashboardIds,
     spaceId,
   });
@@ -102,9 +103,9 @@ exports.importDashboard = async (ctx) => {
     'index-pattern': indexPattern,
   } = query;
 
-  const { status } = await kibana.getSpace(spaceId || DEFAULT_SPACE);
+  const spaceExists = !!(await kibana.getSpace(spaceId || DEFAULT_SPACE));
 
-  if (status === 404) {
+  if (!spaceExists) {
     ctx.throw(409, ctx.$t('errors.space.notFound', spaceId || DEFAULT_SPACE));
   }
 
@@ -118,7 +119,7 @@ exports.importDashboard = async (ctx) => {
     body.objects = patchIndexPattern(body.objects, pattern.id);
   }
 
-  const { data } = await kibana.importDashboard({
+  const data = await kibana.importDashboard({
     data: body,
     spaceId,
     force,
@@ -140,24 +141,25 @@ exports.copyDashboard = async (ctx) => {
   const sourceDashboards = Array.isArray(source.dashboard) ? source.dashboard : [source.dashboard];
 
   for (let i = 0; i < sourceDashboards.length; i += 1) {
-    const { status } = await kibana.getObject({ // eslint-disable-line no-await-in-loop
+    // eslint-disable-next-line no-await-in-loop
+    const objectExists = !!(await kibana.getObject({
       type: 'dashboard',
       id: sourceDashboards[i],
       spaceId: source.space,
-    });
+    }));
 
-    if (status === 404) {
+    if (!objectExists) {
       ctx.throw(404, ctx.$t('errors.dashboard.notFound', sourceDashboards[i]));
     }
   }
 
-  const { status: spaceStatus } = await kibana.getSpace(target.space || DEFAULT_SPACE);
+  const spaceExists = await kibana.getSpace(target.space || DEFAULT_SPACE);
 
-  if (spaceStatus === 404) {
+  if (!spaceExists) {
     ctx.throw(409, ctx.$t('errors.space.notFound', target.space || DEFAULT_SPACE));
   }
 
-  const { data: dashboard } = await kibana.exportDashboard({
+  const dashboard = await kibana.exportDashboard({
     dashboardId: sourceDashboards,
     spaceId: source.space,
   });
@@ -176,7 +178,7 @@ exports.copyDashboard = async (ctx) => {
     dashboard.objects = patchIndexPattern(dashboard.objects, pattern.id);
   }
 
-  const { data: importResponse } = await kibana.importDashboard({
+  const importResponse = await kibana.importDashboard({
     data: dashboard,
     spaceId: target.space,
     force,

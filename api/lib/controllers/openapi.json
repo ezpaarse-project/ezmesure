@@ -4239,6 +4239,86 @@
         "tags": ["Institutions", "Sushi"]
       }
     },
+    "/profile/memberships/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "description": "ID of the institution",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Join an institution",
+        "description": "Join an institution. The institution must be open to self registrations.",
+        "operationId": "put-profile-memberships-id",
+        "tags": ["Institutions"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User is already a member of the institution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Membership"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "User successfuly joined the institution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Membership"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Leave an institution",
+        "description": "Leave an institution.",
+        "operationId": "delete-profile-memberships-id-",
+        "tags": ["Institutions"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User successfuly leaved the institution"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/institutions/{id}": {
       "parameters": [
         {
@@ -6722,6 +6802,25 @@
           }
         },
         "operationId": "getProfile"
+      },
+      "delete": {
+        "tags": ["Authentication"],
+        "summary": "Delete profile",
+        "description": "delete the profile associated with the JWT token.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success response"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "deleteProfile"
       }
     },
     "/auth/memberships": {
@@ -6899,6 +6998,50 @@
       }
     },
     "/auth/excludeNotifications": {
+      "put": {
+        "tags": ["Authentication"],
+        "summary": "Update ignored notifications",
+        "description": "Update notifications that shouldn't been sent to user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "excludeNotifications"
+      }
+    },
+    "/profile/excludeNotifications": {
       "put": {
         "tags": ["Authentication"],
         "summary": "Update ignored notifications",

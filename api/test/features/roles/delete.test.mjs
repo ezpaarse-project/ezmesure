@@ -63,9 +63,8 @@ describe('[roles] Delete features', () => {
     });
 
     it('#01 Should be able to delete a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRole.id}`, {
         method: 'DELETE',
-        url: `/roles/${testRole.id}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -89,9 +88,8 @@ describe('[roles] Delete features', () => {
     });
 
     it('#02 Should not be able to delete a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRole.id}`, {
         method: 'DELETE',
-        url: `/roles/${testRole.id}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -107,9 +105,8 @@ describe('[roles] Delete features', () => {
 
   describe('An unauthenticated user', () => {
     it('#03 Should not be able to delete a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRole.id}`, {
         method: 'DELETE',
-        url: `/roles/${testRole.id}`,
       });
 
       // Check API response

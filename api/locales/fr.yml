@@ -10,11 +10,7 @@ errors:
   unauthorized: Vous n'êtes pas autorisés à utiliser cette route
 
   harvest:
-    noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
     taskExists: "Les identifiants COUNTER [%s] ont déjà une tâche associée (statut: [%s])"
-    invalidDate: La date [%s] est invalide
-    invalidPeriod: La période [de %s à %s] est invalide
-    failedToUpdateSupportedReports: La mise à jour de la liste des rapports disponibles a échoué
     sessionNotFound: La session [%s] n'existe pas
     updateSessionAfterStart: Impossible de mettre a jour la session [%s] une fois lancée
     sessionAlreadyRunning: La session [%s] est déjà lancée
@@ -171,3 +167,6 @@ errors:
 
   metric:
     notFound: Métrique [%s] introuvable
+
+  logs:
+    tooManySSEConnections: Trop de connexions SSE en cours

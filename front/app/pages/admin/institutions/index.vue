@@ -236,7 +236,7 @@ definePageMeta({
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedInstitutions = ref([]);
