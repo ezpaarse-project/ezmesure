@@ -18,7 +18,7 @@ server {
   ## Certificates
   ssl_certificate /etc/nginx/ssl/cert.pem;
   ssl_certificate_key /etc/nginx/ssl/key.pem;
-  ssl_trusted_certificate /etc/nginx/ssl/cert.pem;
+  ssl_trusted_certificate /etc/nginx/ssl/ca.pem;
 
   include /etc/nginx/conf.d/utils/http-proxy.conf;
 
