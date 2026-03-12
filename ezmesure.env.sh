@@ -86,7 +86,7 @@ export SAML_ENTITY_ID="${EZMESURE_PUBLIC_URL}/sp"
 
 # OIDC vars
 export EZMESURE_ADMIN_PASSWORD_HASH="$(echo $EZMESURE_ADMIN_PASSWORD | htpasswd -BinC 10 admin | cut -d: -f2)"
-export EZMESURE_OIDC_ISSUER_URI="https://${EZMESURE_DOMAIN}/auth"
+export EZMESURE_OIDC_ISSUER_URI="${EZMESURE_PUBLIC_URL}/auth"
 export EZMESURE_OIDC_DISCOVERY_URI="${EZMESURE_OIDC_ISSUER_URI}/.well-known/openid-configuration"
 # set EZMESURE_OIDC_DISCOVERY_URI or the following :
 # export EZMESURE_OIDC_AUTH_URI="${EZMESURE_OIDC_ISSUER_URI}/auth"
