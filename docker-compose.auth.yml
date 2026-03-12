@@ -26,7 +26,7 @@ services:
       - EZMESURE_ADMIN_PASSWORD_HASH
     volumes:
       - ./auth/dex.yaml:/etc/dex/config.docker.yaml
-      - ./satosa/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
+      - ./rp/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
     restart: unless-stopped
 
   # We use SATOSA to proxy auth to Renater, you can skip that if your institutional provider already
