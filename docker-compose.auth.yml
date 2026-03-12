@@ -4,7 +4,7 @@ services:
   auth:
     image: 'dexidp/dex'
     extra_hosts:
-      - "satosa.${EZMESURE_DOMAIN}:host-gateway"
+      - "${SATOSA_DOMAIN}:host-gateway"
     environment:
       - SATOSA_ENABLED
 
