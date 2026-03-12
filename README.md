@@ -44,16 +44,19 @@ ezMESURE needs to be served over HTTPS, by default the reverse proxy included wi
 - `./rp/certs/cert.pem` - The certificate
 - `./rp/certs/key.pem` - The private key
 
+**NB:** if you are using Satosa, the certificates must also cover its dedicated hostname
+
 You can skip this step by using a dedicated reverse proxy (cf. step 0).
 
 You can generate certificates with tools like [`mkcert`](https://github.com/FiloSottile/mkcert).
 
 ### 3. Configure satosa
 
-Put the certificate (`server.crt`) and private key (`server.key`) used to declare the service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in :
+Put the certificate (`server.crt`) and private key (`server.key`) used to declare the service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all), as well as the certificate used to sign the metadata file, in :
 
 - `./satosa/certs/sp.crt` - The certificate
 - `./satosa/certs/sp.key` - The private key
+- `./satosa/certs/metadata.crt` - The metadata signing certificate
 
 **NB**: the private key is critical and should not be shared.
 
