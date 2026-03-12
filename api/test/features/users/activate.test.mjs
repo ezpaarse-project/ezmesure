@@ -20,7 +20,6 @@ describe('[users]: Test activate users features', () => {
   };
 
   const data = {
-    password: 'changeme',
     acceptTerms: true,
   };
 
