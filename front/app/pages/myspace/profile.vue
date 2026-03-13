@@ -74,19 +74,7 @@ definePageMeta({
 const { oidcProfileUri } = useRuntimeConfig().public;
 const { data: apiConfig } = await useApiConfig();
 const { data: user, signOut } = useAuth();
-const { openInTab } = useSingleTabLinks('profile');
-const { t, locale } = useI18n();
-
-const { spacesPermissions } = storeToRefs(useCurrentUserStore());
-
-const valid = shallowRef(false);
-const loading = shallowRef(false);
-const success = shallowRef(false);
-const actualPassword = shallowRef('');
-const password = shallowRef('');
-const passwordRepeat = shallowRef('');
-const showPassword = shallowRef(false);
-const errorMessage = ref(undefined);
+const { locale } = useI18n();
 
 const deleteDuration = computed(() => {
   const deleteDurationDays = apiConfig?.value?.users?.deleteDurationDays;
