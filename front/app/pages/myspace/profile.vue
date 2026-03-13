@@ -101,11 +101,6 @@ async function deleteAccount() {
     method: 'DELETE',
   });
 
-  if (!config.shibbolethDisabled) {
-    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
-    return;
-  }
-
   await signOut({ callbackUrl: '/' });
 }
 
