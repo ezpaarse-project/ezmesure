@@ -88,11 +88,11 @@ const refreshProfileURL = computed(() => {
 
 const fields = computed(
   () => [
-    { name: 'name', value: user.value.fullName, icon: 'mdi-account' },
-    { name: 'mail', value: user.value.email, icon: 'mdi-email' },
-    { name: 'idp', value: user.value.metadata?.idp, icon: 'mdi-web' },
-    { name: 'organization', value: user.value.metadata?.org, icon: 'mdi-domain' },
-    { name: 'unit', value: user.value.metadata?.unit, icon: 'mdi-account-group' },
+    { name: 'name', value: user.value?.fullName, icon: 'mdi-account' },
+    { name: 'mail', value: user.value?.email, icon: 'mdi-email' },
+    { name: 'idp', value: user.value?.metadata?.idp, icon: 'mdi-web' },
+    { name: 'organization', value: user.value?.metadata?.org, icon: 'mdi-domain' },
+    { name: 'unit', value: user.value?.metadata?.unit, icon: 'mdi-account-group' },
   ].filter((f) => f.value),
 );
 
