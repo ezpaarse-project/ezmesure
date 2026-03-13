@@ -97,7 +97,7 @@ const fields = computed(
 );
 
 async function deleteAccount() {
-  await $fetch('/api/profile', {
+  await $fetch('/api/auth', {
     method: 'DELETE',
   });
 
