@@ -509,7 +509,7 @@ async function saveSpacePermission(spaceId) {
  * Save permissions for all spaces
  */
 function saveAllSpacePermissions() {
-  return Promise.all(spaces.value.map(({ pattern }) => saveAliasPermission(pattern)));
+  return Promise.all(spaces.value.map(({ id }) => saveSpacePermission(id)));
 }
 /**
  * Save the form
