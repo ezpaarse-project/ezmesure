@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -43,40 +45,44 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#01 Should get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'GET',
-        url: '/institutions',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
       });
 
       expect(httpAppResponse).toHaveProperty('status', 200);
+      expect(httpAppResponse).toHaveProperty('_data.length', 1);
 
-      const institutions = httpAppResponse?.data[0];
-      expect(institutions).toHaveProperty('id', institutionId);
-      expect(institutions).toHaveProperty('parentInstitutionId', null);
-      expect(institutions?.createdAt).not.toBeNull();
-      expect(institutions?.updatedAt).not.toBeNull();
-      expect(institutions).toHaveProperty('name', institutionTest.name);
-      expect(institutions).toHaveProperty('namespace', null);
-      expect(institutions).toHaveProperty('validated', false);
-      expect(institutions).toHaveProperty('hidePartner', false);
-      expect(institutions).toHaveProperty('tags', []);
-      expect(institutions).toHaveProperty('logoId', null);
-      expect(institutions).toHaveProperty('type', null);
-      expect(institutions).toHaveProperty('acronym', null);
-      expect(institutions).toHaveProperty('websiteUrl', null);
-      expect(institutions).toHaveProperty('city', null);
-      expect(institutions).toHaveProperty('uai', null);
-      expect(institutions).toHaveProperty('social', null);
-      expect(institutions).toHaveProperty('sushiReadySince', null);
+      expect(httpAppResponse).toMatchObject({
+        _data: [
+          expect.objectContaining({
+            id: institutionId,
+            parentInstitutionId: null,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+            name: institutionTest.name,
+            namespace: null,
+            validated: false,
+            hidePartner: false,
+            tags: [],
+            logoId: null,
+            type: null,
+            acronym: null,
+            websiteUrl: null,
+            city: null,
+            uai: null,
+            social: null,
+            sushiReadySince: null,
+          }),
+        ],
+      });
     });
 
     it(`#02 Should get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -84,24 +90,27 @@ describe('[institutions]: Test read features', () => {
 
       expect(httpAppResponse).toHaveProperty('status', 200);
 
-      const institution = httpAppResponse?.data;
-      expect(institution).toHaveProperty('id', institutionId);
-      expect(institution).toHaveProperty('parentInstitutionId', null);
-      expect(institution?.createdAt).not.toBeNull();
-      expect(institution?.updatedAt).not.toBeNull();
-      expect(institution).toHaveProperty('name', institutionTest.name);
-      expect(institution).toHaveProperty('namespace', null);
-      expect(institution).toHaveProperty('validated', false);
-      expect(institution).toHaveProperty('hidePartner', false);
-      expect(institution).toHaveProperty('tags', []);
-      expect(institution).toHaveProperty('logoId', null);
-      expect(institution).toHaveProperty('type', null);
-      expect(institution).toHaveProperty('acronym', null);
-      expect(institution).toHaveProperty('websiteUrl', null);
-      expect(institution).toHaveProperty('city', null);
-      expect(institution).toHaveProperty('uai', null);
-      expect(institution).toHaveProperty('social', null);
-      expect(institution).toHaveProperty('sushiReadySince', null);
+      expect(httpAppResponse).toMatchObject({
+        _data: expect.objectContaining({
+          id: institutionId,
+          parentInstitutionId: null,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+          name: institutionTest.name,
+          namespace: null,
+          validated: false,
+          hidePartner: false,
+          tags: [],
+          logoId: null,
+          type: null,
+          acronym: null,
+          websiteUrl: null,
+          city: null,
+          uai: null,
+          social: null,
+          sushiReadySince: null,
+        }),
+      });
     });
 
     afterEach(async () => {
@@ -122,41 +131,44 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#03 Should get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'GET',
-        url: '/institutions',
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       });
 
       expect(httpAppResponse).toHaveProperty('status', 200);
+      expect(httpAppResponse).toHaveProperty('_data.length', 1);
 
-      const institutions = httpAppResponse?.data[0];
-
-      expect(institutions).toHaveProperty('id', institutionId);
-      expect(institutions).toHaveProperty('parentInstitutionId', null);
-      expect(institutions?.createdAt).not.toBeNull();
-      expect(institutions?.updatedAt).not.toBeNull();
-      expect(institutions).toHaveProperty('name', institutionTest.name);
-      expect(institutions).toHaveProperty('namespace', null);
-      expect(institutions).toHaveProperty('validated', false);
-      expect(institutions).toHaveProperty('hidePartner', false);
-      expect(institutions).toHaveProperty('tags', []);
-      expect(institutions).toHaveProperty('logoId', null);
-      expect(institutions).toHaveProperty('type', null);
-      expect(institutions).toHaveProperty('acronym', null);
-      expect(institutions).toHaveProperty('websiteUrl', null);
-      expect(institutions).toHaveProperty('city', null);
-      expect(institutions).toHaveProperty('uai', null);
-      expect(institutions).toHaveProperty('social', null);
-      expect(institutions).toHaveProperty('sushiReadySince', null);
+      expect(httpAppResponse).toMatchObject({
+        _data: [
+          expect.objectContaining({
+            id: institutionId,
+            parentInstitutionId: null,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+            name: institutionTest.name,
+            namespace: null,
+            validated: false,
+            hidePartner: false,
+            tags: [],
+            logoId: null,
+            type: null,
+            acronym: null,
+            websiteUrl: null,
+            city: null,
+            uai: null,
+            social: null,
+            sushiReadySince: null,
+          }),
+        ],
+      });
     });
 
     it(`#04 GET Should get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -164,24 +176,27 @@ describe('[institutions]: Test read features', () => {
 
       expect(httpAppResponse).toHaveProperty('status', 200);
 
-      const institutions = httpAppResponse?.data;
-      expect(institutions).toHaveProperty('id', institutionId);
-      expect(institutions).toHaveProperty('parentInstitutionId', null);
-      expect(institutions?.createdAt).not.toBeNull();
-      expect(institutions?.updatedAt).not.toBeNull();
-      expect(institutions).toHaveProperty('name', institutionTest.name);
-      expect(institutions).toHaveProperty('namespace', null);
-      expect(institutions).toHaveProperty('validated', false);
-      expect(institutions).toHaveProperty('hidePartner', false);
-      expect(institutions).toHaveProperty('tags', []);
-      expect(institutions).toHaveProperty('logoId', null);
-      expect(institutions).toHaveProperty('type', null);
-      expect(institutions).toHaveProperty('acronym', null);
-      expect(institutions).toHaveProperty('websiteUrl', null);
-      expect(institutions).toHaveProperty('city', null);
-      expect(institutions).toHaveProperty('uai', null);
-      expect(institutions).toHaveProperty('social', null);
-      expect(institutions).toHaveProperty('sushiReadySince', null);
+      expect(httpAppResponse).toMatchObject({
+        _data: expect.objectContaining({
+          id: institutionId,
+          parentInstitutionId: null,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+          name: institutionTest.name,
+          namespace: null,
+          validated: false,
+          hidePartner: false,
+          tags: [],
+          logoId: null,
+          type: null,
+          acronym: null,
+          websiteUrl: null,
+          city: null,
+          uai: null,
+          social: null,
+          sushiReadySince: null,
+        }),
+      });
     });
 
     afterEach(async () => {
@@ -198,9 +213,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#05 Should not get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'GET',
-        url: '/institutions',
         headers: {
           Authorization: 'Bearer: random',
         },
@@ -210,9 +224,8 @@ describe('[institutions]: Test read features', () => {
     });
 
     it(`#06 Should not get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
       });
 
       expect(httpAppResponse).toHaveProperty('status', 401);
@@ -230,18 +243,16 @@ describe('[institutions]: Test read features', () => {
     });
 
     it('#07 Should not get all institutions', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw('/institutions', {
         method: 'GET',
-        url: '/institutions',
       });
 
       expect(httpAppResponse).toHaveProperty('status', 401);
     });
 
     it(`#08 Should not get institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'GET',
-        url: `/institutions/${institutionId}`,
       });
 
       expect(httpAppResponse).toHaveProperty('status', 401);

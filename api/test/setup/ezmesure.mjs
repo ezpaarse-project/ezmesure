@@ -1,12 +1,9 @@
-import axios from 'axios';
+import { ofetch } from 'ofetch';
 
-const ezmesure = axios.create({
-  timeout: 3000,
-  proxy: false,
+const $fetch = ofetch.create({
   baseURL: 'http://localhost:3000/',
-  maxContentLength: Infinity,
-  maxBodyLength: Infinity,
-  validateStatus: (status) => status < 500,
+  timeout: 3000,
+  ignoreResponseError: true,
 });
 
-export default ezmesure;
+export default $fetch;

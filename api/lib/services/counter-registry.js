@@ -1,6 +1,7 @@
 const { isValid, isBefore, addHours } = require('date-fns');
+const { ofetch } = require('ofetch');
 
-const registry = require('axios').create({
+const registry = ofetch.create({
   baseURL: 'https://registry.countermetrics.org/api/v1',
 });
 
@@ -27,7 +28,7 @@ const isCacheInvalid = (cachedAt) => !cachedAt
  */
 async function getAllPlatforms() {
   if (isCacheInvalid(platformsCache?.cachedAt)) {
-    const { data } = await registry.get('/platform');
+    const data = await registry('/platform');
     platformsCache = {
       platforms: data,
       cachedAt: new Date(),
@@ -47,7 +48,7 @@ async function getAllPlatforms() {
  * @returns {Promise<object>}
  */
 async function getPlatform(id) {
-  const { data } = await registry.get(`/platform/${id}`);
+  const data = await registry(`/platform/${id}`);
   return data;
 }
 
@@ -61,7 +62,7 @@ async function getPlatform(id) {
 async function getDataHost(id) {
   let { dataHost, cachedAt } = dataHostCache.get(id) ?? {};
   if (isCacheInvalid(cachedAt)) {
-    ({ data: dataHost } = await registry.get(`/usage-data-host/${id}`));
+    (dataHost = await registry(`/usage-data-host/${id}`));
     cachedAt = new Date();
 
     dataHostCache.set(id, { dataHost, cachedAt });

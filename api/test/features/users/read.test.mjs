@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -32,9 +34,8 @@ describe('[users]: Test read users features', () => {
   describe('As admin', () => {
     describe('Get all users', () => {
       it('#01 Should get all users', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/users', {
           method: 'GET',
-          url: '/users',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -43,7 +44,7 @@ describe('[users]: Test read users features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        expect(httpAppResponse?.data).toEqual([
+        expect(httpAppResponse?._data).toEqual([
           { fullName: adminFullName, username: adminUsername },
         ]);
       });
@@ -56,9 +57,8 @@ describe('[users]: Test read users features', () => {
       });
 
       it(`#02 Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'GET',
-          url: `/users/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -67,7 +67,7 @@ describe('[users]: Test read users features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const user = httpAppResponse?.data;
+        const { _data: user } = httpAppResponse;
 
         expect(user).toHaveProperty('username', userTest.username);
         expect(user).toHaveProperty('fullName', userTest.fullName);
@@ -81,9 +81,8 @@ describe('[users]: Test read users features', () => {
     describe('Get user that does not exist', () => {
       const usernameNotExist = 'random';
       it(`#03 GET /users/random - Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/users/random', {
           method: 'GET',
-          url: '/users/random',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -112,9 +111,8 @@ describe('[users]: Test read users features', () => {
 
     describe('Get all users', () => {
       it('#04 Should get all users', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/users', {
           method: 'GET',
-          url: '/users',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -123,7 +121,7 @@ describe('[users]: Test read users features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        expect(httpAppResponse?.data).toEqual([
+        expect(httpAppResponse?._data).toEqual([
           { fullName: adminFullName, username: adminUsername },
           { fullName: userTest.fullName, username: userTest.username },
         ]);
@@ -132,9 +130,8 @@ describe('[users]: Test read users features', () => {
 
     describe(`Get user with username [${userTest.username}]`, () => {
       it(`#05 Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'GET',
-          url: `/users/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -143,7 +140,7 @@ describe('[users]: Test read users features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const user = httpAppResponse?.data;
+        const { _data: user } = httpAppResponse;
 
         expect(user).toHaveProperty('username', userTest.username);
         expect(user).toHaveProperty('fullName', userTest.fullName);
@@ -166,9 +163,8 @@ describe('[users]: Test read users features', () => {
     });
     describe('Get all users', () => {
       it('#06 Should not get users', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/users', {
           method: 'GET',
-          url: '/users',
           headers: {
             Authorization: 'Bearer random',
           },
@@ -191,9 +187,8 @@ describe('[users]: Test read users features', () => {
 
     describe(`Get user with username [${userTest.username}]`, () => {
       it(`#07 Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'GET',
-          url: `/users/${userTest.username}`,
           headers: {
             Authorization: 'Bearer random',
           },

@@ -344,14 +344,7 @@ const availableCustomProps = computed(
     })),
 );
 
-function isValidUrl(v) {
-  try {
-    const url = new URL(v);
-    return !!url;
-  } catch {
-    return false;
-  }
-}
+const isValidUrl = (v) => URL.canParse(v);
 
 function diffValues(oldValue, newValue) {
   if (!Array.isArray(oldValue) && !Array.isArray(newValue)) {

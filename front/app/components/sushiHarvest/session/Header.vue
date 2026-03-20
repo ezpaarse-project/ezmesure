@@ -84,31 +84,34 @@
     </v-list-item-subtitle>
 
     <template #append>
-      <template v-if="status">
-        <v-chip
-          v-if="modelValue.status === 'prepared'"
-          :text="$t('harvest.sessions.status.list.prepared')"
-          color="orange"
-          class="mr-2"
-        />
-        <v-chip
-          v-else-if="modelValue.status === 'starting'"
-          :text="$t('harvest.sessions.status.list.starting')"
-          color="blue"
-          class="mr-2"
-        />
-        <v-chip
-          v-else-if="modelValue.status === 'stopping' || modelValue.status === 'stopped'"
-          :text="$t('harvest.sessions.status.list.stopped')"
-          color="red"
-          class="mr-2"
-        />
-        <SushiHarvestSessionProgress
-          v-else
-          :status="status"
-          :job-count="modelValue._count.jobs"
-        />
-      </template>
+      <SushiHarvestSessionErrorMenu
+        v-if="modelValue.error !== null"
+        :model-value="modelValue"
+      />
+
+      <v-chip
+        v-if="modelValue.status === 'prepared'"
+        :text="$t('harvest.sessions.status.list.prepared')"
+        color="orange"
+        class="mr-2"
+      />
+      <v-chip
+        v-else-if="modelValue.status === 'starting'"
+        :text="$t('harvest.sessions.status.list.starting')"
+        color="blue"
+        class="mr-2"
+      />
+      <v-chip
+        v-else-if="modelValue.status === 'stopping' || modelValue.status === 'stopped'"
+        :text="$t('harvest.sessions.status.list.stopped')"
+        color="red"
+        class="mr-2"
+      />
+      <SushiHarvestSessionProgress
+        v-else-if="status"
+        :status="status"
+        :job-count="modelValue._count.jobs"
+      />
 
       <v-menu>
         <template #activator="{ props: menu }">
@@ -123,7 +126,7 @@
         <v-list>
           <v-list-item
             :title="$t('modify')"
-            :disabled="modelValue.status !== 'prepared'"
+            :disabled="modelValue.status === 'starting' ? !modelValue.error : modelValue.status !== 'prepared'"
             prepend-icon="mdi-pencil"
             @click="emit('click:update', modelValue)"
           />
@@ -138,7 +141,7 @@
 
           <v-list-item
             :title="$t('harvest.sessions.start')"
-            :disabled="modelValue.status !== 'prepared'"
+            :disabled="modelValue.status === 'starting' ? !modelValue.error : modelValue.status !== 'prepared'"
             prepend-icon="mdi-play"
             @click="startSession()"
           />

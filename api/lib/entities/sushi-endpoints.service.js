@@ -186,13 +186,13 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
     };
 
     try {
-      const { data } = await sushiService.getAvailableReports(credentials, counterVersion);
+      const { _data } = await sushiService.getAvailableReports(credentials, counterVersion);
 
-      if (!Array.isArray(data) || !data.every(isValidReport)) {
+      if (!Array.isArray(_data) || !_data.every(isValidReport)) {
         throw new Error('invalid response body');
       }
 
-      const list = new Map(data.map((report) => [report.Report_ID.toLowerCase(), report]));
+      const list = new Map(_data.map((report) => [report.Report_ID.toLowerCase(), report]));
 
       // Remove unsupported reports
       defaultHarvestedReports.forEach((reportId) => {
@@ -202,7 +202,7 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
       });
 
       // Update supported data
-      data.forEach((report) => {
+      _data.forEach((report) => {
         const reportId = report.Report_ID.toLowerCase();
 
         const {

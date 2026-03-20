@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -71,18 +73,17 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       it('#01 Should update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: sushiEndpointUpdateTest,
+          body: sushiEndpointUpdateTest,
         });
 
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
-        const sushiEndpointFromResponse = httpAppResponse?.data;
+        const { _data: sushiEndpointFromResponse } = httpAppResponse;
         sushiEndpointId = sushiEndpointFromResponse.id;
 
         expect(sushiEndpointFromResponse?.createdAt).not.toBeNull();
@@ -143,13 +144,12 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       it('#02 Should not update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: sushiEndpointUpdateTest,
+          body: sushiEndpointUpdateTest,
         });
 
         // Test API
@@ -193,10 +193,9 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#03 Should not update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          data: sushiEndpointUpdateTest,
+          body: sushiEndpointUpdateTest,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -239,10 +238,9 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#04 Should not update sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'PATCH',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          data: sushiEndpointUpdateTest,
+          body: sushiEndpointUpdateTest,
         });
 
         // Test API

@@ -1223,6 +1223,20 @@ harvest:
         prepared: Not yet started
         starting: Starting in progress
         stopped: Stopped
+      errors:
+        title: An error occurred
+        types:
+          noTarget: An involved institution doesn't have any "COUNTER" repository.
+          invalidDate: One of the dates in the requested period is invalid.
+          invalidPeriod: The requested period is invalid.
+        causes:
+          beginDate: 'Begin date: {n}'
+          endDate: 'End date: {n}'
+          institution: Go to institution page
+        api:
+          title: Message from API
+        actions:
+          restart: After fixing the problem (you can edit the session), please restart the session.
     form:
       title:add: Create an harvest session
       title:update: Update an harvest session
