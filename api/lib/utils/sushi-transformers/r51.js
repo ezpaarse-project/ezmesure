@@ -29,8 +29,16 @@ function formatItemID(ids) {
 
   if (ids?.ISBN) {
     // We want to show the hyphened version of ISBN13
-    // @ts-expect-error - Types are missing the second parameter
     result.ISBN = asIsbn13(ids.ISBN, true) || undefined;
+  }
+
+  if (ids?.Online_ISSN) {
+    // We want to uppercase the trailing X
+    result.Online_ISSN = result.Online_ISSN.toUpperCase();
+  }
+  if (ids?.Print_ISSN) {
+    // We want to uppercase the trailing X
+    result.Print_ISSN = result.Print_ISSN.toUpperCase();
   }
 
   return result;
