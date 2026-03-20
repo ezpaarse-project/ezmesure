@@ -34,11 +34,11 @@ function formatItemID(ids) {
 
   if (ids?.Online_ISSN) {
     // We want to uppercase the trailing X
-    result.Online_ISSN = result.Online_ISSN.toUpperCase();
+    result.Online_ISSN = ids.Online_ISSN.toUpperCase();
   }
   if (ids?.Print_ISSN) {
     // We want to uppercase the trailing X
-    result.Print_ISSN = result.Print_ISSN.toUpperCase();
+    result.Print_ISSN = ids.Print_ISSN.toUpperCase();
   }
 
   return result;
