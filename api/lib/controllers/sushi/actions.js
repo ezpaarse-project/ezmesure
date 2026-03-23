@@ -601,7 +601,7 @@ const getCounterVersionForCheck = (endpoint, period) => {
     const firstMonthAvailable = endpoint.counterVersionsAvailability?.[version] ?? '';
     return !firstMonthAvailable
       || typeof firstMonthAvailable !== 'string'
-      || HarvestSessionService.isEndAfterLimit(period, firstMonthAvailable);
+      || period < firstMonthAvailable;
   }) || availableVersions[0];
 };
 
