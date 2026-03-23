@@ -19,7 +19,6 @@ const ActionsService = require('../../entities/actions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
-const HarvestSessionService = require('../../entities/harvest-session.service');
 const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
 const { schema, includableFields } = require('../../entities/sushi-credentials.dto');
@@ -601,7 +600,7 @@ const getCounterVersionForCheck = (endpoint, period) => {
     const firstMonthAvailable = endpoint.counterVersionsAvailability?.[version] ?? '';
     return !firstMonthAvailable
       || typeof firstMonthAvailable !== 'string'
-      || period < firstMonthAvailable;
+      || period.endDate < firstMonthAvailable;
   }) || availableVersions[0];
 };
 
