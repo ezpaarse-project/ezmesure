@@ -158,9 +158,8 @@ async function getStatus(sushi, version = '5.1') {
   const allowedScopes = [undefined, 'all'];
   const params = getSushiParams(sushi, allowedScopes);
 
-  const data = await $fetch({
+  const data = await $fetch(`${baseUrl}/status`, {
     method: 'get',
-    url: `${baseUrl}/status`,
     responseType: 'json',
     query: params,
   });
