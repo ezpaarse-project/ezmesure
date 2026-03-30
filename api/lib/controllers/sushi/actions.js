@@ -921,7 +921,7 @@ exports.getSushiUrls = async (ctx) => {
       );
 
       const url = new URL(downloadConfig.url);
-      url.search = new URLSearchParams(downloadConfig.params);
+      url.search = new URLSearchParams(downloadConfig.query);
 
       return [
         version,
