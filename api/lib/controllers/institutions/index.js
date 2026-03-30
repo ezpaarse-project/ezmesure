@@ -22,8 +22,6 @@ const {
   updateInstitution,
   updateInstitutionSushiReady,
   harvestableInstitutions,
-  joinInstitution,
-  leaveInstitution,
 } = require('./actions');
 
 const memberships = require('./memberships');
