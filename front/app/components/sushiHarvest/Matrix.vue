@@ -199,7 +199,7 @@ const supportedReports = computed(() => {
 
   // We don't need first/last month available, so we can merge all versions
   const supported = endpointVersions.value.flatMap(
-    (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {}).map(
+    (version) => Object.entries(props.sushi?.endpoint?.supportedData?.[version] ?? {}).map(
       ([r, reportData]) => {
         if (!reportData?.supported?.value) {
           return [];
@@ -230,7 +230,7 @@ const unsupportedReports = computed(() => {
 
   // We don't need first/last month available, so we can merge all versions
   const unsupported = endpointVersions.value.flatMap(
-    (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {}).map(
+    (version) => Object.entries(props.sushi?.endpoint?.supportedData?.[version] ?? {}).map(
       ([r, reportData]) => {
         if (reportData?.supported?.value === true) {
           return [];
