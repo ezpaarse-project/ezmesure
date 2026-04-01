@@ -74,7 +74,6 @@ services:
       - 8080:8080
     environment:
       - NUXT_PUBLIC_CURRENT_INSTANCE
-      - NUXT_PUBLIC_SUPPORT_MAIL
       - NUXT_PUBLIC_OIDC_PROFILE_URI
       - HOST=0.0.0.0
       - PORT=8080

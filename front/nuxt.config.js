@@ -8,7 +8,6 @@ import vuetifyOptions from './config/vuetify.options';
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      supportMail: 'ezteam@couperin.org',
       currentInstance: '',
       oidcProfileUri: '',
       counterRegistryUrl: 'https://registry.countermetrics.org',

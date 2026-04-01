@@ -106,12 +106,17 @@ exports.loginCallback = async (ctx) => {
 };
 
 exports.logout = async (ctx) => {
+  let redirectPath = '/';
+
+  // Try to generate a logout url
   try {
-    await openid.revokeUserToken(ctx.state.jwtData.token);
+    const { url } = await openid.buildEndSessionUrl();
+    redirectPath = url.href;
   } catch (err) {
-    appLogger.error(`Failed to revoke token for ${ctx.state.user.username}: ${err}`);
+    appLogger.warn(`Failed to revoke token for ${ctx.state.user.username}: ${err}`);
   }
 
+  // Reset cookie anyway to at least logout on app side
   ctx.cookies.set(cookie, '', { httpOnly: true });
-  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
+  ctx.redirect(redirectPath);
 };

@@ -181,14 +181,18 @@ module.exports.getTokenInfo = async (accessToken) => {
 };
 
 /**
- * Get info about access token
+ * Build end session URL using OIDC configuration
  *
- * @param {string} accessToken  - The access token
- *
- * @returns {Promise<void>}
+ * @returns {Promise<{ url: URL }>}
  */
-module.exports.revokeUserToken = async (accessToken) => {
+module.exports.buildEndSessionUrl = async () => {
   const oidc = await getOIDCConfig();
 
-  return openid.tokenRevocation(oidc, accessToken);
+  const redirect = new URL('/', redirectURL);
+
+  return {
+    url: openid.buildEndSessionUrl(oidc, {
+      post_logout_redirect_uri: redirect.href,
+    }),
+  };
 };
