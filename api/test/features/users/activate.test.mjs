@@ -20,7 +20,6 @@ describe('[users]: Test activate users features', () => {
   };
 
   const data = {
-    password: 'changeme',
     acceptTerms: true,
   };
 
@@ -39,7 +38,7 @@ describe('[users]: Test activate users features', () => {
       });
 
       it(`#01 Should activate user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure.raw('/profile/_activate', {
+        const httpAppResponse = await ezmesure.raw('/auth/_activate', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${userToken}`,

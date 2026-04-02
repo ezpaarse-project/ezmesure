@@ -23,6 +23,7 @@ const schema = {
   excludeNotifications: Joi.array().items(Joi.string()),
 
   metadata: Joi.object(),
+  lastActivity: Joi.date(),
 
   memberships: Joi.array().items(Joi.object()),
   elasticRoles: Joi.array().items(Joi.object()),
@@ -36,6 +37,7 @@ const immutableFields = [
   'username',
   'updatedAt',
   'createdAt',
+  'lastActivity',
   'deletedAt',
   'memberships',
   'historyEntries',

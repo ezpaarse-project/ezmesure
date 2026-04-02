@@ -1,93 +1,71 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-
 const { bodyParser } = require('@koa/bodyparser');
 
 const { requireJwt, requireUser } = require('../../services/auth');
 
+const oauth = require('./oauth');
+const activate = require('./activate');
+
 const {
   standardMembershipsQueryParams,
   standardElasticRolesQueryParams,
-  getToken,
-  getUser,
-  getResetToken,
-  deleteUser,
-  resetPassword,
-  changePassword,
+  getCurrentUser,
+  getCurrentUserAppToken,
+  getCurrentUserReportingToken,
+  getCurrentUserMemberships,
+  getCurrentUserElasticRoles,
+  deleteCurrentUser,
   changeExcludeNotifications,
-  getMemberships,
   joinInstitution,
   leaveInstitution,
-  getElasticRoles,
-  getReportingToken,
-  activate,
-} = require('./auth');
+} = require('./actions');
+
+router.use(oauth.prefix('/oauth').middleware());
+router.use(activate.prefix('/_activate').middleware());
+
+router.use(requireJwt, requireUser);
 
 const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
 
 router.route({
-  method: 'POST',
-  path: '/password/_get_token',
+  method: 'GET',
+  path: '/',
   handler: [
-    bodyParser(),
-    getResetToken,
+    getCurrentUser,
   ],
-  validate: {
-    type: 'json',
-    body: {
-      username: Joi.string().trim().required(),
-    },
-  },
 });
-
-router.route({
-  method: 'POST',
-  path: '/password/_reset',
-  handler: [
-    bodyParser(),
-    resetPassword,
-  ],
-  validate: {
-    type: 'json',
-    body: Joi.object({
-      password: Joi.string().trim().min(6).required(),
-      token: Joi.string().trim().required(),
-    }),
-  },
-});
-
-router.use(requireJwt, requireUser);
-
-router.route({
-  method: 'POST',
-  path: '/_activate',
-  handler: [
-    bodyParser(),
-    activate,
-  ],
-  validate: {
-    type: 'json',
-    body: Joi.object({
-      password: Joi.string().trim().min(6).required(),
-      acceptTerms: Joi.boolean().valid(true).required(),
-    }),
-  },
-});
-
-router.get('/', getUser);
 
 router.route({
   method: 'DELETE',
   path: '/',
-  handler: deleteUser,
+  handler: [
+    deleteCurrentUser,
+  ],
 });
 
-router.get('/reporting_token', getReportingToken);
+router.route({
+  method: 'GET',
+  path: '/token',
+  handler: [
+    getCurrentUserAppToken,
+  ],
+});
+
+router.route({
+  method: 'GET',
+  path: '/reporting_token',
+  handler: [
+    getCurrentUserReportingToken,
+  ],
+});
 
 router.route({
   method: 'GET',
   path: '/memberships',
-  handler: getMemberships,
+  handler: [
+    getCurrentUserMemberships,
+  ],
   validate: {
     query: standardMembershipsQueryParams.manyValidation,
   },
@@ -108,25 +86,24 @@ router.route({
 router.route({
   method: 'GET',
   path: '/elastic-roles',
-  handler: getElasticRoles,
+  handler: getCurrentUserElasticRoles,
   validate: {
     query: standardElasticRolesQueryParams.manyValidation,
   },
 });
-router.get('/token', getToken);
+
 router.route({
   method: 'PUT',
-  path: '/password',
+  path: '/excludeNotifications',
   handler: [
     bodyParser(),
-    changePassword,
+    changeExcludeNotifications,
   ],
   validate: {
     type: 'json',
-    body: Joi.object({
-      actualPassword: Joi.string().required().trim().min(1),
-      password: Joi.string().trim().min(6).required(),
-    }),
+    body: Joi.array().items(
+      Joi.string().valid(...NOTIFICATION_KEYS),
+    ),
   },
 });
 router.route({

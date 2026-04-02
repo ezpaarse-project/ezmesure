@@ -177,7 +177,7 @@ async function updateNotifications() {
   error.value = undefined;
   success.value = false;
   try {
-    await $fetch('/api/profile/excludeNotifications', {
+    await $fetch('/api/auth/excludeNotifications', {
       method: 'PUT',
       body: Object.entries(data.value)
         .filter(([, value]) => value === false)

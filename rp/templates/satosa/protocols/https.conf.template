@@ -1,0 +1,39 @@
+server {
+  server_name ${SATOSA_DOMAIN};
+
+  listen 80;
+  listen [::]:80;
+
+  location / {
+    return 301 https://${SATOSA_DOMAIN}$request_uri;
+  }
+}
+
+server {
+  server_name ${SATOSA_DOMAIN};
+
+  listen 443;
+  listen [::]:443 ssl;
+
+  ## Certificates
+  ssl_certificate /etc/nginx/ssl/cert.pem;
+  ssl_certificate_key /etc/nginx/ssl/key.pem;
+  ssl_trusted_certificate /etc/nginx/ssl/cert.pem;
+
+  include /etc/nginx/conf.d/utils/http-proxy.conf;
+
+  include /etc/nginx/conf.d/satosa/routes.conf;
+
+  ## Diffie-Hellman
+  ssl_ecdh_curve secp384r1;
+
+  ## Protocol
+  ssl_protocols TLSv1.2;
+
+  ## Cipher suite
+  ssl_ciphers EECDH+AESGCM:EECDH+CHACHA20:EECDH+AES;
+  ssl_prefer_server_ciphers on;
+
+  ## HTTP Strict Transport Security
+  add_header Strict-Transport-Security "max-age=15552000; preload";
+}

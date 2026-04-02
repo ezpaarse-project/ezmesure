@@ -106,6 +106,10 @@
         />
       </template>
 
+      <template #[`item.user.lastActivity`]="{ value }">
+        <LocalDate :model-value="value" />
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ props: menu }">
@@ -294,6 +298,12 @@ const headers = computed(() => [
         align: 'center',
       },
     ],
+  },
+  {
+    title: t('users.user.lastActivity'),
+    value: 'user.lastActivity',
+    align: 'center',
+    sortable: true,
   },
   {
     title: t('actions'),

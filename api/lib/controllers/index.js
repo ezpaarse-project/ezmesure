@@ -1,15 +1,13 @@
 const Koa = require('koa');
 const router = require('koa-joi-router');
-const { Joi } = require('koa-joi-router');
 const serve = require('koa-static');
 const mount = require('koa-mount');
 const path = require('path');
 
-const { renaterLogin, elasticLogin, logout } = require('./auth/auth');
 const config = require('./config');
 const logs = require('./logs');
+const auth = require('./auth');
 const apiLogs = require('./api-logs');
-const authorize = require('./auth');
 const partners = require('./partners');
 const metrics = require('./metrics');
 const roles = require('./roles');
@@ -40,28 +38,13 @@ const kibana = require('./kibana');
 const activity = require('./activity');
 const actions = require('./actions');
 const sync = require('./sync');
+const kibanaBridge = require('./kibana-bridge');
 
 const openapi = require('./openapi.json');
 
 const app = new Koa();
 
 const publicRouter = router();
-publicRouter.get('/login', renaterLogin);
-publicRouter.get('/logout', logout);
-
-publicRouter.route({
-  method: 'POST',
-  path: '/login/local',
-  handler: elasticLogin,
-  validate: {
-    type: 'json',
-    body: {
-      username: Joi.string().required().trim().min(1),
-      password: Joi.string().required().trim().min(1),
-      callbackUrl: Joi.string(),
-    },
-  },
-});
 
 publicRouter.get('/', async (ctx) => {
   ctx.status = 200;
@@ -84,7 +67,7 @@ app.use(partners.prefix('/partners').middleware());
 app.use(metrics.prefix('/metrics').middleware());
 app.use(contact.prefix('/contact').middleware());
 
-app.use(authorize.prefix('/profile').middleware());
+app.use(auth.prefix('/auth').middleware());
 app.use(logs.prefix('/logs').middleware());
 app.use(apiLogs.prefix('/api-logs').middleware());
 app.use(institutions.prefix('/institutions').middleware());
@@ -114,5 +97,7 @@ app.use(kibana.prefix('/kibana').middleware());
 app.use(actions.prefix('/actions').middleware());
 app.use(activity.prefix('/activity').middleware());
 app.use(sync.prefix('/sync').middleware());
+
+app.use(kibanaBridge.prefix('/_kbb').middleware());
 
 module.exports = app;

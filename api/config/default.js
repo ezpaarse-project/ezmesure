@@ -74,6 +74,22 @@ module.exports = {
   auth: {
     secret: 'some-secret',
     cookie: 'eztoken',
+    oidc: {
+      client: {
+        id: 'changeme',
+        secret: 'changeme',
+      },
+      uris: {
+        discovery: '',
+        // or
+        issuer: '',
+        authorization: '',
+        token: '',
+        introspection: '',
+        userinfo: '',
+      },
+      scopes: ['openid', 'profile', 'email', 'groups'],
+    },
   },
   admin: {
     username: 'ezmesure-admin',
