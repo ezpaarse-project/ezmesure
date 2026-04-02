@@ -1,5 +1,4 @@
 const router = require('koa-joi-router')();
-const { parse: parseCookie } = require('cookie');
 
 const { requireJwt, requireUser } = require('../services/auth');
 const { appLogger } = require('../services/logger');
@@ -16,14 +15,14 @@ router.route({
     redirectToFront,
     async (ctx) => {
       try {
-        await requireJwt(ctx, () => {});
+        await requireJwt(ctx, () => { });
       } catch {
         // Try to login with OAuth
         ctx.redirect('/api/auth/oauth/login?origin=/kibana/login');
         return;
       }
 
-      await requireUser(ctx, () => {});
+      await requireUser(ctx, () => { });
 
       const { user } = ctx.state;
       const { next, msg } = ctx.query;
@@ -42,19 +41,12 @@ router.route({
         throw err;
       }
 
-      let cookies = [];
       try {
-        const res = await loginUser(esUser.username, esUser.password, ctx.href);
-        cookies = res.headers['set-cookie'].map((str) => parseCookie(str));
+        const authCookie = await loginUser(esUser.username, esUser.password, ctx.href);
+        ctx.cookies.set(authCookie.name, authCookie.value, authCookie.params);
       } catch (err) {
         appLogger.error(`[kibana-bridge] Failed to login into kibana: ${err}`);
         throw err;
-      }
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cookie of cookies) {
-        const [[name, value], ...params] = Object.entries(cookie);
-        ctx.cookies.set(name, value, Object.fromEntries(params));
       }
 
       ctx.redirect(next || '/kibana');

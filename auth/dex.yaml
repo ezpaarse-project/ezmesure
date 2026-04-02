@@ -21,7 +21,7 @@ logger:
 enablePasswordDB: true
 
 staticPasswords:
-  - email: {{ getenv "EZMESURE_ADMIN_EMAIL" "ezmesure-admin@admin.com" }}
+  - email: {{ getenv "EZMESURE_ADMIN_EMAIL" "ezmesure-admin@example.com" }}
     hash: {{ getenv "EZMESURE_ADMIN_PASSWORD_HASH" }}
     username: {{ getenv "EZMESURE_ADMIN_USERNAME" "ezmesure-admin" }}
     userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"

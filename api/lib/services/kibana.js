@@ -1,5 +1,6 @@
 // @ts-check
 const { ofetch, createFetchError } = require('ofetch');
+const { parse: parseCookie, serialize: serializeCookie } = require('cookie');
 const config = require('config');
 
 const username = config.get('elasticsearch.user');
@@ -10,6 +11,10 @@ const port = config.get('kibana.port');
 const authString = Buffer.from(`${username}:${password}`).toString('base64');
 
 const DEFAULT_SPACE = 'default';
+const AUTH_COOKIE = {
+  name: 'sid',
+  params: { httpOnly: true, path: '/' },
+};
 
 /* eslint-disable max-len */
 /**
@@ -480,16 +485,20 @@ const importDashboard = (opts) => {
  *
  * **USES INTERNAL API** Makes sure to update this function whenever you upgrade Kibana
  *
- * @param {string} user
- * @param {string} passwd
- * @param {string} currentURL
+ * @param {string} user - The username
+ * @param {string} passwd - The password
+ * @param {string} currentURL - The current URL
  *
- * @returns {Promise<AxiosResponse<unknown>>}
+ * @returns {Promise<{ name: string, value: string, params: any }>} auth cookie
  */
-function loginUser(user, passwd, currentURL) {
-  return axiosClient.post(
-    '/internal/security/login',
-    {
+async function loginUser(user, passwd, currentURL) {
+  const response = await ofetch.raw('/internal/security/login', {
+    method: 'POST',
+    baseURL: `http://${host}:${port}`,
+    headers: {
+      'kbn-xsrf': 'true',
+    },
+    body: {
       providerType: 'basic',
       providerName: 'basic',
       currentURL,
@@ -498,17 +507,50 @@ function loginUser(user, passwd, currentURL) {
         password: passwd,
       },
     },
-    {
-      withCredentials: true,
-      headers: {
-        'kbn-xsrf': 'true',
-      },
+  });
+
+  const cookies = response.headers.getSetCookie().map((str) => {
+    const cookie = parseCookie(str);
+    const [[name, value], ...options] = Object.entries(cookie);
+    return { name, value: value || '', params: Object.fromEntries(options) };
+  });
+
+  const authCookie = cookies.find((cookie) => cookie.name === AUTH_COOKIE.name);
+  if (!authCookie) {
+    throw new Error('Auth cookie not found in Kibana response');
+  }
+
+  // Keep track of params used to set cookie
+  return authCookie;
+}
+
+/**
+ * Makes a request to logout a user
+ *
+ * **USES INTERNAL API** Makes sure to update this function whenever you upgrade Kibana
+ *
+ * @param {string} authToken - Cookie used to auth to Kibana
+ *
+ * @returns {Promise<void>} auth cookie
+ */
+async function logoutUser(authToken) {
+  await ofetch('/api/security/logout', {
+    method: 'GET',
+    baseURL: `http://${host}:${port}`,
+    headers: {
+      Cookies: serializeCookie({
+        name: AUTH_COOKIE.name,
+        value: authToken,
+        ...AUTH_COOKIE.params,
+      }),
     },
-  );
+    redirect: 'manual',
+  });
 }
 
 module.exports = {
   DEFAULT_SPACE,
+  AUTH_COOKIE,
   getSpaces,
   getSpace,
   createSpace,
@@ -528,4 +570,5 @@ module.exports = {
   exportDashboard,
   importDashboard,
   loginUser,
+  logoutUser,
 };

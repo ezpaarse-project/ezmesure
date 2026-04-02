@@ -1,4 +1,4 @@
-location /kibana {
+location /kibana/ {
   rewrite     ^/kibana(/.*)$ $1 break;
 
   proxy_pass  http://kibana_server;
