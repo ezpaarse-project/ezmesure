@@ -7,19 +7,6 @@
         <v-col>
           <v-card :title="$t('myspace.title')">
             <template #append>
-              <v-btn
-                v-if="oidcProfileUri"
-                :text="$t('myspace.iamAccount')"
-                :href="oidcProfileUri"
-                target="_blank"
-                rel="noopener noreferrer"
-                prepend-icon="mdi-key"
-                append-icon="mdi-open-in-new"
-                color="primary"
-                variant="tonal"
-                class="mr-2"
-              />
-
               <ConfirmPopover
                 :agree="() => deleteAccount()"
                 :text="$t('myspace.profile.actions.delete.confirm.text', { duration: deleteDuration })"
@@ -55,6 +42,19 @@
                   lines="two"
                 />
               </v-list>
+
+              <v-btn
+                v-if="oidcProfileUri"
+                :text="$t('myspace.profile.actions.goToAccount.title')"
+                :href="oidcProfileUri"
+                target="_blank"
+                rel="noopener noreferrer"
+                prepend-icon="mdi-key"
+                append-icon="mdi-open-in-new"
+                color="primary"
+                variant="tonal"
+                class="mr-2"
+              />
             </template>
           </v-card>
         </v-col>

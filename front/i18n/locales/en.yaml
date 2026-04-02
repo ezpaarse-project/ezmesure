@@ -64,7 +64,6 @@ myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
   determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE contact in your institution, or use the menu to your left to {join}.
-  iamAccount: Go to profile settings
   ezmesureTeam: ezMESURE team
   name: Name
   mail: Mail
@@ -79,6 +78,8 @@ myspace:
   roles: "My roles:"
   profile:
     actions:
+      goToAccount:
+        title: Go to profile settings
       delete:
         title: Delete account
         confirm:
