@@ -260,7 +260,7 @@ exports.activate = async (ctx) => {
         }
 
         try {
-          await sendNewUserToContacts(userMail, {
+          await sendNewUserToContacts([userMail], {
             manageMemberLinks: memberships.map(({ institution }) => ({
               href: `${origin}/myspace/institutions/${institution.id}/members`,
               label: institution.name,
