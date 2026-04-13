@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const util = require('util');
 const yaml = require('js-yaml');
+const { template } = require('lodash');
 
 const defaultOptions = {
   queryField: 'locale',
@@ -53,12 +54,7 @@ function getLocales(dir) {
   return locales;
 }
 
-/**
- * Add locale functions to the app context
- * @param {Object} app the koa app
- * @param {Object} opts options
- */
-module.exports = function i18n(app, opts = {}) {
+module.exports = function i18n(opts = {}) {
   const options = { ...defaultOptions, ...opts };
   const {
     queryField,
@@ -69,95 +65,118 @@ module.exports = function i18n(app, opts = {}) {
 
   const locales = getLocales(dir);
 
-  /**
-   * Translates a key with the current locale, interpolating values with util.format()
-   * @param {String} key
-   * @param  {...String} values
-   * @returns String
-   */
-  function translate(key, ...values) {
+  const t = (locale) => (key, ...values) => {
     if (typeof key !== 'string') {
       return '';
     }
 
-    const locale = this.getLocale();
-    const dict = locales[locale];
-
+    const dict = locales[locale || defaultLocale];
     if (!dict || typeof dict[key] !== 'string') { return key; }
 
+    if (values.length === 1 && typeof values[0] === 'object') {
+      return template(dict[key], {
+        escape: null,
+        interpolate: /{{([\s\S]+?)}}/g,
+      })(values[0]);
+    }
+
     return util.format(dict[key], ...values);
-  }
+  };
 
   /**
-   * Get the locale origin (query, cookie, header, default)
-    * @returns String the locale origin
+   * Add locale functions to the app context
+   * @param {Object} app the koa app
+   * @param {Object} opts options
    */
-  function getLocaleOrigin() {
-    if (!this.state.localeOrigin) {
-      this.getLocale();
-    }
-    return this.state.localeOrigin;
-  }
+  const init = (app) => {
+    /**
+     * Translates a key with the current locale, interpolating values with util.format()
+     * @param {String} key
+     * @param  {...String} values
+     * @returns String
+     */
+    const translate = (key, ...values) => {
+      const locale = this.getLocale();
+      return t(locale)(key, ...values);
+    };
 
-  /**
-   * Get the locale of the request by looking at different places
-   * 1. query: /?locale=en-US
-   * 2. cookie: locale=zh-TW
-   * 3. header: Accept-Language: zh-CN,zh;q=0.5
-   * @returns String
-   */
-  function getLocale() {
-    if (this.state.locale) {
-      return this.state.locale;
-    }
+    /**
+     * Get the locale origin (query, cookie, header, default)
+      * @returns String the locale origin
+      */
+    const getLocaleOrigin = () => {
+      if (!this.state.localeOrigin) {
+        this.getLocale();
+      }
+      return this.state.localeOrigin;
+    };
 
-    // Query
-    let locale = this.query[queryField];
-    let localeOrigin = 'query';
+    /**
+     * Get the locale of the request by looking at different places
+     * 1. query: /?locale=en-US
+     * 2. cookie: locale=zh-TW
+     * 3. header: Accept-Language: zh-CN,zh;q=0.5
+     * @returns String
+     */
+    const getLocale = () => {
+      if (this.state.locale) {
+        return this.state.locale;
+      }
 
-    // Cookie
-    if (!locale) {
-      locale = this.cookies.get(cookieName, { signed: false });
-      localeOrigin = 'cookie';
-    }
+      // Query
+      let locale = this.query[queryField];
+      let localeOrigin = 'query';
 
-    // Header
-    if (!locale) {
-      const languages = this.acceptsLanguages();
+      // Cookie
+      if (!locale) {
+        locale = this.cookies.get(cookieName, { signed: false });
+        localeOrigin = 'cookie';
+      }
 
-      if (Array.isArray(languages)) {
-        for (let i = 0; i < languages.length; i += 1) {
-          if (typeof languages[i] === 'string') {
-            const lang = languages[i].substring(0, 2).toLowerCase(); // fr-FR => fr
+      // Header
+      if (!locale) {
+        const languages = this.acceptsLanguages();
 
-            if (locales[lang]) {
-              locale = lang;
-              localeOrigin = 'header';
-              break;
+        if (Array.isArray(languages)) {
+          for (let i = 0; i < languages.length; i += 1) {
+            if (typeof languages[i] === 'string') {
+              const lang = languages[i].substring(0, 2).toLowerCase(); // fr-FR => fr
+
+              if (locales[lang]) {
+                locale = lang;
+                localeOrigin = 'header';
+                break;
+              }
             }
           }
         }
       }
-    }
 
-    // if all missing or invalid locale, use default locale
-    if (!locales[locale]) {
-      locale = defaultLocale;
-      localeOrigin = 'default';
-    }
+      // if all missing or invalid locale, use default locale
+      if (!locales[locale]) {
+        locale = defaultLocale;
+        localeOrigin = 'default';
+      }
 
-    if (typeof locale === 'string') {
-      locale = locale.substring(0, 2).toLowerCase(); // fr-FR => fr
-    }
+      if (typeof locale === 'string') {
+        locale = locale.substring(0, 2).toLowerCase(); // fr-FR => fr
+      }
 
-    this.state.locale = locale;
-    this.state.localeOrigin = localeOrigin;
-    return locale;
-  }
+      this.state.locale = locale;
+      this.state.localeOrigin = localeOrigin;
+      return locale;
+    };
 
-  Object.assign(app.context, {
-    $t: translate,
-    getLocale,
-    getLocaleOrigin,
-  });
+    Object.assign(app.context, {
+      $t: translate,
+      getLocale,
+      getLocaleOrigin,
+    });
+  };
+
+  return {
+    locales,
+    t,
+    init,
+  };
 };
