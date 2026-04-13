@@ -131,6 +131,7 @@ exports.stopOne = async (ctx) => {
       type: 'harvest-sessions/stop',
       author: { connect: { username: ctx.state.user.username } },
       data: {
+        sessionId: session.id,
         state: {
           ...session,
           status: 'stopping',

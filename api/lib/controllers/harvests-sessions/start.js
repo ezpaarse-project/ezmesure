@@ -137,6 +137,7 @@ exports.startOne = async (ctx) => {
         type: 'harvest-sessions/start',
         author: { connect: { username: ctx.state.user.username } },
         data: {
+          sessionId: session.id,
           state: {
             ...session,
             status: 'starting',

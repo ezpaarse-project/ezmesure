@@ -137,6 +137,7 @@ exports.createOne = async (ctx) => {
         type: 'harvest-sessions/create',
         author: { connect: { username: ctx.state.user.username } },
         data: {
+          sessionId: session.id,
           state: session,
         },
       },
@@ -208,6 +209,7 @@ exports.upsertOne = async (ctx) => {
           type: 'harvest-sessions/upsert',
           author: { connect: { username: ctx.state.user.username } },
           data: {
+            sessionId: session.id,
             state: session,
             oldState: oldSession,
           },
@@ -244,6 +246,7 @@ exports.deleteOne = async (ctx) => {
       type: 'harvest-sessions/delete',
       author: { connect: { username: ctx.state.user.username } },
       data: {
+        sessionId: session.id,
         oldState: session,
       },
     },
