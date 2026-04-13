@@ -3,6 +3,9 @@
  */
 export default {
   baseURL: '/api/',
+  plugin: [
+    '~/plugins/auth/locale.js',
+  ],
   provider: {
     type: 'local',
     endpoints: {
