@@ -6,6 +6,8 @@ model User {
   fullName             String
   /// Email
   email                String
+  /// Preferred language
+  language             String?
   /// Creation date
   createdAt            DateTime      @default(now())
   /// Latest update date

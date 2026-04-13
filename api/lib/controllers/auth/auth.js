@@ -418,6 +418,20 @@ exports.changeExcludeNotifications = async (ctx) => {
   ctx.body = user.excludeNotifications;
 };
 
+exports.changeLanguage = async (ctx) => {
+  const { body } = ctx.request;
+  const { username } = ctx.state.user;
+
+  const service = new UsersService();
+  const user = await service.update({
+    where: { username },
+    data: { language: body.value },
+  });
+
+  ctx.status = 200;
+  ctx.body = user;
+};
+
 exports.getUser = async (ctx) => {
   const usersService = new UsersService();
   const user = await usersService.findUnique({
