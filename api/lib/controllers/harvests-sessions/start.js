@@ -138,6 +138,8 @@ exports.startOne = async (ctx) => {
         author: { connect: { username: ctx.state.user.username } },
         data: {
           sessionId: session.id,
+          beginDate: session.beginDate,
+          endDate: session.endDate,
           state: {
             ...session,
             status: 'starting',
