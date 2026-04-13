@@ -1,25 +1,15 @@
-const { createHash } = require('node:crypto');
-
-const InMemoryQueue = require('../../utils/memory-queue');
-
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 const { appLogger } = require('../../services/logger');
 
 const HTTPError = require('../../models/HTTPError');
 
+const ActionsService = require('../../entities/actions.service');
 const HarvestSessionService = require('../../entities/harvest-session.service');
-const HarvestService = require('../../entities/harvest.service');
-const InstitutionsService = require('../../entities/institutions.service');
-const EndpointsService = require('../../entities/sushi-endpoints.service');
 
 const { Prisma } = require('../../services/prisma');
-const { harvestQueue } = require('../../services/jobs');
 
 const { schema, includableFields } = require('../../entities/harvest-session.dto');
-
-const MATRIX_CACHE_DURATION = 5 * 60 * 1000;
-const JOBS_CACHE_DURATION = 5 * 60 * 1000;
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -110,48 +100,63 @@ exports.getOneCredentials = async (ctx) => {
 };
 
 exports.createOne = async (ctx) => {
-  ctx.action = 'harvest-sessions/create';
   ctx.type = 'json';
-  const { body: { institutions, ...body } } = ctx.request;
+  const { body } = ctx.request;
   const { harvestId } = ctx.params;
 
-  const harvestSessionService = new HarvestSessionService();
-
   ctx.status = 200;
-  ctx.body = await harvestSessionService.create({
-    data: {
-      // Default values
-      timeout: 600,
-      allowFaulty: false,
-      downloadUnsupported: false,
-      forceDownload: false,
-      sendEndMail: true,
-      allowedCounterVersions: ['5.1', '5'],
-      params: {},
-      // Provided values
-      ...body,
-      // Provided id
-      id: harvestId,
-    },
-    include: {
-      _count: {
-        select: {
-          jobs: true,
+  ctx.body = await HarvestSessionService.$transaction(async (service) => {
+    const actionService = new ActionsService(service);
+
+    const session = await service.create({
+      data: {
+        // Default values
+        timeout: 600,
+        allowFaulty: false,
+        downloadUnsupported: false,
+        forceDownload: false,
+        sendEndMail: true,
+        allowedCounterVersions: ['5.1', '5'],
+        params: {},
+        // Provided values
+        ...body,
+        // Provided id
+        id: harvestId,
+      },
+      include: {
+        _count: {
+          select: {
+            jobs: true,
+          },
         },
       },
-    },
+    });
+
+    await actionService.create({
+      data: {
+        type: 'harvest-sessions/create',
+        author: { connect: { username: ctx.state.user.username } },
+        data: {
+          state: session,
+        },
+      },
+    });
+
+    return session;
   });
 };
 
 exports.upsertOne = async (ctx) => {
-  ctx.action = 'harvest-sessions/upsert';
   ctx.type = 'json';
-  const { body: { institutions, ...body } } = ctx.request;
+  const { body } = ctx.request;
   const { harvestId } = ctx.params;
 
-  const upsertedSession = await HarvestSessionService.$transaction(
-    async (harvestSessionService) => {
-      const session = await harvestSessionService.findUnique({
+  ctx.status = 200;
+  ctx.body = await HarvestSessionService.$transaction(
+    async (service) => {
+      const actionService = new ActionsService(service);
+
+      const oldSession = await service.findUnique({
         where: { id: harvestId },
         include: {
           _count: {
@@ -163,7 +168,7 @@ exports.upsertOne = async (ctx) => {
       });
 
       // eslint-disable-next-line no-underscore-dangle
-      if (session && session._count.jobs > 0) {
+      if (oldSession && oldSession._count.jobs > 0) {
         throw new HTTPError(409, 'errors.harvest.updateSessionAfterStart', [harvestId]);
       }
 
@@ -185,7 +190,7 @@ exports.upsertOne = async (ctx) => {
         error: Prisma.DbNull,
       };
 
-      return harvestSessionService.upsert({
+      const session = await service.upsert({
         where: { id: harvestId },
         create: data,
         update: data,
@@ -197,148 +202,24 @@ exports.upsertOne = async (ctx) => {
           },
         },
       });
+
+      await actionService.create({
+        data: {
+          type: 'harvest-sessions/upsert',
+          author: { connect: { username: ctx.state.user.username } },
+          data: {
+            state: session,
+            oldState: oldSession,
+          },
+        },
+      });
+
+      return session;
     },
   );
-
-  ctx.status = 200;
-  ctx.body = upsertedSession;
-};
-
-const jobsStarted = new Map();
-
-async function startSession(session, options = {}) {
-  const service = new HarvestSessionService();
-
-  try {
-    const harvestJobs = service.start(session, options);
-
-    const now = new Date();
-    const jobs = [];
-    // Add jobs to queue
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const harvestJob of harvestJobs) {
-      jobs.push(harvestJob);
-      jobsStarted.set(session.id, {
-        status: 'starting',
-        error: undefined,
-        jobs,
-      });
-
-      if (options.dryRun) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-
-      const job = await harvestQueue.getJob(harvestJob.id);
-      if (job) {
-        await job.moveToDelayed(now + 100);
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-
-      await harvestQueue.add(
-        'harvest',
-        { taskId: harvestJob.id, timeout: session.timeout },
-        { jobId: harvestJob.id },
-      );
-    }
-
-    jobsStarted.set(session.id, {
-      status: 'running',
-      jobs,
-    });
-  } catch (err) {
-    const error = err instanceof Error ? err : new Error(`${err}`);
-
-    const data = {
-      status: 'starting',
-      error: {
-        name: error.name,
-        message: error.message,
-        cause: error.cause,
-      },
-    };
-
-    jobsStarted.set(session.id, data);
-
-    if (!options.dryRun) {
-      await service.update({
-        where: { id: session.id },
-        data,
-      });
-    }
-  }
-
-  setTimeout(() => {
-    jobsStarted.delete(session.id);
-  }, JOBS_CACHE_DURATION);
-}
-
-exports.getStartStatus = async (ctx) => {
-  const { harvestId } = ctx.params;
-
-  const harvestSessionService = new HarvestSessionService();
-
-  const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
-    select: { id: true, status: true, jobs: true },
-  });
-
-  if (!session) {
-    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
-  }
-
-  ctx.status = 200;
-  ctx.body = jobsStarted.get(session.id) ?? {
-    status: session.status,
-    jobs: session.jobs,
-  };
-};
-
-exports.startOne = async (ctx) => {
-  ctx.action = 'harvest-sessions/start';
-  ctx.type = 'json';
-  const { harvestId } = ctx.params;
-  const {
-    restartAll = false,
-    forceRefreshSupported = false,
-    dryRun = false,
-  } = ctx.request.body;
-
-  const harvestSessionService = new HarvestSessionService();
-
-  const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
-  });
-
-  if (!session) {
-    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
-    return;
-  }
-
-  if (HarvestSessionService.isActive(session)) {
-    ctx.throw(409, ctx.$t('errors.harvest.sessionAlreadyRunning', harvestId));
-    return;
-  }
-
-  jobsStarted.set(session.id, { status: 'starting', jobs: [] });
-
-  // Don't await promise so it runs in the background
-  startSession(session, {
-    restartAll,
-    forceRefreshSupported,
-    dryRun,
-  });
-
-  ctx.status = 200;
-  ctx.body = {
-    ...session,
-    status: 'starting',
-  };
 };
 
 exports.deleteOne = async (ctx) => {
-  ctx.action = 'harvest-sessions/delete';
   const { harvestId } = ctx.params;
 
   const harvestSessionService = new HarvestSessionService();
@@ -357,332 +238,16 @@ exports.deleteOne = async (ctx) => {
     .then(() => { appLogger.info(`[harvest-sessions] Deleted ${harvestId}`); })
     .catch((error) => { appLogger.error(`[harvest-sessions] Couldn't delete ${harvestId}: ${error}`); });
 
-  ctx.status = 204;
-};
-
-const jobsStopped = new Map();
-
-async function stopSession(session) {
-  const service = new HarvestSessionService();
-
-  try {
-    const harvestJobs = service.stop(session);
-
-    const jobs = [];
-    // Cancel jobs from queue
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const harvestJob of harvestJobs) {
-      try {
-        jobs.push(harvestJob);
-        jobsStopped.set(session.id, {
-          status: 'stopping',
-          jobs,
-        });
-
-        const job = await harvestQueue.getJob(harvestJob.id);
-        if (!job) {
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-
-        // Remove job if not currently running
-        if (!await job.isActive()) {
-          await job.remove();
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-
-        // Kill job if currently running
-        if (!job?.data?.pid) {
-          throw new Error('Cannot cancel job without PID');
-        }
-
-        process.kill(job.data.pid, 'SIGTERM');
-      } catch (error) {
-        appLogger.error(`[Harvest Queue] Failed to stop job ${harvestJob.id}: ${error}`);
-      }
-    }
-
-    jobsStopped.set(session.id, {
-      status: 'stopped',
-      jobs,
-    });
-  } catch (err) {
-    const error = err instanceof Error ? err : new Error(`${err}`);
-
-    const data = {
-      status: 'stopping',
-      error: {
-        name: error.name,
-        message: error.message,
-        cause: error.cause,
+  const actionService = new ActionsService();
+  await actionService.create({
+    data: {
+      type: 'harvest-sessions/delete',
+      author: { connect: { username: ctx.state.user.username } },
+      data: {
+        oldState: session,
       },
-    };
-
-    jobsStopped.set(session.id, data);
-
-    await service.update({
-      where: { id: session.id },
-      data,
-    });
-  }
-
-  setTimeout(() => {
-    jobsStopped.delete(session.id);
-  }, JOBS_CACHE_DURATION);
-}
-
-exports.getStopStatus = async (ctx) => {
-  const { harvestId } = ctx.params;
-
-  const harvestSessionService = new HarvestSessionService();
-
-  const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
-    select: { id: true, status: true, jobs: true },
-  });
-
-  if (!session) {
-    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
-  }
-
-  ctx.status = 200;
-  ctx.body = jobsStopped.get(session.id) ?? {
-    status: session.status,
-    jobs: session.jobs,
-  };
-};
-
-exports.stopOne = async (ctx) => {
-  ctx.action = 'harvest-sessions/stop';
-  ctx.type = 'json';
-  const { harvestId } = ctx.params;
-
-  const harvestSessionService = new HarvestSessionService();
-
-  const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
-  });
-
-  if (!session) {
-    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
-    return;
-  }
-
-  if (!HarvestSessionService.isActive(session)) {
-    ctx.status = 204;
-    return;
-  }
-
-  jobsStopped.set(session.id, { status: 'stopping', jobs: [] });
-
-  // Don't await promise so it runs in the background
-  stopSession(session);
-
-  ctx.status = 200;
-  ctx.body = {
-    ...session,
-    status: 'stopping',
-  };
-};
-
-const matrixManager = {
-  createId: (query) => createHash('md5').update(JSON.stringify(query)).digest('hex'),
-  cache: new Map(),
-  queue: new InMemoryQueue(
-    /**
-     * Generate harvest matrix and cache it
-     *
-     * @param {string} id - Id in the cache
-     * @param {*} query - query parameters
-     */
-    async (id, query) => {
-      let data = {};
-
-      try {
-        data = matrixManager.cache.get(id) ?? {};
-
-        appLogger.verbose(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Generating matrix...`);
-
-        const { sessionId } = query;
-
-        const harvests = new HarvestService();
-        const institutions = new InstitutionsService();
-        const endpoints = new EndpointsService();
-
-        // Generate matrix
-        const matrix = await harvests.getMatrix(
-          (harvest) => harvest.credentials.endpointId,
-          (harvest) => harvest.credentials.institutionId,
-          {
-            where: {
-              harvestedBy: {
-                sessionId,
-              },
-            },
-            include: {
-              credentials: {
-                select: { endpointId: true, institutionId: true },
-              },
-            },
-          },
-        );
-
-        // Resolve headers
-        appLogger.verbose(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Resolving headers...`);
-        const [columns, rows] = await Promise.all([
-          institutions.findMany({
-            where: { id: { in: matrix.headers.columns } },
-            orderBy: { name: 'asc' },
-          }),
-          endpoints.findMany({ where: { id: { in: matrix.headers.rows } } }),
-        ]);
-
-        // Aggregate institutions into a one line matrix
-        // cause we use cells instead of harvest (for performance reasons)
-        // we need to aggregate manually
-        appLogger.verbose(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Aggregating institutions...`);
-        const summary = new Map();
-        // eslint-disable-next-line no-restricted-syntax
-        for (const row of matrix.rows) {
-          // eslint-disable-next-line no-restricted-syntax
-          for (const cell of row.cells) {
-            if (cell.total <= 0) {
-              // eslint-disable-next-line no-continue
-              continue;
-            }
-
-            const entry = summary.get(cell.columnId) ?? {};
-
-            entry.id = cell.columnId;
-
-            // Keep last harvestedAt
-            if ((entry.harvestedAt ?? 0) <= (cell.harvestedAt ?? 0)) {
-              entry.harvestedAt = cell.harvestedAt;
-            }
-
-            // Aggregate counter versions
-            entry.counterVersions = new Set([
-              ...(entry.counterVersions ?? []),
-              ...(cell.counterVersions ?? []),
-            ]);
-            // Aggregate errors
-            entry.errors = new Set([
-              ...(entry.errors ?? []),
-              ...(cell.errors ?? []),
-            ]);
-            // Aggregate report ids
-            entry.reportIds = new Set([
-              ...(entry.reportIds ?? []),
-              ...(cell.reportIds ?? []),
-            ]);
-
-            // Aggregate period
-            entry.period = entry.period ?? cell.period ?? {};
-            if ((entry.period?.beginDate ?? 0) >= (cell.period?.beginDate ?? 0)) {
-              entry.period.beginDate = cell.period?.beginDate ?? 0;
-            }
-            if ((entry.period?.endDate ?? 0) <= (cell.period?.endDate ?? 0)) {
-              entry.period.endDate = cell.period?.endDate ?? 0;
-            }
-
-            // Aggregate counts into one cell
-            entry.total = (entry.total ?? 0) + cell.total;
-            entry.counts = entry.counts ?? {};
-            // eslint-disable-next-line no-restricted-syntax
-            for (const [status, count] of Object.entries(cell.counts ?? {})) {
-              entry.counts[status] = (entry.counts[status] ?? 0) + count;
-            }
-
-            entry.items = {
-              inserted: (entry.items?.inserted ?? 0) + (cell.items?.inserted ?? 0),
-              updated: (entry.items?.updated ?? 0) + (cell.items?.updated ?? 0),
-              failed: (entry.items?.failed ?? 0) + (cell.items?.failed ?? 0),
-            };
-
-            summary.set(cell.columnId, entry);
-          }
-        }
-        // Get status of each summary cell
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [, entry] of summary) {
-          // Define status based on counts
-          ([[entry.status] = []] = Object.entries(entry.counts)
-            .sort(([, aValue], [, bValue]) => bValue - aValue));
-
-          // Array-ify errors and counter versions
-          entry.counterVersions = Array.from(entry.counterVersions).sort();
-          entry.errors = Array.from(entry.errors).sort();
-          entry.reportIds = Array.from(entry.reportIds).sort();
-        }
-
-        // Cache matrix
-        appLogger.verbose(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
-        data.generatedAt = new Date();
-        data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
-        data.summary = Array.from(summary.values());
-        data.matrix = {
-          ...matrix,
-          headers: {
-            columns,
-            rows,
-          },
-          rows: matrix.rows
-            // Sort cells by institution
-            .map((row) => ({
-              ...row,
-              cells: row.cells.toSorted((cellA, cellB) => {
-                const indexA = columns.findIndex((inst) => inst.id === cellA.columnId);
-                const indexB = columns.findIndex((inst) => inst.id === cellB.columnId);
-                return indexA - indexB;
-              }),
-            })),
-        };
-
-        matrixManager.cache.set(id, data);
-      } catch (error) {
-        appLogger.error(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Something happened while generating matrix: ${error}`);
-        // Cache error
-        data.error = error;
-        matrixManager.cache.set(id, data);
-      } finally {
-        // Delete cache when it expires
-        setTimeout(() => {
-          appLogger.verbose(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Clearing cache entry`);
-          matrixManager.cachedelete(id);
-        }, MATRIX_CACHE_DURATION);
-      }
     },
-  ),
-};
+  });
 
-exports.getMatrix = async (ctx) => {
-  const { harvestId } = ctx.params;
-  const { retryCode = 202 } = ctx.request.query;
-
-  const query = { sessionId: harvestId };
-
-  const requestId = matrixManager.createId(query);
-  const cached = matrixManager.cache.get(requestId);
-
-  if (!cached) {
-    const data = { requestedAt: new Date() };
-
-    matrixManager.cache.set(requestId, data);
-    matrixManager.queue.add(requestId, query);
-
-    ctx.type = 'json';
-    ctx.status = retryCode;
-    ctx.body = data;
-    return;
-  }
-
-  if (cached.error) {
-    ctx.throw(500, cached.error);
-    return;
-  }
-
-  ctx.type = 'json';
-  ctx.status = cached.matrix ? 200 : retryCode;
-  ctx.body = cached;
+  ctx.status = 204;
 };
