@@ -53,11 +53,7 @@ app.use(cors({
   headers: ['Content-Type', 'Authorization'],
 }));
 
-i18n({
-  dir: path.resolve(__dirname, 'locales'),
-  defaultLocale: 'en',
-  cookieName: 'ezmesure_i18n',
-}).init(app);
+i18n.init(app, { cookieName: 'ezmesure_i18n' });
 
 // Server logs
 app.use(async (ctx, next) => {
