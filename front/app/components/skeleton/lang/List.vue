@@ -28,7 +28,7 @@ const snacks = useSnacksStore();
 const changeLocale = async (lang) => {
   setLocale(lang);
 
-  if (status === 'authenticated') {
+  if (status.value === 'authenticated') {
     try {
       await $fetch('/api/profile/language', {
         method: 'PUT',
