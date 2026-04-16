@@ -22,8 +22,8 @@ const {
   updateEndpoint,
   addEndpoint,
   importEndpoints,
-  getMatrix,
 } = require('./actions');
+const { getMatrix } = require('./matrix');
 
 const registry = require('./_registry');
 

@@ -15,8 +15,8 @@ const {
 
   getAll,
   getMetrics,
-  getMatrix,
 } = require('./actions');
+const { getMatrix } = require('./matrix');
 
 router.use(requireActiveJwt, requireUser);
 

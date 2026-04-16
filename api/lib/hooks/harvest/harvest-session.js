@@ -64,7 +64,11 @@ async function sendEndMail(session) {
           },
         },
         include: {
-          endpoint: true,
+          endpoint: {
+            select: {
+              vendor: true,
+            },
+          },
         },
       },
       // Get spaces of institutions
@@ -79,9 +83,9 @@ async function sendEndMail(session) {
 
   const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.newCounterDataAvailable);
 
-  try {
-    await Promise.all(
-      institutions.map(async (institution) => {
+  await Promise.all(
+    institutions.map(async (institution) => {
+      try {
         const contacts = new Set(institution.memberships.map((m) => m.user.email));
 
         // TODO: what if multiple spaces
@@ -115,18 +119,19 @@ async function sendEndMail(session) {
           spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
         };
 
+        const to = Array.from(contacts);
         await sendMail({
-          to: Array.from(contacts),
+          to,
           bcc: admins.filter((email) => !contacts.has(email)),
           subject: `Des nouvelles données COUNTER pour "${institution.name}" ont été moissonnées !`,
           ...generateMail('harvest-end', data),
         });
-        appLogger.verbose(`[harvest-session][hooks] Mail sent to ${contacts.join(', ')} for ${institution.name}`);
-      }),
-    );
-  } catch (error) {
-    appLogger.error(`[harvest-session][hooks] Error while sending mail: ${error}`);
-  }
+        appLogger.verbose(`[harvest-session][hooks] Mail sent to ${to.join(', ')} for ${institution.name}`);
+      } catch (error) {
+        appLogger.error(`[harvest-session][hooks] Error while sending mail for ${institution.name}: ${error}`);
+      }
+    }),
+  );
 }
 
 /* eslint-disable max-len */
@@ -141,7 +146,11 @@ async function sendEndMail(session) {
 const onHarvestSessionStart = async (session) => {
   try {
     await prisma.harvestSession.update({
-      where: { id: session.id },
+      where: {
+        id: session.id,
+        // Preventing from marking session multiple times
+        status: 'starting',
+      },
       data: {
         status: 'running',
         startedAt: new Date(),
@@ -158,7 +167,11 @@ const onHarvestSessionStart = async (session) => {
 const onHarvestSessionStop = async (session) => {
   try {
     await prisma.harvestSession.update({
-      where: { id: session.id },
+      where: {
+        id: session.id,
+        // Preventing from marking session multiple times
+        status: 'stopping',
+      },
       data: { status: 'stopped' },
     });
   } catch (err) {
@@ -172,11 +185,16 @@ const onHarvestSessionStop = async (session) => {
 const onHarvestSessionEnd = async (session) => {
   try {
     await prisma.harvestSession.update({
-      where: { id: session.id },
+      where: {
+        id: session.id,
+        // Preventing from marking session multiple times
+        status: 'running',
+      },
       data: { status: 'finished' },
     });
   } catch (err) {
     appLogger.error(`[harvest-session][hooks] Error while updating status: ${err}`);
+    return;
   }
 
   if (session.sendEndMail) {
@@ -186,5 +204,5 @@ const onHarvestSessionEnd = async (session) => {
 
 registerHook('harvest-session:start', onHarvestSessionStart);
 registerHook('harvest-session:stop', onHarvestSessionStop);
-// Using debounce here to avoid triggering session end multiple times
-registerHook('harvest-session:end', onHarvestSessionEnd, { debounce: true });
+// Using long debounce here to avoid triggering session end multiple times
+registerHook('harvest-session:end', onHarvestSessionEnd, { debounce: 5000 });

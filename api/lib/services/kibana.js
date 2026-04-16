@@ -346,7 +346,7 @@ async function createIndexPattern(spaceId, opts) {
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
   return $fetch(`${spacePrefix}/api/saved_objects/index-pattern`, {
     method: 'POST',
-    body: attributes,
+    body: { attributes },
   });
 }
 

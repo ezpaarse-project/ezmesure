@@ -324,7 +324,16 @@ const headers = computed(() => [
 const availableActions = computed(() => {
   const actions = [
     { header: 'sushi' },
+    'sushi/create',
+    'sushi/update',
+    'sushi/update',
     'sushi/delete',
+    { header: 'harvest' },
+    'harvest-sessions/create',
+    'harvest-sessions/upsert',
+    'harvest-sessions/delete',
+    'harvest-sessions/start',
+    'harvest-sessions/stop',
   ];
 
   return actions.map((item) => {
