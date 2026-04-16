@@ -267,7 +267,7 @@ const emit = defineEmits({
 const maxHarvestYear = new Date().getFullYear();
 
 const { params } = useRoute();
-const { data: user } = useAuthState();
+const { user } = useAuth();
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();

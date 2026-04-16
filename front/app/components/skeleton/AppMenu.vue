@@ -113,7 +113,7 @@
 
 <script setup>
 const { t } = useI18n();
-const { data: user } = useAuthState();
+const { user } = useAuth();
 
 const items = computed(() => [
   { text: t('menu.bar.partners'), to: '/partners', exact: true },

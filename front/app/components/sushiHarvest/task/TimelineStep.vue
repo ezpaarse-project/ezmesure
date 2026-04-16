@@ -59,7 +59,7 @@ const props = defineProps({
 });
 
 const { t, te } = useI18n();
-const { data: user } = useAuthState();
+const { user } = await useAuth();
 const { isSupported: clipboard, copy } = useClipboard();
 
 const date = useDateFormat(() => props.modelValue.startedAt, 'PPPpp');

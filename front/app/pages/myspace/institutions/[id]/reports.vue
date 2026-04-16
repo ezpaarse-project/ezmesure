@@ -34,7 +34,7 @@
 <script setup>
 definePageMeta({
   layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
+  middleware: ['require-auth', 'require-terms'],
   alias: ['/admin/institutions/:id/reports'],
 });
 

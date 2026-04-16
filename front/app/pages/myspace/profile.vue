@@ -68,12 +68,12 @@ import { millisecondsInDay } from 'date-fns/constants';
 
 definePageMeta({
   layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
+  middleware: ['require-auth', 'require-terms'],
 });
 
 const { oidcProfileUri } = useRuntimeConfig().public;
 const { data: apiConfig } = await useApiConfig();
-const { data: user, signOut } = useAuth();
+const { signOut, user } = useAuth();
 const { locale } = useI18n();
 
 const deleteDuration = computed(() => {
@@ -101,7 +101,8 @@ async function deleteAccount() {
     method: 'DELETE',
   });
 
-  await signOut({ callbackUrl: '/' });
+  await signOut({ local: true });
+  await navigateTo('/');
 }
 
 </script>

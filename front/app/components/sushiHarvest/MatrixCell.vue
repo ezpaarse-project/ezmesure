@@ -95,7 +95,7 @@ const props = defineProps({
 });
 
 const { t, te } = useI18n();
-const { data: user } = useAuthState();
+const { user } = useAuth();
 const snacks = useSnacksStore();
 
 /** @type {Ref<Object | null>} */

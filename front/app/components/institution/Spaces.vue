@@ -140,7 +140,7 @@ const emit = defineEmits({
 });
 
 const { t } = useI18n();
-const { data: user } = useAuthState();
+const { user } = useAuth();
 const snacks = useSnacksStore();
 
 /** @type {Ref<object[]>} */

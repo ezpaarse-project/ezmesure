@@ -3,7 +3,7 @@ import {
   setPageLayout,
 } from '#imports';
 
-import adminMiddleware from './admin';
+import adminMiddleware from './requireAdmin';
 
 const ADMIN_PATH_REGEX = /^\/admin/;
 

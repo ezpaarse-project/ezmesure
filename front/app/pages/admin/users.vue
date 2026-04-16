@@ -124,7 +124,7 @@ import UserFormDialog from '~/components/user/FormDialog.vue';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['sidebase-auth', 'terms', 'admin'],
+  middleware: ['require-auth', 'require-terms', 'require-admin'],
 });
 
 const { data: apiConfig } = await useApiConfig();

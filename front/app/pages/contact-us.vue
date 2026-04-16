@@ -280,7 +280,7 @@ import { MultiTextField } from '#components';
 const { t, te, locale } = useI18n();
 const { back } = useRouter();
 const { query } = useRoute();
-const { data: user } = useAuthState();
+const { user } = useAuth();
 const currentUserStore = useCurrentUserStore();
 const snacks = useSnacksStore();
 

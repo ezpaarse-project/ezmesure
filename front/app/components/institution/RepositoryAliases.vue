@@ -162,7 +162,7 @@ const emit = defineEmits({
   'update:modelValue': (items) => !!items,
 });
 
-const { data: user } = useAuthState();
+const { user } = useAuth();
 const { t } = useI18n();
 const snacks = useSnacksStore();
 

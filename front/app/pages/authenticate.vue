@@ -47,10 +47,10 @@ definePageMeta({
   },
 });
 
-const { status } = useAuth();
+const { isAuthenticated, signIn } = useAuth();
 const { query } = useRoute();
 
-if (status.value === 'authenticated') {
+if (isAuthenticated.value) {
   await navigateTo(query?.redirect || '/myspace');
 }
 
@@ -70,10 +70,9 @@ async function goToLogin() {
     clearTimeout(timeoutId);
   }
 
-  await navigateTo(
-    { path: redirectUrl.value.pathname, query: Object.fromEntries(redirectUrl.value.searchParams) },
-    { external: true },
-  );
+  const origin = query?.redirect || undefined;
+
+  await signIn(origin);
 
   timeoutId = setTimeout(() => {
     userIsWaiting.value = true;
