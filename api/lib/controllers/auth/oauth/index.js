@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { requireActiveJwt, requireUser, requireJwt } = require('../../../services/auth');
+const { requireUser, requireJwt } = require('../../../services/auth');
 
 const { redirectToFront } = require('./middlewares');
 
@@ -40,7 +40,7 @@ router.route({
   method: 'GET',
   path: '/logout',
   handler: [
-    requireActiveJwt,
+    requireJwt,
     requireUser,
     redirectToFront,
     logout,

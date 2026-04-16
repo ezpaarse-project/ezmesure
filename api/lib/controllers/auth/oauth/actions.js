@@ -7,10 +7,11 @@ const UsersService = require('../../../entities/users.service');
 const { sendWelcomeMail } = require('../mail');
 const { appLogger } = require('../../../services/logger');
 const { logoutUser, AUTH_COOKIE } = require('../../../services/kibana');
+const { createCache } = require('../../../utils/cache-manager');
 
 const { cookie } = config.get('auth');
 
-const loginState = new Map();
+const loginStateCache = createCache(3600 * 1000);
 
 exports.login = async (ctx) => {
   const {
@@ -18,7 +19,7 @@ exports.login = async (ctx) => {
     expected,
   } = await openid.buildAuthorizationUrl();
 
-  loginState.set(
+  await loginStateCache.set(
     expected.nonce ? `nonce:${expected.nonce}` : `state:${expected.state}`,
     { expected, query: ctx.query },
   );
@@ -29,14 +30,14 @@ exports.login = async (ctx) => {
 exports.loginCallback = async (ctx) => {
   const stateKey = ctx.query.nonce ? `nonce:${ctx.query.nonce}` : `state:${ctx.query.state}`;
 
-  const state = loginState.get(stateKey);
+  const state = await loginStateCache.get(stateKey);
   if (!state) {
     ctx.throw(400, 'Invalid state: cannot find expected state');
     return;
   }
 
   // State is valid, delete it to avoid replay attacks
-  loginState.delete(stateKey);
+  await loginStateCache.del(stateKey);
 
   // ctx.href may be unaware of the proxy
   // so we use the expected "redirectURL" and append the query parameters
