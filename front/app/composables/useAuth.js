@@ -3,6 +3,7 @@ import {
   ref,
   computed,
   watch,
+  useEventBus,
 } from '#imports';
 
 /**
@@ -17,7 +18,7 @@ import {
  * @property {{ acceptedTerms?: boolean }?} metadata
  */
 
-/** @type {Ref<AuthenticatedUser>} */
+/** @type {Ref<AuthenticatedUser | null>} */
 const user = ref(null);
 
 /**
@@ -74,14 +75,31 @@ async function setupTokenRotation() {
   }
 }
 
-// Start token rotation on login
-watch(user, () => {
-  if (user.value && !timeoutId) {
+// Setup events
+const bus = useEventBus('auth');
+watch(user, (value, previous) => {
+  if (!previous && value) {
+    bus.emit('login', value);
+    return;
+  }
+  if (previous && !value) {
+    bus.emit('logout', previous);
+    return;
+  }
+  if (previous.username && value.username) {
+    bus.emit('logout', previous);
+    bus.emit('login', value);
+  }
+});
+
+bus.on((event) => {
+  // Start token rotation on login
+  if (event === 'login') {
     setupTokenRotation();
   }
-  if (!user.value && timeoutId) {
+  // Stop refresh on logout
+  if (event === 'logout') {
     clearTimeout(timeoutId);
-    timeoutId = undefined;
   }
 });
 
@@ -96,5 +114,7 @@ export default function useAuth() {
     signIn,
     signOut,
     refreshAuthenticatedUser,
+
+    bus,
   };
 }
