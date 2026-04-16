@@ -3,95 +3,16 @@ const { createHash } = require('node:crypto');
 const InMemoryQueue = require('../../utils/memory-queue');
 const { createCache } = require('../../utils/cache-manager');
 
-const { prepareStandardQueryParams } = require('../../services/std-query');
-const { queryToPrismaFilter } = require('../../services/std-query/prisma-query');
 const { appLogger } = require('../../services/logger');
 
 const HarvestsService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
 
-const { schema, includableFields } = require('../../entities/harvest.dto');
+const CACHE_DURATION = 5 * 60 * 1000;
+const cache = createCache(CACHE_DURATION);
 
-const standardQueryParams = prepareStandardQueryParams({
-  schema,
-  includableFields,
-  queryFields: [],
-});
-exports.standardQueryParams = standardQueryParams;
-
-/**
-  * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
-  * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestWhereInput} HarvestWhereInput
- */
-
-exports.getHarvests = async (ctx) => {
-  const {
-    'period:from': from,
-    'period:to': to,
-    endpointId,
-    institutionId,
-    tags,
-    packages,
-  } = ctx.request.query;
-
-  /** @type {HarvestFindManyArgs} */
-  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
-  if (institutionId || endpointId || tags || packages) {
-    prismaQuery.where.credentials = {
-      endpointId: queryToPrismaFilter(endpointId),
-      institutionId: queryToPrismaFilter(institutionId),
-      tags: tags && { hasSome: queryToPrismaFilter(tags).in },
-      packages: packages && { hasSome: queryToPrismaFilter(packages).in },
-    };
-  }
-
-  if (from || to) {
-    prismaQuery.where.period = { gte: from, lte: to };
-  }
-
-  const harvestsService = new HarvestsService();
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.set('X-Total-Count', await harvestsService.count({ where: prismaQuery.where }));
-  ctx.body = await harvestsService.findMany(prismaQuery);
-};
-
-exports.deleteHarvestsByQuery = async (ctx) => {
-  const {
-    credentialsId,
-    reportId,
-    period,
-    status,
-  } = ctx.request.body;
-
-  /** @type {HarvestFindManyArgs} */
-  const prismaQuery = {
-    where: {
-      credentialsId,
-      reportId,
-      period: {
-        gte: period.from,
-        lte: period.to,
-      },
-      status,
-    },
-  };
-
-  const harvestsService = new HarvestsService();
-
-  const deleted = await harvestsService.deleteMany(prismaQuery);
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = { deleted };
-};
-
-const MATRIX_CACHE_DURATION = 5 * 60 * 1000;
-const matrixCache = createCache(MATRIX_CACHE_DURATION);
-
-const institutionsMatrixQueue = new InMemoryQueue(
+const institutionsQueue = new InMemoryQueue(
   /**
    * Generate harvest matrix and cache it
    *
@@ -102,7 +23,7 @@ const institutionsMatrixQueue = new InMemoryQueue(
     let data = {};
 
     try {
-      data = (await matrixCache.get(id)) ?? {};
+      data = (await cache.get(id)) ?? {};
 
       appLogger.verbose(`[harvest-matrix][institutions][${id}] Generating matrix...`);
 
@@ -156,9 +77,9 @@ const institutionsMatrixQueue = new InMemoryQueue(
       });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${CACHE_DURATION}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + CACHE_DURATION);
       data.unharvested = unharvested;
       data.matrix = {
         ...matrix,
@@ -172,11 +93,11 @@ const institutionsMatrixQueue = new InMemoryQueue(
       // Cache error
       data.error = error;
     }
-    await matrixCache.set(id, data);
+    await cache.set(id, data);
   },
 );
 
-const endpointsMatrixQueue = new InMemoryQueue(
+const endpointsQueue = new InMemoryQueue(
   /**
    * Generate harvest matrix and cache it
    *
@@ -187,7 +108,7 @@ const endpointsMatrixQueue = new InMemoryQueue(
     let data = {};
 
     try {
-      data = await matrixCache.get(id) ?? {};
+      data = await cache.get(id) ?? {};
 
       appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Generating matrix...`);
 
@@ -220,9 +141,9 @@ const endpointsMatrixQueue = new InMemoryQueue(
       const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${CACHE_DURATION}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + CACHE_DURATION);
       data.matrix = {
         ...matrix,
         headers: {
@@ -235,7 +156,7 @@ const endpointsMatrixQueue = new InMemoryQueue(
       // Cache error
       data.error = error;
     }
-    await matrixCache.set(id, data);
+    await cache.set(id, data);
   },
 );
 
@@ -244,13 +165,13 @@ exports.getInstitutionsMatrix = async (ctx) => {
 
   const id = createHash('md5').update(JSON.stringify(query)).digest('hex');
   const requestId = `institutions:${id}`;
-  const cached = await matrixCache.get(requestId);
+  const cached = await cache.get(requestId);
 
   if (!cached) {
     const data = { requestedAt: new Date() };
 
-    await matrixCache.set(requestId, data);
-    institutionsMatrixQueue.add(requestId, query);
+    await cache.set(requestId, data);
+    institutionsQueue.add(requestId, query);
 
     ctx.type = 'json';
     ctx.status = retryCode;
@@ -273,13 +194,13 @@ exports.getEndpointsMatrix = async (ctx) => {
 
   const id = createHash('md5').update(JSON.stringify(query)).digest('hex');
   const requestId = `endpoints:${id}`;
-  const cached = await matrixCache.get(requestId);
+  const cached = await cache.get(requestId);
 
   if (!cached) {
     const data = { requestedAt: new Date() };
 
-    await matrixCache.set(requestId, data);
-    endpointsMatrixQueue.add(requestId, query);
+    await cache.set(requestId, data);
+    endpointsQueue.add(requestId, query);
 
     ctx.type = 'json';
     ctx.status = retryCode;

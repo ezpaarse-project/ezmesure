@@ -13,10 +13,11 @@ const {
   standardQueryParams,
   getHarvests,
   deleteHarvestsByQuery,
-
+} = require('./actions');
+const {
   getInstitutionsMatrix,
   getEndpointsMatrix,
-} = require('./actions');
+} = require('./matrix');
 
 router.use(
   requireActiveJwt,
