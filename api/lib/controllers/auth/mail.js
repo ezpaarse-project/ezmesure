@@ -1,8 +1,5 @@
 const { sendMail, generateMail } = require('../../services/mail');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
-const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
-
 /**
  * Sends an email to the user who has just accepted the terms of use.
  *

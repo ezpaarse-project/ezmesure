@@ -2,7 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireJwt, requireUser } = require('../../services/auth');
+const { requireActiveJwt, requireUser } = require('../../services/auth');
 
 const oauth = require('./oauth');
 const activate = require('./activate');
@@ -24,7 +24,7 @@ const {
 router.use(oauth.prefix('/oauth').middleware());
 router.use(activate.prefix('/_activate').middleware());
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveJwt, requireUser);
 
 const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
 

@@ -88,7 +88,7 @@ module.exports = {
         introspection: '',
         userinfo: '',
       },
-      scopes: ['openid', 'profile', 'email', 'groups'],
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
     },
   },
   admin: {

@@ -1,6 +1,6 @@
 const router = require('koa-joi-router')();
 
-const { requireJwt, requireUser } = require('../services/auth');
+const { requireActiveJwt, requireUser } = require('../services/auth');
 const { appLogger } = require('../services/logger');
 
 const { setRandomPasswordForUser } = require('../services/elastic/users');
@@ -15,7 +15,7 @@ router.route({
     redirectToFront,
     async (ctx) => {
       try {
-        await requireJwt(ctx, () => { });
+        await requireActiveJwt(ctx, () => { });
       } catch {
         // Try to login with OAuth
         ctx.redirect('/api/auth/oauth/login?origin=/kibana/login');

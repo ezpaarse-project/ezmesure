@@ -11,8 +11,8 @@ web:
 expiry:
   deviceRequests: "5m"
   signingKeys: "6h"
-  idTokens: "24h"
-  authRequests: "24h"
+  idTokens: "5m"
+  authRequests: "5m"
 
 logger:
   level: info
@@ -30,6 +30,9 @@ oauth2:
   responseTypes: [code]
   skipApprovalScreen: false
   alwaysShowLoginScreen: false
+  grantTypes:
+    - "authorization_code"
+    - "refresh_token"
 
 staticClients:
 - id: {{ getenv "OIDC_CLIENT_ID" }}

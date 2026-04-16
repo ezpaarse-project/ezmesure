@@ -1,13 +1,14 @@
 const config = require('config');
 
 const openid = require('../../../utils/openid');
+const { signJWE } = require('../../../utils/jwt');
 
 const UsersService = require('../../../entities/users.service');
 const { sendWelcomeMail } = require('../mail');
 const { appLogger } = require('../../../services/logger');
 const { logoutUser, AUTH_COOKIE } = require('../../../services/kibana');
 
-const cookie = config.get('auth.cookie');
+const { cookie } = config.get('auth');
 
 const loginState = new Map();
 
@@ -54,8 +55,19 @@ exports.loginCallback = async (ctx) => {
   let user = await usersService.findUnique({ where: { username: userProps.username } });
 
   const next = () => {
-    ctx.cookies.set(cookie, auth.access_token, { httpOnly: true });
-    ctx.body = auth;
+    const ezToken = signJWE(
+      { username: userProps.username, refreshToken: auth.refresh_token },
+      { expiresIn: auth.expires_in },
+    );
+
+    ctx.cookies.set(cookie, ezToken, { httpOnly: true });
+
+    ctx.body = {
+      refresh_token: !!auth.refresh_token,
+      expires_in: auth.expires_in,
+      token_type: 'cookie',
+    };
+
     ctx.redirect(decodeURIComponent(state.query.origin || '/'));
   };
 
@@ -66,7 +78,7 @@ exports.loginCallback = async (ctx) => {
 
     try {
       await usersService.update({
-        where: { username: user.username },
+        where: { username: userProps.username },
         data: userProps,
       });
       appLogger.info(`User [${user.username}] is updated`);
@@ -84,7 +96,7 @@ exports.loginCallback = async (ctx) => {
     ctx.action = 'user/connection';
 
     await usersService.update({
-      where: { username: user.username },
+      where: { username: userProps.username },
       data: { deletedAt: null },
     });
 
@@ -128,4 +140,28 @@ exports.logout = async (ctx) => {
   ctx.cookies.set(cookie, '', { httpOnly: true });
   ctx.cookies.set(AUTH_COOKIE.name, '', AUTH_COOKIE.params);
   ctx.redirect(redirectPath);
+};
+
+exports.refresh = async (ctx) => {
+  const { jwtData, user } = ctx.state;
+
+  if (!jwtData.data.refreshToken) {
+    ctx.throw(400, 'Invalid state: no refresh token found');
+    return;
+  }
+
+  const auth = await openid.refreshTokenGrant(jwtData.data.refreshToken);
+
+  const token = signJWE(
+    { username: user.username, refreshToken: auth.refresh_token },
+    { expiresIn: auth.expires_in },
+  );
+
+  ctx.cookies.set(cookie, token, { httpOnly: true });
+
+  ctx.body = {
+    refresh_token: !!auth.refresh_token,
+    expires_in: auth.expires_in,
+    token_type: 'cookie',
+  };
 };

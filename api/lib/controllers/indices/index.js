@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
+const { requireActiveJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   getIndex,
   createIndex,
@@ -10,7 +10,7 @@ const {
 
 const indexNamePattern = /^[a-z0-9][a-z0-9_.-]*$/;
 
-router.use(requireJwt, requireUser, requireAdmin);
+router.use(requireActiveJwt, requireUser, requireAdmin);
 
 router.route({
   method: 'GET',

@@ -1,7 +1,6 @@
-const { auth } = require('config');
-const jwt = require('jsonwebtoken');
+const config = require('config');
 
-const openid = require('../utils/openid');
+const { verifyJWT, verifyJWE } = require('../utils/jwt');
 
 const InstitutionsService = require('../entities/institutions.service');
 const SushiEndpointService = require('../entities/sushi-endpoints.service');
@@ -13,32 +12,21 @@ const SpacesService = require('../entities/spaces.service');
 
 const { triggerHooks } = require('../hooks/hookEmitter');
 
+const { cookie: cookieName } = config.get('auth');
+
 /**
  * Get JWT data of cookie using OpenID provider
  *
  * @param {string} cookie - The cookie found in request
+ * @param {boolean} [checkExpiration] - Should check expiration of JWT
  *
  * @returns {Promise<{ type: 'oauth', token: string, data: unknown }>}
  */
-async function getJWTDataFromCookie(cookie) {
-  let data;
-
-  try {
-    data = await openid.getTokenInfo(cookie);
-  } catch {
-    throw new Error("Can't get token");
-  }
-
-  if (!data.active) {
-    throw new Error('Token is revoked');
-  }
-
-  return {
-    type: 'oauth',
-    token: cookie,
-    data,
-  };
-}
+const getJWTDataFromCookie = async (cookie, checkExpiration = false) => ({
+  type: 'oauth',
+  token: cookie,
+  data: await verifyJWE(cookie, { ignoreExpiration: !checkExpiration }),
+});
 
 /**
  * Get JWT data of header using JWT methods
@@ -47,76 +35,59 @@ async function getJWTDataFromCookie(cookie) {
  *
  * @returns {Promise<{ type: 'old_jwt', token: string, data: unknown }>}
  */
-function getJWTDataFromAuthHeader(header) {
+async function getJWTDataFromAuthHeader(header) {
   const matches = /Bearer (?<token>.+)/i.exec(header);
   const { token } = matches.groups ?? {};
   if (!token) {
     throw new Error("Can't get token");
   }
 
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, auth.secret, {}, (err, data) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      resolve({
-        type: 'old_jwt',
-        token,
-        data,
-      });
-    });
-  });
+  return {
+    type: 'oauth',
+    token,
+    data: await verifyJWT(token),
+  };
 }
 
 /**
- * Check if request have a valid JWT, and decode it's cotent
+ * Create a middleware to check for JWT validation
  *
- * @param {import('koa').Context} ctx - Koa context
- * @param {import('koa').Next} next - Next handler
+ * @param {object} [options]
+ * @param {boolean} [options.checkExpiration] - Should check expiration of JWT
  */
-const requireJwt = async (ctx, next) => {
-  let jwtData = {};
+function createRequireJwt(options = {}) {
+  /**
+  * Check if request have a valid JWT, and decode it's cotent
+  *
+  * @param {import('koa').Context} ctx - Koa context
+  * @param {import('koa').Next} next - Next handler
+  */
+  return async (ctx, next) => {
+    let jwtData = {};
 
-  try {
-    const cookie = ctx.cookies.get(auth.cookie);
-    if (cookie) {
-      jwtData = await getJWTDataFromCookie(cookie);
+    try {
+      const cookie = ctx.cookies.get(cookieName);
+      if (cookie) {
+        jwtData = await getJWTDataFromCookie(cookie, options.checkExpiration);
+      }
+
+      const authHeader = ctx.get('authorization');
+      if (authHeader) {
+        jwtData = await getJWTDataFromAuthHeader(authHeader);
+      }
+    } catch {
+      ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+      return;
     }
 
-    const authHeader = ctx.get('authorization');
-    if (authHeader) {
-      jwtData = await getJWTDataFromAuthHeader(authHeader);
+    if (!jwtData.token || !jwtData.data) {
+      ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+      return;
     }
-  } catch {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
-    return;
-  }
 
-  if (!jwtData.token || !jwtData.data) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
-    return;
-  }
-
-  ctx.state.jwtData = jwtData;
-  await next();
-};
-
-/**
- * Get username from OAuth (using OpenID provider)
- *
- * @param {string} token - The token found in request
- * @param {unknown} data - The data of the token
- *
- * @returns {Promise<string>} - The username found in data
- */
-async function getUsernameFromOAuth(token, data) {
-  const userProps = openid.getUserFromInfo(
-    await openid.getUserInfo(token, data.sub),
-  );
-
-  return userProps.username;
+    ctx.state.jwtData = jwtData;
+    await next();
+  };
 }
 
 /**
@@ -127,14 +98,14 @@ async function getUsernameFromOAuth(token, data) {
  *
  * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
  */
-function getUsernameFromOldJWT(token, data) {
+function getUsernameFromJWT(token, data) {
   return Promise.resolve(data.username);
 }
 
 /**
  * Check if request have a valid user
  *
- * Needs `requireJWT`
+ * Needs `requireActiveJwt`
  *
  * @param {import('koa').Context} ctx - Koa context
  * @param {import('koa').Next} next - Next handler
@@ -152,10 +123,8 @@ const requireUser = async (ctx, next) => {
   try {
     switch (jwtData.type) {
       case 'oauth':
-        username = await getUsernameFromOAuth(jwtData.token, jwtData.data);
-        break;
       case 'old_jwt':
-        username = await getUsernameFromOldJWT(jwtData.token, jwtData.data);
+        username = await getUsernameFromJWT(jwtData.token, jwtData.data);
         break;
 
       default:
@@ -349,7 +318,8 @@ function requireValidatedInstitution(opts = {}) {
 }
 
 module.exports = {
-  requireJwt,
+  requireJwt: createRequireJwt(),
+  requireActiveJwt: createRequireJwt({ checkExpiration: true }),
   requireUser,
   requireAdmin,
   requireTermsOfUse,

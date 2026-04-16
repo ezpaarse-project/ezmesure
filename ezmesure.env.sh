@@ -60,7 +60,7 @@ export SAML_METADATA_URL="https://pub.federation.renater.fr/metadata/test/idps.x
 
 # OIDC vars
 export EZMESURE_OIDC_CLIENT_ID="ezmesure"
-export EZMESURE_OIDC_SCOPES="[\"openid\",\"profile\",\"email\"]"
+export EZMESURE_OIDC_SCOPES="[\"openid\",\"profile\",\"email\",\"offline_access\"]"
 
 # Check your IDP configuration
 export EZMESURE_OIDC_CLIENT_SECRET="changeme"
