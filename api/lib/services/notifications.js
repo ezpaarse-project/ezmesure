@@ -155,28 +155,49 @@ async function sendNotifications(logger = appLogger) {
     return;
   }
 
-  const to = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.appRecentActivity);
-  if (to.length === 0) {
+  const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.appRecentActivity);
+
+  if (admins.length === 0) {
     logger.info('No admins to send recent activity');
     return;
   }
 
-  await sendMail({
-    to,
-    subject: '[Admin] Activité ezMESURE',
-    ...generateMail('recent-activity', {
-      noActions: actions.length === 0,
-      files,
-      users,
-      insertions,
-      institutions,
-      sushi,
+  const results = await Promise.allSettled(
+    admins.map(async (admin) => {
+      try {
+        await sendMail({
+          to: admin.email,
+          ...generateMail(
+            'recent-activity',
+            {
+              noActions: actions.length === 0,
+              files,
+              users,
+              insertions,
+              institutions,
+              sushi,
+            },
+            { locale: admin.language },
+          ),
+        });
+
+        appLogger.verbose(`[recent-activity] Mail sent to ${admin.email}`);
+      } catch (err) {
+        appLogger.error(`[recent-activity] Failed to send mail to ${admin.email}: ${err}`);
+        throw err;
+      }
     }),
-  });
+  );
 
-  logger.info('Recent activity successfully broadcasted');
+  const succeeded = results.some((result) => result.status === 'fulfilled');
 
-  if (actions.length > 0) {
+  if (succeeded) {
+    logger.info('Recent activity successfully broadcasted');
+  } else {
+    logger.error('Failed to broadcast recent activity');
+  }
+
+  if (actions.length > 0 && succeeded) {
     try {
       await setBroadcasted(actions);
     } catch (err) {

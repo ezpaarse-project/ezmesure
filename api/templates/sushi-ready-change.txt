@@ -1,12 +1,12 @@
-Bonjour,
+{{ t('emails.sushiReadyChange.body.headline') }}
 
 {% if sushiReadySince %}
-L'établissement "{{ institutionName }}" a terminé la saisie de ses identifiants COUNTER.
+{{ t('emails.sushiReadyChange.body.p1.start', { institutionName: '"' + institutionName + '"' }) }}
 {% else %}
-L'établissement "{{ institutionName }}" a repris la saisie de ses identifiants COUNTER.
+{{ t('emails.sushiReadyChange.body.p1.end', { institutionName: '"' + institutionName + '"' }) }}
 {% endif %}
 
-Vous pouvez visualiser ses identifiants à cette adresse : {{ institutionSushiLink }}.
+{{ t('emails.sushiReadyChange.body.p2.text', { institutionSushiLink: institutionSushiLink }) }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

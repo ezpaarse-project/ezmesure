@@ -29,7 +29,7 @@ const { sendMail, generateMail } = require('../../services/mail');
 const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
 const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
 
-const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContact } = require('./mail');
 
 const publicUrl = config.get('publicUrl');
 const secret = config.get('auth.secret');
@@ -254,18 +254,20 @@ exports.activate = async (ctx) => {
 
   if (Array.isArray(correspondents) && correspondents.length > 0) {
     await Promise.all(
-      correspondents.map(async ({ email: userMail, memberships }) => {
+      correspondents.map(async (contact) => {
+        const { email: userMail, memberships } = contact;
+
         if (!userMail || memberships.length <= 0) {
           return;
         }
 
         try {
-          await sendNewUserToContacts([userMail], {
+          await sendNewUserToContact(contact, {
             manageMemberLinks: memberships.map(({ institution }) => ({
               href: `${origin}/myspace/institutions/${institution.id}/members`,
               label: institution.name,
             })),
-            newUser: user.username,
+            newUser: user,
           });
         } catch (err) {
           appLogger.error(`Failed to send mail to ${userMail}: ${err}`);
@@ -448,7 +450,7 @@ exports.getUser = async (ctx) => {
 };
 
 exports.deleteUser = async (ctx) => {
-  const { username, email } = ctx.state.user;
+  const { username, email, language } = ctx.state.user;
 
   const deletedAt = add(new Date(), { days: deleteDurationDays });
 
@@ -470,11 +472,13 @@ exports.deleteUser = async (ctx) => {
     await sendMail({
       to: email,
       bcc: admins,
-      subject: 'Votre demande de suppression à bien été prise en compte',
       ...generateMail('user-deletion-requested', {
         loginURL: new URL('/authenticate', publicUrl).href,
         deletedAt: format(deletedAt, 'PPP', { locale: fr }),
         isFromUser: true,
+      }, {
+        locale: language,
+        subjectKey: 'subject.fromUser',
       }),
     });
   } catch (err) {

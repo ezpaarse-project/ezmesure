@@ -3,9 +3,9 @@
 {% block title %}
 <mj-title>
   {% if isFromUser %}
-  Votre demande de suppression à bien été prise en compte
+  {{ t('emails.userDeletionRequested.title.fromUser') }}
   {% else %}
-  Un administrateur d'ezMESURE a effectué une action sur votre compte
+  {{ t('emails.userDeletionRequested.title.fromAdmin') }}
   {% endif %}
 </mj-title>
 {% endblock %}
@@ -14,7 +14,9 @@
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Cher·e utilisateur·ice,</mj-text>
+    <mj-text mj-class="headline">
+      {{ t('emails.userDeletionRequested.body.headline') }}
+    </mj-text>
   </mj-column>
 </mj-section>
 
@@ -23,15 +25,14 @@
     <mj-text>
       <p>
         {% if isFromUser %}
-        Vous avez demandé
+        {{ t('emails.userDeletionRequested.body.youRequested', { deletedAt: deletedAt }) }}
         {% else %}
-        Un administrateur d'ezMESURE a programmé
+        {{ t('emails.userDeletionRequested.body.anAdminScheduled', { deletedAt: deletedAt }) }}
         {% endif %}
-        la suppression de votre compte sur ezMESURE, elle sera effective le {{ deletedAt }}.
       </p>
 
       <p>
-        Si vous souhaitez annuler cette opération, il suffit de <strong>vous connectez à ezMESURE</strong>.
+        {{ t('emails.userDeletionRequested.body.howToCancel') | safe }}
       </p>
     </mj-text>
 
@@ -41,12 +42,12 @@
       background-color="#9c27b0"
       color="white"
     >
-      Se connecter
+      {{ t('emails.global.login') }}
     </mj-button>
 
     <mj-text>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
     </mj-text>
   </mj-column>
 </mj-section>

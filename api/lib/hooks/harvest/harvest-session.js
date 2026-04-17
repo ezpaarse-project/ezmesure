@@ -86,7 +86,12 @@ async function sendEndMail(session) {
   await Promise.all(
     institutions.map(async (institution) => {
       try {
-        const contacts = new Set(institution.memberships.map((m) => m.user.email));
+        const contacts = institution.memberships.map((m) => m.user);
+        const contactEmails = new Set(contacts.map((user) => user.email));
+
+        const adminEmails = admins
+          .filter(({ email }) => !contactEmails.has(email))
+          .map(({ email }) => email);
 
         // TODO: what if multiple spaces
         const spaceID = institution.spaces.at(0)?.id;
@@ -119,14 +124,21 @@ async function sendEndMail(session) {
           spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
         };
 
-        const to = Array.from(contacts);
-        await sendMail({
-          to,
-          bcc: admins.filter((email) => !contacts.has(email)),
-          subject: `Des nouvelles données COUNTER pour "${institution.name}" ont été moissonnées !`,
-          ...generateMail('harvest-end', data),
-        });
-        appLogger.verbose(`[harvest-session][hooks] Mail sent to ${to.join(', ')} for ${institution.name}`);
+        await Promise.all(
+          Array.from(contacts).map(async (contact) => {
+            try {
+              await sendMail({
+                to: contact.email,
+                bcc: adminEmails,
+                ...generateMail('harvest-end', data, { locale: contact.language }),
+              });
+
+              appLogger.verbose(`[harvest-session][hooks] Mail sent to ${contact.email} for ${institution.name}`);
+            } catch (e) {
+              appLogger.error(`[harvest-session][hooks] Failed to send mail to ${contact.email} for ${institution.name}`);
+            }
+          }),
+        );
       } catch (error) {
         appLogger.error(`[harvest-session][hooks] Error while sending mail for ${institution.name}: ${error}`);
       }

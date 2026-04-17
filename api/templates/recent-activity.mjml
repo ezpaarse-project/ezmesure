@@ -1,14 +1,14 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Activité récente</mj-title>
+<mj-title>{{ t('emails.recentActivity.title') }}</mj-title>
 {% endblock %}
 
 {% block content %}
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Activité récente</mj-text>
+    <mj-text mj-class="headline">{{ t('emails.recentActivity.body.headline') }}</mj-text>
   </mj-column>
 </mj-section>
 
@@ -16,7 +16,7 @@
 <mj-section>
   <mj-column>
     <mj-text>
-      Aucune activité n'a été enregistrée dernièrement.
+      {{ t('emails.recentActivity.body.noAction') }}
     </mj-text>
   </mj-column>
 </mj-section>
@@ -25,11 +25,11 @@
 <mj-section>
   <mj-column>
     <mj-text>
-      {% if users.length %}<div><strong>{{ users.length }}</strong> enregistrements</div>{% endif %}
-      {% if institutions.length %}<div><strong>{{ institutions.length }}</strong> mises à jour d'établissements</div>{% endif %}
-      {% if sushi.length %}<div><strong>{{ sushi.length }}</strong> mises à jour d'identifiants COUNTER </div>{% endif %}
-      {% if files.length %}<div><strong>{{ files.length }}</strong> dépôts de fichiers</div>{% endif %}
-      {% if insertions.length %}<div><strong>{{ insertions.length }}</strong> chargements</div>{% endif %}
+      {% if users.length %}<div>{{ t('emails.recentActivity.summary.users', { count: '<strong>' + users.length + '</strong>' }) }}{% endif %}
+      {% if institutions.length %}<div>{{ t('emails.recentActivity.summary.institutions', { count: '<strong>' + institutions.length + '</strong>' }) }}{% endif %}
+      {% if sushi.length %}<div>{{ t('emails.recentActivity.summary.sushi', { count: '<strong>' + sushi.length + '</strong>' }) }}{% endif %}
+      {% if files.length %}<div>{{ t('emails.recentActivity.summary.files', { count: '<strong>' + files.length + '</strong>' }) }}{% endif %}
+      {% if insertions.length %}<div>{{ t('emails.recentActivity.summary.insertions', { count: '<strong>' + insertions.length + '</strong>' }) }}{% endif %}
     </mj-text>
   </mj-column>
 </mj-section>
@@ -38,15 +38,15 @@
 <mj-section>
   <mj-column>
     <mj-text mj-class="subheading">
-      Enregistrements ({{ users.length }})
+      {{ t('emails.recentActivity.users.title', { count: users.length }) }}
     </mj-text>
     <mj-table cellpadding="5px">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
-          <th>Nom</th>
-          <th>Email</th>
-          <th style="width: 140px">Date</th>
-          <th style="width: 50px">Statut</th>
+          <th>{{ t('emails.recentActivity.global.name') }}</th>
+          <th>{{ t('emails.recentActivity.global.email') }}</th>
+          <th style="width: 140px">{{ t('emails.recentActivity.global.date') }}</th>
+          <th style="width: 50px">{{ t('emails.recentActivity.global.status') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -68,16 +68,16 @@
 <mj-section>
   <mj-column>
     <mj-text mj-class="subheading">
-      Mises à jour établissements ({{ institutions.length }})
+      {{ t('emails.recentActivity.institutions.title', { count: institutions.length }) }}
     </mj-text>
     <mj-table cellpadding="5px">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
           <th></th>
-          <th>Utilisateur</th>
-          <th>Établissement</th>
-          <th style="width: 130px">Date</th>
-          <th style="width: 50px">Statut</th>
+          <th>{{ t('emails.recentActivity.global.user') }}</th>
+          <th>{{ t('emails.recentActivity.global.institution') }}</th>
+          <th style="width: 130px">{{ t('emails.recentActivity.global.date') }}</th>
+          <th style="width: 50px">{{ t('emails.recentActivity.global.status') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -106,16 +106,16 @@
 <mj-section>
   <mj-column>
     <mj-text mj-class="subheading">
-      Mises à jour d'identifiants COUNTER ({{ sushi.length }})
+      {{ t('emails.recentActivity.sushi.title', { count: sushi.length }) }}
     </mj-text>
     <mj-table cellpadding="5px">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
           <th></th>
-          <th>Utilisateur</th>
-          <th>Vendor</th>
-          <th style="width: 130px">Date</th>
-          <th style="width: 50px">Statut</th>
+          <th>{{ t('emails.recentActivity.global.user') }}</th>
+          <th>{{ t('emails.recentActivity.global.endpoint') }}</th>
+          <th style="width: 130px">{{ t('emails.recentActivity.global.date') }}</th>
+          <th style="width: 50px">{{ t('emails.recentActivity.global.status') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -154,15 +154,15 @@
 <mj-section>
   <mj-column>
     <mj-text mj-class="subheading">
-      Dépôts de fichiers ({{ files.length }})
+      {{ t('emails.recentActivity.files.title', { count: files.length }) }}
     </mj-text>
     <mj-table cellpadding="5px">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
           <th></th>
-          <th>Fichier</th>
-          <th style="width: 130px">Date</th>
-          <th style="width: 50px">Statut</th>
+          <th>{{ t('emails.recentActivity.global.file') }}</th>
+          <th style="width: 130px">{{ t('emails.recentActivity.global.date') }}</th>
+          <th style="width: 50px">{{ t('emails.recentActivity.global.status') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -186,18 +186,18 @@
 <mj-section>
   <mj-column>
     <mj-text mj-class="subheading">
-      Chargements ({{ insertions.length }})
+      {{ t('emails.recentActivity.insertions.title', { count: insertions.length }) }}
     </mj-text>
     <mj-table cellpadding="5px">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
-          <th>Utilisateur</th>
-          <th>Index</th>
-          <th>Insérés</th>
-          <th>Mis à jour</th>
-          <th>Échecs</th>
-          <th style="width: 130px">Date</th>
-          <th style="width: 50px">Statut</th>
+          <th>{{ t('emails.recentActivity.global.user') }}</th>
+          <th>{{ t('emails.recentActivity.global.index') }}</th>
+          <th>{{ t('emails.recentActivity.insertions.inserted') }}</th>
+          <th>{{ t('emails.recentActivity.insertions.updated') }}</th>
+          <th>{{ t('emails.recentActivity.insertions.failed') }}</th>
+          <th style="width: 130px">{{ t('emails.recentActivity.global.date') }}</th>
+          <th style="width: 50px">{{ t('emails.recentActivity.global.status') }}</th>
         </tr>
       </thead>
       <tbody>

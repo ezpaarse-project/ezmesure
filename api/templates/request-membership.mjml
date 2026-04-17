@@ -1,26 +1,26 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Un utilisateur souhaite rejoindre votre établissement</mj-title>
+<mj-title>{{ t('emails.requestMembership.body.title') }}</mj-title>
 {% endblock %}
 
 {% block content %}
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Un utilisateur souhaite rejoindre votre établissement</mj-text>
+    <mj-text mj-class="headline">{{ t('emails.requestMembership.body.headline') }}</mj-text>
   </mj-column>
 </mj-section>
 
 <mj-section>
   <mj-column>
     <mj-text>
-      L'utilisateur <b>{{ user }}</b> souhaite rejoindre votre établissement <b>{{ institution }}</b>, vous pouvez ajouter cet utilisateur depuis la page <a target="_blank" href="{{ linkInstitution }}"> "Mon établissement"</a>
+      {{ t('emails.requestMembership.body.p1', { user: '<b>' + (user | e) + '</b>', institution: '<b>' + (institution | e) + '</b>', linkInstitution: (linkInstitution | e) }) | safe }}
     </mj-text>
 
     <mj-text>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
     </mj-text>
   </mj-column>
 </mj-section>

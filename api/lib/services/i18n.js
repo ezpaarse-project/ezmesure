@@ -99,21 +99,21 @@ const init = (app, options = {}) => {
    * @param  {...String} values
    * @returns String
    */
-  const translate = (key, ...values) => {
+  function translate(key, ...values) {
     const locale = this.getLocale();
     return t(locale)(key, ...values);
-  };
+  }
 
   /**
    * Get the locale origin (query, cookie, header, default)
     * @returns String the locale origin
     */
-  const getLocaleOrigin = () => {
+  function getLocaleOrigin() {
     if (!this.state.localeOrigin) {
       this.getLocale();
     }
     return this.state.localeOrigin;
-  };
+  }
 
   /**
    * Get the locale of the request by looking at different places
@@ -122,7 +122,7 @@ const init = (app, options = {}) => {
    * 3. header: Accept-Language: zh-CN,zh;q=0.5
    * @returns String
    */
-  const getLocale = () => {
+  function getLocale() {
     if (this.state.locale) {
       return this.state.locale;
     }
@@ -169,7 +169,7 @@ const init = (app, options = {}) => {
     this.state.locale = locale;
     this.state.localeOrigin = localeOrigin;
     return locale;
-  };
+  }
 
   Object.assign(app.context, {
     $t: translate,

@@ -1,16 +1,24 @@
-Des nouvelles données COUNTER pour "{{ institution }}" ont été moissonnées !
+{{ t('emails.harvestEnd.body.headline') }}
 
-Cher·es utilisateurs·ices,
+{{ t('emails.harvestEnd.body.p1', { institution: institution, periodStart: periodStart, periodEnd: periodEnd }) }}
 
-Nous avons procédé au moissonnage de rapports COUNTER 5 pour le compte de "{{ institution }}" et couvrant la période {{ periodStart }} ~ {{ periodEnd }}
+{{ t('emails.harvestEnd.body.p2') }}
 
-Les données sont accessibles via vos tableaux de bords habituels, à condition d'en régler la temporalité à la période voulue.
+{% for c in credentials %}
+  - {{ c.endpoint }} | {{ c.packages }}{% if c.expired %}(⚠️ {{ t('emails.harvestEnd.body.outOfDate') }}){% endif %}
+{% endfor %}
+
+{{ t('emails.harvestEnd.body.p3') }}
 
 {% if spaceURL %}{{ spaceURL }}{% endif %}
 
-Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement{% if REPLY_TO %} à {{ REPLY_TO }}{% endif %} pour nous permettre de le signaler aux éditeurs.
+{% if REPLY_TO %}
+{{ t('emails.harvestEnd.body.p4.withoutAddress') }}
+{% else %}
+{{ t('emails.harvestEnd.body.p4.withAddress', { replyTo: REPLY_TO }) | striptags }}
+{% endif %}
 
-Vous pouvez continuer à saisir de nouveaux identifiants dans le formulaire ezCOUNTER ou en déclarer de nouveaux dans le formulaire ezCOUNTER. A l’issue de cette saisie, merci de cliquer à nouveau sur le bouton “VALIDER DES IDENTIFIANTS” si vous souhaitez que les rapports soient à nouveau moissonnés pour votre établissement : nous procéderons régulièrement à des moissonnages réguliers, au moins une fois par mois.
+{{ t('emails.harvestEnd.body.p5', { credentialsURL: credentialsURL }) | striptags }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

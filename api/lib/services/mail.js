@@ -4,7 +4,10 @@ const fs = require('fs-extra');
 const nunjucks = require('nunjucks');
 const mjml2html = require('mjml');
 const nodemailer = require('nodemailer');
+const { camelCase } = require('lodash');
 const { smtp, publicUrl, notifications } = require('config');
+
+const i18n = require('./i18n');
 
 /** @typedef {import('mjml-core').MJMLParseError} MJMLParseError */
 
@@ -50,18 +53,27 @@ module.exports.sendMail = (mailOptions) => {
  *
  * @returns {{ html: string, text: string, errors: MJMLParseError[] }}
  */
-module.exports.generateMail = (templateName, locals = {}) => {
+module.exports.generateMail = (templateName, locals = {}, opts = {}) => {
   if (!templateName) { throw new Error('No template name provided'); }
+
+  const t = i18n.t(opts.locale);
 
   const data = {
     ...locals,
     PUBLIC_URL: publicUrl,
     REPLY_TO: notifications.replyTo,
+    t,
   };
 
+  const subject = t(`emails.${camelCase(templateName)}.${opts?.subjectKey ?? 'subject'}`, data);
   const text = nunjucks.render(`${templateName}.txt`, data);
   const mjmlTemplate = nunjucks.render(`${templateName}.mjml`, data);
   const { html, errors } = mjml2html(mjmlTemplate);
 
-  return { html, text, errors };
+  return {
+    subject,
+    html,
+    text,
+    errors,
+  };
 };

@@ -1,14 +1,14 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>La suppression de votre compte est maintenant effective</mj-title>
+<mj-title>{{ t('emails.userDeleted.title') }}</mj-title>
 {% endblock %}
 
 {% block content %}
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Cher·e utilisateur·ice,</mj-text>
+    <mj-text mj-class="headline">{{ t('emails.userDeleted.body.headline') }}</mj-text>
   </mj-column>
 </mj-section>
 
@@ -16,14 +16,13 @@
   <mj-column>
     <mj-text>
       <p>
-        Suite à ce mail et conformément à votre demande, votre compte utilisateur sur ezMESURE
-        (incluant votre nom, prénom, adresse mail et affiliations) a bien été supprimé.
+        {{ t('emails.userDeleted.body.p1') }}
       </p>
     </mj-text>
 
     <mj-text>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
     </mj-text>
   </mj-column>
 </mj-section>

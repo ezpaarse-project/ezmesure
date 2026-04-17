@@ -1,9 +1,9 @@
-Bienvenue {{ username }},
-Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ username }}</strong>
+{{ t('emails.activateUser.body.headline', { fullname: user.fullName }) }}
 
-Vous pouvez activer votre compte en créant votre mot de passe en cliquant sur le bouton suivant :
+{{ t('emails.activateUser.body.p1', { username: '"' + user.username + '"' }) }}
+{{ t('emails.activateUser.body.p2') }}
 
 {{ activateLink }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

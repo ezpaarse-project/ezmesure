@@ -21,7 +21,7 @@ const schema = {
   email: Joi.string().email(),
   isAdmin: Joi.boolean(),
   excludeNotifications: Joi.array().items(Joi.string()),
-  language: Joi.string().valid('fr', 'en'),
+  language: Joi.string().valid(null, 'fr', 'en'),
 
   metadata: Joi.object(),
 

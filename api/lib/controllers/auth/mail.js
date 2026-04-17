@@ -20,8 +20,7 @@ const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constant
 exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink) {
   return sendMail({
     to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('activate-user', { username: user.username, activateLink }),
+    ...generateMail('activate-user', { user, activateLink }, { locale: user.language }),
   });
 };
 
@@ -37,8 +36,7 @@ exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink)
 exports.sendWelcomeMail = function sendWelcomeMail(user) {
   return sendMail({
     to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { username: user.username }),
+    ...generateMail('welcome', { user }, { locale: user.language }),
   });
 };
 
@@ -57,31 +55,29 @@ exports.sendWelcomeMail = function sendWelcomeMail(user) {
 exports.sendPasswordRecovery = function sendPasswordRecovery(user, data) {
   return sendMail({
     to: user.email,
-    subject: 'Réinitialisation mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, ...data }),
+    ...generateMail('new-password', { user, ...data }, { locale: user.language }),
   });
 };
 
 /**
- * Sends an email to the contacts of the user who has just activated his account according
+ * Sends an email to a contact of the user who has just activated his account according
  * to the domain name of the user's email.
  *
- * @param {Array<string>} receivers - Emails of contacts.
+ * @param {{ email: string, language: string }} user - Email and language of the contact.
  * @param {Object} data - Mail config.
  * @param {string} data.newUser - Username of user who activated his account.
  *
  * @returns {Promise<void>}
  */
-exports.sendNewUserToContacts = async (receivers, data) => {
+exports.sendNewUserToContact = async (user, data) => {
   const admins = await getNotificationRecipients(
     ADMIN_NOTIFICATION_TYPES.newUserMatchingInstitution,
-    receivers,
+    [user.email],
   );
 
   return sendMail({
-    to: receivers,
+    to: user.email,
     bcc: admins,
-    subject: `${data.newUser} s'est inscrit sur ezMESURE`,
-    ...generateMail('new-account', { data }),
+    ...generateMail('new-account', { user, ...data }, { locale: user.language }),
   });
 };
