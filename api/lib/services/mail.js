@@ -46,10 +46,17 @@ module.exports.sendMail = (mailOptions) => {
 };
 
 /**
+ * @typedef {object} GenerateMailOptions
+ * @property {string} [locale] - The locale to use for translations
+ * @property {string} [subjectKey] - The key to use for the subject. Defaults to "subject".
+ */
+
+/**
  * Generate a mail with a registered template
  *
  * @param {string} templateName the template to use
- * @param {Record<string, unknown>} locals local variables to be used in the template
+ * @param {Record<string, unknown>} [locals] local variables to be used in the template
+ * @param {GenerateMailOptions} [opts] options
  *
  * @returns {{ html: string, text: string, errors: MJMLParseError[] }}
  */
