@@ -453,6 +453,7 @@ async function unarchiveSushis(items) {
       try {
         await $fetch(`/api/sushi/${item.id}`, {
           method: 'PATCH',
+          query: { force: true },
           body: { archived: false },
         });
 

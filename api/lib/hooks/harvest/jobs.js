@@ -92,17 +92,18 @@ const onHarvestJobUpdate = async (harvestJob) => {
       }),
     );
 
-    // Check if a job is still active, if not: trigger hook as session ended
+    // Check if a job is still active. If not, trigger hook as session ended
     const harvestJobsService = new HarvestJobsService(harvestService);
-    const activeJob = await harvestJobsService.findFirst({
+    const { id: activeCount } = await harvestJobsService.count({
       where: {
         sessionId: session.id,
         status: {
           notIn: HarvestJobsService.endStatuses,
         },
       },
+      select: { id: true },
     });
-    if (!activeJob) {
+    if (activeCount <= 0) {
       triggerHooks('harvest-session:end', session);
     }
   });

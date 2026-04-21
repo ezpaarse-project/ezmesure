@@ -92,34 +92,34 @@ services:
       timeout: ${POSTGRES_HEALTHCHECK_TIMEOUT:-5s}
       retries: ${POSTGRES_HEALTHCHECK_RETRIES:-5}
 
-  rp:
-    build:
-      context: ./rp
-      dockerfile: Dockerfile
-      args:
-        - http_proxy
-        - https_proxy
-    ports:
-      - 8443:443
-    environment:
-      - http_proxy
-      - https_proxy
-      - APPLI_APACHE_SERVERNAME
-      - APPLI_APACHE_SERVERADMIN
-      - APPLI_APACHE_LOGLEVEL
-      - EZMESURE_DISABLE_SHIBBOLETH
-      - SHIBBOLETH_SP_URL
-      - SHIBBOLETH_DS_URL
-      - EZMESURE_FRONT_URL=${EZMESURE_FRONT_URL:-http://front:8080}
-      - EZMESURE_API_URL=${EZMESURE_API_URL:-http://api:3000}
-      - EZMESURE_KIBANA_URL=http://${EZMESURE_KIBANA_HOST:-kibana}:${EZMESURE_KIBANA_PORT:-5601}
-      - EZMESURE_REPORT_URL=http://${EZMESURE_REPORT_HOST:-reporting}:${EZREEPORT_API_HTTP_PORT:-8080}
-    volumes:
-      - ./rp/shibboleth/ssl:/etc/shibboleth/ssl
-      - ./rp/apache2/ssl:/etc/ssl/certificates
-      - ./rp/sp-log/:/var/log/shibboleth/
-      - ./rp/sp-cache:/var/cache/shibboleth
-    restart: unless-stopped
+  # rp:
+  #   build:
+  #     context: ./rp
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - http_proxy
+  #       - https_proxy
+  #   ports:
+  #     - 8443:443
+  #   environment:
+  #     - http_proxy
+  #     - https_proxy
+  #     - APPLI_APACHE_SERVERNAME
+  #     - APPLI_APACHE_SERVERADMIN
+  #     - APPLI_APACHE_LOGLEVEL
+  #     - EZMESURE_DISABLE_SHIBBOLETH
+  #     - SHIBBOLETH_SP_URL
+  #     - SHIBBOLETH_DS_URL
+  #     - EZMESURE_FRONT_URL=${EZMESURE_FRONT_URL:-http://front:8080}
+  #     - EZMESURE_API_URL=${EZMESURE_API_URL:-http://api:3000}
+  #     - EZMESURE_KIBANA_URL=http://${EZMESURE_KIBANA_HOST:-kibana}:${EZMESURE_KIBANA_PORT:-5601}
+  #     - EZMESURE_REPORT_URL=http://${EZMESURE_REPORT_HOST:-reporting}:${EZREEPORT_API_HTTP_PORT:-8080}
+  #   volumes:
+  #     - ./rp/shibboleth/ssl:/etc/shibboleth/ssl
+  #     - ./rp/apache2/ssl:/etc/ssl/certificates
+  #     - ./rp/sp-log/:/var/log/shibboleth/
+  #     - ./rp/sp-cache:/var/cache/shibboleth
+  #   restart: unless-stopped
 
   reporting:
     image: ghcr.io/ezpaarse-project/ezreeport-aio:rc
