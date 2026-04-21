@@ -1,3 +1,5 @@
+const config = require('config');
+
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
@@ -8,6 +10,8 @@ const RolesService = require('../../entities/roles.service');
 
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES, EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
+const publicUrl = config.get('publicUrl');
 
 /* eslint-disable max-len */
 /**
@@ -303,10 +307,13 @@ exports.updateInstitution = async (ctx) => {
       language: m.user.language,
     }));
 
+    const membersUrl = new URL(`/myspace/institutions/${institution.id}/members`, publicUrl);
+    const counterUrl = new URL(`/myspace/institutions/${institution.id}/sushi`, publicUrl);
+
     if (Array.isArray(contacts) && contacts.length > 0) {
       await sendValidateInstitutionMail(contacts, {
-        manageMemberLink: `${origin}/myspace/institutions/${institution.id}/members`,
-        manageSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
+        manageMemberLink: membersUrl.href,
+        manageSushiLink: counterUrl.href,
       });
     }
   }
