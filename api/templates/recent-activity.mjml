@@ -54,7 +54,7 @@
         <tr style="border-bottom: 1px solid #d0d0d0">
           <td>{{ action.elasticUser.full_name }}</td>
           <td>{{ action.elasticUser.email }}</td>
-          <td>{{ action.datetime }}</td>
+          <td>{{ d(action.datetime, 'Pp') }}</td>
           <td>{{ action.response.status }}</td>
         </tr>
         {% endfor %}
@@ -92,7 +92,7 @@
           {% endif %}
           <td>{{ action.user.name }}</td>
           <td>{{ action.metadata.institutionName or action.metadata.institutionId }}</td>
-          <td>{{ action.datetime }}</td>
+          <td>{{ d(action.datetime, 'Pp') }}</td>
           <td>{{ action.response.status }}</td>
         </tr>
         {% endfor %}
@@ -126,7 +126,7 @@
                 <td>-</td>
                 <td>{{ action.user.name }}</td>
                 <td>{{ result.vendor or result.id }}</td>
-                <td>{{ action.datetime }}</td>
+                <td>{{ d(action.datetime, 'Pp') }}</td>
                 <td>{{ result.status }}</td>
               </tr>
             {% endfor %}
@@ -139,7 +139,7 @@
             {% endif %}
             <td>{{ action.user.name }}</td>
             <td>{{ action.metadata.vendor or action.metadata.sushiId }}</td>
-            <td>{{ action.datetime }}</td>
+            <td>{{ d(action.datetime, 'Pp') }}</td>
             <td>{{ action.response.status }}</td>
           </tr>
           {% endif %}
@@ -171,7 +171,7 @@
           <tr style="border-bottom: 1px solid #d0d0d0">
             <td>{{ "+" if action.action == 'file/upload' else "-" }}</td>
             <td>{{ path }}</td>
-            <td>{{ action.datetime }}</td>
+            <td>{{ d(action.datetime, 'Pp') }}</td>
             <td>{{ action.response.status }}</td>
           </tr>
           {% endfor %}
@@ -208,7 +208,7 @@
           <td>{{ action.response.body.inserted }}</td>
           <td>{{ action.response.body.updated }}</td>
           <td>{{ action.response.body.failed }}</td>
-          <td>{{ action.datetime }}</td>
+          <td>{{ d(action.datetime, 'Pp') }}</td>
           <td>{{ action.response.status }}</td>
         </tr>
         {% endfor %}

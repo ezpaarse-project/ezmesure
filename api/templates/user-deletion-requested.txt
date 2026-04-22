@@ -7,9 +7,9 @@
 {{ t('emails.userDeletionRequested.body.headline') }}
 
 {% if isFromUser %}
-{{ t('emails.userDeletionRequested.body.youRequested', { deletedAt: deletedAt }) }}
+{{ t('emails.userDeletionRequested.body.youRequested', { deletedAt: d(deletedAt, 'PPP') }) }}
 {% else %}
-{{ t('emails.userDeletionRequested.body.anAdminScheduled', { deletedAt: deletedAt }) }}
+{{ t('emails.userDeletionRequested.body.anAdminScheduled', { deletedAt: d(deletedAt, 'PPP') }) }}
 {% endif %}
 
 {{ t('emails.userDeletionRequested.body.howToCancel') }}

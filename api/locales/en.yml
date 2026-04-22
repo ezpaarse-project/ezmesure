@@ -208,8 +208,8 @@ emails:
       fromAdmin: An ezMESURE administrator has performed an action on your account
     body:
       headline: Dear user,
-      youRequested: You have requested the deletion of your account on ezMESURE. It will be effective at {{ deletedAt }}.
-      anAdminScheduled: An ezMESURE administrator has scheduled the deletion of your account on ezMESURE. It will be effective at {{ deletedAt }}.
+      youRequested: You have requested the deletion of your account on ezMESURE. It will take effect on {{ deletedAt }}.
+      anAdminScheduled: An ezMESURE administrator has scheduled the deletion of your account on ezMESURE. It will take effect on {{ deletedAt }}.
       howToCancel: If you wish to cancel this operation, just <strong>log in to ezMESURE</strong>.
 
   userDeleted:

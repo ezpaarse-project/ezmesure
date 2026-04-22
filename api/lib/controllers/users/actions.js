@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { add, format } = require('date-fns');
-const { fr } = require('date-fns/locale');
+const { add } = require('date-fns');
 
 const { getNotificationRecipients } = require('../../utils/notifications');
 const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
@@ -344,7 +343,7 @@ exports.deleteUser = async (ctx) => {
         'user-deletion-requested',
         {
           loginURL: new URL('/authenticate', publicUrl).href,
-          deletedAt: format(deletedAt, 'PPP', { locale: fr }),
+          deletedAt,
         },
         {
           locale: user.language,

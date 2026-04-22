@@ -24,14 +24,14 @@
 {% if users.length -%}
 {{ t('emails.recentActivity.users.title', { count: users.length }) }}
   {% for action in users -%}
-    [{{ action.datetime }}][{{ action.response.status }}] {{ action.elasticUser.full_name }} ({{ action.elasticUser.email }}) [{{ action.datetime }}]
+    [{{ d(action.datetime, 'Pp') }}][{{ action.response.status }}] {{ action.elasticUser.full_name }} ({{ action.elasticUser.email }})
   {% endfor %}
 {% endif -%}
 
 {% if institutions.length -%}
 {{ t('emails.recentActivity.institutions.title', { count: institutions.length }) }}
   {% for action in institutions -%}
-    [{{ "+" if action.action == 'institutions/create' }}{{ "*" if action.action == 'institutions/update' }}{{ "-" if action.action == 'institutions/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
+    [{{ "+" if action.action == 'institutions/create' }}{{ "*" if action.action == 'institutions/update' }}{{ "-" if action.action == 'institutions/delete' }}][{{ d(action.datetime, 'Pp') }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
   {% endfor %}
 {% endif -%}
 
@@ -40,10 +40,10 @@
   {% for action in sushi -%}
   {% if action.action == 'sushi/delete-many' -%}
   {% for result in action.metadata.sushiDeleteResult -%}
-    [-][{{ action.datetime }}][{{ result.status }}] {{ action.user.name }} / {{ result.vendor or result.id }}
+    [-][{{ d(action.datetime, 'Pp') }}][{{ result.status }}] {{ action.user.name }} / {{ result.vendor or result.id }}
   {% endfor %}
   {%- else -%}
-    [{{ "+" if action.action == 'sushi/create' }}{{ "*" if action.action == 'sushi/update' }}{{ "-" if action.action == 'sushi/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
+    [{{ "+" if action.action == 'sushi/create' }}{{ "*" if action.action == 'sushi/update' }}{{ "-" if action.action == 'sushi/delete' }}][{{ d(action.datetime, 'Pp') }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
   {% endif -%}
   {% endfor %}
 {% endif -%}
@@ -52,7 +52,7 @@
 {{ t('emails.recentActivity.files.title', { count: files.length }) }}
   {% for action in files -%}
   {% for path in action.path -%}
-    [{{ "+" if action.action == 'file/upload' else "-" }}][{{ action.datetime }}][{{ action.response.status }}] {{ path }}
+    [{{ "+" if action.action == 'file/upload' else "-" }}][{{ d(action.datetime, 'Pp') }}][{{ action.response.status }}] {{ path }}
   {% endfor %}
   {%- endfor %}
 {% endif -%}
@@ -60,7 +60,7 @@
 {% if insertions.length -%}
 {{ t('emails.recentActivity.insertions.title', { count: insertions.length }) }}
   {% for action in insertions -%}
-    [{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.index }} (i:{{ action.response.body.inserted }}|u:{{ action.response.body.updated }}|e:{{ action.response.body.failed }})
+    [{{ d(action.datetime, 'Pp') }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.index }} (i:{{ action.response.body.inserted }}|u:{{ action.response.body.updated }}|e:{{ action.response.body.failed }})
   {% endfor %}
 {% endif -%}
 

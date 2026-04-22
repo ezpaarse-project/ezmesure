@@ -5,6 +5,11 @@ const util = require('util');
 const yaml = require('js-yaml');
 const { template } = require('lodash');
 
+const { format, formatDuration } = require('date-fns');
+const { fr, en } = require('date-fns/locale');
+
+const dateLocales = { fr, en };
+
 const localesDir = path.resolve(__dirname, '../../locales');
 const defaultLocale = config.get('defaultLocale');
 
@@ -80,6 +85,24 @@ const t = (locale) => (key, ...values) => {
   }
 
   return util.format(dict[key], ...values);
+};
+
+/**
+ * Get a set of date formatting functions for a given locale
+ * @param {string} loc - The locale to use for formatting
+ * @returns {{ format: Function, formatDistanceStrict: Function }}
+ */
+const dateFormatter = (loc) => {
+  const locale = dateLocales[loc || defaultLocale];
+
+  return {
+    format: (date, formatStr, options = {}) => (
+      format(date, formatStr, { locale, ...options })
+    ),
+    formatDuration: (duration, options = {}) => (
+      formatDuration(duration, { locale, ...options })
+    ),
+  };
 };
 
 /**
@@ -181,5 +204,6 @@ const init = (app, options = {}) => {
 module.exports = {
   locales,
   t,
+  dateFormatter,
   init,
 };

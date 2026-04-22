@@ -64,12 +64,15 @@ module.exports.generateMail = (templateName, locals = {}, opts = {}) => {
   if (!templateName) { throw new Error('No template name provided'); }
 
   const t = i18n.t(opts.locale);
+  const { format: d, formatDuration } = i18n.dateFormatter(opts.locale);
 
   const data = {
     ...locals,
     PUBLIC_URL: publicUrl,
     REPLY_TO: notifications.replyTo,
     t,
+    d,
+    formatDuration,
   };
 
   const subject = t(`emails.${camelCase(templateName)}.${opts?.subjectKey ?? 'subject'}`, data);

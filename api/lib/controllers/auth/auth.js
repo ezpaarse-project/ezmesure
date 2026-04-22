@@ -4,10 +4,7 @@ const {
   add,
   isBefore,
   parseISO,
-  format,
 } = require('date-fns');
-
-const { fr } = require('date-fns/locale');
 
 const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
 const { getNotificationRecipients } = require('../../utils/notifications');
@@ -35,6 +32,7 @@ const publicUrl = config.get('publicUrl');
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const { deleteDurationDays = 7 } = config.get('users');
+const passwordResetValidity = config.get('passwordResetValidity');
 
 const resetPasswordSecret = `${secret}_password_reset`;
 
@@ -305,11 +303,10 @@ exports.getResetToken = async (ctx) => {
     expiresAt,
   }, resetPasswordSecret);
 
-  const diffInHours = config.get('passwordResetValidity');
   await sendPasswordRecovery(user, {
     recoveryLink: `${origin}/password/new?token=${token}`,
     resetLink: `${origin}/password/reset`,
-    validity: `${diffInHours} heure${diffInHours > 1 ? 's' : ''}`,
+    validity: passwordResetValidity,
   });
 
   ctx.status = 204;
@@ -474,7 +471,7 @@ exports.deleteUser = async (ctx) => {
       bcc: admins,
       ...generateMail('user-deletion-requested', {
         loginURL: new URL('/authenticate', publicUrl).href,
-        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
+        deletedAt,
         isFromUser: true,
       }, {
         locale: language,
