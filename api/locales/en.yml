@@ -176,3 +176,172 @@ errors:
 
   logs:
     tooManySSEConnections: Too many SSE connections
+
+emails:
+  global:
+    login: Sign in
+    regards: Regards,
+    theTeam: The ezMESURE team
+    user: User
+    institution: Institution
+    endpoint: Endpoint
+    name: Name
+    email: Email
+    date: Date
+    status: Status
+    file: File
+    index: Index
+    package: Package
+
+  layout:
+    body:
+      footer:
+        contactUs: For any question, contact us by mail
+        contactUsAt: For any question, contact us by mail at <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a>
+
+  userDeletionRequested:
+    subject:
+      fromUser: Your request to delete your account has been received
+      fromAdmin: An ezMESURE administrator has performed an action on your account
+    title:
+      fromUser: Your request to delete your account has been received
+      fromAdmin: An ezMESURE administrator has performed an action on your account
+    body:
+      headline: Dear user,
+      youRequested: You have requested the deletion of your account on ezMESURE. It will take effect on {{ deletedAt }}.
+      anAdminScheduled: An ezMESURE administrator has scheduled the deletion of your account on ezMESURE. It will take effect on {{ deletedAt }}.
+      howToCancel: If you wish to cancel this operation, just <strong>log in to ezMESURE</strong>.
+
+  userDeleted:
+    subject: The suppression of your account is now effective
+    title: The suppression of your account is now effective
+    body:
+      headline: Dear user,
+      p1: Since this email and in compliance with your request, your account on ezMESURE (including your name, first name, email address and affiliations) has been deleted.
+
+  activateUser:
+    subject: Activate your ezMESURE account
+    title: Activate your ezMESURE account
+    body:
+      headline: Welcome {{ fullname }},
+      p1: You are now registered on ezMESURE with the Kibana user {{ username }}
+      p2: "You can activate your account and create your password by clicking on the link below :"
+      activateAccount: Activate my account
+
+  welcome:
+    subject: Welcome to ezMESURE !
+    title: Welcome to ezMESURE
+    body:
+      headline: Welcome {{ name }},
+      p1: You are now registered on ezMESURE with the Kibana user {{ username }}
+
+  newPassword:
+    subject: ezMESURE/Kibana password reset
+    title: ezMESURE/Kibana password reset
+    body:
+      headline: Hello {{ name }},
+      p1: We have learned that you have lost your ezMESURE/Kibana password. We are deeply sorry!
+      p2: "But don't worry! You can use the link below to reset your password:"
+      resetPassword: Reset your password
+      p3: "If you don't use this link within {{ validity }}, it will expire. To obtain a new password reset link, visit: {{ resetLink }}."
+
+  newAccount:
+    subject: A new collaborator has signed up
+    title: A new collaborator has signed up
+    body:
+      headline: "{{ name }} has just signed up on ezMESURE"
+      p1: "You can integrate him/her to your institutions from the members management interface:"
+
+  contact:
+    subject: Contact - {{ appName }}
+    title: Contact - {{ appName }}
+    body:
+      headline: Contact - {{ appName }}
+      email: "Email:"
+      subject: "Subject:"
+      browser: "Browser:"
+      message: "Message:"
+
+  validateInstitution:
+    subject: Your institution has been validated
+    title: Your institution has been validated
+    body:
+      headline: Hello,
+      p1: We inform you that the institution to which you are attached has been validated.
+      p2: As a contact, you can now <a target="_blank" href="{{ manageMemberLink }}">manage members</a> of your institution and <a target="_blank" href="{{ manageSushiLink }}">enter COUNTER credentials</a>.
+
+  sushiReadyChange:
+    subject:
+      start: Resume of COUNTER credentials entry
+      end: End of COUNTER credentials entry
+    body:
+      headline: Hello,
+      p1:
+        start: The institution {{ institutionName }} has finished entering COUNTER credentials.
+        end: The institution {{ institutionName }} has resumed entering COUNTER credentials.
+      p2:
+        text: "You can view those credentials at this address: {{ institutionSushiLink }}."
+        html: You can view those credentials at <a target="_blank" href="{{ institutionSushiLink }}">this address</a>.
+
+  assignedRole:
+    subject: A new role has been assigned to you
+    title: You are now {{ roleLabel }} of {{ institutionName }}
+    body:
+      headline: You are now {{ roleLabel }} of {{ institutionName }}
+      p1:
+        html: You will find all the information on this role in the blog post <a target="_blank" href="{{ contactDocLink }}">{{ contactDocLink }}</a>
+        text: "You will find all the information on this role in the blog post : {{ contactDocLink }}"
+
+  requestMembership:
+    subject: A user wants to join your institution
+    title: A user wants to join your institution
+    body:
+      headline: A user wants to join your institution
+      p1: The user {{ user }} wants to join your institution {{ institution }}, you can add this user from the <a target="_blank" href="{{ linkInstitution }}">"My institution"</a> page
+
+  harvestEnd:
+    subject: New COUNTER data for "{{ institution }}" has been harvested
+    title: New COUNTER data for "{{ institution }}" has been harvested
+    body:
+      headline: Dear user,
+      p1: We have performed a COUNTER harvest for "{{ institution }}", covering the period {{ periodStart }} ~ {{ periodEnd }}.
+      p2: "You will find the list of harvested credentials below :"
+      p3: The data is available via your usual Kibana dashboards, provided you adjust the temporality to the period you want.
+      p4:
+        withoutAddress: If you notice missing or invalid data, please contact us immediately to allow us to notify the publishers.
+        withAddress: If you notice missing or invalid data, please contact us immediately at <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a> to allow us to notify the publishers.
+      p5: 'You can continue to enter new COUNTER credentials in <a href="{{ credentialsURL }}">the ezCOUNTER form</a>. After this entry, please click again on the "VALIDATE MY CREDENTIALS" button if you want the reports to be re-harvested for your institution: we perform regular harvests, at least once a month.'
+      outOfDate: These credentials are out of date !
+      accessYourSpace: Access your space
+
+  recentActivity:
+    subject: "[Admin] ezMESURE activity"
+    title: Recent activity
+    body:
+      headline: Recent activity
+      noActions: No activity has been recorded recently.
+      summary:
+        users: "{{ count }} registrations"
+        institutions: "{{ count }} institutions updates"
+        sushi: "{{ count }} COUNTER credentials updates"
+        files: "{{ count }} file deposits"
+        insertions: "{{ count }} insertions"
+      users:
+        title: Registrations ({{ count }})
+      institutions:
+        title: Institutions updates ({{ count }})
+      sushi:
+        title: COUNTER credentials updates ({{ count }})
+      files:
+        title: File deposits ({{ count }})
+      insertions:
+        title: Insertions ({{ count }})
+        updated: Updated
+        inserted: Inserted
+        failed: Failed
+
+  errorHappened:
+    subject: An error has happened
+    title: An error has happened
+    body:
+      headline: An error has happened in ezMESURE.

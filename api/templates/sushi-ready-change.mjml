@@ -1,14 +1,14 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Statut de saisie COUNTER modifié</mj-title>
+<mj-title>{{ t('emails.sushiReadyChange.title') }}</mj-title>
 {% endblock %}
 
 {% block content %}
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Bonjour,</mj-text>
+    <mj-text mj-class="headline">{{ t('emails.sushiReadyChange.body.headline') }}</mj-text>
   </mj-column>
 </mj-section>
 
@@ -17,16 +17,16 @@
 
     <mj-text>
       {% if sushiReadySince %}
-      <p>L'établissement <strong>{{ institutionName }}</strong> a terminé la saisie de ses identifiants COUNTER.</p>
+      <p>{{ t('emails.sushiReadyChange.body.p1.start', { institutionName: '<strong>' + (institutionName | e) + '</strong>' }) | safe }}</p>
       {% else %}
-      <p>L'établissement <strong>{{ institutionName }}</strong> a repris la saisie de ses identifiants COUNTER.</p>
+      <p>{{ t('emails.sushiReadyChange.body.p1.end', { institutionName: '<strong>' + (institutionName | e) + '</strong>' }) | safe }}</p>
       {% endif %}
-      <p>Vous pouvez visualiser ses identifiants à <a target="_blank" href="{{ institutionSushiLink }}">cette adresse</a>.</p>
+      <p>{{ t('emails.sushiReadyChange.body.p2.html', { institutionSushiLink: (institutionSushiLink | e) }) | safe }}</p>
     </mj-text>
 
     <mj-text>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
     </mj-text>
   </mj-column>
 </mj-section>

@@ -1,3 +1,5 @@
+const config = require('config');
+
 const { sendMail, generateMail } = require('../../services/mail');
 
 const { appLogger } = require('../../services/logger');
@@ -7,18 +9,34 @@ const UsersService = require('../../entities/users.service');
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
-async function sendValidateInstitution(receivers) {
-  const admins = await getNotificationRecipients(
-    ADMIN_NOTIFICATION_TYPES.institutionValidated,
-    receivers,
-  );
+const publicUrl = config.get('publicUrl');
 
-  return sendMail({
-    to: receivers,
-    bcc: admins,
-    subject: 'Votre établissement a été validé',
-    ...generateMail('validate-institution'),
-  });
+async function sendValidateInstitutionMail(receivers, data) {
+  try {
+    const admins = await getNotificationRecipients(
+      ADMIN_NOTIFICATION_TYPES.institutionValidated,
+      receivers.map((receiver) => receiver.email),
+    );
+
+    return await Promise.allSettled(
+      receivers.map(async (receiver) => {
+        try {
+          await sendMail({
+            to: receiver.email,
+            bcc: admins,
+            ...generateMail('validate-institution', data, { locale: receiver.language }),
+          });
+
+          appLogger.verbose(`[validate-institution] Mail sent to ${receiver.email}`);
+        } catch (err) {
+          appLogger.error(`[validate-institution] Failed to send mail to ${receiver.email}: ${err}`);
+          throw err;
+        }
+      }),
+    );
+  } catch (err) {
+    appLogger.error(`[validate-institution] Failed to send sushi-ready-change mail: ${err}`);
+  }
 }
 
 exports.validateInstitution = async (ctx) => {
@@ -37,7 +55,7 @@ exports.validateInstitution = async (ctx) => {
   });
 
   if (!wasValidated && validated === true) {
-    let contacts = await usersService.findMany({
+    const contacts = await usersService.findMany({
       where: {
         deletedAt: { equals: null },
         memberships: {
@@ -47,13 +65,21 @@ exports.validateInstitution = async (ctx) => {
           },
         },
       },
+      select: {
+        email: true,
+        language: true,
+      },
     });
 
-    contacts = contacts?.map?.((e) => e.email);
+    const membersUrl = new URL(`/myspace/institutions/${institution.id}/members`, publicUrl);
+    const counterUrl = new URL(`/myspace/institutions/${institution.id}/sushi`, publicUrl);
 
     if (Array.isArray(contacts) && contacts.length > 0) {
       try {
-        await sendValidateInstitution(contacts);
+        await sendValidateInstitutionMail(contacts, {
+          manageMemberLink: membersUrl.href,
+          manageSushiLink: counterUrl.href,
+        });
       } catch (err) {
         appLogger.error(`Failed to send validate institution mail: ${err}`);
       }

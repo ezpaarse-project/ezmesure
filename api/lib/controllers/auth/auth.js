@@ -4,10 +4,7 @@ const {
   add,
   isBefore,
   parseISO,
-  format,
 } = require('date-fns');
-
-const { fr } = require('date-fns/locale');
 
 const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
 const { getNotificationRecipients } = require('../../utils/notifications');
@@ -29,12 +26,13 @@ const { sendMail, generateMail } = require('../../services/mail');
 const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
 const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
 
-const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContact } = require('./mail');
 
 const publicUrl = config.get('publicUrl');
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const { deleteDurationDays = 7 } = config.get('users');
+const passwordResetValidity = config.get('passwordResetValidity');
 
 const resetPasswordSecret = `${secret}_password_reset`;
 
@@ -254,18 +252,20 @@ exports.activate = async (ctx) => {
 
   if (Array.isArray(correspondents) && correspondents.length > 0) {
     await Promise.all(
-      correspondents.map(async ({ email: userMail, memberships }) => {
+      correspondents.map(async (contact) => {
+        const { email: userMail, memberships } = contact;
+
         if (!userMail || memberships.length <= 0) {
           return;
         }
 
         try {
-          await sendNewUserToContacts([userMail], {
+          await sendNewUserToContact(contact, {
             manageMemberLinks: memberships.map(({ institution }) => ({
               href: `${origin}/myspace/institutions/${institution.id}/members`,
               label: institution.name,
             })),
-            newUser: user.username,
+            newUser: user,
           });
         } catch (err) {
           appLogger.error(`Failed to send mail to ${userMail}: ${err}`);
@@ -303,11 +303,10 @@ exports.getResetToken = async (ctx) => {
     expiresAt,
   }, resetPasswordSecret);
 
-  const diffInHours = config.get('passwordResetValidity');
   await sendPasswordRecovery(user, {
     recoveryLink: `${origin}/password/new?token=${token}`,
     resetLink: `${origin}/password/reset`,
-    validity: `${diffInHours} heure${diffInHours > 1 ? 's' : ''}`,
+    validity: passwordResetValidity,
   });
 
   ctx.status = 204;
@@ -418,6 +417,20 @@ exports.changeExcludeNotifications = async (ctx) => {
   ctx.body = user.excludeNotifications;
 };
 
+exports.changeLanguage = async (ctx) => {
+  const { body } = ctx.request;
+  const { username } = ctx.state.user;
+
+  const service = new UsersService();
+  const user = await service.update({
+    where: { username },
+    data: { language: body.value },
+  });
+
+  ctx.status = 200;
+  ctx.body = user;
+};
+
 exports.getUser = async (ctx) => {
   const usersService = new UsersService();
   const user = await usersService.findUnique({
@@ -434,7 +447,7 @@ exports.getUser = async (ctx) => {
 };
 
 exports.deleteUser = async (ctx) => {
-  const { username, email } = ctx.state.user;
+  const { username, email, language } = ctx.state.user;
 
   const deletedAt = add(new Date(), { days: deleteDurationDays });
 
@@ -456,11 +469,13 @@ exports.deleteUser = async (ctx) => {
     await sendMail({
       to: email,
       bcc: admins,
-      subject: 'Votre demande de suppression à bien été prise en compte',
       ...generateMail('user-deletion-requested', {
         loginURL: new URL('/authenticate', publicUrl).href,
-        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
+        deletedAt,
         isFromUser: true,
+      }, {
+        locale: language,
+        subjectKey: 'subject.fromUser',
       }),
     });
   } catch (err) {

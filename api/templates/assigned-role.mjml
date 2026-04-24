@@ -1,0 +1,30 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>{{ t('emails.assignedRole.title', { roleLabel: (data.role.label | e), institutionName: '<strong>' + (data.institution | e) + '</strong>' }) | safe }}</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">
+      {{ t('emails.assignedRole.body.headline', { roleLabel: (data.role.label | e), institutionName: '<strong>' + (data.institution | e) + '</strong>' }) | safe }}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      {{ t('emails.assignedRole.body.p1.html', { contactDocLink: (data.contactDocLink | e) }) | safe }}
+    </mj-text>
+
+    <mj-text>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

@@ -2,8 +2,7 @@
 
 {% block title %}
 <mj-title>
-  Des nouvelles données COUNTER pour "<strong>{{ institution }}</strong>"
-  ont été moissonnées !
+  {{ t('emails.harvestEnd.title', { institution: '<strong>' + (institution | e) + '</strong>' }) }}
 </mj-title>
 {% endblock %}
 
@@ -11,40 +10,37 @@
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Cher·es utilisateurs·ices,</mj-text>
+    <mj-text mj-class="headline">{{ t('emails.harvestEnd.body.headline') }}</mj-text>
   </mj-column>
 </mj-section>
 
 <mj-section>
   <mj-column>
     <mj-text>
-      Nous avons procédé au moissonnage de rapports COUNTER 5 pour le compte de
-      "<strong>{{ institution }}</strong>" et couvrant la période
-      <strong>{{ periodStart }}</strong> ~ <strong>{{ periodEnd }}</strong>.
+      {{ t('emails.harvestEnd.body.p1', { institution: '<strong>' + (institution | e) + '</strong>', periodStart: '<strong>' + (periodStart | e) + '</strong>', periodEnd: '<strong>' + (periodEnd | e) + '</strong>' }) | safe }}
     </mj-text>
 
     <mj-text>
-      Vous trouverez la liste des identifiants COUNTER moissonnés ci-dessous :
+      {{ t('emails.harvestEnd.body.p2') }}
     </mj-text>
 
     <mj-table>
       <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
-        <th>Point d'accès</th>
-        <th style="padding: 0 8px;">Package</th>
+        <th>{{ t('emails.global.endpoint') }}</th>
+        <th style="padding: 0 8px;">{{ t('emails.global.package') }}</th>
         <th></th>
       </tr>
       {% for c in credentials %}
         <tr style="width: 100%;">
           <td style="max-width: 0; width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.endpoint }}</td>
           <td style="max-width: 0; width: 25%; padding: 0 8px;">{{ c.packages }}</td>
-          <td style="max-width: 0; width: 25%; color: orange;">{% if c.expired %}Ces identifiants sont périmés !{% endif %}</td>
+          <td style="max-width: 0; width: 25%; color: orange;">{% if c.expired %}{{ t('emails.harvestEnd.body.outOfDate') }}{% endif %}</td>
         </tr>
       {% endfor %}
     </mj-table>
 
     <mj-text>
-      Les données sont accessibles via vos tableaux de bord habituels, à condition d'en régler
-      la temporalité à la période voulue.
+      {{ t('emails.harvestEnd.body.p3') }}
     </mj-text>
 
     {% if spaceURL %}
@@ -54,31 +50,25 @@
       background-color="#9c27b0"
       color="white"
     >
-      Accéder à votre espace
+      {{ t('emails.harvestEnd.body.getToYourSpace') }}
     </mj-button>
     {% endif %}
 
     <mj-text>
-      Si vous remarquez des données qui vous paraissent manquantes ou non valides,
-      merci de nous contacter rapidement
       {% if REPLY_TO %}
-      à <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a>
+      {{ t('emails.harvestEnd.body.p4.withoutAddress') }}
+      {% else %}
+      {{ t('emails.harvestEnd.body.p4.withAddress', { replyTo: (REPLY_TO | e) }) | safe }}
       {% endif %}
-      pour nous permettre de le signaler aux éditeurs.
     </mj-text>
 
     <mj-text>
-      Vous pouvez continuer à saisir de nouveaux identifiants dans
-      <a href="{{ credentialsURL }}">le formulaire ezCOUNTER</a> ou en déclarer de nouveaux dans
-      <a href="{{ credentialsURL }}">le formulaire ezCOUNTER</a>. A l’issue de cette saisie, merci
-      de cliquer à nouveau sur le bouton “VALIDER DES IDENTIFIANTS” si vous souhaitez que les
-      rapports soient à nouveau moissonnés pour votre établissement : nous procéderons régulièrement
-      à des moissonnages réguliers, au moins une fois par mois.
+      {{ t('emails.harvestEnd.body.p5', { credentialsURL: (credentialsURL | e) }) | safe }}
     </mj-text>
 
     <mj-text>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
     </mj-text>
   </mj-column>
 </mj-section>

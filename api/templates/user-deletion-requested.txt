@@ -1,14 +1,18 @@
 {% if isFromUser %}
-Votre demande de suppression à bien été prise en compte
+{{ t('emails.userDeletionRequested.title.fromUser') }}
 {% else %}
-Un administrateur d'ezMESURE a effectué une action sur votre compte
+{{ t('emails.userDeletionRequested.title.fromAdmin') }}
 {% endif %}
 
-Cher·e utilisateur·ice,
+{{ t('emails.userDeletionRequested.body.headline') }}
 
-{% if isFromUser %}Vous avez demandé{% else %}Un administrateur d'ezMESURE a programmé{% endif %} la suppression de votre compte sur ezMESURE, elle sera effective le {{ deletedAt }}.
+{% if isFromUser %}
+{{ t('emails.userDeletionRequested.body.youRequested', { deletedAt: d(deletedAt, 'PPP') }) }}
+{% else %}
+{{ t('emails.userDeletionRequested.body.anAdminScheduled', { deletedAt: d(deletedAt, 'PPP') }) }}
+{% endif %}
 
-Si vous souhaitez annuler cette opération, il suffit de vous connectez à ezMESURE.
+{{ t('emails.userDeletionRequested.body.howToCancel') }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

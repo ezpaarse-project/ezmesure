@@ -4,12 +4,14 @@ const { getNotificationRecipients } = require('../../utils/notifications');
 const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 /**
+ * @typedef {import('../../entities/users.service').User} User
+ */
+
+/**
  * Sends an email to a newly created user where there is a link to create his password
  * and accept the terms of use.
  *
- * @param {Object} user - User data.
- * @param {string} user.username - Username of user.
- * @param {string} user.email - User email.
+ * @param {User} user - User data.
  * @param {Object} data - Mail config.
  * @param {string} data.recoveryLink - Recovery password link.
  * @param {string} data.resetLink - Reset recovery password link.
@@ -20,33 +22,28 @@ const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constant
 exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink) {
   return sendMail({
     to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('activate-user', { username: user.username, activateLink }),
+    ...generateMail('activate-user', { user, activateLink }, { locale: user.language }),
   });
 };
 
 /**
  * Sends an email to the user who has just accepted the terms of use.
  *
- * @param {Object} user - User data.
- * @param {string} user.username - Username of user.
- * @param {string} user.email - User email.
+ * @param {User} user - User data.
  *
  * @returns {Promise<void>}
  */
 exports.sendWelcomeMail = function sendWelcomeMail(user) {
   return sendMail({
     to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { username: user.username }),
+    ...generateMail('welcome', { user }, { locale: user.language }),
   });
 };
 
 /**
  * Sends an email to the user who has just requested to change his password.
  *
- * @param {Object} user - User data.
- * @param {string} user.username - Username of user.
+ * @param {User} user - User data.
  * @param {Object} data - Mail config.
  * @param {string} data.recoveryLink - Recovery password link.
  * @param {string} data.resetLink - Reset recovery password link.
@@ -57,31 +54,29 @@ exports.sendWelcomeMail = function sendWelcomeMail(user) {
 exports.sendPasswordRecovery = function sendPasswordRecovery(user, data) {
   return sendMail({
     to: user.email,
-    subject: 'Réinitialisation mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, ...data }),
+    ...generateMail('new-password', { user, ...data }, { locale: user.language }),
   });
 };
 
 /**
- * Sends an email to the contacts of the user who has just activated his account according
+ * Sends an email to a contact of the user who has just activated his account according
  * to the domain name of the user's email.
  *
- * @param {Array<string>} receivers - Emails of contacts.
+ * @param {User} user - The contact to notify.
  * @param {Object} data - Mail config.
- * @param {string} data.newUser - Username of user who activated his account.
+ * @param {User} data.newUser - The user who activated his account.
  *
  * @returns {Promise<void>}
  */
-exports.sendNewUserToContacts = async (receivers, data) => {
+exports.sendNewUserToContact = async (user, data) => {
   const admins = await getNotificationRecipients(
     ADMIN_NOTIFICATION_TYPES.newUserMatchingInstitution,
-    receivers,
+    [user.email],
   );
 
   return sendMail({
-    to: receivers,
+    to: user.email,
     bcc: admins,
-    subject: `${data.newUser} s'est inscrit sur ezMESURE`,
-    ...generateMail('new-account', { data }),
+    ...generateMail('new-account', { user, ...data }, { locale: user.language }),
   });
 };

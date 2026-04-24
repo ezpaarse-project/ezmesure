@@ -65,9 +65,8 @@ async function deleteMarkedUsers() {
       try {
         await sendMail({
           to: user.email,
-          bcc: admins,
-          subject: 'La suppression de votre compte est maintenant effective',
-          ...generateMail('user-deleted'),
+          bcc: admins.map((admin) => admin.email),
+          ...generateMail('user-deleted', {}, { locale: user.language }),
         });
       } catch (err) {
         appLogger.error(`[user-deletion] Failed to send mail to [${user.email}]`, err);

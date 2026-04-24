@@ -27,7 +27,7 @@ const getNotificationUserWhere = (type) => ({
  * @param {string[]} [exclude] - List of emails to exclude from result
  * @param {TransactionClient} [tx] - The Prisma client/transaction
  *
- * @returns {Promise<string[]>} The emails of admins
+ * @returns {Promise<{email: string, language: string?}[]>} The emails of admins
  */
 module.exports.getNotificationRecipients = async (notificationType, exclude = [], tx = prisma) => {
   /** @type {UserWhereInput[]} */
@@ -39,12 +39,10 @@ module.exports.getNotificationRecipients = async (notificationType, exclude = []
     where.push({ email: { notIn: exclude } });
   }
 
-  const targets = await tx.user.findMany({
+  return tx.user.findMany({
     where: { AND: where },
-    select: { email: true },
+    select: { email: true, language: true },
   });
-
-  return targets.map((user) => user.email);
 };
 
 /**

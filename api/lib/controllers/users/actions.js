@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { add, format } = require('date-fns');
-const { fr } = require('date-fns/locale');
+const { add } = require('date-fns');
 
 const { getNotificationRecipients } = require('../../utils/notifications');
 const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
@@ -146,9 +145,8 @@ exports.createOrReplaceUser = async (ctx) => {
   if (!userExists) {
     const origin = ctx.get('origin');
     const link = activateUserLink(origin, username);
-    const userData = { username, email: body.email };
     try {
-      await sendActivateUserMail(userData, link);
+      await sendActivateUserMail(user, link);
     } catch (err) {
       appLogger.error(`Failed to send mail: ${err}`);
     }
@@ -341,11 +339,17 @@ exports.deleteUser = async (ctx) => {
     await sendMail({
       to: user.email,
       bcc: admins,
-      subject: "Un administrateur d'ezMESURE a effectué une action sur votre compte",
-      ...generateMail('user-deletion-requested', {
-        loginURL: new URL('/authenticate', publicUrl).href,
-        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
-      }),
+      ...generateMail(
+        'user-deletion-requested',
+        {
+          loginURL: new URL('/authenticate', publicUrl).href,
+          deletedAt,
+        },
+        {
+          locale: user.language,
+          subjectKey: 'subject.fromAdmin',
+        },
+      ),
     });
   } catch (err) {
     appLogger.error(`Failed to send mail to ${user.email}: ${err}`);

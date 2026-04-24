@@ -1,34 +1,34 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Bienvenue sur ezMESURE</mj-title>
+<mj-title>{{ t('emails.activateUser.title') }}</mj-title>
 {% endblock %}
 
 {% block content %}
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Bienvenue {{ username }},</mj-text>
+    <mj-text mj-class="headline">{{ t('emails.activateUser.body.headline', { fullname: user.fullName }) }}</mj-text>
   </mj-column>
 </mj-section>
 
 <mj-section>
   <mj-column>
     <mj-text>
-      Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ username }}</strong>
+      {{ t('emails.activateUser.body.p1', { username: '<strong>' + (user.username | e) + '</strong>' }) | safe }}
     </mj-text>
 
     <mj-text>
-      Vous pouvez activer votre compte en créant votre mot de passe en cliquant sur le bouton suivant :
+      {{ t('emails.activateUser.body.p2') }}
     </mj-text>
 
     <mj-button href="{{ activateLink }}" font-family="Helvetica" background-color="#9c27b0" color="white">
-      Activer votre compte
+      {{ t('emails.activateUser.body.activateAccount') }}
     </mj-button>
 
     <mj-text>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
     </mj-text>
   </mj-column>
 </mj-section>
