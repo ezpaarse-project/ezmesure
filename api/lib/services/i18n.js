@@ -90,7 +90,7 @@ const t = (locale) => (key, ...values) => {
 /**
  * Get a set of date formatting functions for a given locale
  * @param {string} loc - The locale to use for formatting
- * @returns {{ format: Function, formatDistanceStrict: Function }}
+ * @returns {{ format: typeof format, formatDuration: typeof formatDuration }}
  */
 const dateFormatter = (loc) => {
   const locale = dateLocales[loc || defaultLocale];
