@@ -5,3 +5,4 @@ Porquet Thomas
 Felix Léo
 Sublet Tom
 Lechaudel Dominique
+Truong Frédéric
