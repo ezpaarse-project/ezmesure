@@ -184,6 +184,7 @@
       }
     }
   },
+  "defaultLocale": "EZMESURE_DEFAULT_LOCALE",
   "appName": "EZMESURE_APP_NAME",
   "publicUrl": "EZMESURE_PUBLIC_URL"
 }

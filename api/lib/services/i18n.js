@@ -1,14 +1,17 @@
 const fs = require('fs-extra');
 const path = require('path');
+const config = require('config');
 const util = require('util');
 const yaml = require('js-yaml');
+const { template } = require('lodash');
 
-const defaultOptions = {
-  queryField: 'locale',
-  cookieName: 'locale',
-  defaultLocale: 'en',
-  dir: path.resolve(process.cwd(), 'locales'),
-};
+const { format, formatDuration } = require('date-fns');
+const { fr, en } = require('date-fns/locale');
+
+const dateLocales = { fr, en };
+
+const localesDir = path.resolve(__dirname, '../../locales');
+const defaultLocale = config.get('defaultLocale');
 
 /**
  * Flatten nested properties of an object by seperating keys with dots
@@ -24,7 +27,7 @@ function flatten(obj) {
 
       if (typeof value === 'string') {
         flattened[newKeys.join('.')] = value;
-      } else if (typeof value === 'object') {
+      } else if (typeof value === 'object' && value != null) {
         flattenProp(value, newKeys);
       }
     });
@@ -53,21 +56,65 @@ function getLocales(dir) {
   return locales;
 }
 
+const locales = getLocales(localesDir);
+
+/**
+ * @typedef {Function} TranslateFunction
+ * @param {String} key - The key to translate
+ * @param {Object} values - The values to replace in the translation
+ */
+
+/**
+ * Get a translation function for a given locale
+ * @param {string} locale - The locale to use for translations
+ * @returns {TranslateFunction}
+ */
+const t = (locale) => (key, ...values) => {
+  if (typeof key !== 'string') {
+    return '';
+  }
+
+  const dict = locales[locale || defaultLocale];
+  if (!dict || typeof dict[key] !== 'string') { return key; }
+
+  if (values.length === 1 && typeof values[0] === 'object') {
+    return template(dict[key], {
+      escape: null,
+      interpolate: /{{([\s\S]+?)}}/g,
+    })(values[0]);
+  }
+
+  return util.format(dict[key], ...values);
+};
+
+/**
+ * Get a set of date formatting functions for a given locale
+ * @param {string} loc - The locale to use for formatting
+ * @returns {{ format: typeof format, formatDuration: typeof formatDuration }}
+ */
+const dateFormatter = (loc) => {
+  const locale = dateLocales[loc || defaultLocale];
+
+  return {
+    format: (date, formatStr, options = {}) => (
+      format(date, formatStr, { locale, ...options })
+    ),
+    formatDuration: (duration, options = {}) => (
+      formatDuration(duration, { locale, ...options })
+    ),
+  };
+};
+
 /**
  * Add locale functions to the app context
  * @param {Object} app the koa app
  * @param {Object} opts options
  */
-module.exports = function i18n(app, opts = {}) {
-  const options = { ...defaultOptions, ...opts };
+const init = (app, options = {}) => {
   const {
-    queryField,
-    cookieName,
-    defaultLocale,
-    dir,
+    queryField = 'locale',
+    cookieName = 'locale',
   } = options;
-
-  const locales = getLocales(dir);
 
   /**
    * Translates a key with the current locale, interpolating values with util.format()
@@ -76,22 +123,14 @@ module.exports = function i18n(app, opts = {}) {
    * @returns String
    */
   function translate(key, ...values) {
-    if (typeof key !== 'string') {
-      return '';
-    }
-
     const locale = this.getLocale();
-    const dict = locales[locale];
-
-    if (!dict || typeof dict[key] !== 'string') { return key; }
-
-    return util.format(dict[key], ...values);
+    return t(locale)(key, ...values);
   }
 
   /**
    * Get the locale origin (query, cookie, header, default)
     * @returns String the locale origin
-   */
+    */
   function getLocaleOrigin() {
     if (!this.state.localeOrigin) {
       this.getLocale();
@@ -160,4 +199,11 @@ module.exports = function i18n(app, opts = {}) {
     getLocale,
     getLocaleOrigin,
   });
+};
+
+module.exports = {
+  locales,
+  t,
+  dateFormatter,
+  init,
 };

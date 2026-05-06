@@ -17,6 +17,7 @@ const {
   getCurrentUserElasticRoles,
   deleteCurrentUser,
   changeExcludeNotifications,
+  changeLanguage,
   joinInstitution,
   leaveInstitution,
 } = require('./actions');
@@ -118,6 +119,20 @@ router.route({
     body: Joi.array().items(
       Joi.string().valid(...NOTIFICATION_KEYS),
     ),
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/language',
+  handler: [
+    changeLanguage,
+  ],
+  validate: {
+    type: 'json',
+    body: {
+      value: Joi.string().required().valid('en', 'fr'),
+    },
   },
 });
 

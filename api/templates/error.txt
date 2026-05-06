@@ -1,4 +1,4 @@
-Une erreur est survenue sur ezMESURE.
+{{ t('emails.errorHappened.body.headline') }}
 
 {{ message }}
 {{ error }}

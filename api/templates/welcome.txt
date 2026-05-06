@@ -1,5 +1,5 @@
-Bienvenue {{ username }},
-Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ username }}</strong>
+{{ t('emails.welcome.body.headline', { name: user.fullName }) }}
+{{ t('emails.welcome.body.p1', { username: '"' + user.username + '"' } ) }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

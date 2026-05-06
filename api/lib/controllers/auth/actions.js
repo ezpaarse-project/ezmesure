@@ -126,6 +126,20 @@ exports.deleteCurrentUser = async (ctx) => {
   ctx.status = 204;
 };
 
+exports.changeLanguage = async (ctx) => {
+  const { body } = ctx.request;
+  const { username } = ctx.state.user;
+
+  const service = new UsersService();
+  const user = await service.update({
+    where: { username },
+    data: { language: body.value },
+  });
+
+  ctx.status = 200;
+  ctx.body = user;
+};
+
 exports.changeExcludeNotifications = async (ctx) => {
   const { body } = ctx.request;
   const { username } = ctx.state.user;

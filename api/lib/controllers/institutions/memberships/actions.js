@@ -32,20 +32,21 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-async function sendNewContact(receiver, institutionName, role) {
+async function sendNewAssignedRole(receiver, institutionName, role) {
+  const { email, language } = receiver;
+
   const data = {
     contactDocLink: 'https://docs.readmetrics.org/s/fr-ezmesure-user/doc/gestion-des-membres-et-des-droits-weKwpEeLVZ#h-les-roles-et-leurs-attributions-dans-ezmesure',
     institution: institutionName,
     role,
   };
 
-  const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.roleAssigned, [receiver]);
+  const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.roleAssigned, [email]);
 
   return sendMail({
-    to: receiver,
+    to: email,
     bcc: admins,
-    subject: 'Un nouveau rôle vous a été assigné',
-    ...generateMail('new-contact', { data }),
+    ...generateMail('assigned-role', { data }, { locale: language }),
   });
 }
 
@@ -258,6 +259,7 @@ exports.requestMembership = async (ctx) => {
   const usersToNotify = await usersService.findMany({
     select: {
       email: true,
+      language: true,
     },
     where: {
       memberships: {
@@ -277,16 +279,21 @@ exports.requestMembership = async (ctx) => {
     emails,
   );
 
-  await sendMail({
-    to: emails.length > 0 ? emails : admins,
-    bcc: emails.length > 0 ? admins : undefined,
-    subject: 'Un utilisateur souhaite rejoindre votre établissement',
-    ...generateMail('request-membership', {
-      user: ctx.state.user.username,
-      institution: ctx.state.institution.name,
-      linkInstitution,
-    }),
-  });
+  const receivers = usersToNotify.length > 0 ? usersToNotify : admins;
+
+  await Promise.all(
+    receivers.map((user) => sendMail({
+      to: user.email,
+      bcc: emails.length > 0 ? admins : undefined,
+      ...generateMail('request-membership', {
+        user: ctx.state.user.username,
+        institution: ctx.state.institution.name,
+        linkInstitution,
+      }, {
+        locale: user.language,
+      }),
+    })),
+  );
 
   ctx.type = 'json';
   ctx.status = 204;
@@ -407,7 +414,11 @@ exports.addInstitutionMemberRole = async (ctx) => {
 
   if (shouldBeNotified && !alreadyHasRole && email) {
     try {
-      await sendNewContact(email, updatedMembership.institution.name, appliedRole);
+      await sendNewAssignedRole(
+        updatedMembership.user,
+        updatedMembership.institution.name,
+        appliedRole,
+      );
     } catch (err) {
       appLogger.error(`Failed to send new contact mail: ${err}`);
     }

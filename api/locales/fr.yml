@@ -170,3 +170,173 @@ errors:
 
   logs:
     tooManySSEConnections: Trop de connexions SSE en cours
+
+emails:
+  global:
+    login: Se connecter
+    regards: Cordialement,
+    theTeam: L'équipe ezMESURE
+    user: Utilisateur
+    institution: Établissement
+    endpoint: Point d'accès
+    name: Nom
+    email: Email
+    date: Date
+    status: Statut
+    file: Fichier
+    index: Index
+    package: Package
+
+  layout:
+    body:
+      footer:
+        contactUs: Pour toute question, contactez-nous par mail
+        contactUsAt: Pour toute question, contactez-nous par mail à <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a>
+
+  userDeletionRequested:
+    subject:
+      fromUser: Votre demande de suppression à bien été prise en compte
+      fromAdmin: Un administrateur d'ezMESURE a effectué une action sur votre compte
+    title:
+      fromUser: Votre demande de suppression à bien été prise en compte
+      fromAdmin: Un administrateur d'ezMESURE a effectué une action sur votre compte
+    body:
+      headline: Cher·e utilisateur·ice,
+      youRequested: Vous avez demandé la suppression de votre compte sur ezMESURE. Elle sera effective le {{ deletedAt }}.
+      anAdminScheduled: Un administrateur d'ezMESURE a programmé la suppression de votre compte sur ezMESURE, elle sera effective le {{ deletedAt }}.
+      howToCancel: Si vous souhaitez annuler cette opération, il suffit de <strong>vous connectez à ezMESURE</strong>.
+
+  userDeleted:
+    subject: La suppression de votre compte est maintenant effective
+    title: La suppression de votre compte est maintenant effective
+    body:
+      headline: Cher·e utilisateur·ice,
+      p1: Suite à ce mail et conformement à votre demande, votre compte utilisateur sur ezMESURE (incluant votre nom, prénom, adresse mail et affiliations) a bien been supprimé.
+
+  activateUser:
+    subject: Activer votre compte ezMESURE
+    title: Activer votre compte ezMESURE
+    body:
+      headline: Bienvenue {{ fullname }},
+      p1: Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana {{ username }}
+      p2: "Vous pouvez activer votre compte et créer votre mot de passe en cliquant sur le lien suivant :"
+      activateAccount: Activer mon compte
+
+  welcome:
+    subject: Bienvenue sur ezMESURE !
+    title: Bienvenue sur ezMESURE
+    body:
+      headline: Bienvenue {{ name }},
+      p1: Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana {{ username }}
+
+  newPassword:
+    subject: Réinitialisation mot de passe ezMESURE/Kibana
+    title: Réinitialisation mot de passe ezMESURE/Kibana
+    body:
+      headline: Bonjour {{ name }},
+      p1: Nous avons appris que vous aviez perdu votre mot de passe ezMESURE. Nous en sommes désolés !
+      p2: "Mais ne vous inquiétez pas ! Vous pouvez utiliser le lien suivant pour réinitialiser votre mot de passe :"
+      resetPassword: Reinitialiser votre mot de passe
+      p3: "Si vous n'utilisez pas ce lien dans les {{ validity }}, il expirera. Pour obtenir un nouveau lien de réinitialisation du mot de passe, visitez : {{ resetLink }}."
+
+  newAccount:
+    subject: Un nouveau collaborateur s'est inscrit
+    title: Un nouveau collaborateur s'est inscrit
+    body:
+      headline: "{{ name }} vient de créer son compte sur ezMESURE"
+      p1: "Vous pouvez dès à présent l'intégrer à vos établissements depuis l'interface de gestion des membres :"
+
+  contact:
+    subject: Contact - {{ appName }}
+    title: Contact - {{ appName }}
+    body:
+      headline: Contact - {{ appName }}
+      email: "Email :"
+      subject: "Objet :"
+      browser: "Navigateur :"
+      message: "Message :"
+
+  validateInstitution:
+    subject: Votre établissement a été validé
+    title: Votre établissement a été validé
+    body:
+      headline: Bonjour,
+      p1: Nous vous informons que l'établissement auquel vous êtes rattaché a été validé.
+      p2: En tant que correspondant, vous pouvez à présent <a target="_blank" href="{{ manageMemberLink }}">gérer les membres</a> de votre établissement et <a target="_blank" href="{{ manageSushiLink }}">saisir vos identifiants COUNTER</a>.
+
+  sushiReadyChange:
+    subject:
+      start: Reprise de saisie des identifiants COUNTER
+      end: Fin de saisie des identifiants COUNTER
+    body:
+      headline: Bonjour,
+      p1:
+        start: L'établissement {{ institutionName }} a terminé la saisie de ses identifiants COUNTER.
+        end: L'établissement {{ institutionName }} a repris la saisie de ses identifiants COUNTER.
+      p2:
+        text: "Vous pouvez visualiser ses identifiants à cette adresse : {{ institutionSushiLink }}."
+        html: Vous pouvez visualiser ses identifiants à <a target="_blank" href="{{ institutionSushiLink }}">cette adresse</a>.
+
+  assignedRole:
+    subject: Un nouveau rôle vous a été assigné
+    title: Vous êtes désormais {{ roleLabel }} de {{ institutionName }}
+    body:
+      headline: Vous êtes désormais {{ roleLabel }} de {{ institutionName }}
+      p1:
+        html: Vous trouverez toutes les informations sur ce rôle dans le billet <a target="_blank" href="{{ contactDocLink }}">{{ contactDocLink }}</a>
+        text: "Vous trouverez toutes les informations sur ce rôle dans le billet : {{ contactDocLink }}"
+
+  requestMembership:
+    subject: Un utilisateur souhaite rejoindre votre établissement
+    title: Un utilisateur souhaite rejoindre votre établissement
+    body:
+      headline: Un utilisateur souhaite rejoindre votre établissement
+      p1: L'utilisateur {{ user }} souhaite rejoindre votre établissement {{ institution }}, vous pouvez ajouter cet utilisateur depuis la page <a target="_blank" href="{{ linkInstitution }}">"Mon établissement"</a>
+
+  harvestEnd:
+    subject: Des nouvelles données COUNTER pour "{{ institution }}" ont été moissonnées !
+    title: Des nouvelles données COUNTER pour "{{ institution }}" ont été moissonnées !
+    body:
+      headline: Cher·es utilisateurs·ices,
+      p1: Nous avons procédé au moissonnage de rapports COUNTER 5 pour le compte de "{{ institution }}" et couvrant la période {{ periodStart }} ~ {{ periodEnd }}.
+      p2: "Vous trouverez la liste des identifiants COUNTER moissonnés ci-dessous :"
+      p3: Les données sont accessibles via vos tableaux de bord habituels, à condition d'en régler la temporalité à la période voulue.
+      p4:
+        withoutAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement pour nous permettre de le signaler aux éditeurs.
+        withAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement à <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a> pour nous permettre de le signaler aux éditeurs.
+      p5: 'Vous pouvez continuer à saisir de nouveaux identifiants dans <a href="{{ credentialsURL }}">le formulaire ezCOUNTER</a>. À l’issue de cette saisie, merci de cliquer à nouveau sur le bouton “VALIDER MES IDENTIFIANTS” si vous souhaitez que les rapports soient à nouveau moissonnés pour votre établissement : nous procédons à des moissonnages réguliers, au moins une fois par mois.'
+      outOfDate: Ces identifiants sont périmés !
+      getToYourSpace: Accéder à votre espace
+
+  recentActivity:
+    subject: "[Admin] Activité ezMESURE"
+    title: Activité récente
+    body:
+      headline: Activité récente
+      noActions: Aucune activité n'a été enregistrée dernièrement.
+      summary:
+        users: "{{ count }} enregistrements"
+        institutions: "{{ count }} mises à jour d'établissements"
+        sushi: "{{ count }} mises à jour d'identifiants COUNTER"
+        files: "{{ count }} dépôts de fichiers"
+        insertions: "{{ count }} chargements"
+      users:
+        title: Enregistrements ({{ count }})
+      institutions:
+        title: Mises à jour établissements ({{ count }})
+      sushi:
+        title: Mises à jour d'identifiants COUNTER ({{ count }})
+      files:
+        title: Dépôts de fichiers ({{ count }})
+      insertions:
+        title: Chargements ({{ count }})
+        updated: Mis à jour
+        inserted: Inserés
+        failed: Échecs
+
+  errorHappened:
+    subject: Une erreur est survenue
+    title: Une erreur est survenue
+    body:
+      headline: Une erreur est survenue sur ezMESURE.
+

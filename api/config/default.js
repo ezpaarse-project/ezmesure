@@ -176,6 +176,7 @@ module.exports = {
   cypher: {
     secret: 'some-secret',
   },
+  defaultLocale: 'en',
   appName: 'ezMESURE',
   passwordResetValidity: 3,
   publicUrl: 'https://ezmesure.couperin.org',

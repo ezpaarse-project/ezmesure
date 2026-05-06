@@ -1,5 +1,0 @@
-Vous êtes correspondant de {{ institution }}
-Vous pouvez voir les informations concernant votre nouveau role dans ezmesure sur cet article de blog
-
-Cordialement,
-L'équipe ezMESURE.
