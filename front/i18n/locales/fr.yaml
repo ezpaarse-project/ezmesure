@@ -78,6 +78,8 @@ myspace:
   roles: 'Mes rôles :'
   profile:
     actions:
+      goToAccount:
+        title: Accéder aux paramètres du profil
       delete:
         title: Supprimer le compte
         confirm:
@@ -882,6 +884,9 @@ authenticate:
   loginFailed: Les informations transmises n'ont pas permis de vous authentifier
   failed: Une erreur est survenue
   impersonate: Emprunter l'identité
+  loadingDesc: Vous serez redirigé vers la page d'authentification dans quelques instants !
+  longLoadingDesc: Si vous voyez cette page après quelques instants, veuillez vérifier votre connexion internet, ou cliquer sur le bouton ci-dessous
+  longLoadingBtn: Accéder à la page de connexion
 impersonate:
   ezmesureDesc: Prendre l'identité de l'utilisateur dans l'interface d'ezMESURE.
   kibanaDesc: Créer des utilisateurs test dans Kibana.
@@ -1015,6 +1020,7 @@ users:
     membershipsCount: >
       1 établissement
       |{count} établissements
+    lastActivity: Dernière activité
     roles: Rôles
     no_roles: Aucun rôle
     permissions: Permissions

@@ -70,7 +70,7 @@ const props = defineProps({
   },
 });
 
-const { data: user } = useAuthState();
+const { user } = useAuth();
 const { t } = useI18n();
 
 const isOpen = shallowRef(false);

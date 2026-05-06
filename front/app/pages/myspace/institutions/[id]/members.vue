@@ -106,6 +106,10 @@
         />
       </template>
 
+      <template #[`item.user.lastActivity`]="{ value }">
+        <LocalDate :model-value="value" />
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ props: menu }">
@@ -188,13 +192,13 @@
 <script setup>
 definePageMeta({
   layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
+  middleware: ['require-auth', 'require-terms'],
   alias: ['/admin/institutions/:id/members'],
 });
 
 const { params } = useRoute();
 const { t } = useI18n();
-const { data: user } = useAuthState();
+const { user } = useAuth();
 const { hasPermission } = useCurrentUserStore();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
@@ -294,6 +298,12 @@ const headers = computed(() => [
         align: 'center',
       },
     ],
+  },
+  {
+    title: t('users.user.lastActivity'),
+    value: 'user.lastActivity',
+    align: 'center',
+    sortable: true,
   },
   {
     title: t('actions'),

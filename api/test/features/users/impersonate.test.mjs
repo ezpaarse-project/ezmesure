@@ -71,7 +71,7 @@ describe('[users]: Test impersonation features', () => {
 
       const targetUserToken = tokenPattern.exec(cookieHeader)?.[1];
 
-      const profileResponse = await ezmesure.raw('/profile', {
+      const profileResponse = await ezmesure.raw('/auth', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${targetUserToken}`,

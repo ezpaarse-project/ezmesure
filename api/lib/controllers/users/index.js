@@ -10,7 +10,7 @@ const memberships = require('./memberships');
 const elasticRoles = require('./elastic-roles');
 
 const { stringOrArrayValidation } = require('../../services/std-query');
-const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
+const { requireActiveJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   standardQueryParams,
 
@@ -26,7 +26,7 @@ const {
 router.use(memberships.prefix('/:username/memberships').middleware());
 router.use(elasticRoles.prefix('/:username/elastic-roles').middleware());
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveJwt, requireUser);
 
 router.route({
   method: 'GET',

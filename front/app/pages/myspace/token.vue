@@ -43,14 +43,14 @@
 <script setup>
 definePageMeta({
   layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
+  middleware: ['require-auth', 'require-terms'],
 });
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
 
-const { data: token } = await useFetch('/api/profile/token');
+const { data: token } = await useFetch('/api/auth/token');
 
 const showToken = shallowRef(false);
 

@@ -10,7 +10,10 @@ services:
       - "./api:/usr/src/app"
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
       - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
+      - ./rp/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
     working_dir: /usr/src/app
+    extra_hosts:
+      - "${EZMESURE_DOMAIN}:host-gateway"
     environment:
       - http_proxy
       - https_proxy
@@ -21,7 +24,7 @@ services:
       - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
       - EZMESURE_REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
       - EZMESURE_REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
-      - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZMESURE_POSTGRES_DB:-ezmesure}
+      - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@postgres:5432/${EZMESURE_POSTGRES_DB:-ezmesure}
       - EZMESURE_HARVEST_CONCURRENCY
       - EZMESURE_MAX_DEFERRALS
       - EZMESURE_DEFERRAL_BACKOFF_DURATION
@@ -33,6 +36,17 @@ services:
       - EZMESURE_ADMIN_PASSWORD
       - EZMESURE_ADMIN_EMAIL
       - EZMESURE_AUTH_SECRET
+      - EZMESURE_OIDC_CLIENT_ID
+      - EZMESURE_OIDC_CLIENT_SECRET
+      - EZMESURE_OIDC_CONFIG_URI
+      - EZMESURE_OIDC_DISCOVERY_URI
+      - EZMESURE_OIDC_ISSUER_URI
+      - EZMESURE_OIDC_AUTH_URI
+      - EZMESURE_OIDC_TOKEN_URI
+      - EZMESURE_OIDC_INTROSPECTION_URI
+      - EZMESURE_OIDC_REVOCATION_URI
+      - EZMESURE_OIDC_USERINFO_URI
+      - EZMESURE_OIDC_SCOPES
       - EZMESURE_SMTP_HOST=maildev
       - EZMESURE_SMTP_PORT=25
       - EZMESURE_SMTP_SECURE=false
@@ -49,6 +63,7 @@ services:
       - NODE_ENV
       - NODE_CONFIG
       - NODE_USE_ENV_PROXY=1
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/ezmesure.pem
     restart: "no"
     command: npm run dev
 
@@ -62,8 +77,8 @@ services:
     environment:
       - NODE_ENV
       - NUXT_PUBLIC_CURRENT_INSTANCE
+      - NUXT_PUBLIC_OIDC_PROFILE_URI
       - NUXT_PUBLIC_SUPPORT_MAIL
-      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
     tmpfs: /tmp
     command: npm run dev -- --host 0.0.0.0
     restart: "no"

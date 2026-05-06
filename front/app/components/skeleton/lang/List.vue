@@ -22,15 +22,15 @@
 import locales from '@/lib/locales';
 
 const { t, setLocale } = useI18n();
-const { status } = useAuth();
+const { isAuthenticated } = useAuth();
 const snacks = useSnacksStore();
 
 const changeLocale = async (lang) => {
   setLocale(lang);
 
-  if (status.value === 'authenticated') {
+  if (isAuthenticated.value) {
     try {
-      await $fetch('/api/profile/language', {
+      await $fetch('/api/auth/language', {
         method: 'PUT',
         body: { value: lang },
       });

@@ -147,7 +147,7 @@ const emit = defineEmits({
   'update:modelValue': (items) => !!items,
 });
 
-const { data: user } = useAuthState();
+const { user } = useAuth();
 
 /** @type {Ref<object[]>} */
 const repositories = ref(props.institution.repositories || []);

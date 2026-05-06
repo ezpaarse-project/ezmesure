@@ -2,7 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
 const {
-  requireJwt,
+  requireActiveJwt,
   requireUser,
   requireAdmin,
 } = require('../../services/auth');
@@ -13,13 +13,14 @@ const {
   standardQueryParams,
   getHarvests,
   deleteHarvestsByQuery,
-
+} = require('./actions');
+const {
   getInstitutionsMatrix,
   getEndpointsMatrix,
-} = require('./actions');
+} = require('./matrix');
 
 router.use(
-  requireJwt,
+  requireActiveJwt,
   requireUser,
   requireAdmin,
 );

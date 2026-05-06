@@ -12,7 +12,7 @@ const url = config.get('kibana.url');
 
 const authString = Buffer.from(`${username}:${password}`).toString('base64');
 
-const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
+const { requireActiveJwt, requireUser, requireAdmin } = require('../../services/auth');
 
 const kibanaProxy = createProxyMiddleware({
   target: url || `http://${host}:${port}`,
@@ -27,7 +27,7 @@ const kibanaProxy = createProxyMiddleware({
   },
 });
 
-router.use(requireJwt, requireUser, requireAdmin);
+router.use(requireActiveJwt, requireUser, requireAdmin);
 
 router.route({
   path: '(.*)',

@@ -4,7 +4,7 @@ const { Joi } = require('koa-joi-router');
 const { FEATURES } = require('../../../entities/memberships.dto');
 
 const {
-  requireJwt,
+  requireActiveJwt,
   requireUser,
   fetchInstitution,
   requireMemberPermissions,
@@ -22,7 +22,7 @@ const {
   removeInstitutionMemberRole,
 } = require('./actions');
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveJwt, requireUser);
 
 router.route({
   method: 'POST',

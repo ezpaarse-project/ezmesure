@@ -11,8 +11,8 @@ const { sendMail, generateMail } = require('../../services/mail');
 const UsersService = require('../../entities/users.service');
 const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
 
-const { sendActivateUserMail } = require('../auth/mail');
-const { activateUserLink } = require('../auth/password');
+const { sendActivateUserMail } = require('../auth/activate/mail');
+const { activateUserLink } = require('../auth/activate/actions');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');

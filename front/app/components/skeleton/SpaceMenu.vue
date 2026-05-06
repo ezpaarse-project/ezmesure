@@ -80,7 +80,7 @@
             size="small"
             color="red"
             variant="tonal"
-            @click="logout()"
+            @click="signOut()"
           />
         </template>
       </v-list-item>
@@ -89,18 +89,9 @@
 </template>
 
 <script setup>
-const { public: config } = useRuntimeConfig();
-const { data: user, signOut } = useAuth();
+const { signOut, user } = useAuth();
 const { isOpen } = storeToRefs(useDrawerStore());
 const { foreignSpacesPermissions } = storeToRefs(useCurrentUserStore());
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
 
-async function logout() {
-  if (!config.shibbolethDisabled) {
-    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
-    return;
-  }
-
-  await signOut({ callbackUrl: '/' });
-}
 </script>

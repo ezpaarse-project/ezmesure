@@ -1,5 +1,7 @@
-const { auth } = require('config');
-const jwt = require('koa-jwt');
+const config = require('config');
+
+const { verifyJWT, verifyJWE } = require('../utils/jwt');
+
 const InstitutionsService = require('../entities/institutions.service');
 const SushiEndpointService = require('../entities/sushi-endpoints.service');
 const SushiCredentialsService = require('../entities/sushi-credentials.service');
@@ -8,14 +10,130 @@ const RepositoriesService = require('../entities/repositories.service');
 const RepositoryAliasesService = require('../entities/repository-aliases.service');
 const SpacesService = require('../entities/spaces.service');
 
-const requireJwt = jwt({
-  secret: auth.secret,
-  cookie: auth.cookie,
-  key: 'jwtdata',
+const { triggerHooks } = require('../hooks/hookEmitter');
+
+const { cookie: cookieName } = config.get('auth');
+
+/**
+ * Get JWT data of cookie using OpenID provider
+ *
+ * @param {string} cookie - The cookie found in request
+ * @param {boolean} [checkExpiration] - Should check expiration of JWT
+ *
+ * @returns {Promise<{ type: 'oauth', token: string, data: unknown }>}
+ */
+const getJWTDataFromCookie = async (cookie, checkExpiration = false) => ({
+  type: 'oauth',
+  token: cookie,
+  data: await verifyJWE(cookie, { ignoreExpiration: !checkExpiration }),
 });
 
+/**
+ * Get JWT data of header using JWT methods
+ *
+ * @param {string} header - The header found in request
+ *
+ * @returns {Promise<{ type: 'old_jwt', token: string, data: unknown }>}
+ */
+async function getJWTDataFromAuthHeader(header) {
+  const matches = /Bearer (?<token>.+)/i.exec(header);
+  const { token } = matches.groups ?? {};
+  if (!token) {
+    throw new Error("Can't get token");
+  }
+
+  return {
+    type: 'oauth',
+    token,
+    data: await verifyJWT(token),
+  };
+}
+
+/**
+ * Create a middleware to check for JWT validation
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.checkExpiration] - Should check expiration of JWT
+ */
+function createRequireJwt(options = {}) {
+  /**
+  * Check if request have a valid JWT, and decode it's cotent
+  *
+  * @param {import('koa').Context} ctx - Koa context
+  * @param {import('koa').Next} next - Next handler
+  */
+  return async (ctx, next) => {
+    let jwtData = {};
+
+    try {
+      const cookie = ctx.cookies.get(cookieName);
+      if (cookie) {
+        jwtData = await getJWTDataFromCookie(cookie, options.checkExpiration);
+      }
+
+      const authHeader = ctx.get('authorization');
+      if (authHeader) {
+        jwtData = await getJWTDataFromAuthHeader(authHeader);
+      }
+    } catch {
+      ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+      return;
+    }
+
+    if (!jwtData.token || !jwtData.data) {
+      ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+      return;
+    }
+
+    ctx.state.jwtData = jwtData;
+    await next();
+  };
+}
+
+/**
+ * Get username from old jwt
+ *
+ * @param {string} token - The token found in request
+ * @param {unknown} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
+ */
+function getUsernameFromJWT(token, data) {
+  return Promise.resolve(data.username);
+}
+
+/**
+ * Check if request have a valid user
+ *
+ * Needs `requireActiveJwt`
+ *
+ * @param {import('koa').Context} ctx - Koa context
+ * @param {import('koa').Next} next - Next handler
+ */
 const requireUser = async (ctx, next) => {
-  const username = ctx.state?.jwtdata?.username;
+  const { jwtData } = ctx.state ?? {};
+
+  if (!jwtData?.token || !jwtData?.data) {
+    ctx.throw(401, ctx.$t('errors.auth.noUsername'));
+    return;
+  }
+
+  let username;
+
+  try {
+    switch (jwtData.type) {
+      case 'oauth':
+      case 'old_jwt':
+        username = await getUsernameFromJWT(jwtData.token, jwtData.data);
+        break;
+
+      default:
+        throw new Error('JWT type unsupported');
+    }
+  } catch {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
 
   if (!username) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
@@ -23,7 +141,6 @@ const requireUser = async (ctx, next) => {
   }
 
   const usersService = new UsersService();
-
   const user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
@@ -33,6 +150,7 @@ const requireUser = async (ctx, next) => {
 
   ctx.state.user = user;
   ctx.state.userIsAdmin = user.isAdmin;
+  triggerHooks('user:action', user);
 
   await next();
 };
@@ -200,7 +318,8 @@ function requireValidatedInstitution(opts = {}) {
 }
 
 module.exports = {
-  requireJwt,
+  requireJwt: createRequireJwt(),
+  requireActiveJwt: createRequireJwt({ checkExpiration: true }),
   requireUser,
   requireAdmin,
   requireTermsOfUse,

@@ -78,6 +78,8 @@ myspace:
   roles: "My roles:"
   profile:
     actions:
+      goToAccount:
+        title: Go to profile settings
       delete:
         title: Delete account
         confirm:
@@ -872,6 +874,9 @@ authenticate:
   loginFailed: The information transmitted did not allow you to authenticate
   failed: An error occurred
   impersonate: Impersonate
+  loadingDesc: You will be redirected to the authentication page in a few moments !
+  longLoadingDesc: If you keep seeing this page after a few moments, please check your internet connection, or click on the button below
+  longLoadingBtn: Access the login page
 impersonate:
   ezmesureDesc: Take the identity of the user in the ezMESURE interface.
   kibanaDesc: Create test users in Kibana.
@@ -1005,6 +1010,7 @@ users:
     membershipsCount: >
       {count} institution
       |{count} institutions
+    lastActivity: Last activity
     roles: Roles
     no_roles: No roles
     permissions: Permissions
