@@ -250,7 +250,7 @@ emails:
     title: A new collaborator has signed up
     body:
       headline: "{{ name }} has just signed up on ezMESURE"
-      p1: "You can integrate him/her to your institutions from the members management interface:"
+      p1: "You can integrate them to your institutions from the members management interface:"
 
   contact:
     subject: Contact - {{ appName }}
