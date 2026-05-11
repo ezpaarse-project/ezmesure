@@ -141,7 +141,6 @@ function fixISBNHyphens(...schemas) {
         type: 'string',
         pattern: '^97[89][0-9-]+$',
         minLength: 13,
-        maxLength: 13,
       };
     }
   }
