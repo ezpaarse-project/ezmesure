@@ -101,27 +101,39 @@ async function sendEndMail(session) {
           periodStart: session.beginDate,
           periodEnd: session.endDate,
           institution: institution.name,
-          credentials: institution.sushiCredentials
-            .map((c) => {
-              let status;
-              if (isConnection(c.connection)) {
-                status = c.connection.status;
-              }
-
-              return ({
-                endpoint: c.endpoint.vendor,
-                packages: c.packages.sort().join(', '),
-                expired: status === 'unauthorized',
-                createdAt: c.createdAt,
-              });
-            })
-            .sort(
-              (a, b) => a.endpoint.localeCompare(b.endpoint)
-                || a.packages.localeCompare(b.packages)
-                || (isAfter(a.createdAt, b.createdAt) ? 1 : -1),
-            ),
           credentialsURL: new URL(`myspace/institutions/${institution.id}/sushi`, publicUrl).href,
           spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
+          endpoints:
+            // Group credentials per endpoint (and keep only list of credentials per endpoint)
+            Object.values(
+              Object.groupBy(institution.sushiCredentials, (credentials) => credentials.endpointId),
+            )
+              // Remove null or undefined values
+              .filter(Boolean)
+              .map(
+                (list) => list?.map(
+                  // Map credentials data to reduce payload size
+                  (creds) => {
+                    let status;
+                    if (isConnection(creds.connection)) {
+                      status = creds.connection.status;
+                    }
+
+                    return ({
+                      endpoint: creds.endpoint.vendor,
+                      package: creds.packages.sort().join(', '),
+                      expired: status === 'unauthorized',
+                      createdAt: creds.createdAt,
+                    });
+                  },
+                )
+                  // Sort credentials per package (or creation date)
+                  .sort(
+                    (a, b) => a.package.localeCompare(b.package)
+                      || (isAfter(a.createdAt, b.createdAt) ? 1 : -1),
+                  ),
+                // Sort the whole list per endpoint name
+              ).sort((a, b) => a?.[0].endpoint.localeCompare(b?.[0].endpoint ?? '') ?? 0),
         };
 
         await Promise.all(

@@ -312,7 +312,7 @@ emails:
         withAddress: If you notice missing or invalid data, please contact us immediately at <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a> to allow us to notify the publishers.
       p5: 'You can continue to enter new COUNTER credentials in <a href="{{ credentialsURL }}">the ezCOUNTER form</a>. After this entry, please click again on the "VALIDATE MY CREDENTIALS" button if you want the reports to be re-harvested for your institution: we perform regular harvests, at least once a month.'
       outOfDate: These credentials are out of date !
-      accessYourSpace: Access your space
+      getToYourSpace: Access your space
 
   recentActivity:
     subject: "[Admin] ezMESURE activity"

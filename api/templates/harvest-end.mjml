@@ -17,39 +17,51 @@
 <mj-section>
   <mj-column>
     <mj-text>
-      {{ t('emails.harvestEnd.body.p1', { institution: '<strong>' + (institution | e) + '</strong>', periodStart: '<strong>' + (periodStart | e) + '</strong>', periodEnd: '<strong>' + (periodEnd | e) + '</strong>' }) | safe }}
+      {{
+      t('emails.harvestEnd.body.p1', {
+      institution: '<strong>' + (institution | e) + '</strong>',
+      periodStart: '<strong>' + (periodStart | e) + '</strong>',
+      periodEnd: '<strong>' + (periodEnd | e) + '</strong>'
+      }) | safe
+      }}
     </mj-text>
 
     <mj-text>
       {{ t('emails.harvestEnd.body.p2') }}
     </mj-text>
+  </mj-column>
+</mj-section>
 
-    <mj-table>
-      <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
-        <th>{{ t('emails.global.endpoint') }}</th>
-        <th style="padding: 0 8px;">{{ t('emails.global.package') }}</th>
-        <th></th>
-      </tr>
-      {% for c in credentials %}
-        <tr style="width: 100%;">
-          <td style="max-width: 0; width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ c.endpoint }}</td>
-          <td style="max-width: 0; width: 25%; padding: 0 8px;">{{ c.packages }}</td>
-          <td style="max-width: 0; width: 25%; color: orange;">{% if c.expired %}{{ t('emails.harvestEnd.body.outOfDate') }}{% endif %}</td>
-        </tr>
-      {% endfor %}
-    </mj-table>
+<mj-section>
+  <mj-column>
+    {% for list in endpoints %}
+    <mj-text font-weight="bold" padding-bottom="0px">
+      {{ list[0].endpoint }}
+    </mj-text>
 
+    {% for creds in list %}
+    <mj-text padding-left="5%" padding-top="0px" padding-bottom="0px">
+      {{ creds.package }}
+
+      {% if creds.expired %}
+      <span style="color: orange">
+        ⚠️ {{ t('emails.harvestEnd.body.outOfDate') }}
+      </span>
+      {% endif %}
+    </mj-text>
+    {% endfor %}
+    {% endfor %}
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
     <mj-text>
       {{ t('emails.harvestEnd.body.p3') }}
     </mj-text>
 
     {% if spaceURL %}
-    <mj-button
-      href="{{ spaceURL }}"
-      font-family="Helvetica"
-      background-color="#9c27b0"
-      color="white"
-    >
+    <mj-button href="{{ spaceURL }}" font-family="Helvetica" background-color="#9c27b0" color="white">
       {{ t('emails.harvestEnd.body.getToYourSpace') }}
     </mj-button>
     {% endif %}

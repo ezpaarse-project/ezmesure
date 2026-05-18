@@ -4,8 +4,11 @@
 
 {{ t('emails.harvestEnd.body.p2') }}
 
-{% for c in credentials %}
-  - {{ c.endpoint }} | {{ c.packages }}{% if c.expired %}(⚠️ {{ t('emails.harvestEnd.body.outOfDate') }}){% endif %}
+{% for list in endpoints %}
+{{ list[0].endpoint }}
+{% for creds in list %}
+  - {{ creds.package }}{% if creds.expired %} ⚠️ {{ t('emails.harvestEnd.body.outOfDate') }}{% endif %}
+{% endfor %}
 {% endfor %}
 
 {{ t('emails.harvestEnd.body.p3') }}
