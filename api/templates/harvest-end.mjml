@@ -39,17 +39,19 @@
       {{ list[0].endpoint }}
     </mj-text>
 
-    {% for creds in list %}
-    <mj-text padding-left="5%" padding-top="0px" padding-bottom="0px">
-      {{ creds.package }}
+    <mj-table padding-left="5%" padding-top="0px" padding-bottom="0px">
+      {% for creds in list %}
+      <tr>
+        <td>{{ creds.package }}</td>
 
-      {% if creds.expired %}
-      <span style="color: orange">
-        ⚠️ {{ t('emails.harvestEnd.body.outOfDate') }}
-      </span>
-      {% endif %}
-    </mj-text>
-    {% endfor %}
+        {% if creds.expired %}
+        <td style="color: orange">
+          ⚠️ {{ t('emails.harvestEnd.body.outOfDate') }}
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </mj-table>
     {% endfor %}
   </mj-column>
 </mj-section>
