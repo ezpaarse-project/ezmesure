@@ -177,6 +177,7 @@ module.exports.getUserFromInfo = (userInfo) => {
       org: userInfo.organisation,
       unit: userInfo.unit,
     },
+    language: config.defaultLocale,
     deletedAt: null,
   };
 };
