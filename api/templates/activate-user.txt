@@ -1,9 +1,0 @@
-{{ t('emails.activateUser.body.headline', { fullname: user.fullName }) }}
-
-{{ t('emails.activateUser.body.p1', { username: '"' + user.username + '"' }) }}
-{{ t('emails.activateUser.body.p2') }}
-
-{{ activateLink }}
-
-{{ t('emails.global.regards') }}
-{{ t('emails.global.theTeam') }}

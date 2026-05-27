@@ -219,15 +219,6 @@ emails:
       headline: Dear user,
       p1: Since this email and in compliance with your request, your account on ezMESURE (including your name, first name, email address and affiliations) has been deleted.
 
-  activateUser:
-    subject: Activate your ezMESURE account
-    title: Activate your ezMESURE account
-    body:
-      headline: Welcome {{ fullname }},
-      p1: You are now registered on ezMESURE with the Kibana user {{ username }}
-      p2: "You can activate your account and create your password by clicking on the link below :"
-      activateAccount: Activate my account
-
   welcome:
     subject: Welcome to ezMESURE !
     title: Welcome to ezMESURE

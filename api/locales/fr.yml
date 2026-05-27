@@ -213,15 +213,6 @@ emails:
       headline: Cher·e utilisateur·ice,
       p1: Suite à ce mail et conformement à votre demande, votre compte utilisateur sur ezMESURE (incluant votre nom, prénom, adresse mail et affiliations) a bien been supprimé.
 
-  activateUser:
-    subject: Activer votre compte ezMESURE
-    title: Activer votre compte ezMESURE
-    body:
-      headline: Bienvenue {{ fullname }},
-      p1: Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana {{ username }}
-      p2: "Vous pouvez activer votre compte et créer votre mot de passe en cliquant sur le lien suivant :"
-      activateAccount: Activer mon compte
-
   welcome:
     subject: Bienvenue sur ezMESURE !
     title: Bienvenue sur ezMESURE
@@ -339,4 +330,3 @@ emails:
     title: Une erreur est survenue
     body:
       headline: Une erreur est survenue sur ezMESURE.
-

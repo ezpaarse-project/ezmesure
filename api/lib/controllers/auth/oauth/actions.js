@@ -55,12 +55,12 @@ exports.loginCallback = async (ctx) => {
   const usersService = new UsersService();
   let user = await usersService.findUnique({ where: { username: userProps.username } });
 
-  const next = () => {
-    const ezToken = signJWE(
-      { username: userProps.username, refreshToken: auth.refresh_token },
-      { expiresIn: auth.expires_in },
-    );
+  const ezToken = await signJWE(
+    { username: userProps.username, refreshToken: auth.refresh_token },
+    { expiresIn: auth.expires_in },
+  );
 
+  const next = () => {
     ctx.cookies.set(cookie, ezToken, { httpOnly: true });
 
     ctx.body = {
@@ -153,7 +153,7 @@ exports.refresh = async (ctx) => {
 
   const auth = await openid.refreshTokenGrant(jwtData.data.refreshToken);
 
-  const token = signJWE(
+  const token = await signJWE(
     { username: user.username, refreshToken: auth.refresh_token },
     { expiresIn: auth.expires_in },
   );

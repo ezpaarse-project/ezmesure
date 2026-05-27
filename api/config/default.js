@@ -74,6 +74,7 @@ module.exports = {
   auth: {
     secret: 'some-secret',
     cookie: 'eztoken',
+    defaultExpiresIn: 60 * 60,
     oidc: {
       client: {
         id: 'changeme',
@@ -178,6 +179,5 @@ module.exports = {
   },
   defaultLocale: 'en',
   appName: 'ezMESURE',
-  passwordResetValidity: 3,
   publicUrl: 'https://ezmesure.couperin.org',
 };

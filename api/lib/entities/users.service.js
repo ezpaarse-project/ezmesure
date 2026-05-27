@@ -1,14 +1,9 @@
 // @ts-check
 const config = require('config');
-const jwt = require('jsonwebtoken');
-const { addHours } = require('date-fns');
 
 const BasePrismaService = require('./base-prisma.service');
 const elasticUsers = require('../services/elastic/users');
 const usersPrisma = require('../services/prisma/users');
-
-const secret = config.get('auth.secret');
-const passwordResetValidity = config.get('passwordResetValidity');
 
 /* eslint-disable max-len */
 /**
@@ -35,17 +30,6 @@ module.exports = class UsersService extends BasePrismaService {
    */
   static async updatePassword(username, password) {
     await elasticUsers.updatePassword(username, password);
-  }
-
-  static async generateTokenForActivate(username) {
-    const currentDate = new Date();
-    const expiresAt = addHours(currentDate, passwordResetValidity);
-
-    return jwt.sign({
-      username,
-      createdAt: currentDate,
-      expiresAt,
-    }, secret);
   }
 
   /**
@@ -201,19 +185,6 @@ module.exports = class UsersService extends BasePrismaService {
     const deletedUser = usersPrisma.removeByUsername(username);
     this.triggerHooks('user:delete', deletedUser);
     return deletedUser;
-  }
-
-  /**
-   * @param {string} username
-   * @returns {Promise<string | null>}
-   */
-  async generateToken(username) {
-    const user = await this.findByUsername(username);
-    if (!user) {
-      // TODO throw ?
-      return null;
-    }
-    return jwt.sign({ username: user.username, email: user.email }, secret);
   }
 
   /**

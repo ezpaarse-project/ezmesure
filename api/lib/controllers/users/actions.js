@@ -1,18 +1,15 @@
-const jwt = require('jsonwebtoken');
 const config = require('config');
 const { add } = require('date-fns');
 
 const { getNotificationRecipients } = require('../../utils/notifications');
 const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { signJWE } = require('../../utils/jwt');
 
 const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
 
 const UsersService = require('../../entities/users.service');
 const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
-
-const { sendActivateUserMail } = require('../auth/activate/mail');
-const { activateUserLink } = require('../auth/activate/actions');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');
@@ -26,16 +23,8 @@ const standardQueryParams = prepareStandardQueryParams({
 exports.standardQueryParams = standardQueryParams;
 
 const publicUrl = config.get('publicUrl');
-const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const { deleteDurationDays = 7 } = config.get('users');
-
-function generateToken(user) {
-  if (!user) { return null; }
-
-  const { username, email } = user;
-  return jwt.sign({ username, email }, secret);
-}
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
@@ -141,16 +130,6 @@ exports.createOrReplaceUser = async (ctx) => {
   appLogger.verbose(`User [${user.username}] is upserted`);
 
   ctx.body = user;
-
-  if (!userExists) {
-    const origin = ctx.get('origin');
-    const link = activateUserLink(origin, username);
-    try {
-      await sendActivateUserMail(user, link);
-    } catch (err) {
-      appLogger.error(`Failed to send mail: ${err}`);
-    }
-  }
 
   ctx.status = userExists ? 200 : 201;
 };
@@ -369,7 +348,10 @@ exports.impersonateUser = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
-  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
+  // Using default options
+  const ezToken = await signJWE({ username });
+
+  ctx.cookies.set(cookie, ezToken, { httpOnly: true });
   ctx.body = user;
   ctx.status = 200;
 };

@@ -1,103 +1,134 @@
 // @ts-check
-const { createCipheriv, createDecipheriv, randomBytes } = require('node:crypto');
+const { randomBytes } = require('node:crypto');
 
 const config = require('config');
-const jwt = require('jsonwebtoken');
+const {
+  SignJWT,
+  EncryptJWT,
+  jwtVerify,
+  jwtDecrypt,
+} = require('jose');
 
-const issuer = config.get('publicUrl');
-const { secret } = config.get('auth');
+const publicUrl = config.get('publicUrl');
+const { secret, defaultExpiresIn } = config.get('auth');
 
-// Create key to cipher/decipher
-const key = randomBytes(32);
-const iv = randomBytes(16);
+/**
+ * @typedef {import('jose').JWTPayload} JWTPayload
+ * @typedef {import('jose').JWTVerifyOptions} JWTVerifyOptions
+ */
+
+/**
+  * @typedef {object} SignJWTOptions
+  * @property {number} [expiresIn]
+  */
+
+/**
+  * @typedef {object} VerifyJWTOptions
+  * @property {boolean} [requireIssuer] - Should require
+  * @property {boolean} [requireAudience]
+  * @property {boolean} [requireExpiration]
+  */
+
+const encodedSecret = new TextEncoder().encode(secret);
+// A256CBC-HS512 requires a 64bytes secret
+const encryptKey = randomBytes(64);
+
+/**
+ * Setup payload of JWT or JWE
+ *
+ * @param {SignJWT | EncryptJWT} token - The token
+ * @param {SignJWTOptions} options - The options to sign token
+ */
+function setJWTPayload(token, options) {
+  token
+    .setIssuedAt()
+    .setIssuer(publicUrl)
+    .setAudience(publicUrl);
+
+  if (options.expiresIn) {
+    token.setExpirationTime(Date.now() + (options.expiresIn * 1000));
+  }
+}
+
+/**
+ * Get options to verify a JWT
+ *
+ * @param {VerifyJWTOptions} options - The options to verify token
+ *
+ * @returns {JWTVerifyOptions} The options to pass to jose
+ */
+function getJWTVerifyOptions(options) {
+  return {
+    audience: options.requireAudience !== false ? publicUrl : undefined,
+    clockTolerance: options.requireExpiration !== false ? 0 : undefined,
+    issuer: options.requireIssuer !== false ? publicUrl : undefined,
+  };
+}
 
 /**
  * Sign a JWT
  *
- * @param {Record<string, string>} payload - The payload of the JWT
- * @param {jwt.SignOptions} [options] - Options to sign JWT
+ * @param {JWTPayload} payload - The payload of the JWT
+ * @param {SignJWTOptions} [options] - The options to sign JWE
  *
- * @returns {string} JWT
+ * @returns {Promise<string>} JWT
  */
-const signJWT = (payload, options) => jwt.sign(
-  payload,
-  secret,
-  {
-    ...options,
-    issuer,
-  },
-);
+module.exports.signJWT = (payload, options = {}) => {
+  const token = new SignJWT(payload);
+
+  setJWTPayload(token, options);
+
+  return token.sign(encodedSecret);
+};
 
 /**
  * Verify a JWT
  *
  * @param {string} token - The JWT
- * @param {jwt.VerifyOptions} [options] - Options to sign JWT
+ * @param {VerifyJWTOptions} [options] - Options to sign JWT
  *
- * @returns {Promise<string | jwt.Jwt | jwt.JwtPayload>} Payload of JWT
+ * @returns {Promise<JWTPayload>} Payload of JWT
  */
-const verifyJWT = (token, options) => new Promise((resolve, reject) => {
-  jwt.verify(
-    token,
-    secret,
-    { ...options, issuer },
-    (err, data) => {
-      if (!data) {
-        reject(err);
-        return;
-      }
+module.exports.verifyJWT = async (token, options = {}) => {
+  const verifyOptions = getJWTVerifyOptions(options);
 
-      resolve(data);
-    },
-  );
-});
+  const { payload } = await jwtVerify(token, encodedSecret, verifyOptions);
+
+  return payload;
+};
 
 /**
  * Sign a JWE
  *
- * @param {Record<string, string>} payload - The payload of the JWT
- * @param {jwt.SignOptions} [options] - Options to sign JWT
+ * @param {JWTPayload} payload - The payload of the JWE
+ * @param {SignJWTOptions} [options] - The options to sign JWE
  *
- * @returns {string} Encoded JWT
+ * @returns {Promise<string>} Encoded JWT
  */
-function signJWE(payload, options) {
-  // Generate a JWT
-  const token = signJWT(payload, options);
+module.exports.signJWE = (payload, options = {}) => {
+  const token = new EncryptJWT(payload).setProtectedHeader({ alg: 'dir', enc: 'A256CBC-HS512' });
 
-  // Encrypt JWT - Making a JWE
-  const cipher = createCipheriv('aes-256-cbc', Buffer.from(key), iv);
-  let encrypted = cipher.update(token, 'utf-8', 'hex');
-  encrypted += cipher.final('hex');
+  setJWTPayload(token, {
+    ...options,
+    // JWE have always an expiration date
+    expiresIn: options.expiresIn || defaultExpiresIn,
+  });
 
-  // Package the IV and encrypted data together
-  return `${iv.toString('hex')}${encrypted}`;
-}
+  return token.encrypt(encryptKey);
+};
 
 /**
  * Verify a JWT
  *
  * @param {string} token - The JWT
- * @param {jwt.VerifyOptions} [options] - Options to sign JWT
+ * @param {VerifyJWTOptions} [options] - Options to sign JWT
  *
- * @returns {Promise<string | jwt.Jwt | jwt.JwtPayload>} Payload of JWT
+ * @returns {Promise<JWTPayload>} Payload of JWT
  */
-function verifyJWE(token, options) {
-  // Unpackage the combined iv + encrypted message.
-  const ivLength = iv.toString('hex').length;
-  // Decrypt JWE
-  const inputIV = token.slice(0, ivLength);
-  const encrypted = token.slice(ivLength);
-  const decipher = createDecipheriv('aes-256-cbc', Buffer.from(key), Buffer.from(inputIV, 'hex'));
+module.exports.verifyJWE = async (token, options = {}) => {
+  const verifyOptions = getJWTVerifyOptions(options);
 
-  let decrypted = decipher.update(encrypted, 'hex', 'utf-8');
-  decrypted += decipher.final('utf-8');
+  const { payload } = await jwtDecrypt(token, encryptKey, verifyOptions);
 
-  return verifyJWT(decrypted, options);
-}
-
-module.exports = {
-  signJWT,
-  verifyJWT,
-  signJWE,
-  verifyJWE,
+  return payload;
 };
