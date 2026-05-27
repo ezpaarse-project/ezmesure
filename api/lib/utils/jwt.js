@@ -10,7 +10,7 @@ const {
 } = require('jose');
 
 const publicUrl = config.get('publicUrl');
-const { secret, defaultExpiresIn } = config.get('auth');
+const { secret } = config.get('auth');
 
 /**
  * @typedef {import('jose').JWTPayload} JWTPayload
@@ -34,10 +34,14 @@ const encodedSecret = new TextEncoder().encode(secret);
 const encryptKey = randomBytes(64);
 
 /**
+ * @template {SignJWT | EncryptJWT} JWT
+ *
  * Setup payload of JWT or JWE
  *
- * @param {SignJWT | EncryptJWT} token - The token
+ * @param {JWT} token - The token
  * @param {SignJWTOptions} options - The options to sign token
+ *
+ * @returns {JWT} The token with correct payload
  */
 function setJWTPayload(token, options) {
   token
@@ -48,6 +52,8 @@ function setJWTPayload(token, options) {
   if (options.expiresIn) {
     token.setExpirationTime(Date.now() + (options.expiresIn * 1000));
   }
+
+  return token;
 }
 
 /**
@@ -60,7 +66,7 @@ function setJWTPayload(token, options) {
 function getJWTVerifyOptions(options) {
   return {
     audience: options.requireAudience !== false ? publicUrl : undefined,
-    clockTolerance: options.requireExpiration !== false ? 0 : undefined,
+    clockTolerance: options.requireExpiration === false ? Number.POSITIVE_INFINITY : undefined,
     issuer: options.requireIssuer !== false ? publicUrl : undefined,
   };
 }
@@ -73,13 +79,10 @@ function getJWTVerifyOptions(options) {
  *
  * @returns {Promise<string>} JWT
  */
-module.exports.signJWT = (payload, options = {}) => {
-  const token = new SignJWT(payload);
-
-  setJWTPayload(token, options);
-
-  return token.sign(encodedSecret);
-};
+module.exports.signJWT = (payload, options = {}) => setJWTPayload(
+  new SignJWT(payload),
+  options,
+).sign(encodedSecret);
 
 /**
  * Verify a JWT
@@ -90,9 +93,14 @@ module.exports.signJWT = (payload, options = {}) => {
  * @returns {Promise<JWTPayload>} Payload of JWT
  */
 module.exports.verifyJWT = async (token, options = {}) => {
-  const verifyOptions = getJWTVerifyOptions(options);
+  const { payload } = await jwtVerify(token, encodedSecret, getJWTVerifyOptions(options));
 
-  const { payload } = await jwtVerify(token, encodedSecret, verifyOptions);
+  // Workaround as `jwtVerify` doesnt seems to check expiration
+  if (options.requireExpiration !== false) {
+    if (!payload.exp || payload.exp <= Date.now()) {
+      throw new Error('"exp" claim timestamp check failed');
+    }
+  }
 
   return payload;
 };
@@ -105,17 +113,11 @@ module.exports.verifyJWT = async (token, options = {}) => {
  *
  * @returns {Promise<string>} Encoded JWT
  */
-module.exports.signJWE = (payload, options = {}) => {
-  const token = new EncryptJWT(payload).setProtectedHeader({ alg: 'dir', enc: 'A256CBC-HS512' });
-
-  setJWTPayload(token, {
-    ...options,
-    // JWE have always an expiration date
-    expiresIn: options.expiresIn || defaultExpiresIn,
-  });
-
-  return token.encrypt(encryptKey);
-};
+module.exports.signJWE = (payload, options = {}) => setJWTPayload(
+  new EncryptJWT(payload)
+    .setProtectedHeader({ alg: 'dir', enc: 'A256CBC-HS512' }),
+  options,
+).encrypt(encryptKey);
 
 /**
  * Verify a JWT
@@ -126,9 +128,14 @@ module.exports.signJWE = (payload, options = {}) => {
  * @returns {Promise<JWTPayload>} Payload of JWT
  */
 module.exports.verifyJWE = async (token, options = {}) => {
-  const verifyOptions = getJWTVerifyOptions(options);
+  const { payload } = await jwtDecrypt(token, encryptKey, getJWTVerifyOptions(options));
 
-  const { payload } = await jwtDecrypt(token, encryptKey, verifyOptions);
+  // Workaround as `jwtDecrypt` doesnt seems to check expiration
+  if (options.requireExpiration !== false) {
+    if (!payload.exp || payload.exp <= Date.now()) {
+      throw new Error('"exp" claim timestamp check failed');
+    }
+  }
 
   return payload;
 };

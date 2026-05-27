@@ -60,7 +60,6 @@
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE",
-    "defaultExpiresIn": "EZMESURE_AUTH_DEFAULT_EXPIRES_IN",
     "oidc": {
       "client": {
         "id": "EZMESURE_OIDC_CLIENT_ID",
@@ -143,6 +142,10 @@
     },
     "deleteDurationDays": {
       "__name": "EZMESURE_USERS_DELETE_DURATION_DAYS",
+      "__format": "number"
+    },
+    "impersonateDuration": {
+      "__name": "EZMESURE_USERS_IMPERSONATE_DURATION_SECONDS",
       "__format": "number"
     }
   },

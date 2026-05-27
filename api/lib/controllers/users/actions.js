@@ -14,6 +14,7 @@ const { schema, adminImportSchema, includableFields } = require('../../entities/
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');
 const { stringToArray } = require('../../services/utils');
+const { logoutUser, AUTH_COOKIE } = require('../../services/kibana');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -23,8 +24,8 @@ const standardQueryParams = prepareStandardQueryParams({
 exports.standardQueryParams = standardQueryParams;
 
 const publicUrl = config.get('publicUrl');
-const cookie = config.get('auth.cookie');
-const { deleteDurationDays = 7 } = config.get('users');
+const { cookie } = config.get('auth');
+const { deleteDurationDays = 7, impersonateDuration } = config.get('users');
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
@@ -339,17 +340,29 @@ exports.deleteUser = async (ctx) => {
 };
 
 exports.impersonateUser = async (ctx) => {
+  const { user } = ctx.state;
   const { username } = ctx.params;
 
   const usersService = new UsersService();
-  const user = await usersService.findUnique({ where: { username } });
-
-  if (!user) {
+  const targetUser = await usersService.findUnique({ where: { username } });
+  if (!targetUser) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
-  // Using default options
-  const ezToken = await signJWE({ username });
+  const ezToken = await signJWE(
+    { username, impersonatedBy: user.username },
+    { expiresIn: impersonateDuration },
+  );
+
+  // Try to logout from kibana
+  try {
+    await logoutUser(ctx.cookies.get(AUTH_COOKIE.name));
+  } catch (err) {
+    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user.username}: ${err}`);
+  }
+
+  // Reset cookie on client side
+  ctx.cookies.set(AUTH_COOKIE.name, '', AUTH_COOKIE.params);
 
   ctx.cookies.set(cookie, ezToken, { httpOnly: true });
   ctx.body = user;

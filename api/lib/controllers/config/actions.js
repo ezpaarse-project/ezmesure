@@ -6,5 +6,6 @@ exports.getConfig = async (ctx) => {
   ctx.status = 200;
   ctx.body = pick(config, [
     'users.deleteDurationDays',
+    'users.impersonateDuration',
   ]);
 };

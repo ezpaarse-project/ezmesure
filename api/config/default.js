@@ -74,7 +74,6 @@ module.exports = {
   auth: {
     secret: 'some-secret',
     cookie: 'eztoken',
-    defaultExpiresIn: 60 * 60,
     oidc: {
       client: {
         id: 'changeme',
@@ -150,6 +149,7 @@ module.exports = {
       schedule: '0 0 0 * * *',
     },
     deleteDurationDays: 7,
+    impersonateDuration: 3 * 60 * oneMinute,
   },
   testUsers: {
     lifespan: {
