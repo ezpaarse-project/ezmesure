@@ -18,14 +18,14 @@ const { cookie: cookieName } = config.get('auth');
  * Get JWT data of cookie using OpenID provider
  *
  * @param {string} cookie - The cookie found in request
- * @param {boolean} [checkExpiration] - Should check expiration of JWT
+ * @param {boolean} [requireExpiration] - Should check expiration of JWT
  *
  * @returns {Promise<{ type: 'oauth', token: string, data: unknown }>}
  */
-const getJWTDataFromCookie = async (cookie, checkExpiration = false) => ({
+const getJWTDataFromCookie = async (cookie, requireExpiration = false) => ({
   type: 'oauth',
   token: cookie,
-  data: await verifyJWE(cookie, { ignoreExpiration: !checkExpiration }),
+  data: await verifyJWE(cookie, { requireExpiration }),
 });
 
 /**
@@ -43,9 +43,13 @@ async function getJWTDataFromAuthHeader(header) {
   }
 
   return {
-    type: 'oauth',
+    type: 'old_jwt',
     token,
-    data: await verifyJWT(token),
+    data: await verifyJWT(token, {
+      requireIssuer: false,
+      requireAudience: false,
+      requireExpiration: false,
+    }),
   };
 }
 
