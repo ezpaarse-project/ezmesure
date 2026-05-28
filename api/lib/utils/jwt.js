@@ -80,7 +80,7 @@ function getJWTVerifyOptions(options) {
  * @returns {Promise<string>} JWT
  */
 module.exports.signJWT = (payload, options = {}) => setJWTPayload(
-  new SignJWT(payload),
+  new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }),
   options,
 ).sign(encodedSecret);
 

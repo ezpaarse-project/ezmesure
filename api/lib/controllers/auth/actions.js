@@ -5,6 +5,7 @@ const { fr } = require('date-fns/locale');
 const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
 const { getNotificationRecipients } = require('../../utils/notifications');
 const { EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { signJWT } = require('../../utils/jwt');
 
 const UsersService = require('../../entities/users.service');
 const MembershipsService = require('../../entities/memberships.service');
@@ -17,8 +18,6 @@ const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
-
-const { generateAppToken } = require('./apptokens');
 
 const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
 const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
@@ -59,8 +58,10 @@ exports.getCurrentUser = async (ctx) => {
 };
 
 exports.getCurrentUserAppToken = async (ctx) => {
+  const { username, email } = ctx.state.user;
+
   ctx.status = 200;
-  ctx.body = generateAppToken(ctx.state.user);
+  ctx.body = await signJWT({ username, email });
 };
 
 exports.getCurrentUserReportingToken = async (ctx) => {
