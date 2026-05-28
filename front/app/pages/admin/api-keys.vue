@@ -214,7 +214,7 @@ import { isAfter } from 'date-fns';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['sidebase-auth', 'terms', 'admin'],
+  middleware: ['require-auth', 'require-terms', 'require-admin'],
 });
 
 const now = new Date();

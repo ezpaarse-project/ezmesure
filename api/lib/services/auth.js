@@ -543,8 +543,6 @@ module.exports = {
   requireActiveAuth: createRequireAuth({ checkExpiration: true }),
   requireJWT: createRequireAuth({ methods: ['cookie', 'bearer'] }),
   requireActiveJWT: createRequireAuth({ methods: ['cookie', 'bearer'], checkExpiration: true }),
-  requireApiKey: createRequireAuth({ methods: ['api_key'] }),
-  requireActiveApiKey: createRequireAuth({ methods: ['api_key'], checkExpiration: true }),
 
   requireUserOrInstitution,
   requireUser,
