@@ -197,7 +197,7 @@ emails:
     body:
       footer:
         contactUs: For any question, contact us by mail
-        contactUsAt: For any question, contact us by mail at <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a>
+        contactUsAt: For any question, contact us by mail at <a href="mailto:{{ replyTo }}">{{ replyTo }}</a>
 
   userDeletionRequested:
     subject:
