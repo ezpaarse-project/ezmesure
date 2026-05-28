@@ -226,16 +226,6 @@ emails:
       headline: Welcome {{ name }},
       p1: You are now registered on ezMESURE with the Kibana user {{ username }}
 
-  newPassword:
-    subject: ezMESURE/Kibana password reset
-    title: ezMESURE/Kibana password reset
-    body:
-      headline: Hello {{ name }},
-      p1: We have learned that you have lost your ezMESURE/Kibana password. We are deeply sorry!
-      p2: "But don't worry! You can use the link below to reset your password:"
-      resetPassword: Reset your password
-      p3: "If you don't use this link within {{ validity }}, it will expire. To obtain a new password reset link, visit: {{ resetLink }}."
-
   newAccount:
     subject: A new collaborator has signed up
     title: A new collaborator has signed up

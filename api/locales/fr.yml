@@ -220,16 +220,6 @@ emails:
       headline: Bienvenue {{ name }},
       p1: Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana {{ username }}
 
-  newPassword:
-    subject: Réinitialisation mot de passe ezMESURE/Kibana
-    title: Réinitialisation mot de passe ezMESURE/Kibana
-    body:
-      headline: Bonjour {{ name }},
-      p1: Nous avons appris que vous aviez perdu votre mot de passe ezMESURE. Nous en sommes désolés !
-      p2: "Mais ne vous inquiétez pas ! Vous pouvez utiliser le lien suivant pour réinitialiser votre mot de passe :"
-      resetPassword: Reinitialiser votre mot de passe
-      p3: "Si vous n'utilisez pas ce lien dans les {{ validity }}, il expirera. Pour obtenir un nouveau lien de réinitialisation du mot de passe, visitez : {{ resetLink }}."
-
   newAccount:
     subject: Un nouveau collaborateur s'est inscrit
     title: Un nouveau collaborateur s'est inscrit
