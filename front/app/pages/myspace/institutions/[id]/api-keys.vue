@@ -230,7 +230,7 @@ import { isAfter } from 'date-fns';
 
 definePageMeta({
   layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
+  middleware: ['require-auth', 'require-terms'],
   alias: ['/admin/institutions/:id/api-keys'],
 });
 
@@ -241,7 +241,7 @@ const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { user } = storeToRefs(useAuthStore());
 const { hasPermission } = useCurrentUserStore();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedKeys = ref([]);

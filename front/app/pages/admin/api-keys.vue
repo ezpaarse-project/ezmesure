@@ -221,7 +221,7 @@ const now = new Date();
 
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedKeys = ref([]);

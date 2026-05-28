@@ -23,7 +23,7 @@ exports.standardQueryParams = standardQueryParams;
 // Routes
 
 /**
- * Get all API keys of institution
+ * Get all API keys of current user
  *
  * @param {KoaContext} ctx
  */
@@ -32,7 +32,8 @@ exports.getAll = async (ctx) => {
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   prismaQuery.where.username = user.username;
-  prismaQuery.omit = { value: true }; // avoid exposing api-key's hash
+  prismaQuery.where.institutionId = null; // Don't show keys assigned to institution
+  prismaQuery.omit = { value: true }; // Avoid exposing api-key's hash
 
   const service = new ApiKeysService();
 
@@ -43,7 +44,7 @@ exports.getAll = async (ctx) => {
 };
 
 /**
- * Get specific API key of institution
+ * Get specific API key of current user
  *
  * @param {KoaContext} ctx
  */
@@ -53,7 +54,8 @@ exports.getOne = async (ctx) => {
 
   const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: apiKeyId });
   prismaQuery.where.username = user.username;
-  prismaQuery.omit = { value: true }; // avoid exposing api-key's hash
+  prismaQuery.where.institutionId = null; // Don't show keys assigned to institution
+  prismaQuery.omit = { value: true }; // Avoid exposing api-key's hash
 
   const service = new ApiKeysService();
   const apiKey = await service.findUnique(prismaQuery);
@@ -69,7 +71,7 @@ exports.getOne = async (ctx) => {
 };
 
 /**
- * Create API key for an institution
+ * Create API key for current user
  *
  * @param {KoaContext} ctx
  */
@@ -132,7 +134,7 @@ exports.createOne = async (ctx) => {
 };
 
 /**
- * Update API key for an institution
+ * Update API key for curent user
  *
  * @param {KoaContext} ctx
  */
@@ -142,9 +144,9 @@ exports.updateOne = async (ctx) => {
   const { body } = ctx.request;
 
   const result = await ApiKeysService.$transaction(async (service) => {
-    // Looking if key exists for institution
+    // Looking if key exists for user (and not related to institution)
     const apiKey = await service.findUnique({
-      where: { id: apiKeyId, username: user.username },
+      where: { id: apiKeyId, username: user.username, institutionId: null },
     });
     if (!apiKey) {
       ctx.throw(404, ctx.$t('errors.apiKey.notFound', apiKeyId));
@@ -193,7 +195,7 @@ exports.updateOne = async (ctx) => {
 };
 
 /**
- * Delete API key for an institution
+ * Delete API key for curent user
  *
  * @param {KoaContext} ctx
  */
@@ -202,9 +204,9 @@ exports.deleteOne = async (ctx) => {
   const { apiKeyId } = ctx.params;
 
   await ApiKeysService.$transaction(async (service) => {
-    // Looking if key exists for institution
+    // Looking if key exists for user (and not related to institution)
     const apiKey = await service.findUnique({
-      where: { id: apiKeyId, username: user.username },
+      where: { id: apiKeyId, username: user.username, institutionId: null },
     });
     if (!apiKey) {
       return;
