@@ -888,8 +888,8 @@ authenticate:
   impersonate:
     title: Emprunter l'identité
     text:
-      intro: Emprunter l'identité vous permettra d'accéder à ezMESURE avec les mêmes droits que cet utilisateur.
-      session: Votre nouvelle session durera {duration}, après quoi vous serez déconnecté.
+      intro: Emprunter l'identité d'un utilisateur pour accéder à ezMESURE avec ses droits spécifiques.
+      session: La session d'emprunt durera {duration}, après quoi vous serez déconnecté.
       defaultDuration: un temps limité
     actions:
       agree: Prendre l’identité

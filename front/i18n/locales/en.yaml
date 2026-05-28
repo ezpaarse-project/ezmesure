@@ -878,8 +878,8 @@ authenticate:
   impersonate:
     title: Impersonate
     text:
-      intro: Impersonating will allow you to access ezMESURE with the same rights as this user.
-      session: Your new session will last {duration}, after that duration you will be logged out.
+      intro: Impersonate a user's identity to access ezMESURE using their specific rights.
+      session: The borrowing session will last {duration}, after that duration you will be logged out.
       defaultDuration: a limited time
     actions:
       agree: Impersonate
