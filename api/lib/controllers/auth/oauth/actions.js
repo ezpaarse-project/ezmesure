@@ -176,7 +176,7 @@ exports.refresh = async (ctx) => {
 
   // Don't extend impersonating duration but don't throw error until expired
   const expiresInMs = jwtData.data.exp - Date.now();
-  if (jwtData.data.impersonatedBy && expiresInMs >= 1) {
+  if (jwtData.data.impersonatedBy && expiresInMs >= 1000) {
     ctx.body = {
       refresh_token: true,
       expires_in: Math.floor(expiresInMs / 1000),
