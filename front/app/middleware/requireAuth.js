@@ -13,5 +13,5 @@ export default defineNuxtRouteMiddleware((ctx) => {
   if (isAuthenticated.value) {
     return true;
   }
-  return navigateTo({ path: '/authenticate', query: { redirect: ctx.path } });
+  return navigateTo({ path: '/authenticate', query: { redirect: ctx.path } }, { replace: true });
 });

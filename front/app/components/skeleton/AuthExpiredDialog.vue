@@ -23,13 +23,15 @@
 </template>
 
 <script setup>
+const route = useRoute();
+
 const { signOut } = useAuthStore();
 const dialogStore = useDialogStore();
 const { show } = storeToRefs(dialogStore);
 
 async function agree() {
   dialogStore.closeDialog();
-  await navigateTo('/authenticate');
+  await navigateTo({ path: '/authenticate', query: { redirect: route.path } }, { replace: true });
 }
 
 async function disagree() {
