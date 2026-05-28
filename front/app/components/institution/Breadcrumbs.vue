@@ -24,7 +24,7 @@ const props = defineProps({
   },
 });
 
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 
 const institutionLink = computed(() => (user.value?.isAdmin ? `/admin/institutions/${props.institution.id}` : undefined));
 </script>

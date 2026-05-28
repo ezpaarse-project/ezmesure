@@ -64,7 +64,7 @@ defineEmits({
   click: () => true,
 });
 
-const { user: currentUser } = await useAuth();
+const { user: currentUser } = storeToRefs(useAuthStore());
 
 const isAlreadyAssigned = computed(
   () => props.list.some((user) => user.username === props.modelValue.username) ?? false,

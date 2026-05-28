@@ -198,7 +198,7 @@ definePageMeta({
 
 const { params } = useRoute();
 const { t } = useI18n();
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 const { hasPermission } = useCurrentUserStore();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();

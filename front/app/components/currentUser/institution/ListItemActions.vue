@@ -132,7 +132,7 @@ const props = defineProps({
   },
 });
 
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
 const { fetchMemberships } = useCurrentUserStore();
 const { t } = useI18n();

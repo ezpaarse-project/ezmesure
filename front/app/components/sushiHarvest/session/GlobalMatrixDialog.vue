@@ -70,7 +70,7 @@ const props = defineProps({
   },
 });
 
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 const { t } = useI18n();
 
 const isOpen = shallowRef(false);

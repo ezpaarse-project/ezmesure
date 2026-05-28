@@ -265,7 +265,7 @@ const TABS_COMPONENTS = {
 
 const { params } = useRoute();
 const { t } = useI18n();
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 const { hasPermission } = useCurrentUserStore();
 const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();

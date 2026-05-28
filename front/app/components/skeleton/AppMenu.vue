@@ -113,7 +113,7 @@
 
 <script setup>
 const { t } = useI18n();
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 
 const items = computed(() => [
   { text: t('menu.bar.partners'), to: '/partners', exact: true },

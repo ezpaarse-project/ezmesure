@@ -292,7 +292,7 @@ const emit = defineEmits({
 
 const maxHarvestYear = new Date().getFullYear();
 
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 const { t, locale } = useI18n();
 const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { isSupported: clipboard, copy } = useClipboard();

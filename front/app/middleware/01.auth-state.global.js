@@ -1,15 +1,17 @@
 import {
   defineNuxtRouteMiddleware,
-  useAuth,
+  useAuthStore,
+  storeToRefs,
 } from '#imports';
 
 /**
  * Refresh auth session if needed
  */
 export default defineNuxtRouteMiddleware(async () => {
-  const { isAuthenticated, refreshAuthenticatedUser } = useAuth();
+  const authStore = useAuthStore();
+  const { isAuthenticated } = storeToRefs(authStore);
   if (!isAuthenticated.value) {
-    await refreshAuthenticatedUser();
+    await authStore.refreshAuthenticatedUser({ confirmOnError: false });
   }
   return true;
 });

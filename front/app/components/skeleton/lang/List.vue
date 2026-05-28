@@ -22,7 +22,7 @@
 import locales from '@/lib/locales';
 
 const { t, setLocale } = useI18n();
-const { isAuthenticated } = useAuth();
+const { isAuthenticated } = storeToRefs(useAuthStore());
 const snacks = useSnacksStore();
 
 const changeLocale = async (lang) => {

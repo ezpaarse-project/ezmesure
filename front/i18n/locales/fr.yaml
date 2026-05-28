@@ -171,14 +171,6 @@ files:
     text: Déposez ici les fichiers d'événements de consultation que vous souhaitez charger dans ezMESURE. Nous vous invitons à lire nos {bestPracticeLink} afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants.
     not: pas
     bestPracticeLink: règles de bonnes pratiques
-kibana:
-  title: Identifiants kibana
-  passwordLost: Mot de passe oublié
-  username: Nom d'utilisateur
-  newPasswordSentByEmail: Un courriel vous a été envoyé pour réinitialiser votre mot de passe.
-  whatDoesUsername:
-    text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, remplissez le formulaire ci-dessous ou accédez à votre {accountLink}.
-    accountLink: compte Kibana
 token:
   title: Token d'autentification
   whatDoesToken:
@@ -883,42 +875,24 @@ authenticate:
   logInWithProvider: Connectez-vous via votre fournisseur d'identité.
   loginFailed: Les informations transmises n'ont pas permis de vous authentifier
   failed: Une erreur est survenue
-  impersonate: Emprunter l'identité
   loadingDesc: Vous serez redirigé vers la page d'authentification dans quelques instants !
   longLoadingDesc: Si vous voyez cette page après quelques instants, veuillez vérifier votre connexion internet, ou cliquer sur le bouton ci-dessous
   longLoadingBtn: Accéder à la page de connexion
-impersonate:
-  ezmesureDesc: Prendre l'identité de l'utilisateur dans l'interface d'ezMESURE.
-  kibanaDesc: Créer des utilisateurs test dans Kibana.
-  createTestUser: Créer un utilisateur test
-  connectedToKibana: Connecté à Kibana
-testUsers:
-  description: Les comptes Kibana créés ici sont calqués sur l'utilisateur actuel. Ils sont temporaires et permettent de vérifier le bon fonctionnement du compte dans Kibana. Veuillez noter que les mots de passe ne sont plus accessibles une fois cette fenêtre fermée.
-  expires: 'Expire le {date}'
-  copyUsername: Copier l'identifiant
-  copyPassword: Copier le mot de passe
-  loginToKibana: Se connecter à Kibana
-password:
-  forgot: Mot de passe oublié ?
-  reset: Réinitialiser le mot de passe
-  save: Sauvegarder le mot de passe
-  backToLogin: Retour à la connexion
-  user: Utilisateur
-  password: Mot de passe
-  repeatPassword: Répéter le mot de passe
-  actualPassword: Mot de passe Kibana actuel
-  newPassword: Nouveau mot de passe Kibana
-  repeatNewPassword: Répéter le nouveau mot de passe Kibana
-  passwordIsRequired: Mot de passe requis
-  enterUser: Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de réinitialiser votre mot de passe.
-  checkYourEmail: Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.
-  waitFewMinutes: S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.
-  notEqual: Les mots de passes ne correspondent pas
-  updated: Mot de passe mis à jour
-  youCanNowLogin: Vous pouvez maintenant vous connecter avec vos nouveaux identifiants.
-  pattern: Minimum 6 caractères
-  length: Le mot de passe doit contenir au moins 6 caractères
-  update: Mettre à jour votre mot de passe
+  expired:
+    confirm:
+      title: Votre session a expiré
+      text: Cela peut arriver après une période d'inactivité trop longue. Voulez-vous vous reconnecter ?
+      actions:
+        agree: Se reconnecter
+        disagree: Retourner à l’accueil
+  impersonate:
+    title: Emprunter l'identité
+    text:
+      intro: Emprunter l'identité vous permettra d'accéder à ezMESURE avec les mêmes droits que cet utilisateur.
+      session: Votre nouvelle session durera {duration}, après quoi vous serez déconnecté.
+      defaultDuration: un temps limité
+    actions:
+      agree: Prendre l’identité
 contact:
   title: Nous contacter
   fields:

@@ -171,14 +171,6 @@ files:
     text: Deposit here the consultation event files that you want to load in ezMESURE. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.
     not: not
     bestPracticeLink: best practice rules
-kibana:
-  title: Kibana identifiers
-  passwordLost: Password forgotten
-  username: Username
-  newPasswordSentByEmail: An email has been sent to you to reset your password.
-  whatDoesUsername:
-    text: This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, fille the form below or go to your {accountLink}.
-    accountLink: Kibana account
 token:
   title: Authentication token
   whatDoesToken:
@@ -873,42 +865,24 @@ authenticate:
   logInWithProvider: Log in via your identity provider.
   loginFailed: The information transmitted did not allow you to authenticate
   failed: An error occurred
-  impersonate: Impersonate
   loadingDesc: You will be redirected to the authentication page in a few moments !
   longLoadingDesc: If you keep seeing this page after a few moments, please check your internet connection, or click on the button below
   longLoadingBtn: Access the login page
-impersonate:
-  ezmesureDesc: Take the identity of the user in the ezMESURE interface.
-  kibanaDesc: Create test users in Kibana.
-  createTestUser: Create a test user
-  connectedToKibana: Connected to Kibana
-testUsers:
-  description: The Kibana accounts created here are based on the current user. They are temporary and allow you to check the proper functioning of the account in Kibana. Please note that passwords are no longer accessible once this window is closed.
-  expires: 'Expires on {date}'
-  copyUsername: Copy the username
-  copyPassword: Copy the password
-  loginToKibana: Log in to Kibana
-password:
-  forgot: Forgot your password ?
-  reset: Reset password
-  save: Save password
-  user: User
-  password: Password
-  actualPassword: Actual Kibana password
-  newPassword: New Kibana password
-  repeatNewPassword: Repeat new Kibana password
-  repeatPassword: Repeat password
-  passwordIsRequired: Password required
-  backToLogin: Back to login
-  enterUser: Please enter your username so we can send you an email to reset your password.
-  checkYourEmail: Check your email for a link to reset your password.
-  waitFewMinutes: If it doesn’t appear within a few minutes, check your spam folder
-  notEqual: Passwords don't match
-  updated: Password updated
-  youCanNowLogin: You can now log in with your new credentials.
-  pattern: Minimum 6 characters
-  length: The password must be at least 6 characters long
-  update: Update your password
+  expired:
+    confirm:
+      title: Your session expired
+      text: This can happen after a long time of inactivity. Do you want to log in again ?
+      actions:
+        agree: Log in
+        disagree: Go to home
+  impersonate:
+    title: Impersonate
+    text:
+      intro: Impersonating will allow you to access ezMESURE with the same rights as this user.
+      session: Your new session will last {duration}, after that duration you will be logged out.
+      defaultDuration: a limited time
+    actions:
+      agree: Impersonate
 contact:
   title: Contact us
   fields:
