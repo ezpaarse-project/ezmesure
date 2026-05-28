@@ -1,22 +1,21 @@
-const { addDays, isAfter } = require('date-fns');
 const config = require('config');
+
+const { createCache } = require('../../utils/cache-manager');
+
 const InstitutionService = require('../../entities/institutions.service');
 
-const ezrAxios = require('../../services/ezreeport/axios');
+const $fetchEzr = require('../../services/ezreeport/http');
 const { appLogger } = require('../../services/logger');
 
 const { username } = config.get('admin');
 let reportingAdminToken;
 
-/**
- * key is institution id, value is if a reporting was
- * @type {Map<string, { value: boolean, date: Date }>}
- */
-const reportingCache = new Map();
+const REPORTING_CACHE_DURATION = 24 * 3600 * 1000;
+const reportingCache = createCache(REPORTING_CACHE_DURATION);
 
 const getTokenOfAdmin = async () => {
   if (!reportingAdminToken) {
-    const { data: { content: adminUser } } = await ezrAxios.get(`/admin/users/${username}`);
+    const { content: adminUser } = await $fetchEzr(`/admin/users/${username}`);
     reportingAdminToken = adminUser.token;
   }
   return reportingAdminToken;
@@ -26,33 +25,41 @@ const getTokenOfAdmin = async () => {
  * Checks if institution is using ezREEPORT
  *
  * @param {string} institutionId Institution id
+ * @param {string} adminToken The token of the ezREEPORT admin
  *
  * @returns Is the institution have an enabled report in ezREEPORT
  */
-const institutionHasReport = async (institutionId) => {
-  const now = new Date();
-  const cacheEntry = reportingCache.get(institutionId);
-  if (cacheEntry && isAfter(addDays(cacheEntry.date, 1), now)) {
-    return cacheEntry.value;
+const institutionHasReport = async (institutionId, adminToken) => {
+  const cacheEntry = await reportingCache.get(institutionId);
+  if (cacheEntry) {
+    return cacheEntry;
   }
 
   let found = false;
 
   try {
-    const { data: { content } } = await ezrAxios.get('/tasks', {
+    const { content } = await $fetchEzr('/tasks', {
       params: { namespaceId: institutionId, enabled: true },
-      headers: { Authorization: `Bearer ${await getTokenOfAdmin()}` },
+      headers: { Authorization: `Bearer ${adminToken}` },
     });
     found = content.length > 0;
   } catch (error) {
     appLogger.warn(`Couldn't get reports of [${institutionId}]: ${error}`);
   }
 
-  reportingCache.set(institutionId, { value: found, date: now });
+  reportingCache.set(institutionId, found);
   return found;
 };
 
 exports.list = async (ctx) => {
+  let ezrAdminToken;
+
+  try {
+    ezrAdminToken = await getTokenOfAdmin();
+  } catch (error) {
+    appLogger.warn(`Couldn't get ezREEPORT admin token: ${error}`);
+  }
+
   const institutionService = new InstitutionService();
   const partners = await institutionService.findMany({
     where: {
@@ -111,7 +118,9 @@ exports.list = async (ctx) => {
         }
 
         // search for enabled ezreeport
-        servicesEnabled.ezreeport = await institutionHasReport(i.id);
+        if (ezrAdminToken) {
+          servicesEnabled.ezreeport = await institutionHasReport(i.id, ezrAdminToken);
+        }
 
         // mapping contacts
         const contacts = i.memberships.map(

@@ -421,6 +421,28 @@
                       </template>
                     </v-checkbox>
                   </v-col>
+
+                  <v-col cols="12" sm="6">
+                    <v-checkbox
+                      v-model="institution.openAccess"
+                      density="compact"
+                      color="primary"
+                      hide-details
+                    >
+                      <template #label>
+                        {{ $t('institutions.institution.openAccess.title') }}
+
+                        <v-icon
+                          v-tooltip:right="$t('institutions.institution.openAccess.description')"
+                          icon="mdi-information-outline"
+                          size="x-small"
+                          color="info"
+                          end
+                          style="vertical-align: baseline;"
+                        />
+                      </template>
+                    </v-checkbox>
+                  </v-col>
                 </v-row>
               </template>
             </v-card>
@@ -479,7 +501,7 @@ const LOGO_ACCEPT = 'JPEG, PNG, SVG';
 const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2mb
 
 const { t, locale } = useI18n();
-const { data: user } = useAuthState();
+const { user } = storeToRefs(useAuthStore());
 const snacks = useSnacksStore();
 const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
   accept: 'image/png, image/jpeg, image/svg+xml',

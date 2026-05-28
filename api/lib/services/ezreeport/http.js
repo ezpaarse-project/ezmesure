@@ -1,5 +1,5 @@
 const config = require('config');
-const Axios = require('axios');
+const { ofetch } = require('ofetch');
 
 const {
   host,
@@ -7,9 +7,9 @@ const {
   port,
 } = config.get('ezreeport');
 
-const ezrAxios = Axios.create({
+const $fetch = ofetch.create({
   baseURL: `http://${host}:${port}/v2`,
   headers: { 'X-Api-Key': apiKey },
 });
 
-module.exports = ezrAxios;
+module.exports = $fetch;

@@ -267,10 +267,10 @@ const emit = defineEmits({
 const maxHarvestYear = new Date().getFullYear();
 
 const { params } = useRoute();
-const { data: user } = useAuthState();
+const { user } = storeToRefs(useAuthStore());
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const { addToCheck } = useSushiCheckQueueStore();
 const snacks = useSnacksStore();
 
@@ -453,6 +453,7 @@ async function unarchiveSushis(items) {
       try {
         await $fetch(`/api/sushi/${item.id}`, {
           method: 'PATCH',
+          query: { force: true },
           body: { archived: false },
         });
 

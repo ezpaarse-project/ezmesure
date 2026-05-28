@@ -1,5 +1,5 @@
 // @ts-check
-const ezrAxios = require('./axios');
+const $fetch = require('./http');
 
 /** @typedef {import('../../.prisma/client.mjs').Membership} Membership */
 
@@ -13,9 +13,12 @@ async function upsertMembershipFromMembership(membership) {
   const body = {
     access: membership.permissions.some((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
   };
-  const { data } = await ezrAxios.put(`/admin/namespaces/${membership.institutionId}/memberships/${membership.username}`, body);
+  const { content } = await $fetch(`/admin/namespaces/${membership.institutionId}/memberships/${membership.username}`, {
+    method: 'PUT',
+    body,
+  });
 
-  return data?.content;
+  return content;
 }
 
 /**
@@ -24,7 +27,9 @@ async function upsertMembershipFromMembership(membership) {
  * @param {Membership} membership
  */
 async function deleteMembershipFromMembership(membership) {
-  await ezrAxios.delete(`/admin/namespaces/${membership.institutionId}/memberships/${membership.username}`);
+  await $fetch(`/admin/namespaces/${membership.institutionId}/memberships/${membership.username}`, {
+    method: 'DELETE',
+  });
 }
 
 module.exports = {

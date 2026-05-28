@@ -46,6 +46,8 @@ model HarvestSession {
   params                 Json?                @default("{}")
   /// Status of session
   status                 HarvestSessionStatus @default(prepared)
+  /// Error that occurred when starting session
+  error                  Json?
   /// Start date
   startedAt              DateTime?
   /// Deletion date

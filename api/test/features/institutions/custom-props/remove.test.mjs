@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -63,10 +65,9 @@ describe('[institutions - custom-props] Remove', () => {
     });
 
     it('#01 Should be able to remove a custom prop', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [],
         },
@@ -107,10 +108,9 @@ describe('[institutions - custom-props] Remove', () => {
     });
 
     it('#02 Should not be able to remove a custom prop', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [customProp],
         },

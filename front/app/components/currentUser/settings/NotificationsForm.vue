@@ -126,7 +126,8 @@ const ADMIN_NOTIFICATION_TYPES = [
   'app:recent_activity',
 ];
 
-const { getSession, data: user } = useAuth();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { t } = useI18n();
 
 const currentTab = shallowRef('user');
@@ -177,14 +178,14 @@ async function updateNotifications() {
   error.value = undefined;
   success.value = false;
   try {
-    await $fetch('/api/profile/excludeNotifications', {
+    await $fetch('/api/auth/excludeNotifications', {
       method: 'PUT',
       body: Object.entries(data.value)
         .filter(([, value]) => value === false)
         .map(([key]) => key),
     });
 
-    await getSession({ force: true });
+    await authStore.refreshAuthenticatedUser();
 
     success.value = true;
     setTimeout(() => {

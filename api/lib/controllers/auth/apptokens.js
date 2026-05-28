@@ -1,10 +1,8 @@
-const jwt = require('jsonwebtoken');
+const { signJWT } = require('../../utils/jwt');
 
-const { auth } = require('config');
-
-module.exports.generateAppToken = (user) => {
+module.exports.generateAppToken = async (user) => {
   if (!user) { return null; }
 
   const { username, email } = user;
-  return jwt.sign({ username, email }, auth.secret);
+  return signJWT({ username, email });
 };

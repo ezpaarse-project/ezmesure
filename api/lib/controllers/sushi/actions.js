@@ -19,7 +19,6 @@ const ActionsService = require('../../entities/actions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
-const HarvestSessionService = require('../../entities/harvest-session.service');
 const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
 const { schema, includableFields } = require('../../entities/sushi-credentials.dto');
@@ -416,9 +415,10 @@ exports.getAvailableReports = async (ctx) => {
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      ({ data, headers } = await sushiService.getAvailableReports(sushi, version));
+      ({ _data: data, headers } = await sushiService.getAvailableReports(sushi, version));
     } catch (e) {
-      exceptions = sushiService.getExceptions(e?.response?.data);
+      const { _data } = e?.response ?? {};
+      exceptions = sushiService.getExceptions(_data);
 
       if (!Array.isArray(exceptions) || exceptions.length === 0) {
         reportsPerVersion.set(version, { error: e.message });
@@ -440,7 +440,7 @@ exports.getAvailableReports = async (ctx) => {
     const isValidReport = (report) => (report.Report_ID && report.Report_Name);
 
     if (!Array.isArray(data) || !data.every(isValidReport)) {
-      const contentType = /^\s*([^;\s]*)/.exec(headers['content-type'])?.[1];
+      const contentType = /^\s*([^;\s]*)/.exec(headers.get('content-type'))?.[1];
 
       if (contentType === 'application/json') {
         reportsPerVersion.set(version, { error: ctx.$t('errors.sushi.invalidResponse') });
@@ -504,7 +504,7 @@ exports.downloadReport = async (ctx) => {
     message = 'download initiated, please retry this link later';
 
     sushiService.initiateDownload(sushiData)
-      .on('finish', (response, filePath) => {
+      .on('finish', (_response, filePath) => {
         appLogger.info(`Report downloaded at ${filePath}`);
       })
       .on('error', (err) => {
@@ -600,7 +600,7 @@ const getCounterVersionForCheck = (endpoint, period) => {
     const firstMonthAvailable = endpoint.counterVersionsAvailability?.[version] ?? '';
     return !firstMonthAvailable
       || typeof firstMonthAvailable !== 'string'
-      || HarvestSessionService.isEndAfterLimit(period, firstMonthAvailable);
+      || period.endDate < firstMonthAvailable;
   }) || availableVersions[0];
 };
 
@@ -638,7 +638,7 @@ const checkConnection = async (sushi, params) => {
     sushiService.getOngoingDownload(sushiData) || sushiService.initiateDownload(sushiData)
   );
 
-  /** @type {import('axios').AxiosResponse} */
+  /** @type {import('ofetch').FetchResponse<unknown>} */
   let response;
   /** @type {'unauthorized'|'failed'|'success'} */
   let status;
@@ -921,7 +921,7 @@ exports.getSushiUrls = async (ctx) => {
       );
 
       const url = new URL(downloadConfig.url);
-      url.search = new URLSearchParams(downloadConfig.params);
+      url.search = new URLSearchParams(downloadConfig.query);
 
       return [
         version,

@@ -1,36 +1,9 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { addHours } = require('date-fns');
-
 const UsersService = require('../../../entities/users.service');
 
 const { appLogger } = require('../../../services/logger');
 
 const { sendWelcomeMail } = require('../mail');
-const { sendNewUserToContacts } = require('./mail');
-
-const passwordResetValidity = config.get('passwordResetValidity');
-const secret = config.get('auth.secret');
-
-/**
- * Generates a token for the activation of the user's account.
- *
- * @param {string} origin - Host origin.
- * @param {string} username - Username of the user who needs to activate his account.
- *
- * @returns {string}
- */
-exports.activateUserLink = function activateUserLink(origin, username) {
-  const currentDate = new Date();
-  const expiresAt = addHours(currentDate, passwordResetValidity);
-  const token = jwt.sign({
-    username,
-    createdAt: currentDate,
-    expiresAt,
-  }, secret);
-
-  return `${origin}/activate?token=${token}`;
-};
+const { sendNewUserToContact } = require('./mail');
 
 exports.activateCurrentUser = async (ctx) => {
   const { user } = ctx.state;
@@ -70,18 +43,20 @@ exports.activateCurrentUser = async (ctx) => {
 
   if (Array.isArray(correspondents) && correspondents.length > 0) {
     await Promise.all(
-      correspondents.map(async ({ email: userMail, memberships }) => {
+      correspondents.map(async (contact) => {
+        const { email: userMail, memberships } = contact;
+
         if (!userMail || memberships.length <= 0) {
           return;
         }
 
         try {
-          await sendNewUserToContacts(userMail, {
+          await sendNewUserToContact(contact, {
             manageMemberLinks: memberships.map(({ institution }) => ({
               href: `${origin}/myspace/institutions/${institution.id}/members`,
               label: institution.name,
             })),
-            newUser: user.username,
+            newUser: user,
           });
         } catch (err) {
           appLogger.error(`Failed to send mail to ${userMail}: ${err}`);

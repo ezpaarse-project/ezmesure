@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -82,10 +84,9 @@ describe('[institutions - custom-props] Update', () => {
     it('#01 Should be able to update a readonly custom prop', async () => {
       const newReadonlyCustomProp = { ...readonlyCustomProp, value: 'new-readonly-value' };
 
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [
             editableCustomProp,
@@ -113,10 +114,9 @@ describe('[institutions - custom-props] Update', () => {
     it('#02 Should be able to update an editable custom prop', async () => {
       const newEditableCustomProp = { ...editableCustomProp, value: 'new-editable-value' };
 
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [
             readonlyCustomProp,
@@ -166,10 +166,9 @@ describe('[institutions - custom-props] Update', () => {
     it('#03 Should not be able to update readonly custom prop', async () => {
       const newReadonlyCustomProp = { ...readonlyCustomProp, value: 'new-readonly-value' };
 
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [
             editableCustomProp,
@@ -198,10 +197,9 @@ describe('[institutions - custom-props] Update', () => {
     it('#04 Should be able to update an editable custom prop', async () => {
       const newEditableCustomProp = { ...editableCustomProp, value: 'new-editable-value' };
 
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institution.id}`, {
         method: 'PUT',
-        url: `/institutions/${institution.id}`,
-        data: {
+        body: {
           ...institutionTest,
           customProps: [
             readonlyCustomProp,

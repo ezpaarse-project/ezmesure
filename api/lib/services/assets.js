@@ -1,9 +1,10 @@
 // @ts-check
+const fsp = require('node:fs/promises');
+const path = require('node:path');
 
-const fsp = require('fs/promises');
-const path = require('path');
+const { createCache } = require('../utils/cache-manager');
 
-const cacheMap = new Map();
+const cache = createCache();
 
 /**
  * Load asset and cache it
@@ -20,14 +21,17 @@ const loadAsset = async (filepath, opts = {}) => {
   const shouldUseCache = opts.cache !== false;
   const cacheKey = `${filepath}-${encoding}`;
 
-  const cached = cacheMap.get(cacheKey);
-  if (shouldUseCache && cached) {
-    return cached;
+  if (shouldUseCache) {
+    const cached = await cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
   }
 
   const asset = await fsp.readFile(path.resolve('assets', filepath), { encoding });
+
   if (shouldUseCache) {
-    cacheMap.set(cacheKey, asset);
+    await cache.set(cacheKey, asset);
   }
   return asset;
 };

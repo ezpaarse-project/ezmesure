@@ -11,14 +11,13 @@
     "lintfix": "npm run lint --fix"
   },
   "devDependencies": {
-    "@ezpaarse-project/ezreeport-vue": "^3.1.0",
+    "@ezpaarse-project/ezreeport-vue": "^3.2.2",
     "@mdi/font": "^7.4.47",
     "@mdi/svg": "^7.4.47",
     "@nuxt/devtools": "^3.1.1",
     "@nuxt/eslint-config": "^0.7.4",
     "@nuxtjs/i18n": "^10.0.0",
     "@pinia/nuxt": "^0.11.1",
-    "@sidebase/nuxt-auth": "^1.0.0",
     "@types/node": "^24.0.14",
     "@vue/eslint-config-airbnb": "^8.0.0",
     "@vueuse/core": "^14.1.0",

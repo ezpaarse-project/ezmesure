@@ -1,3 +1,5 @@
+const config = require('config');
+
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
@@ -8,6 +10,8 @@ const RolesService = require('../../entities/roles.service');
 
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES, EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
+const publicUrl = config.get('publicUrl');
 
 /* eslint-disable max-len */
 /**
@@ -44,30 +48,57 @@ exports.standardQueryParams = standardQueryParams;
 const { PERMISSIONS } = require('../../entities/memberships.dto');
 
 async function sendValidateInstitutionMail(receivers, data) {
-  const admins = await getNotificationRecipients(
-    ADMIN_NOTIFICATION_TYPES.institutionValidated,
-    receivers,
-  );
+  try {
+    const admins = await getNotificationRecipients(
+      ADMIN_NOTIFICATION_TYPES.institutionValidated,
+      receivers.map((receiver) => receiver.email),
+    );
 
-  return sendMail({
-    to: receivers,
-    bcc: admins,
-    subject: 'Votre établissement a été validé',
-    ...generateMail('validate-institution', data),
-  });
+    return await Promise.allSettled(
+      receivers.map(async (receiver) => {
+        try {
+          await sendMail({
+            to: receiver.email,
+            bcc: admins,
+            ...generateMail('validate-institution', data, { locale: receiver.language }),
+          });
+
+          appLogger.verbose(`[validate-institution] Mail sent to ${receiver.email}`);
+        } catch (err) {
+          appLogger.error(`[validate-institution] Failed to send mail to ${receiver.email}: ${err}`);
+          throw err;
+        }
+      }),
+    );
+  } catch (err) {
+    appLogger.error(`[validate-institution] Failed to send sushi-ready-change mail: ${err}`);
+  }
 }
 
 async function sendCounterReadyChangeMail(data) {
   try {
     const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.counterReadyChange);
 
-    return sendMail({
-      to: admins,
-      subject: data.sushiReadySince ? 'Fin de saisie d\'identifiant COUNTER' : 'Reprise de saisie d\'identifiant COUNTER',
-      ...generateMail('sushi-ready-change', data),
-    });
+    return await Promise.allSettled(
+      admins.map(async (admin) => {
+        try {
+          await sendMail({
+            to: admin.email,
+            ...generateMail('sushi-ready-change', data, {
+              locale: admin.language,
+              subjectKey: data.sushiReadySince ? 'subject.end' : 'subject.start',
+            }),
+          });
+
+          appLogger.verbose(`[counter-ready-change] Mail sent to ${admin.email}`);
+        } catch (err) {
+          appLogger.error(`[counter-ready-change] Failed to send mail to ${admin.email}: ${err}`);
+          throw err;
+        }
+      }),
+    );
   } catch (err) {
-    appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    appLogger.error(`[counter-ready-change] Failed to send mail: ${err}`);
   }
 }
 
@@ -271,17 +302,19 @@ exports.updateInstitution = async (ctx) => {
       include: { user: true },
     });
 
-    const contacts = contactMemberships?.map?.((m) => m.user.email);
+    const contacts = contactMemberships?.map?.((m) => ({
+      email: m.user.email,
+      language: m.user.language,
+    }));
+
+    const membersUrl = new URL(`/myspace/institutions/${institution.id}/members`, publicUrl);
+    const counterUrl = new URL(`/myspace/institutions/${institution.id}/sushi`, publicUrl);
 
     if (Array.isArray(contacts) && contacts.length > 0) {
-      try {
-        await sendValidateInstitutionMail(contacts, {
-          manageMemberLink: `${origin}/myspace/institutions/${institution.id}/memberships`,
-          manageSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
-        });
-      } catch (err) {
-        appLogger.error(`Failed to send validate institution mail: ${err}`);
-      }
+      await sendValidateInstitutionMail(contacts, {
+        manageMemberLink: membersUrl.href,
+        manageSushiLink: counterUrl.href,
+      });
     }
   }
 

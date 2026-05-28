@@ -1,13 +1,13 @@
 // eslint-disable-next-line import/prefer-default-export
 export function getErrorMessage(err, fallback = 'Unknown Error') {
   let text;
-  // if a page not found
-  if (err.statusCode === 404) {
-    text = "This page doesn't exists";
-  }
   // is a API error
-  if (!text && err.data?.error) {
+  if (err.data?.error) {
     text = err.data?.error;
+  }
+  // if a page not found
+  if (!text && err.statusCode === 404) {
+    text = "This page doesn't exists";
   }
   // have a cause
   if (!text && err.cause) {

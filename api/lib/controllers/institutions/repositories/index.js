@@ -5,7 +5,7 @@ const { FEATURES } = require('../../../entities/memberships.dto');
 const { adminCreateOrConnectSchema } = require('../../../entities/repositories.dto');
 
 const {
-  requireJwt,
+  requireActiveAuth,
   requireUser,
   fetchInstitution,
   fetchRepository,
@@ -24,7 +24,7 @@ const {
   addRepository,
 } = require('./actions');
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveAuth, requireUser);
 
 router.route({
   method: 'GET',

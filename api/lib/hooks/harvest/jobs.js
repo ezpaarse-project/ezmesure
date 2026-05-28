@@ -30,17 +30,12 @@ const onHarvestJobUpdate = async (harvestJob) => {
   const now = new Date();
 
   await HarvestService.$transaction(async (harvestService) => {
-    const harvestSessionService = new HarvestSessionService(harvestService);
-
-    const session = await harvestSessionService.findUnique({ where: { id: harvestJob.sessionId } });
-    if (!session) { throw new Error(`session ${harvestJob.sessionId} not found`); }
-
     /** @type {HarvestUncheckedCreateInput & HarvestUncheckedUpdateInput} */
     const harvestData = {
       harvestedAt: now,
       harvestedById: harvestJob.id,
       credentialsId: harvestJob.credentialsId,
-      period: session.beginDate,
+      period: harvestJob.beginDate,
       reportId: harvestJob.reportType,
       status: harvestJob.status,
       insertedItems: harvestJob.result?.inserted || 0,
@@ -52,8 +47,8 @@ const onHarvestJobUpdate = async (harvestJob) => {
 
     let coveredPeriods;
     const periods = eachMonthOfInterval({
-      start: parse(session.beginDate, HARVEST_FORMAT, now),
-      end: parse(session.endDate, HARVEST_FORMAT, now),
+      start: parse(harvestJob.beginDate, HARVEST_FORMAT, now),
+      end: parse(harvestJob.endDate, HARVEST_FORMAT, now),
     });
     if (harvestJob.result?.coveredPeriods) {
       coveredPeriods = new Set(harvestJob.result.coveredPeriods);
@@ -92,17 +87,25 @@ const onHarvestJobUpdate = async (harvestJob) => {
       }),
     );
 
-    // Check if a job is still active, if not: trigger hook as session ended
+    // Check if a job is still active. If not, trigger hook as session ended
     const harvestJobsService = new HarvestJobsService(harvestService);
-    const activeJob = await harvestJobsService.findFirst({
+    const { id: activeCount } = await harvestJobsService.count({
       where: {
-        sessionId: session.id,
+        sessionId: harvestJob.sessionId,
         status: {
           notIn: HarvestJobsService.endStatuses,
         },
       },
+      select: { id: true },
     });
-    if (!activeJob) {
+
+    if (activeCount <= 0) {
+      const harvestSessionService = new HarvestSessionService(harvestService);
+      const session = await harvestSessionService.findUnique({
+        where: { id: harvestJob.sessionId },
+      });
+      if (!session) { throw new Error(`session ${harvestJob.sessionId} not found`); }
+
       triggerHooks('harvest-session:end', session);
     }
   });

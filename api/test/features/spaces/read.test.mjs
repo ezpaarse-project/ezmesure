@@ -56,9 +56,8 @@ describe('[space]: Test read spaces features', () => {
       });
 
       it('#01 Should get space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -66,7 +65,7 @@ describe('[space]: Test read spaces features', () => {
 
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const space = httpAppResponse?.data;
+        const { _data: space } = httpAppResponse;
 
         expect(space).toHaveProperty('institutionId', institutionId);
         expect(space?.createdAt).not.toBeNull();
@@ -100,9 +99,8 @@ describe('[space]: Test read spaces features', () => {
       });
 
       it('#02 Should not get space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -125,9 +123,8 @@ describe('[space]: Test read spaces features', () => {
       });
 
       it('#03 Should not get space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: 'Bearer: random',
           },
@@ -147,9 +144,8 @@ describe('[space]: Test read spaces features', () => {
       });
 
       it('#04 Should not get space', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/kibana-spaces/${spaceConfig.id}`, {
           method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
         });
         expect(httpAppResponse).toHaveProperty('status', 401);
       });

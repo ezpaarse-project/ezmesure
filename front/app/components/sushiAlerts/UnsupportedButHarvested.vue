@@ -88,7 +88,7 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const lockActions = shallowRef(false);

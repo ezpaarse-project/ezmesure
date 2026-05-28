@@ -164,38 +164,42 @@ module.exports = async function process(params) {
 
         new Promise((resolve, reject) => {
           download.on('error', reject);
-          download.on('finish', (response) => {
-            logs.add('info', 'Download complete');
+          download.on(
+            'finish',
+            /** @param {sushiService.SushiFetchResponse} response */
+            (response) => {
+              logs.add('info', 'Download complete');
 
-            const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
+              const contentType = /^\s*([^;\s]*)/.exec(response.headers.get('content-type') || '')?.[1];
 
-            // @ts-ignore
-            downloadStep.data.statusCode = response?.status;
+              // @ts-ignore
+              downloadStep.data.statusCode = response.status;
 
-            // Handle HTTP status codes
-            if (response?.status === 202) {
-              logs.add('warning', `Endpoint responded with status [${response?.status}]`);
-              deferred = true;
+              // Handle HTTP status codes
+              if (response.status === 202) {
+                logs.add('warning', `Endpoint responded with status [${response.status}]`);
+                deferred = true;
+                // @ts-ignore
+                resolve();
+                return;
+              }
+
+              if (response.status !== 200) {
+                logs.add('error', `Endpoint responded with status [${response.status}]`);
+              }
+
+              if (response.status === 401 || response.status === 403) {
+                unauthorizedErrorCode = ERROR_CODES.unauthorized;
+              }
+
+              if (contentType !== 'application/json') {
+                logs.add('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
+              }
+
               // @ts-ignore
               resolve();
-              return;
-            }
-
-            if (response?.status !== 200) {
-              logs.add('error', `Endpoint responded with status [${response?.status}]`);
-            }
-
-            if (response?.status === 401 || response?.status === 403) {
-              unauthorizedErrorCode = ERROR_CODES.unauthorized;
-            }
-
-            if (contentType !== 'application/json') {
-              logs.add('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
-            }
-
-            // @ts-ignore
-            resolve();
-          });
+            },
+          );
         }),
       ]);
 

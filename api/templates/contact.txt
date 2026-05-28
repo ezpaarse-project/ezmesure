@@ -1,7 +1,7 @@
-Contact {{ appName }}.
+{{ t('emails.contact.body.headline', { appName: appName }) }}
 
-Email : {{ body.email }}
-Objet : {{ body.subject }}
-{% if body.browser %}Navigateur : {{ body.browser }}{% endif %}
-Message : {{ body.message }}
+{{ t('emails.contact.body.email') }} {{ body.email }}
+{{ t('emails.contact.body.subject') }} {{ body.subject }}
+{% if body.browser %}{{ t('emails.contact.body.browser') }} {{ body.browser }}{% endif %}
+{{ t('emails.contact.body.message') }} {{ body.message }}
 

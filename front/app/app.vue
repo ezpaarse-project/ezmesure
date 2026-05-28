@@ -5,6 +5,7 @@
 
       <SkeletonAppBar @model-value:menu="updateVisibleMenu()" />
       <SkeletonSnacks />
+      <SkeletonDialog />
       <SkeletonConfirmDialog />
 
       <nuxt-layout>

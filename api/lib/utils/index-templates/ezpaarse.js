@@ -39,6 +39,29 @@ module.exports = {
         type: 'date',
         format: 'year',
       },
+      ezpaarse_version: {
+        type: 'keyword',
+        fields: {
+          version: {
+            type: 'version',
+          },
+        },
+      },
+      platforms_version: {
+        type: 'keyword',
+      },
+      middlewares_version: {
+        type: 'keyword',
+      },
+      ezpaarse_date: {
+        type: 'date',
+      },
+      platforms_date: {
+        type: 'date',
+      },
+      middlewares_date: {
+        type: 'date',
+      },
       size: {
         type: 'integer',
       },

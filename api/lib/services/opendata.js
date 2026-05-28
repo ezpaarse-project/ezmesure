@@ -1,5 +1,7 @@
+const { Readable } = require('node:stream');
+
 const config = require('config');
-const Axios = require('axios');
+const { ofetch } = require('ofetch');
 const Papa = require('papaparse');
 
 const elastic = require('./elastic');
@@ -7,7 +9,7 @@ const { opendata: indexTemplate } = require('../utils/index-templates');
 
 const { index } = config.get('opendata');
 
-const axios = Axios.create({
+const $fetch = ofetch.create({
   baseURL: 'https://data.enseignementsup-recherche.gouv.fr/api/',
 });
 
@@ -82,7 +84,7 @@ async function recreateIndex() {
 
 async function getDatasetsMetadata() {
   return Promise.all(datasetIds.map(async (datasetId) => {
-    const { data } = await axios.get(`/datasets/1.0/${datasetId}`);
+    const data = await $fetch(`/datasets/1.0/${datasetId}`);
     return {
       ...data,
       id: datasetId,
@@ -115,10 +117,7 @@ async function updateDataset(dataset) {
     }
   };
 
-  // eslint-disable-next-line no-await-in-loop
-  const response = await axios({
-    method: 'get',
-    url: '/records/1.0/download',
+  const responseData = await $fetch('/records/1.0/download', {
     params: {
       dataset: dataset.id,
       format: 'csv',
@@ -132,11 +131,12 @@ async function updateDataset(dataset) {
     },
   });
 
+  const stream = Readable.fromWeb(responseData);
   let items = [];
 
   // eslint-disable-next-line no-await-in-loop
   await new Promise((resolve, reject) => {
-    Papa.parse(response.data, {
+    Papa.parse(stream, {
       delimiter: ';',
       header: true,
       transformHeader: (header) => fieldsTranslations.get(header) || header,

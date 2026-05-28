@@ -1,7 +1,7 @@
 // @ts-check
-const { default: axios } = require('axios');
+const { ofetch, createFetchError } = require('ofetch');
+const { parse: parseCookie, serialize: serializeCookie } = require('cookie');
 const config = require('config');
-const qs = require('qs');
 
 const username = config.get('elasticsearch.user');
 const password = config.get('elasticsearch.password');
@@ -10,19 +10,18 @@ const port = config.get('kibana.port');
 
 const authString = Buffer.from(`${username}:${password}`).toString('base64');
 
-/**
- * @template T
- * @typedef {import('axios').AxiosResponse<T>} AxiosResponse<T>
-*/
+const DEFAULT_SPACE = 'default';
+const AUTH_COOKIE = {
+  name: 'sid',
+  params: { httpOnly: true, path: '/' },
+};
 
+/* eslint-disable max-len */
 /**
- * @typedef {import('axios').AxiosInstance} AxiosInstance
- *
- *
  * @typedef {{ statusCode: number, error: string, message: string }} KibanaError
  *
- * @typedef {{ spaces?: string[], base?: string[], feature?: Object }} KibanaPrivileges
- * @typedef {{ name: string, elasticsearch?: Object, kibana: KibanaPrivileges[] }} KibanaRole
+ * @typedef {{ spaces?: string[], base?: string[], feature?: Record<string, unknown> }} KibanaPrivileges
+ * @typedef {{ name: string, elasticsearch?: Record<string, unknown>, kibana: KibanaPrivileges[] }} KibanaRole
  *
  * @typedef {{
  *  id: string,
@@ -33,60 +32,67 @@ const authString = Buffer.from(`${username}:${password}`).toString('base64');
  *  color?: string
  * }} KibanaSpace
  *
- * @typedef {{ id: string, type: string, attributes: Object, updated_at?: string }} KibanaObject
+ * @typedef {{ id: string, type: string, attributes: Record<string, unknown>, updated_at?: string }} KibanaObject
  * @typedef {{ saved_objects: KibanaObject[], total: number, page: number }} KibanaFoundObjects
  */
+/* eslint-enable max-len */
 
-const allowNotFound = (status) => ((status >= 200 && status < 300) || status === 404);
-
-const axiosClient = axios.create({
-  baseURL: `http://${host}:${port}`,
-  headers: {
-    Authorization: `Basic ${authString}`,
-    // Kibana won't accept any request without this
-    'kbn-xsrf': true,
-  },
-  paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
+const headers = new Headers({
+  Authorization: `Basic ${authString}`,
+  // Kibana won't accept any request without this
+  'kbn-xsrf': 'true',
 });
 
-const DEFAULT_SPACE = 'default';
+const $fetch = ofetch.create({
+  baseURL: `http://${host}:${port}`,
+  headers,
+});
 
 /**
  * Get all spaces
  *
- * @returns {Promise<AxiosResponse<KibanaSpace[]>>}
+ * @returns {Promise<KibanaSpace[]>}
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/spaces-api-get-all.html
  */
-const getSpaces = () => axiosClient.get('/api/spaces/space');
+const getSpaces = () => $fetch('/api/spaces/space');
 
 /**
  * Get a kibana space using given id
  *
  * @param {string} id The id of the space
  *
- * @returns {Promise<AxiosResponse<KibanaSpace | KibanaError>>} The space or the error
+ * @returns {Promise<KibanaSpace | KibanaError | null>} The space or the error, `null` if not found
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/spaces-api-get.html
  */
-const getSpace = (id) => {
+async function getSpace(id) {
   if (!id) {
     throw new Error('Missing required parameter: id');
   }
 
-  return axiosClient.get(`/api/spaces/space/${id}`, { validateStatus: allowNotFound });
-};
+  const request = `/api/spaces/space/${id}`;
+  const response = await $fetch.raw(request, { ignoreResponseError: true });
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw createFetchError({ request, options: { headers }, response });
+  }
+  const { _data } = response;
+  return _data;
+}
 
 /**
  * Create a kibana space
  *
  * @param {KibanaSpace} opts The kibana space
  *
- * @returns {Promise<AxiosResponse<KibanaSpace>>} The space
+ * @returns {Promise<KibanaSpace>} The space
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/spaces-api-post.html
  */
-const createSpace = (opts) => {
+async function createSpace(opts) {
   const options = opts || {};
 
   if (!options.id) {
@@ -96,19 +102,22 @@ const createSpace = (opts) => {
     throw new Error('Missing required parameter: name');
   }
 
-  return axiosClient.post('/api/spaces/space', options);
-};
+  return $fetch('/api/spaces/space', {
+    method: 'POST',
+    body: options,
+  });
+}
 
 /**
  * Updates a kibana space
  *
  * @param {KibanaSpace} opts The kibana space
  *
- * @returns {Promise<AxiosResponse<KibanaSpace>>} The space
+ * @returns {Promise<KibanaSpace>} The space
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/spaces-api-put.html
  */
-const updateSpace = (opts) => {
+async function updateSpace(opts) {
   const options = opts || {};
 
   if (!options.id) {
@@ -118,44 +127,52 @@ const updateSpace = (opts) => {
     throw new Error('Missing required parameter: name');
   }
 
-  return axiosClient.put(`/api/spaces/space/${options.id}`, options);
-};
+  return $fetch(`/api/spaces/space/${options.id}`, {
+    method: 'PUT',
+    body: options,
+  });
+}
 
 /**
  * Updates kibana settings
  *
  * @param {Record<string, any> & { id: string }} opts The kibana settings
  *
- * @returns {Promise<AxiosResponse<Record<string, any>>>} The space
+ * @returns {Promise<void>} The space
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/advanced-options.html
  */
-const updateSpaceSettings = (opts) => {
+async function updateSpaceSettings(opts) {
   const { id, changes } = opts || {};
 
   if (!id) {
     throw new Error('Missing required parameter: id');
   }
 
-  return axiosClient.post(`/s/${id}/api/kibana/settings`, { changes });
-};
+  await $fetch(`/s/${id}/api/kibana/settings`, {
+    method: 'POST',
+    body: { changes },
+  });
+}
 
 /**
  * Delete a kibana space
  *
  * @param {string} spaceId The id of the space
  *
- * @returns {Promise<AxiosResponse<null>>}
+ * @returns {Promise<void>}
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/spaces-api-delete.html
  */
-const deleteSpace = (spaceId) => {
+async function deleteSpace(spaceId) {
   if (!spaceId) {
     throw new Error('Missing required parameter: spaceId');
   }
 
-  return axiosClient.delete(`/api/spaces/space/${spaceId}`);
-};
+  await $fetch(`/api/spaces/space/${spaceId}`, {
+    method: 'DELETE',
+  });
+}
 
 /**
  * Create or update role using given name
@@ -166,22 +183,25 @@ const deleteSpace = (spaceId) => {
  * @param {Map<string, { privileges: string[] }>} [indices] - Map of rights,
  * key is the index value and value are the rights.
  *
- * @returns {Promise<AxiosResponse<null>>}
+ * @returns {Promise<object>}
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/role-management-api-put.html
  */
-const putRole = (name, spaces, indices) => axiosClient.put(`/api/security/role/${name}`, {
-  elasticsearch: {
-    cluster: [],
-    indices: [...(indices ?? [])].map(([index, { privileges }]) => ({
-      names: [index],
-      privileges,
+const putRole = (name, spaces, indices) => $fetch(`/api/security/role/${name}`, {
+  method: 'PUT',
+  body: {
+    elasticsearch: {
+      cluster: [],
+      indices: [...(indices ?? [])].map(([index, { privileges }]) => ({
+        names: [index],
+        privileges,
+      })),
+    },
+    kibana: [...spaces].map(([id, { features }]) => ({
+      spaces: [id],
+      feature: features,
     })),
   },
-  kibana: [...spaces].map(([id, { features }]) => ({
-    spaces: [id],
-    feature: features,
-  })),
 });
 
 /**
@@ -189,43 +209,52 @@ const putRole = (name, spaces, indices) => axiosClient.put(`/api/security/role/$
  *
  * @param {string} name The name of the role
  *
- * @returns {Promise<AxiosResponse<null>>}
+ * @returns {Promise<object>}
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/role-management-api-delete.html
  */
-const deleteRole = (name) => {
+async function deleteRole(name) {
   if (!name) {
     throw new Error('Missing required parameter: name');
   }
 
-  return axiosClient.delete(`/api/security/role/${name}`);
-};
+  return $fetch(`/api/security/role/${name}`, { method: 'DELETE' });
+}
 
 /**
  * Get role using given name
  *
  * @param {string} name The name of the role
  *
- * @returns {Promise<AxiosResponse<KibanaRole | KibanaError>>} The role or the error
+ * @returns {Promise<KibanaRole | KibanaError | null>} The role or the error, `null` if not found
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/role-management-specific-api-get.html
  */
-const getRole = (name) => {
+async function getRole(name) {
   if (!name) {
     throw new Error('Missing required parameter: name');
   }
 
-  return axiosClient.get(`/api/security/role/${name}`, { validateStatus: allowNotFound });
-};
+  const request = `/api/security/role/${name}`;
+  const response = await $fetch.raw(request, { ignoreResponseError: true });
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw createFetchError({ request, options: { headers }, response });
+  }
+  const { _data } = response;
+  return _data;
+}
 
 /**
  * Get all roles
  *
- * @returns {Promise<AxiosResponse<KibanaRole[]>>} The roles
+ * @returns {Promise<KibanaRole[]>} The roles
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/role-management-api-get.html
  */
-const getRoles = () => axiosClient.get('/api/security/role');
+const getRoles = () => $fetch('/api/security/role');
 
 /**
  * Get kibana saved object
@@ -235,11 +264,11 @@ const getRoles = () => axiosClient.get('/api/security/role');
  * @param {string} options.id
  * @param {string} options.spaceId
  *
- * @returns {Promise<AxiosResponse<KibanaObject | KibanaError>>} The saved object or the error
+ * @returns {Promise<KibanaObject | KibanaError | null>} The saved object or the error, or not found
  *
  * @see https://www.elastic.o/guide/en/kibana/7.17/saved-objects-api-get.htmlc
  */
-const getObject = (options) => {
+async function getObject(options) {
   const {
     type,
     id,
@@ -247,8 +276,18 @@ const getObject = (options) => {
   } = options || {};
 
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
-  return axiosClient.get(`${spacePrefix}/api/saved_objects/${type}/${id}`, { validateStatus: allowNotFound });
-};
+
+  const request = `${spacePrefix}/api/saved_objects/${type}/${id}`;
+  const response = await $fetch.raw(request, { ignoreResponseError: true });
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw createFetchError({ request, options: { headers }, response });
+  }
+  const { _data } = response;
+  return _data;
+}
 
 /**
  * Find kibana saved objects
@@ -259,11 +298,11 @@ const getObject = (options) => {
  * @param {number} [options.page]
  * @param {number} [options.perPage]
  *
- * @returns {Promise<AxiosResponse<KibanaFoundObjects>>} The saved object
+ * @returns {Promise<KibanaFoundObjects>} The saved object
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/saved-objects-api-find.html
  */
-const findObjects = (options) => {
+async function findObjects(options) {
   const {
     type,
     spaceId,
@@ -272,14 +311,15 @@ const findObjects = (options) => {
   } = options || {};
 
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
-  const params = {
-    type,
-    page: page || 1,
-    per_page: perPage || 50,
-  };
 
-  return axiosClient.get(`${spacePrefix}/api/saved_objects/_find`, { params });
-};
+  return $fetch(`${spacePrefix}/api/saved_objects/_find`, {
+    params: {
+      type,
+      page: page || 1,
+      per_page: perPage || 50,
+    },
+  });
+}
 
 /**
  * Create a kibana index pattern
@@ -289,11 +329,11 @@ const findObjects = (options) => {
  * @param {string} opts.title
  * @param {string} opts.timeFieldName
  *
- * @returns {Promise<AxiosResponse<KibanaObject>>} The saved object
+ * @returns {Promise<KibanaObject>} The saved object
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/saved-objects-api-create.html
  */
-const createIndexPattern = (spaceId, opts) => {
+async function createIndexPattern(spaceId, opts) {
   const attributes = opts || {};
 
   if (!attributes.title) {
@@ -304,8 +344,11 @@ const createIndexPattern = (spaceId, opts) => {
   }
 
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
-  return axiosClient.post(`${spacePrefix}/api/saved_objects/index-pattern`, { attributes });
-};
+  return $fetch(`${spacePrefix}/api/saved_objects/index-pattern`, {
+    method: 'POST',
+    body: { attributes },
+  });
+}
 
 /**
  * Get all index patterns of a space
@@ -317,15 +360,15 @@ const createIndexPattern = (spaceId, opts) => {
  *
  * @returns The index patters
  */
-const getIndexPatterns = async (opts) => {
+async function getIndexPatterns(opts) {
   const options = {
-    ...(opts || {}),
+    ...opts,
     type: 'index-pattern',
   };
 
-  const { data } = await findObjects(options);
-  let patterns = data && data.saved_objects;
+  const data = await findObjects(options);
 
+  let patterns = data?.saved_objects;
   if (!Array.isArray(patterns)) {
     patterns = [];
   }
@@ -342,7 +385,7 @@ const getIndexPatterns = async (opts) => {
       timeFieldName,
     };
   });
-};
+}
 
 /**
  * Get the default index pattern of a space
@@ -351,30 +394,35 @@ const getIndexPatterns = async (opts) => {
  *
  * @returns {Promise<string | null>} ID of the default index pattern
  */
-const getDefaultIndexPattern = async (spaceId) => {
+async function getDefaultIndexPattern(spaceId) {
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
 
-  const { data } = await axiosClient.get(`${spacePrefix}/api/index_patterns/default`);
+  const data = await $fetch(`${spacePrefix}/api/index_patterns/default`);
 
   return typeof data?.index_pattern_id === 'string' ? data.index_pattern_id : null;
-};
+}
 
 /**
  * Set the default index pattern of a space
  *
  * @param {string} spaceId - ID of the space
  * @param {string | null} patternId - ID of the index pattern to set as default
+ * @param {object} [opts]
+ * @param {boolean} [opts.force]
  *
- * @returns {Promise<string | null>} ID of the default index pattern
+ * @returns {Promise<void>}
  */
-const setDefaultIndexPattern = async (spaceId, patternId, opts) => {
+async function setDefaultIndexPattern(spaceId, patternId, opts) {
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
 
-  return axiosClient.post(`${spacePrefix}/api/index_patterns/default`, {
-    index_pattern_id: patternId,
-    force: opts?.force !== false,
+  await $fetch(`${spacePrefix}/api/index_patterns/default`, {
+    method: 'POST',
+    body: {
+      index_pattern_id: patternId,
+      force: opts?.force !== false,
+    },
   });
-};
+}
 
 /**
  * Export a kibana dashboard
@@ -383,23 +431,24 @@ const setDefaultIndexPattern = async (spaceId, patternId, opts) => {
  * @param {string|string[]} opts.dashboardId
  * @param {string} opts.spaceId
  *
- * @returns {Promise<AxiosResponse<{ objects: Object[] }>>} The saved objects
+ * @returns {Promise<{ objects: Object[] }>} The saved objects
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/dashboard-api-export.html
  */
-const exportDashboard = (opts) => {
+async function exportDashboard(opts) {
   const {
     dashboardId, // Can be an array
     spaceId,
   } = opts || {};
 
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
-  const params = {
-    dashboard: dashboardId,
-  };
 
-  return axiosClient.get(`${spacePrefix}/api/kibana/dashboards/export`, { params });
-};
+  return $fetch(`${spacePrefix}/api/kibana/dashboards/export`, {
+    params: {
+      dashboard: dashboardId,
+    },
+  });
+}
 
 /**
  * Import a kibana dashboard
@@ -409,7 +458,7 @@ const exportDashboard = (opts) => {
  * @param {string} opts.spaceId
  * @param {boolean} [opts.force]
  *
- * @returns {Promise<AxiosResponse<{ objects: Object[] }>>} The saved objects
+ * @returns {Promise<{ objects: Object[] }>} The saved objects
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/dashboard-import-api.html
  */
@@ -421,11 +470,14 @@ const importDashboard = (opts) => {
   } = opts || {};
 
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
-  const params = {
-    force: !!force,
-  };
 
-  return axiosClient.post(`${spacePrefix}/api/kibana/dashboards/import`, data, { params });
+  return $fetch(`${spacePrefix}/api/kibana/dashboards/import`, {
+    method: 'POST',
+    params: {
+      force: !!force,
+    },
+    body: data,
+  });
 };
 
 /**
@@ -433,16 +485,20 @@ const importDashboard = (opts) => {
  *
  * **USES INTERNAL API** Makes sure to update this function whenever you upgrade Kibana
  *
- * @param {string} user
- * @param {string} passwd
- * @param {string} currentURL
+ * @param {string} user - The username
+ * @param {string} passwd - The password
+ * @param {string} currentURL - The current URL
  *
- * @returns {Promise<AxiosResponse<unknown>>}
+ * @returns {Promise<{ name: string, value: string, params: any }>} auth cookie
  */
-function loginUser(user, passwd, currentURL) {
-  return axiosClient.post(
-    '/internal/security/login',
-    {
+async function loginUser(user, passwd, currentURL) {
+  const response = await ofetch.raw('/internal/security/login', {
+    method: 'POST',
+    baseURL: `http://${host}:${port}`,
+    headers: {
+      'kbn-xsrf': 'true',
+    },
+    body: {
       providerType: 'basic',
       providerName: 'basic',
       currentURL,
@@ -451,17 +507,50 @@ function loginUser(user, passwd, currentURL) {
         password: passwd,
       },
     },
-    {
-      withCredentials: true,
-      headers: {
-        'kbn-xsrf': 'true',
-      },
+  });
+
+  const cookies = response.headers.getSetCookie().map((str) => {
+    const cookie = parseCookie(str);
+    const [[name, value], ...options] = Object.entries(cookie);
+    return { name, value: value || '', params: Object.fromEntries(options) };
+  });
+
+  const authCookie = cookies.find((cookie) => cookie.name === AUTH_COOKIE.name);
+  if (!authCookie) {
+    throw new Error('Auth cookie not found in Kibana response');
+  }
+
+  // Keep track of params used to set cookie
+  return authCookie;
+}
+
+/**
+ * Makes a request to logout a user
+ *
+ * **USES INTERNAL API** Makes sure to update this function whenever you upgrade Kibana
+ *
+ * @param {string} authToken - Cookie used to auth to Kibana
+ *
+ * @returns {Promise<void>} auth cookie
+ */
+async function logoutUser(authToken) {
+  await ofetch('/api/security/logout', {
+    method: 'GET',
+    baseURL: `http://${host}:${port}`,
+    headers: {
+      Cookies: serializeCookie({
+        name: AUTH_COOKIE.name,
+        value: authToken,
+        ...AUTH_COOKIE.params,
+      }),
     },
-  );
+    redirect: 'manual',
+  });
 }
 
 module.exports = {
   DEFAULT_SPACE,
+  AUTH_COOKIE,
   getSpaces,
   getSpace,
   createSpace,
@@ -481,4 +570,5 @@ module.exports = {
   exportDashboard,
   importDashboard,
   loginUser,
+  logoutUser,
 };

@@ -1,5 +1,5 @@
 // @ts-check
-const ezrAxios = require('../ezreeport/axios');
+const $fetchEzr = require('../ezreeport/http');
 const reportingUsers = require('../ezreeport/reportingUsers');
 
 const { appLogger } = require('../logger');
@@ -37,11 +37,14 @@ async function syncUsers() {
 
   appLogger.verbose(`[ezreeport] Synchronizing ${users?.length} users`);
 
-  const { data } = await ezrAxios.put('/admin/users', users.map((u) => ({
-    isAdmin: u.isAdmin,
-    username: u.username,
-  })));
-  const { users: userResult } = data?.content ?? {};
+  const { content } = await $fetchEzr('/admin/users', {
+    method: 'PUT',
+    body: users.map((u) => ({
+      isAdmin: u.isAdmin,
+      username: u.username,
+    })),
+  });
+  const { users: userResult } = content ?? {};
 
   if (!userResult) {
     throw new Error("Couldn't synchronize users");
@@ -91,8 +94,11 @@ async function syncNamespaces() {
       })),
   }));
 
-  const { data } = await ezrAxios.put('/admin/namespaces', namespaces);
-  const { namespaces: namespaceResult, memberships: membershipResult } = data?.content ?? {};
+  const { content } = await $fetchEzr('/admin/namespaces', {
+    method: 'PUT',
+    body: namespaces,
+  });
+  const { namespaces: namespaceResult, memberships: membershipResult } = content ?? {};
 
   if (!namespaceResult) {
     throw new Error("Couldn't synchronize namespaces");
@@ -118,10 +124,9 @@ async function syncNamespaces() {
     .then((results) => {
       appLogger.info(`[ezreeport] ${results.upserted} Reporting users synchronized`);
       appLogger.verbose(`[ezreeport] ${results.upserted} reporting users upserted`);
-      appLogger.verbose(`[ezreeport] ${results.deleted} reporting users deleted`);
     })
     .catch((err) => {
-      appLogger.info(`[ezreeport] Cannot synchronize reporting users: ${err}`);
+      appLogger.error(`[ezreeport] Cannot synchronize reporting users: ${err}`);
     });
 
   return {

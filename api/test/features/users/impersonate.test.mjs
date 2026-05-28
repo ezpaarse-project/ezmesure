@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -46,15 +48,14 @@ describe('[users]: Test impersonation features', () => {
     await usersElastic.createUser(regularUser);
 
     const usersService = new UsersService();
-    adminToken = await (new UsersService()).generateToken(adminUsername);
-    regularUserToken = await (new UsersService()).generateToken(regularUser.username);
+    adminToken = await (usersService).generateToken(adminUsername);
+    regularUserToken = await (usersService).generateToken(regularUser.username);
   });
 
   describe('An admin', () => {
     it('#01 Should be able to impersonate another user', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/users/${targetUser.username}/_impersonate`, {
         method: 'POST',
-        url: '/users/target.user/_impersonate',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -63,29 +64,29 @@ describe('[users]: Test impersonation features', () => {
       const tokenPattern = new RegExp(`^${authCookie}=([a-z0-9._-]+)`, 'i');
 
       expect(httpAppResponse).toHaveProperty('status', 200);
-      expect(httpAppResponse).toHaveProperty('headers.set-cookie[0]', expect.stringMatching(tokenPattern));
 
-      const cookieHeader = httpAppResponse.headers['set-cookie'];
+      const cookieHeader = httpAppResponse.headers.get('set-cookie');
+
+      expect(cookieHeader).toMatch(tokenPattern);
+
       const targetUserToken = tokenPattern.exec(cookieHeader)?.[1];
 
-      const profileResponse = await ezmesure({
+      const profileResponse = await ezmesure.raw('/auth', {
         method: 'GET',
-        url: '/auth',
         headers: {
           Authorization: `Bearer ${targetUserToken}`,
         },
       });
 
       expect(profileResponse).toHaveProperty('status', 200);
-      expect(profileResponse).toHaveProperty('data.username', targetUser.username);
+      expect(profileResponse).toHaveProperty('_data.username', targetUser.username);
     });
   });
 
   describe('A regular user', () => {
     it('#02 Should not be able to impersonate another user', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/users/${targetUser.username}/_impersonate`, {
         method: 'POST',
-        url: '/users/target.user/_impersonate',
         headers: {
           Authorization: `Bearer ${regularUserToken}`,
         },
@@ -97,9 +98,8 @@ describe('[users]: Test impersonation features', () => {
 
   describe('An anonymous user', () => {
     it('#03 Should not be able to impersonate another user', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/users/${targetUser.username}/_impersonate`, {
         method: 'POST',
-        url: '/users/target.user/_impersonate',
         headers: {
           Authorization: `Bearer ${regularUser}`,
         },

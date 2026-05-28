@@ -74,9 +74,10 @@ import { getErrorMessage } from '@/lib/errors';
 
 const currentRoute = useRoute();
 const { t } = useI18n();
-const { status: authStatus, getSession } = useAuth();
+const authStore = useAuthStore();
+const { isAuthenticated } = storeToRefs(authStore);
 
-if (authStatus.value === 'unauthenticated' && !currentRoute.query?.token) {
+if (!isAuthenticated.value && !currentRoute.query?.token) {
   await navigateTo('/');
 }
 
@@ -101,7 +102,7 @@ async function activateProfile() {
       },
     });
 
-    await getSession({ force: true });
+    await authStore.refreshAuthenticatedUser();
     await navigateTo('/myspace');
   } catch (err) {
     if (err.statusCode >= 400 && err.statusCode < 500) {

@@ -7,6 +7,8 @@ EZMESURE_NODE_NAME=`hostname`
 THIS_HOST=`hostname -I | cut -d ' ' -f1`
 
 # ======= Local vars =======
+export NGINX_PROTOCOL="https" # or http
+export EZMESURE_PUBLIC_PORT="8443" # or 8880
 
 export EZMESURE_DOMAIN="ezmesure-preprod.couperin.org"
 export SATOSA_DOMAIN="satosa.ezmesure-preprod.couperin.org"
@@ -58,7 +60,7 @@ export SAML_METADATA_URL="https://pub.federation.renater.fr/metadata/test/idps.x
 
 # OIDC vars
 export EZMESURE_OIDC_CLIENT_ID="ezmesure"
-export EZMESURE_OIDC_SCOPES="[\"openid\",\"profile\",\"email\"]"
+export EZMESURE_OIDC_SCOPES="[\"openid\",\"profile\",\"email\",\"offline_access\"]"
 
 # Check your IDP configuration
 export EZMESURE_OIDC_CLIENT_SECRET="changeme"
@@ -71,15 +73,20 @@ fi
 # ======= Set variables based on others =======
 
 # set ezmesure Domain
-export EZMESURE_PUBLIC_URL="https://${EZMESURE_DOMAIN}"
-export SATOSA_PUBLIC_URL="https://${SATOSA_DOMAIN}"
+if [[ -z "${EZMESURE_PUBLIC_PORT}" ]]; then
+  export EZMESURE_PUBLIC_URL="https://${EZMESURE_DOMAIN}"
+  export SATOSA_PUBLIC_URL="https://${SATOSA_DOMAIN}"
+else
+  export EZMESURE_PUBLIC_URL="https://${EZMESURE_DOMAIN}:${EZMESURE_PUBLIC_PORT}"
+  export SATOSA_PUBLIC_URL="https://${SATOSA_DOMAIN}:${EZMESURE_PUBLIC_PORT}"
+fi
 
 # Satosa vars
 export SAML_ENTITY_ID="${EZMESURE_PUBLIC_URL}/sp"
 
 # OIDC vars
 export EZMESURE_ADMIN_PASSWORD_HASH="$(echo $EZMESURE_ADMIN_PASSWORD | htpasswd -BinC 10 admin | cut -d: -f2)"
-export EZMESURE_OIDC_ISSUER_URI="https://${EZMESURE_DOMAIN}/auth"
+export EZMESURE_OIDC_ISSUER_URI="${EZMESURE_PUBLIC_URL}/auth"
 export EZMESURE_OIDC_DISCOVERY_URI="${EZMESURE_OIDC_ISSUER_URI}/.well-known/openid-configuration"
 # set EZMESURE_OIDC_DISCOVERY_URI or the following :
 # export EZMESURE_OIDC_AUTH_URI="${EZMESURE_OIDC_ISSUER_URI}/auth"

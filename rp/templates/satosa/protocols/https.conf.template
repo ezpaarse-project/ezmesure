@@ -12,13 +12,12 @@ server {
 server {
   server_name ${SATOSA_DOMAIN};
 
-  listen 443;
+  listen 443 ssl;
   listen [::]:443 ssl;
 
   ## Certificates
   ssl_certificate /etc/nginx/ssl/cert.pem;
   ssl_certificate_key /etc/nginx/ssl/key.pem;
-  ssl_trusted_certificate /etc/nginx/ssl/cert.pem;
 
   include /etc/nginx/conf.d/utils/http-proxy.conf;
 

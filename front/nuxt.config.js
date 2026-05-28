@@ -1,6 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config';
 
-import authOptions from './config/auth.options';
 import i18nOptions from './config/i18n.options';
 import vuetifyOptions from './config/vuetify.options';
 
@@ -8,7 +7,6 @@ import vuetifyOptions from './config/vuetify.options';
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      supportMail: 'ezteam@couperin.org',
       currentInstance: '',
       oidcProfileUri: '',
       counterRegistryUrl: 'https://registry.countermetrics.org',
@@ -19,13 +17,10 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     'vuetify-nuxt-module',
     '@pinia/nuxt',
-    '@sidebase/nuxt-auth',
     '@vueuse/nuxt',
   ],
 
   i18n: i18nOptions,
-
-  auth: authOptions,
 
   vuetify: vuetifyOptions,
 

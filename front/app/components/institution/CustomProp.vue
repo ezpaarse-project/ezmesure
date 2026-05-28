@@ -5,10 +5,10 @@
     v-bind="$attrs"
     :model-value="modelValue.value"
     :readonly="readonly"
+    :closable-chips="!readonly"
+    :clearable="!readonly"
     multiple
     chips
-    closable-chips
-    clearable
     @update:model-value="emit('update:modelValue', { ...modelValue, value: $event })"
   >
     <template v-if="readonly" #append-inner>

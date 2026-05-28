@@ -3,10 +3,10 @@ const { Joi } = require('koa-joi-router');
 
 const handleElasticErrors = require('../../utils/elastic-error-handler');
 
-const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
+const { requireActiveAuth, requireUser, requireAdmin } = require('../../services/auth');
 const { search, getOne } = require('./actions');
 
-router.use(requireJwt, requireUser, requireAdmin);
+router.use(requireActiveAuth, requireUser, requireAdmin);
 
 const stringOrArray = Joi.alternatives().try(
   Joi.string().trim().min(1),

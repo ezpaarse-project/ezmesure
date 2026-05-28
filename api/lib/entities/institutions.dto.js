@@ -31,6 +31,7 @@ const schema = {
   logoId: Joi.string().allow(null),
 
   onboarding: Joi.boolean(),
+  openAccess: Joi.boolean(),
   validated: Joi.boolean(),
   hidePartner: Joi.boolean(),
   tags: Joi.array().items(Joi.string()),
@@ -52,6 +53,8 @@ const schema = {
  * Fields that cannot be changed by regular users
  */
 const adminFields = [
+  'onboarding',
+  'openAccess',
   'validated',
   'hidePartner',
   'tags',

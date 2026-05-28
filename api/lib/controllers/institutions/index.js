@@ -4,7 +4,7 @@ const { Joi } = require('koa-joi-router');
 const { FEATURES } = require('../../entities/memberships.dto');
 
 const {
-  requireJwt,
+  requireActiveAuth,
   requireUser,
   fetchInstitution,
   requireAdmin,
@@ -50,9 +50,7 @@ router.use(elasticRoles.prefix('/:institutionId/elastic-roles').middleware());
 router.use(apiKeys.prefix('/:institutionId/api-keys').middleware());
 router.use(memberships.prefix('/:institutionId/').middleware()); // Weird prefix cause of contact route
 
-// Global middlewares
-
-router.use(requireJwt, requireUser);
+router.use(requireActiveAuth, requireUser);
 
 // Routes
 

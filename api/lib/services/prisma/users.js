@@ -87,6 +87,7 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
   return tx.user.findMany({
     select: {
       email: true,
+      language: true,
       memberships: {
         select: {
           institution: {

@@ -1,0 +1,5 @@
+{{ t('emails.assignedRole.body.headline', { roleLabel: data.role.label, institutionName: data.institution }) }}
+{{ t('emails.assignedRole.body.p1.text', { contactDocLink: data.contactDocLink }) }}
+
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

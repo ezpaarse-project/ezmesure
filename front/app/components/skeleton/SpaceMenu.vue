@@ -75,7 +75,7 @@
             size="small"
             color="red"
             variant="tonal"
-            @click="logout()"
+            @click="authStore.signOut()"
           />
         </template>
       </v-list-item>
@@ -84,15 +84,10 @@
 </template>
 
 <script setup>
-const { data: user } = useAuth();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { isOpen } = storeToRefs(useDrawerStore());
 const { foreignSpacesPermissions } = storeToRefs(useCurrentUserStore());
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
 
-async function logout() {
-  await navigateTo(
-    { path: '/api/auth/oauth/logout' },
-    { external: true },
-  );
-}
 </script>

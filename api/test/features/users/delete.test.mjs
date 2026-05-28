@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -36,9 +38,9 @@ describe('[users]: Test delete users features', () => {
       });
 
       it(`#01 Should delete [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'DELETE',
-          url: `/users/${userTest.username}`,
+          query: { force: true },
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
@@ -67,9 +69,9 @@ describe('[users]: Test delete users features', () => {
       });
 
       it(`#02 Should not delete [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/users/${userTest.username}`, {
           method: 'DELETE',
-          url: `/users/${userTest.username}`,
+          query: { force: true },
         });
 
         // Test API

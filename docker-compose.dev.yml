@@ -10,19 +10,19 @@ services:
       - "./api:/usr/src/app"
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
       - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
+      - ./rp/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
     working_dir: /usr/src/app
     extra_hosts:
       - "${EZMESURE_DOMAIN}:host-gateway"
     environment:
       - http_proxy
       - https_proxy
-      - no_proxy=localhost,kibana
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - EZMESURE_ELASTIC_HOST=elastic
-      - EZMESURE_ELASTIC_PORT=9200
-      - EZMESURE_KIBANA_HOST=kibana
-      - EZMESURE_KIBANA_PORT=5601
-      - EZMESURE_REDIS_HOST=redis
+      - no_proxy=localhost,kibana,reporting
+      - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
+      - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
+      - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
+      - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
+      - EZMESURE_REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
       - EZMESURE_REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
       - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@postgres:5432/${EZMESURE_POSTGRES_DB:-ezmesure}
       - EZMESURE_HARVEST_CONCURRENCY
@@ -31,6 +31,7 @@ services:
       - EZMESURE_BUSY_BACKOFF_DURATION
       - ELASTICSEARCH_PASSWORD
       - KIBANA_PASSWORD
+      - EZMESURE_USERS_DELETE_DURATION_DAYS
       - EZMESURE_ADMIN_USERNAME
       - EZMESURE_ADMIN_PASSWORD
       - EZMESURE_ADMIN_EMAIL
@@ -58,8 +59,11 @@ services:
       - EZMESURE_ENCRYPTION_SECRET
       - EZMESURE_LOG_LEVEL
       - EZMESURE_PUBLIC_URL
+      - EZMESURE_DEFAULT_LOCALE
       - NODE_ENV
       - NODE_CONFIG
+      - NODE_USE_ENV_PROXY=1
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/ezmesure.pem
     restart: "no"
     command: npm run dev
 

@@ -1,5 +1,5 @@
-Un utilisateur souhaite rejoindre votre établissement
-L'utilisateur {{ user }} souhaite rejoindre votre établissement {{ institution }}, vous pouvez ajouter cet utilisateur depuis la page "Mon établissement"
+{{ t('emails.requestMembership.body.headline') }}
+{{ t('emails.requestMembership.body.p1', { user: user, institution: institution, linkInstitution: linkInstitution }) | striptags }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

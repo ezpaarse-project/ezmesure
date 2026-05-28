@@ -46,7 +46,7 @@ async function upsertReportUserFromInstitutionId(id) {
   if (isUserExist) {
     await elasticUsers.updateUser(user);
   } else {
-    await elasticUsers.createUser(user);
+    await elasticUsers.createUser({ ...user, password: undefined, metadata: undefined });
   }
   return user;
 }
@@ -70,25 +70,16 @@ async function deleteReportUserFromInstitution(institution) {
  * @param {Institution[]} toUpsert institutions to upsert
  */
 async function syncReportUsersFromInstitutions(toUpsert) {
-  let settled = [];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const institutionToUpsert of toUpsert) {
-    const promise = upsertReportUserFromInstitutionId(institutionToUpsert.id);
-    settled = [
-      ...settled,
-      // eslint-disable-next-line no-await-in-loop
-      await promise,
-    ];
-  }
+  const results = await Promise.allSettled(
+    toUpsert.map(({ id }) => upsertReportUserFromInstitutionId(id)),
+  );
 
-  return settled.reduce(
-    (prev, [upsertResult, deleteResult]) => ({
-      upserted: prev.upserted + (upsertResult?.status === 'fulfilled'),
-      deleted: prev.deleted + (deleteResult?.status === 'fulfilled'),
+  return results.reduce(
+    (prev, result) => ({
+      upserted: prev.upserted + (result?.status === 'fulfilled' ? 1 : 0),
     }),
     {
       upserted: 0,
-      deleted: 0,
     },
   );
 }

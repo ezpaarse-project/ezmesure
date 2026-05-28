@@ -106,11 +106,11 @@
 <script setup>
 definePageMeta({
   layout: 'admin',
-  middleware: ['sidebase-auth', 'terms', 'admin'],
+  middleware: ['require-auth', 'require-terms', 'require-admin'],
 });
 
 const { t } = useI18n();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const selectedRoles = ref([]);

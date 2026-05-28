@@ -117,6 +117,19 @@ module.exports.authorizationCodeGrant = async (url, expected) => {
 };
 
 /**
+ * Get access token using refresh token
+ *
+ * @param {string} refreshToken - The refresh token
+ *
+ * @returns {Promise<openid.TokenEndpointResponse & openid.TokenEndpointResponseHelpers>}
+ */
+module.exports.refreshTokenGrant = async (refreshToken) => {
+  const oidc = await getOIDCConfig();
+
+  return openid.refreshTokenGrant(oidc, refreshToken);
+};
+
+/**
  * Get user info using access token
  *
  * @param {string} accessToken - The access token
@@ -135,7 +148,7 @@ module.exports.getUserInfo = async (accessToken, subject) => {
  *
  * @param {openid.UserInfoResponse} userInfo
  *
- * @returns {Omit<import('../../.prisma/client.mjs').User, 'createdAt' | 'updatedAt' | 'lastActivity'>}
+ * @returns {Omit<import('../.prisma/client.mjs').User, 'createdAt' | 'updatedAt' | 'lastActivity'>}
  */
 module.exports.getUserFromInfo = (userInfo) => {
   if (!userInfo.email) {
@@ -157,12 +170,14 @@ module.exports.getUserFromInfo = (userInfo) => {
     fullName: fullName || username,
     email: userInfo.email,
     isAdmin: false,
+    excludeNotifications: [],
     metadata: {
       uid: userInfo.sub,
       idp: userInfo.idp,
       org: userInfo.organisation,
       unit: userInfo.unit,
     },
+    language: config.defaultLocale,
     deletedAt: null,
   };
 };
@@ -181,14 +196,18 @@ module.exports.getTokenInfo = async (accessToken) => {
 };
 
 /**
- * Get info about access token
+ * Build end session URL using OIDC configuration
  *
- * @param {string} accessToken  - The access token
- *
- * @returns {Promise<void>}
+ * @returns {Promise<{ url: URL }>}
  */
-module.exports.revokeUserToken = async (accessToken) => {
+module.exports.buildEndSessionUrl = async () => {
   const oidc = await getOIDCConfig();
 
-  return openid.tokenRevocation(oidc, accessToken);
+  const redirect = new URL('/', redirectURL);
+
+  return {
+    url: openid.buildEndSessionUrl(oidc, {
+      post_logout_redirect_uri: redirect.href,
+    }),
+  };
 };

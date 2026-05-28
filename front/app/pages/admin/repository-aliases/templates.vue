@@ -164,12 +164,12 @@
 <script setup>
 definePageMeta({
   layout: 'admin',
-  middleware: ['sidebase-auth', 'terms', 'admin'],
+  middleware: ['require-auth', 'require-terms', 'require-admin'],
 });
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const activeLoading = ref(new Set());

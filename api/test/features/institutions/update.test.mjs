@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -47,10 +49,9 @@ describe('[institutions]: Test update features', () => {
     });
 
     it(`#01 Should update institution [${institutionTest.name}] to [${updateInstitutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}`,
-        data: updateInstitutionTest,
+        body: updateInstitutionTest,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -59,7 +60,7 @@ describe('[institutions]: Test update features', () => {
       // Test API
       expect(httpAppResponse).toHaveProperty('status', 200);
 
-      const institutionFromResponse = httpAppResponse?.data;
+      const { _data: institutionFromResponse } = httpAppResponse;
       expect(institutionFromResponse).toHaveProperty('id', institutionId);
       expect(institutionFromResponse).toHaveProperty('parentInstitutionId', null);
       expect(institutionFromResponse?.createdAt).not.toBeNull();
@@ -120,10 +121,9 @@ describe('[institutions]: Test update features', () => {
       });
 
       it(`#02 Should update institution [${institutionTest.name}] to [${updateInstitutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}`,
-          data: updateInstitutionTest,
+          body: updateInstitutionTest,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -132,7 +132,7 @@ describe('[institutions]: Test update features', () => {
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const institutionFromResponse = httpAppResponse?.data;
+        const { _data: institutionFromResponse } = httpAppResponse;
         expect(institutionFromResponse).toHaveProperty('id', institutionId);
         expect(institutionFromResponse).toHaveProperty('parentInstitutionId', null);
         expect(institutionFromResponse?.createdAt).not.toBeNull();
@@ -184,10 +184,9 @@ describe('[institutions]: Test update features', () => {
       });
 
       it(`#03 Should not update institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}`,
-          data: updateInstitutionTest,
+          body: updateInstitutionTest,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -233,13 +232,12 @@ describe('[institutions]: Test update features', () => {
     });
 
     it(`#04 Should not update institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}`,
         headers: {
           Authorization: 'Bearer: random',
         },
-        data: updateInstitutionTest,
+        body: updateInstitutionTest,
       });
 
       // Test API
@@ -280,10 +278,9 @@ describe('[institutions]: Test update features', () => {
     });
 
     it(`#05 Should not update institution [${institutionTest.name}]`, async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}`, {
         method: 'PUT',
-        url: `/institutions/${institutionId}`,
-        data: updateInstitutionTest,
+        body: updateInstitutionTest,
       });
 
       // Test API

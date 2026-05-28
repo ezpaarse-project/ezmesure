@@ -79,6 +79,10 @@ module.exports = class RepositoryAliasPermissionsService extends BasePrismaServi
    */
   async delete(params) {
     const permission = await repositoryAliasPermissionsPrisma.remove(params, this.prisma);
+    if (!permission) {
+      return null;
+    }
+
     this.triggerHooks('repository_alias_permission:delete', permission);
     return permission;
   }

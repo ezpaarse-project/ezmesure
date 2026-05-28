@@ -4,7 +4,7 @@ const elastic = require('../../services/elastic');
 const { DEFAULT_SPACE } = kibana;
 
 exports.list = async (ctx) => {
-  const { data: spaces } = await kibana.getSpaces();
+  const spaces = await kibana.getSpaces();
 
   if (!Array.isArray(spaces)) {
     ctx.throw(500, ctx.$t('errors.spaces.failedToQuery'));
@@ -17,9 +17,9 @@ exports.list = async (ctx) => {
 exports.getSpace = async (ctx) => {
   const { spaceId } = ctx.request.params;
 
-  const { data: space, status } = await kibana.getSpace(spaceId);
+  const space = await kibana.getSpace(spaceId);
 
-  if (status === 404) {
+  if (!space) {
     ctx.throw(404, ctx.$t('errors.space.notFound', spaceId));
   }
 
@@ -30,13 +30,13 @@ exports.getSpace = async (ctx) => {
 exports.listIndexPatterns = async (ctx) => {
   const { spaceId } = ctx.request.params;
 
-  const { status } = await kibana.getSpace(spaceId);
+  const spaceExists = !!(await kibana.getSpace(spaceId || DEFAULT_SPACE));
 
-  if (status === 404) {
+  if (!spaceExists) {
     ctx.throw(404, ctx.$t('errors.space.notFound', spaceId));
   }
 
-  const { data } = await kibana.findObjects({
+  const data = await kibana.findObjects({
     spaceId: spaceId === DEFAULT_SPACE ? null : spaceId,
     type: 'index-pattern',
     perPage: 1000,
@@ -55,14 +55,14 @@ exports.createSpace = async (ctx) => {
   const { body = {} } = ctx.request;
   const { id: spaceId } = body;
 
-  const { status } = await kibana.getSpace(spaceId);
+  const spaceExists = !!(await kibana.getSpace(spaceId || DEFAULT_SPACE));
 
-  if (status === 200) {
+  if (spaceExists) {
     ctx.throw(409, ctx.$t('errors.space.alreadyExists', spaceId));
     return;
   }
 
-  const { data: newSpace } = await kibana.createSpace({
+  const newSpace = await kibana.createSpace({
     ...body,
     id: spaceId,
     name: body.name || spaceId,
@@ -76,14 +76,14 @@ exports.updateSpace = async (ctx) => {
   const { spaceId } = ctx.request.params;
   const { body = {} } = ctx.request;
 
-  const { status } = await kibana.getSpace(spaceId);
+  const spaceExists = !!(await kibana.getSpace(spaceId || DEFAULT_SPACE));
 
-  if (status === 404) {
+  if (!spaceExists) {
     ctx.throw(404, ctx.$t('errors.space.notFound', spaceId));
     return;
   }
 
-  const { data: newSpace } = await kibana.updateSpace(body);
+  const newSpace = await kibana.updateSpace(body);
 
   ctx.status = 200;
   ctx.body = newSpace;
@@ -93,14 +93,14 @@ exports.createIndexPattern = async (ctx) => {
   const { spaceId } = ctx.request.params;
   const { body = {} } = ctx.request;
 
-  const { status } = await kibana.getSpace(spaceId);
+  const spaceExists = !!(await kibana.getSpace(spaceId || DEFAULT_SPACE));
 
-  if (status === 404) {
+  if (!spaceExists) {
     ctx.throw(404, ctx.$t('errors.space.notFound', spaceId));
     return;
   }
 
-  const { data } = await kibana.findObjects({
+  const data = await kibana.findObjects({
     spaceId: spaceId === DEFAULT_SPACE ? null : spaceId,
     type: 'index-pattern',
     perPage: 1000,
@@ -128,7 +128,7 @@ exports.createIndexPattern = async (ctx) => {
   }
 
   const space = spaceId === DEFAULT_SPACE ? null : spaceId;
-  const { data: createdIndexPattern } = await kibana.createIndexPattern(space, body);
+  const createdIndexPattern = await kibana.createIndexPattern(space, body);
 
   ctx.status = 201;
   ctx.body = createdIndexPattern;

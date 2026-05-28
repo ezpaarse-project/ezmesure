@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
@@ -53,18 +55,16 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
     });
     describe('Get all sushi-endpoints', () => {
       it('#01 Should get all sushi-endpoints', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/sushi-endpoints', {
           method: 'GET',
-          url: '/sushi-endpoints',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: sushiEndpointTest,
         });
 
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
-        const [sushiEndpoint] = httpAppResponse.data;
+        const [sushiEndpoint] = httpAppResponse._data;
 
         expect(sushiEndpoint?.createdAt).not.toBeNull();
         expect(sushiEndpoint?.updatedAt).not.toBeNull();
@@ -85,13 +85,11 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
     });
     describe('Get sushi-endpoint', () => {
       it('#02 Should not get sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/sushi-endpoints/not-exist', {
           method: 'GET',
-          url: '/sushi-endpoints/not-exist',
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: sushiEndpointTest,
         });
 
         // Test API
@@ -119,18 +117,16 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
 
     describe('Get sushi-endpoints', () => {
       it('#03 Should get sushi-endpoints', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/sushi-endpoints', {
           method: 'GET',
-          url: '/sushi-endpoints',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: sushiEndpointTest,
         });
 
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
-        const [sushiEndpoint] = httpAppResponse.data;
+        const [sushiEndpoint] = httpAppResponse._data;
 
         expect(sushiEndpoint?.createdAt).not.toBeNull();
         expect(sushiEndpoint?.updatedAt).not.toBeNull();
@@ -152,18 +148,16 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
 
     describe('Get sushi-endpoint', () => {
       it('#04 Should get sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'GET',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: sushiEndpointTest,
         });
 
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
-        const sushiEndpoint = httpAppResponse?.data;
+        const { _data: sushiEndpoint } = httpAppResponse;
 
         expect(sushiEndpoint?.createdAt).not.toBeNull();
         expect(sushiEndpoint?.updatedAt).not.toBeNull();
@@ -185,13 +179,11 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
 
     describe('Get sushi-endpoint', () => {
       it('#05 Should not get sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/sushi-endpoints/not-exist', {
           method: 'GET',
-          url: '/sushi-endpoints/not-exist',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: sushiEndpointTest,
         });
 
         // Test API
@@ -214,10 +206,8 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
     });
     describe('Get sushi-endpoints', () => {
       it('#06 Should not get sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw('/sushi-endpoints', {
           method: 'GET',
-          url: '/sushi-endpoints',
-          data: sushiEndpointTest,
         });
 
         // Test API
@@ -226,10 +216,8 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
     });
     describe('Get sushi-endpoint', () => {
       it('#07 Should not get sushi-endpoint', async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/sushi-endpoints/${sushiEndpointId}`, {
           method: 'GET',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          data: sushiEndpointTest,
         });
 
         // Test API

@@ -298,7 +298,7 @@ defineEmits({
 const now = addDays(new Date(), 1);
 
 const { t, locale } = useI18n();
-const { data: currentUser } = useAuthState();
+const { user: currentUser } = storeToRefs(useAuthStore());
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
 const {

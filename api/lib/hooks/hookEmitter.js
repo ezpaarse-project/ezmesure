@@ -97,11 +97,8 @@ const registerHook = (event, handler, opts = {}) => {
   let fnc = (key, payload) => safeHandler(payload);
 
   if (opts.debounce !== false || !opts.queue) {
-    fnc = memoizeDebounce(
-      safeHandler,
-      typeof opts.debounce === 'number' ? opts.debounce : 250,
-      {},
-    );
+    const wait = typeof opts.debounce === 'number' ? opts.debounce : 250;
+    fnc = memoizeDebounce(safeHandler, wait, {});
   }
 
   if (opts.queue) {

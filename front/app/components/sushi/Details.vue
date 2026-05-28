@@ -48,7 +48,7 @@
         <v-table v-if="!!sushiUrls.urls" density="compact">
           <tbody>
             <tr
-              v-for="[version, { url, firstMonthAvailable }] in sushiUrls.urls"
+              v-for="[version, { to, url, firstMonthAvailable }] in sushiUrls.urls"
               :key="version"
             >
               <td>
@@ -78,11 +78,12 @@
               <td style="word-wrap: anywhere;">
                 <div style="overflow-y: auto; width: 100%;">
                   <a
-                    :href="url"
+                    :href="to"
                     target="_blank"
                     rel="noreferrer noopener"
                   >
-                    {{ url }}<v-icon
+                    {{ url }}
+                    <v-icon
                       icon="mdi-open-in-new"
                       color="secondary"
                       size="small"
@@ -127,14 +128,14 @@ const sushiUrls = computedAsync(async () => {
         Object.entries(urls)
           // Sort from most recent to oldest (6 -> 5.2 -> 5.1 -> 5 -> ...)
           .sort((a, b) => (b > a ? 1 : -1))
-          .map(([version, { url: baseURL, firstMonthAvailable }]) => {
-            const url = new URL(baseURL);
+          .map(([version, { url: to, firstMonthAvailable }]) => {
+            const url = new URL(to);
             // Delete standard optional attributes
             url.searchParams.delete('attributes_to_show');
             url.searchParams.delete('include_parent_details');
             url.searchParams.delete('include_component_details');
 
-            return [version, { url, firstMonthAvailable }];
+            return [version, { to, url, firstMonthAvailable }];
           }),
       ),
     };

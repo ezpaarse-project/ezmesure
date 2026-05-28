@@ -1,8 +1,6 @@
-const { auth } = require('config');
-const jwt = require('jsonwebtoken');
-const { isAfter } = require('date-fns');
+const config = require('config');
 
-const openid = require('../utils/openid');
+const { verifyJWT, verifyJWE } = require('../utils/jwt');
 
 const InstitutionsService = require('../entities/institutions.service');
 const SushiEndpointService = require('../entities/sushi-endpoints.service');
@@ -17,11 +15,12 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 
 const { appLogger } = require('./logger');
 
+const { cookie: cookieName } = config.get('auth');
+
 /**
  * @typedef {KoaContext} KoaContext
  * @typedef {KoaNext} KoaNext
- * @typedef {import('openid-client').IntrospectionResponse} IntrospectionResponse
- * @typedef {import('jsonwebtoken').JwtPayload} JwtPayload
+ * @typedef {import('jose').JWTPayload} JWTPayload
  * @typedef {import('../.prisma/client.mjs').ApiKey} ApiKey
  * @typedef {import('../.prisma/client.mjs').User} User
  * @typedef {import('../.prisma/client.mjs').Institution} Institution
@@ -31,67 +30,50 @@ const { appLogger } = require('./logger');
  * Get auth data of cookie using OpenID provider
  *
  * @param {string} cookie - The cookie found in request
+ * @param {boolean} [requireExpiration] - Should check expiration of JWT
  *
- * @returns {Promise<{ type: 'oauth', token: string, data: IntrospectionResponse }>}
+ * @returns {Promise<{ type: 'oauth', token: string, data: JWTPayload }>}
  */
-async function getAuthDataFromCookie(cookie) {
-  let data;
-
-  try {
-    data = await openid.getTokenInfo(cookie);
-  } catch {
-    throw new Error("Can't get token");
-  }
-
-  if (!data.active) {
-    throw new Error('Token is revoked');
-  }
-
-  return {
-    type: 'oauth',
-    token: cookie,
-    data,
-  };
-}
+const getAuthDataFromCookie = async (cookie, requireExpiration = false) => ({
+  type: 'oauth',
+  token: cookie,
+  data: await verifyJWE(cookie, { requireExpiration }),
+});
 
 /**
  * Get auth data of header using JWT methods
  *
  * @param {string} header - The header found in request
  *
- * @returns {Promise<{ type: 'old_jwt', token: string, data: JwtPayload }>}
+ * @returns {Promise<{ type: 'old_jwt', token: string, data: JWTPayload }>}
  */
-function getAuthDataFromAuthHeader(header) {
+async function getAuthDataFromAuthHeader(header) {
   const matches = /Bearer (?<token>.+)/i.exec(header);
   const { token } = matches.groups ?? {};
   if (!token) {
     throw new Error("Can't get token");
   }
 
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, auth.secret, {}, (err, data) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      resolve({
-        type: 'old_jwt',
-        token,
-        data,
-      });
-    });
-  });
+  return {
+    type: 'old_jwt',
+    token,
+    data: await verifyJWT(token, {
+      requireIssuer: false,
+      requireAudience: false,
+      requireExpiration: false,
+    }),
+  };
 }
 
 /**
  * Get auth data of header using API Key
  *
  * @param {string} header - The header found in request
+ * @param {boolean} [requireExpiration] - Should check expiration of API Key
  *
  * @returns {Promise<{ type: 'api_key', token: string, data: ApiKey }>}
  */
-async function getAuthDataFromApiHeader(header) {
+async function getAuthDataFromApiHeader(header, requireExpiration = false) {
   const hash = ApiKeysService.getHashValue(header);
 
   const service = new ApiKeysService();
@@ -105,7 +87,7 @@ async function getAuthDataFromApiHeader(header) {
     throw new Error('API key is revoked');
   }
 
-  if (data.expiresAt && isAfter(new Date(), data.expiresAt)) {
+  if (requireExpiration && data.expiresAt && data.expiresAt.getTime() >= Date.now()) {
     throw new Error('API key is expired');
   }
 
@@ -117,61 +99,58 @@ async function getAuthDataFromApiHeader(header) {
 }
 
 /**
- * Check if request have a valid auth
+ * Create a middleware to check for auth validation
  *
- * @param {KoaContext} ctx - Koa context
- * @param {KoaNext} next - Next handler
+ * @param {object} [options]
+ * @param {boolean} [options.checkExpiration] - Should check expiration (default: `false`)
+ * @param {('cookie' | 'bearer' | 'api_key')[]} [options.methods] - Allowed methods (default: all)
  */
-const requireAuth = async (ctx, next) => {
-  let authData = {};
+function createRequireAuth(options = {}) {
+  const methods = new Set(options.methods ?? ['cookie', 'bearer', 'api_key']);
 
-  try {
-    // Check if a OAuth token is present
-    const cookie = ctx.cookies.get(auth.cookie);
-    if (cookie) {
-      authData = await getAuthDataFromCookie(cookie);
+  /**
+   * Check if request have a valid auth, and decode it's cotent
+   *
+   * @param {import('koa').Context} ctx - Koa context
+   * @param {import('koa').Next} next - Next handler
+   */
+  return async (ctx, next) => {
+    let authData = {};
+
+    try {
+      if (methods.has('cookie')) {
+        const cookie = ctx.cookies.get(cookieName);
+        if (cookie) {
+          authData = await getAuthDataFromCookie(cookie, options.checkExpiration);
+        }
+      }
+
+      if (methods.has('bearer')) {
+        const authHeader = ctx.get('authorization');
+        if (authHeader) {
+          authData = await getAuthDataFromAuthHeader(authHeader);
+        }
+      }
+
+      if (methods.has('api_key')) {
+        const apikeyHeader = ctx.get('x-api-key');
+        if (apikeyHeader) {
+          authData = await getAuthDataFromApiHeader(apikeyHeader, options.checkExpiration);
+        }
+      }
+    } catch {
+      ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+      return;
     }
 
-    // Check if a deprecated JWT token is present
-    const authHeader = ctx.get('authorization');
-    if (authHeader) {
-      authData = await getAuthDataFromAuthHeader(authHeader);
+    if (!authData.token || !authData.data) {
+      ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+      return;
     }
 
-    // Check if an API Key is present
-    const apikeyHeader = ctx.get('x-api-key');
-    if (apikeyHeader) {
-      authData = await getAuthDataFromApiHeader(apikeyHeader);
-    }
-  } catch (err) {
-    appLogger.warn(`[auth] Couldn't get auth data: ${err}`);
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
-    return;
-  }
-
-  if (!authData.token || !authData.data) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
-    return;
-  }
-
-  ctx.state.authData = authData;
-  await next();
-};
-
-/**
- * Get username from OAuth (using OpenID provider)
- *
- * @param {string} token - The token found in request
- * @param {IntrospectionResponse} data - The data of the token
- *
- * @returns {Promise<string>} - The username found in data
- */
-async function getUsernameFromOAuth(token, data) {
-  const userProps = openid.getUserFromInfo(
-    await openid.getUserInfo(token, data.sub),
-  );
-
-  return userProps.username;
+    ctx.state.authData = authData;
+    await next();
+  };
 }
 
 /**
@@ -182,7 +161,7 @@ async function getUsernameFromOAuth(token, data) {
  *
  * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
  */
-function getUsernameFromOldJWT(token, data) {
+function getUsernameFromJWT(token, data) {
   return Promise.resolve(data.username);
 }
 
@@ -196,7 +175,7 @@ function getUsernameFromOldJWT(token, data) {
  */
 function getUsernameFromApiKey(token, data) {
   if (data.institutionId) {
-    return Promise.reject(Error('API key is scoped to an institution'));
+    return Promise.reject(new Error('API key is scoped to an institution'));
   }
 
   if (!data.username) {
@@ -221,10 +200,8 @@ async function getUserFromAuthData({ type, token, data }) {
   let username = '';
   switch (type) {
     case 'oauth':
-      username = await getUsernameFromOAuth(token, data);
-      break;
     case 'old_jwt':
-      username = await getUsernameFromOldJWT(token, data);
+      username = await getUsernameFromJWT(token, data);
       break;
     case 'api_key':
       username = await getUsernameFromApiKey(token, data);
@@ -248,7 +225,7 @@ async function getUserFromAuthData({ type, token, data }) {
  */
 function getInstitutionIdFromApiKey(token, data) {
   if (!data.institutionId) {
-    return Promise.reject(Error('API key is scoped to an institution'));
+    return Promise.reject(new Error('API key is scoped to an institution'));
   }
   return Promise.resolve(data.institutionId);
 }
@@ -282,7 +259,7 @@ async function getInstitutionFromAuthData({ type, token, data }) {
 /**
  * Check if request have a valid user
  *
- * Needs `requireAuth`
+ * Needs `requireActiveAuth`
  *
  * @param {KoaContext} ctx - Koa context
  * @param {KoaNext} next - Next handler
@@ -425,23 +402,6 @@ const requireAdmin = (ctx, next) => {
 
   return next();
 };
-
-/**
- * Forbids API keys from accessing that ressource
- *
- *  Needs `requireAuth`
- *
- * @param {KoaContext} ctx - Koa context
- * @param {KoaNext} next - Next handler
- */
-const forbidAPIKeys = (ctx, next) => {
-  if (!ctx.state?.authData || ctx.state.authData?.type === 'api_key') {
-    ctx.throw(403, ctx.$t('errors.perms.feature'));
-  }
-
-  return next();
-};
-
 /**
  * Middleware that fetches an item from a model and put it in ctx.state
  * Looks for {modelName}Id in the route params by default
@@ -579,17 +539,22 @@ function requireValidatedInstitution(opts = {}) {
 }
 
 module.exports = {
-  requireAuth,
-  /** @deprecated use `requireAuth` (currently an alias) */
-  requireJwt: requireAuth,
-  requireUser,
+  requireAuth: createRequireAuth(),
+  requireActiveAuth: createRequireAuth({ checkExpiration: true }),
+  requireJWT: createRequireAuth({ methods: ['cookie', 'bearer'] }),
+  requireActiveJWT: createRequireAuth({ methods: ['cookie', 'bearer'], checkExpiration: true }),
+  requireApiKey: createRequireAuth({ methods: ['api_key'] }),
+  requireActiveApiKey: createRequireAuth({ methods: ['api_key'], checkExpiration: true }),
+
   requireUserOrInstitution,
+  requireUser,
   requireAdmin,
   requireTermsOfUse,
+
   requireAnyRole,
   requireMemberPermissions,
   requireValidatedInstitution,
-  forbidAPIKeys,
+
   fetchModel,
   fetchInstitution: (opts = {}) => fetchModel('institution', { state: 'institution', ...opts }),
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),

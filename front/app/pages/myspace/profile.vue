@@ -7,19 +7,6 @@
         <v-col>
           <v-card :title="$t('myspace.title')">
             <template #append>
-              <v-btn
-                v-if="oidcProfileUri"
-                :text="$t('myspace.iamAccount')"
-                :href="oidcProfileUri"
-                target="_blank"
-                rel="noopener noreferrer"
-                prepend-icon="mdi-key"
-                append-icon="mdi-open-in-new"
-                color="primary"
-                variant="tonal"
-                class="mr-2"
-              />
-
               <ConfirmPopover
                 :agree="() => deleteAccount()"
                 :text="$t('myspace.profile.actions.delete.confirm.text', { duration: deleteDuration })"
@@ -55,6 +42,19 @@
                   lines="two"
                 />
               </v-list>
+
+              <v-btn
+                v-if="oidcProfileUri"
+                :text="$t('myspace.profile.actions.goToAccount.title')"
+                :href="oidcProfileUri"
+                target="_blank"
+                rel="noopener noreferrer"
+                prepend-icon="mdi-key"
+                append-icon="mdi-open-in-new"
+                color="primary"
+                variant="tonal"
+                class="mr-2"
+              />
             </template>
           </v-card>
         </v-col>
@@ -341,16 +341,18 @@ import { getErrorMessage } from '@/lib/errors';
 
 definePageMeta({
   layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
+  middleware: ['require-auth', 'require-terms'],
 });
 
 const { oidcProfileUri } = useRuntimeConfig().public;
 const { data: apiConfig } = await useApiConfig();
-const { data: user, signOut } = useAuth();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { t, locale } = useI18n();
 
 const selectedKeys = ref([]);
 const apiKeyActiveLoadingMap = ref(new Map());
+const showToken = shallowRef(false);
 
 const apiKeyFormDialogRef = useTemplateRef('apiKeyFormDialogRef');
 
@@ -402,11 +404,11 @@ const refreshProfileURL = computed(() => {
 
 const fields = computed(
   () => [
-    { name: 'name', value: user.value.fullName, icon: 'mdi-account' },
-    { name: 'mail', value: user.value.email, icon: 'mdi-email' },
-    { name: 'idp', value: user.value.metadata?.idp, icon: 'mdi-web' },
-    { name: 'organization', value: user.value.metadata?.org, icon: 'mdi-domain' },
-    { name: 'unit', value: user.value.metadata?.unit, icon: 'mdi-account-group' },
+    { name: 'name', value: user.value?.fullName, icon: 'mdi-account' },
+    { name: 'mail', value: user.value?.email, icon: 'mdi-email' },
+    { name: 'idp', value: user.value?.metadata?.idp, icon: 'mdi-web' },
+    { name: 'organization', value: user.value?.metadata?.org, icon: 'mdi-domain' },
+    { name: 'unit', value: user.value?.metadata?.unit, icon: 'mdi-account-group' },
   ].filter((f) => f.value),
 );
 
@@ -578,15 +580,12 @@ async function copyKeyId({ id }) {
 }
 
 async function deleteAccount() {
-  await $fetch('/api/profile', {
+  await $fetch('/api/auth', {
     method: 'DELETE',
   });
 
-  if (!config.shibbolethDisabled) {
-    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
-    return;
-  }
-
-  await signOut({ callbackUrl: '/' });
+  await authStore.signOut({ local: true });
+  await navigateTo('/');
 }
+
 </script>

@@ -8,10 +8,9 @@ const {
 } = require('../../../entities/api-key.dto');
 
 const {
-  requireAuth,
+  requireActiveJWT,
   requireUser,
   requireTermsOfUse,
-  forbidAPIKeys,
 } = require('../../../services/auth');
 
 const {
@@ -26,7 +25,7 @@ const {
 
 // Global middlewares
 
-router.use(requireAuth, requireUser, requireTermsOfUse, forbidAPIKeys);
+router.use(requireActiveJWT, requireUser, requireTermsOfUse);
 
 // Routes
 

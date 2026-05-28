@@ -2,7 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireJwt, requireUser } = require('../../services/auth');
+const { requireActiveAuth, requireUser, requireAuthuireUser } = require('../../services/auth');
 
 const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
 
@@ -16,6 +16,9 @@ const {
   getCurrentUserElasticRoles,
   deleteCurrentUser,
   changeExcludeNotifications,
+  changeLanguage,
+  joinInstitution,
+  leaveInstitution,
 } = require('./actions');
 
 // Sub routes
@@ -30,7 +33,7 @@ router.use(apiKeys.prefix('/api-keys').middleware());
 
 // Global middlewares
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveAuth, requireUser);
 
 // Routes
 
@@ -78,6 +81,18 @@ router.route({
 });
 
 router.route({
+  method: 'PUT',
+  path: '/memberships/:institutionId',
+  handler: joinInstitution,
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/memberships/:institutionId',
+  handler: leaveInstitution,
+});
+
+router.route({
   method: 'GET',
   path: '/elastic-roles',
   handler: getCurrentUserElasticRoles,
@@ -98,6 +113,34 @@ router.route({
     body: Joi.array().items(
       Joi.string().valid(...NOTIFICATION_KEYS),
     ),
+  },
+});
+router.route({
+  method: 'PUT',
+  path: '/excludeNotifications',
+  handler: [
+    bodyParser(),
+    changeExcludeNotifications,
+  ],
+  validate: {
+    type: 'json',
+    body: Joi.array().items(
+      Joi.string().valid(...NOTIFICATION_KEYS),
+    ),
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/language',
+  handler: [
+    changeLanguage,
+  ],
+  validate: {
+    type: 'json',
+    body: {
+      value: Joi.string().required().valid('en', 'fr'),
+    },
   },
 });
 

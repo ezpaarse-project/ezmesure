@@ -41,12 +41,22 @@ module.exports = {
     apiKey: '00000000-0000-0000-0000-000000000000',
   },
   logs: {
+    sse: {
+      maxPoolSize: 20,
+      heartbeatInterval: 10000,
+    },
     app: {
       Console: {
         format: format.combine(
           format.colorize(),
           format.timestamp(),
           format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`),
+        ),
+      },
+      Buffered: {
+        size: 500,
+        format: format.combine(
+          format.timestamp(),
         ),
       },
     },
@@ -78,14 +88,14 @@ module.exports = {
         introspection: '',
         userinfo: '',
       },
-      scopes: ['openid', 'profile', 'email', 'groups'],
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
     },
   },
   admin: {
     username: 'ezmesure-admin',
     fullName: 'ezMESURE Administrator',
     password: 'changeme',
-    email: 'ezmesure-admin@admin.com',
+    email: 'admin@example.com',
   },
   storage: {
     path: path.resolve(__dirname, '../storage'),
@@ -139,6 +149,7 @@ module.exports = {
       schedule: '0 0 0 * * *',
     },
     deleteDurationDays: 7,
+    impersonateDuration: 3 * 60 * oneMinute,
   },
   testUsers: {
     lifespan: {
@@ -166,7 +177,7 @@ module.exports = {
   cypher: {
     secret: 'some-secret',
   },
+  defaultLocale: 'en',
   appName: 'ezMESURE',
-  passwordResetValidity: 3,
   publicUrl: 'https://ezmesure.couperin.org',
 };

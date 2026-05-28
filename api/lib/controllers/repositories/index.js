@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const {
-  requireJwt,
+  requireActiveAuth,
   requireUser,
   fetchRepository,
   requireAdmin,
@@ -25,7 +25,7 @@ const {
   adminUpdateSchema,
 } = require('../../entities/repositories.dto');
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveAuth, requireUser);
 
 router.route({
   method: 'GET',

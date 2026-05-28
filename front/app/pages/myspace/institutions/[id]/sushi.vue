@@ -254,7 +254,7 @@ import ArchivedTable from '@/components/sushi/credentials/ArchivedTable.vue';
 
 definePageMeta({
   layout: 'space',
-  middleware: ['sidebase-auth', 'terms'],
+  middleware: ['require-auth', 'require-terms'],
   alias: ['/admin/institutions/:id/sushi'],
 });
 
@@ -265,9 +265,9 @@ const TABS_COMPONENTS = {
 
 const { params } = useRoute();
 const { t } = useI18n();
-const { data: user } = useAuthState();
+const { user } = storeToRefs(useAuthStore());
 const { hasPermission } = useCurrentUserStore();
-const { openConfirm } = useDialogStore();
+const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
 
 const tabsData = ref(new Map());

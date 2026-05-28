@@ -25,7 +25,7 @@ const isOpen = shallowRef(false);
 /** @type {Ref<object | undefined>} */
 const sushi = ref(undefined);
 /** @type {Ref<string | undefined>} */
-const period = ref(undefined);
+const period = shallowRef(undefined);
 
 async function open(s, opts) {
   sushi.value = s;

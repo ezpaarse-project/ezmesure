@@ -1,24 +1,24 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Contact {{ appName }}</mj-title>
+<mj-title>{{ t('emails.contact.title', { appName: appName }) }}</mj-title>
 {% endblock %}
 
 {% block content %}
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Contact {{ appName }}.</mj-text>
+    <mj-text mj-class="headline">{{ t('emails.contact.body.headline', { appName: appName }) }}</mj-text>
   </mj-column>
 </mj-section>
 
 <mj-section>
   <mj-column>
     <mj-text>
-      <div><strong>Email :</strong> {{ body.email }}</div>
-      <div><strong>Objet :</strong> {{ body.subject }}</div>
-      {% if body.browser %}<div><strong>Navigateur : </strong>{{ body.browser }}</div>{% endif %}
-      <p><strong>Message :</strong></p>
+      <div><strong>{{ t('emails.contact.body.email') }}</strong> {{ body.email }}</div>
+      <div><strong>{{ t('emails.contact.body.subject') }}</strong> {{ body.subject }}</div>
+      {% if body.browser %}<div><strong>{{ t('emails.contact.body.browser') }}</strong>{{ body.browser }}</div>{% endif %}
+      <p><strong>{{ t('emails.contact.body.message') }}</strong></p>
       <p>{{ body.message | escape | nl2br }}</p>
     </mj-text>
   </mj-column>

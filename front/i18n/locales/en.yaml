@@ -65,7 +65,6 @@ myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
   determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE contact in your institution, or use the menu to your left to {join}.
-  iamAccount: Go to profile settings
   ezmesureTeam: ezMESURE team
   name: Name
   mail: Mail
@@ -80,13 +79,15 @@ myspace:
   roles: "My roles:"
   profile:
     actions:
+      goToAccount:
+        title: Go to profile settings
       delete:
         title: Delete account
         confirm:
           text: Your account and all related data will be deleted in {duration}. Any attempt to log in will cancel this deletion. Do you wish to continue?
   settings:
     notifications:
-      title: My notifications
+      title: My mail notifications
       description:
         text: Select which notifications you want to receive. These notifications will be sent to you by email to the address linked to your account. You can check this address in your "{credentialsLink}" area.
         parts:
@@ -171,14 +172,6 @@ files:
     text: Deposit here the consultation event files that you want to load in ezMESURE. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.
     not: not
     bestPracticeLink: best practice rules
-kibana:
-  title: Kibana identifiers
-  passwordLost: Password forgotten
-  username: Username
-  newPasswordSentByEmail: An email has been sent to you to reset your password.
-  whatDoesUsername:
-    text: This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, fille the form below or go to your {accountLink}.
-    accountLink: Kibana account
 token:
   title: Authentication token [Deprecated]
   deprecated: This method of authentication is deprecated and will be removed in a future version of ezMESURE, please use API keys.
@@ -373,8 +366,15 @@ institutions:
   sendMailToJoin: An email has been sent to the institution's contacts
   askToJoinAnInstitution: Join an institution
   searchForInstitution: Look for your institution
+  join: Join
+  joinSuccess: You have joined the institution
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the contacts of this institution to let them know.
+  joinInstitutionOpen: This institution is open to self registration, your membership will take effect immediately.
+  leave: Leave
+  leaveSuccess: You have left the institution
+  leaveInstitution: Leave this institution
+  leaveInstitutionConfirm: You are about to leave {institution}. You will no longer have access to the data of this institution.
   createMailContactList: Copy the emails of the contacts
   modify: Modify my institution
   reports:
@@ -432,7 +432,10 @@ institutions:
     hidePartner: Do not show as partner
     onboarding:
       title: '"Onboarding" institution'
-      description: This institution will be added to any new user of ezMESURE, and will be removed once this user will join any other institution.
+      description: Any new user of ezMESURE will be added to this institution.
+    openAccess:
+      title: Open access
+      description: Users can freely join the institution.
     failedToUpdateValidation: Failed to update validation
     attachedDomains: Attached domains
     noAttachedDomains: There's no domain attached to this institution yet.
@@ -867,42 +870,24 @@ authenticate:
   logInWithProvider: Log in via your identity provider.
   loginFailed: The information transmitted did not allow you to authenticate
   failed: An error occurred
-  impersonate: Impersonate
   loadingDesc: You will be redirected to the authentication page in a few moments !
   longLoadingDesc: If you keep seeing this page after a few moments, please check your internet connection, or click on the button below
   longLoadingBtn: Access the login page
-impersonate:
-  ezmesureDesc: Take the identity of the user in the ezMESURE interface.
-  kibanaDesc: Create test users in Kibana.
-  createTestUser: Create a test user
-  connectedToKibana: Connected to Kibana
-testUsers:
-  description: The Kibana accounts created here are based on the current user. They are temporary and allow you to check the proper functioning of the account in Kibana. Please note that passwords are no longer accessible once this window is closed.
-  expires: 'Expires on {date}'
-  copyUsername: Copy the username
-  copyPassword: Copy the password
-  loginToKibana: Log in to Kibana
-password:
-  forgot: Forgot your password ?
-  reset: Reset password
-  save: Save password
-  user: User
-  password: Password
-  actualPassword: Actual Kibana password
-  newPassword: New Kibana password
-  repeatNewPassword: Repeat new Kibana password
-  repeatPassword: Repeat password
-  passwordIsRequired: Password required
-  backToLogin: Back to login
-  enterUser: Please enter your username so we can send you an email to reset your password.
-  checkYourEmail: Check your email for a link to reset your password.
-  waitFewMinutes: If it doesn’t appear within a few minutes, check your spam folder
-  notEqual: Passwords don't match
-  updated: Password updated
-  youCanNowLogin: You can now log in with your new credentials.
-  pattern: Minimum 6 characters
-  length: The password must be at least 6 characters long
-  update: Update your password
+  expired:
+    confirm:
+      title: Your session expired
+      text: This can happen after a long time of inactivity. Do you want to log in again ?
+      actions:
+        agree: Log in
+        disagree: Go to home
+  impersonate:
+    title: Impersonate
+    text:
+      intro: Impersonate a user's identity to access ezMESURE using their specific rights.
+      session: The borrowing session will last {duration}, after that duration you will be logged out.
+      defaultDuration: a limited time
+    actions:
+      agree: Impersonate
 contact:
   title: Contact us
   fields:
@@ -1017,17 +1002,30 @@ users:
     disable:
       title: Disable
       confirm:
-        text: The accounts and their related data will be deleted in {duration}. Any attempt to log in from one of the users will cancel his deletion. Do you want to continue ?
+        text: >
+          The account and all related data will be deleted in {duration}. Any attempt to log in from the user will cancel his deletion. Do you want to continue ?
+          |The accounts and their related data will be deleted in {duration}. Any attempt to log in from one of the users will cancel his deletion. Do you want to continue ?
         agree: Disable
       error: An error occured while disabling user {id}
       success: 1 user has been disabled|{n} users has been disabled
     restore:
       title: Restore
       confirm:
-        text: Restoring users will cancel their deletion. Do you want to continue ?
+        text: >
+          Restoring the user will cancel his deletion. Do you want to continue ?
+          |Restoring users will cancel their deletion. Do you want to continue ?
         agree: Restore
       error: An error occured while restoring user {id}
       success: 1 user has been restored|{n} users has been restored
+    delete:
+      title: Delete
+      confirm:
+        text: >
+          You are about to delete the user. The associated indices, spaces and roles will not be affected. Do you want to continue ?
+          |You are about to delete {number} users. The associated indices, spaces and roles will not be affected. Do you want to continue ?
+        agree: Delete
+      error: An error occured while deleting user {id}
+      success: 1 user has been deleted|{n} users has been deleted
 report:
   title: My reports
   health: Health status
@@ -1211,6 +1209,20 @@ harvest:
         prepared: Not yet started
         starting: Starting in progress
         stopped: Stopped
+      errors:
+        title: An error occurred
+        types:
+          noTarget: An involved institution doesn't have any "COUNTER" repository.
+          invalidDate: One of the dates in the requested period is invalid.
+          invalidPeriod: The requested period is invalid.
+        causes:
+          beginDate: 'Begin date: {n}'
+          endDate: 'End date: {n}'
+          institution: Go to institution page
+        api:
+          title: Message from API
+        actions:
+          restart: After fixing the problem (you can edit the session), please restart the session.
     form:
       title:add: Create an harvest session
       title:update: Update an harvest session
@@ -1404,6 +1416,11 @@ images:
   dropImageHere: Drop your image here
   invalidImageFile: "Invalid image file. Accepted file types: {accept}"
   imageTooLarge: "Image is too large. Maximum allowed size: {size}"
+admin:
+  logs:
+    title: Application logs
+    connecting: Connecting...
+    connectionError: Connection error
 anErrorOccurred: An error occurred
 url: URL
 type: Type
@@ -1413,6 +1430,7 @@ idCopied: ID copied in the clipboard
 emailsCopied: Emails copied in the clipboard
 advancedSettings: Advanced settings
 actions: Actions
+moreActions: More actions
 name: Name
 value: Value
 status: Status

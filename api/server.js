@@ -53,11 +53,7 @@ app.use(cors({
   headers: ['Content-Type', 'Authorization'],
 }));
 
-i18n(app, {
-  dir: path.resolve(__dirname, 'locales'),
-  defaultLocale: 'en',
-  cookieName: 'ezmesure_i18n',
-});
+i18n.init(app, { cookieName: 'ezmesure_i18n' });
 
 // Server logs
 app.use(async (ctx, next) => {
@@ -147,6 +143,9 @@ app.on('error', (err, ctx = {}) => {
 app.use(mount('/', controller));
 
 function start() {
+  metrics.ensureIndex()
+    .catch((err) => appLogger.error(`Couldn't ensure index for metrics: ${err}`));
+
   notifications.startBroadcastCron();
   opendata.startRefreshCron();
   ezreeportSync.startSyncCron();

@@ -64,7 +64,11 @@ async function sendEndMail(session) {
           },
         },
         include: {
-          endpoint: true,
+          endpoint: {
+            select: {
+              vendor: true,
+            },
+          },
         },
       },
       // Get spaces of institutions
@@ -79,10 +83,15 @@ async function sendEndMail(session) {
 
   const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.newCounterDataAvailable);
 
-  try {
-    await Promise.all(
-      institutions.map(async (institution) => {
-        const contacts = new Set(institution.memberships.map((m) => m.user.email));
+  await Promise.all(
+    institutions.map(async (institution) => {
+      try {
+        const contacts = institution.memberships.map((m) => m.user);
+        const contactEmails = new Set(contacts.map((user) => user.email));
+
+        const adminEmails = admins
+          .filter(({ email }) => !contactEmails.has(email))
+          .map(({ email }) => email);
 
         // TODO: what if multiple spaces
         const spaceID = institution.spaces.at(0)?.id;
@@ -92,41 +101,61 @@ async function sendEndMail(session) {
           periodStart: session.beginDate,
           periodEnd: session.endDate,
           institution: institution.name,
-          credentials: institution.sushiCredentials
-            .map((c) => {
-              let status;
-              if (isConnection(c.connection)) {
-                status = c.connection.status;
-              }
-
-              return ({
-                endpoint: c.endpoint.vendor,
-                packages: c.packages.sort().join(', '),
-                expired: status === 'unauthorized',
-                createdAt: c.createdAt,
-              });
-            })
-            .sort(
-              (a, b) => a.endpoint.localeCompare(b.endpoint)
-                || a.packages.localeCompare(b.packages)
-                || (isAfter(a.createdAt, b.createdAt) ? 1 : -1),
-            ),
           credentialsURL: new URL(`myspace/institutions/${institution.id}/sushi`, publicUrl).href,
           spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
+          endpoints:
+            // Group credentials per endpoint (and keep only list of credentials per endpoint)
+            Object.values(
+              Object.groupBy(institution.sushiCredentials, (credentials) => credentials.endpointId),
+            )
+              // Remove null or undefined values
+              .filter(Boolean)
+              .map(
+                (list) => list?.map(
+                  // Map credentials data to reduce payload size
+                  (creds) => {
+                    let status;
+                    if (isConnection(creds.connection)) {
+                      status = creds.connection.status;
+                    }
+
+                    return ({
+                      endpoint: creds.endpoint.vendor,
+                      package: creds.packages.sort().join(', '),
+                      expired: status === 'unauthorized',
+                      createdAt: creds.createdAt,
+                    });
+                  },
+                )
+                  // Sort credentials per package (or creation date)
+                  .sort(
+                    (a, b) => a.package.localeCompare(b.package)
+                      || (isAfter(a.createdAt, b.createdAt) ? 1 : -1),
+                  ),
+                // Sort the whole list per endpoint name
+              ).sort((a, b) => a?.[0].endpoint.localeCompare(b?.[0].endpoint ?? '') ?? 0),
         };
 
-        await sendMail({
-          to: Array.from(contacts),
-          bcc: admins.filter((email) => !contacts.has(email)),
-          subject: `Des nouvelles données COUNTER pour "${institution.name}" ont été moissonnées !`,
-          ...generateMail('harvest-end', data),
-        });
-        appLogger.verbose(`[harvest-session][hooks] Mail sent to ${contacts.join(', ')} for ${institution.name}`);
-      }),
-    );
-  } catch (error) {
-    appLogger.error(`[harvest-session][hooks] Error while sending mail: ${error}`);
-  }
+        await Promise.all(
+          Array.from(contacts).map(async (contact) => {
+            try {
+              await sendMail({
+                to: contact.email,
+                bcc: adminEmails,
+                ...generateMail('harvest-end', data, { locale: contact.language }),
+              });
+
+              appLogger.verbose(`[harvest-session][hooks] Mail sent to ${contact.email} for ${institution.name}`);
+            } catch (e) {
+              appLogger.error(`[harvest-session][hooks] Failed to send mail to ${contact.email} for ${institution.name}`);
+            }
+          }),
+        );
+      } catch (error) {
+        appLogger.error(`[harvest-session][hooks] Error while sending mail for ${institution.name}: ${error}`);
+      }
+    }),
+  );
 }
 
 /* eslint-disable max-len */
@@ -141,7 +170,11 @@ async function sendEndMail(session) {
 const onHarvestSessionStart = async (session) => {
   try {
     await prisma.harvestSession.update({
-      where: { id: session.id },
+      where: {
+        id: session.id,
+        // Preventing from marking session multiple times
+        status: 'starting',
+      },
       data: {
         status: 'running',
         startedAt: new Date(),
@@ -158,7 +191,11 @@ const onHarvestSessionStart = async (session) => {
 const onHarvestSessionStop = async (session) => {
   try {
     await prisma.harvestSession.update({
-      where: { id: session.id },
+      where: {
+        id: session.id,
+        // Preventing from marking session multiple times
+        status: 'stopping',
+      },
       data: { status: 'stopped' },
     });
   } catch (err) {
@@ -172,11 +209,16 @@ const onHarvestSessionStop = async (session) => {
 const onHarvestSessionEnd = async (session) => {
   try {
     await prisma.harvestSession.update({
-      where: { id: session.id },
+      where: {
+        id: session.id,
+        // Preventing from marking session multiple times
+        status: 'running',
+      },
       data: { status: 'finished' },
     });
   } catch (err) {
     appLogger.error(`[harvest-session][hooks] Error while updating status: ${err}`);
+    return;
   }
 
   if (session.sendEndMail) {
@@ -186,5 +228,5 @@ const onHarvestSessionEnd = async (session) => {
 
 registerHook('harvest-session:start', onHarvestSessionStart);
 registerHook('harvest-session:stop', onHarvestSessionStop);
-// Using debounce here to avoid triggering session end multiple times
-registerHook('harvest-session:end', onHarvestSessionEnd, { debounce: true });
+// Using long debounce here to avoid triggering session end multiple times
+registerHook('harvest-session:end', onHarvestSessionEnd, { debounce: 5000 });

@@ -1,5 +1,5 @@
 // @ts-check
-const ezrAxios = require('./axios');
+const $fetch = require('./http');
 
 /** @typedef {import('../../.prisma/client.mjs').User} User */
 
@@ -10,8 +10,8 @@ const ezrAxios = require('./axios');
  * @returns The token
  */
 async function getUserToken(username) {
-  const { data } = await ezrAxios.get(`/admin/users/${username}`);
-  return data?.content?.token;
+  const { content } = await $fetch(`/admin/users/${username}`);
+  return content?.token;
 }
 
 /**
@@ -24,9 +24,12 @@ async function upsertUserFromUser(user) {
   const body = {
     isAdmin: user.isAdmin,
   };
-  const { data } = await ezrAxios.put(`/admin/users/${user.username}`, body);
+  const { content } = await $fetch(`/admin/users/${user.username}`, {
+    method: 'PUT',
+    body,
+  });
 
-  return data?.content;
+  return content;
 }
 
 /**
@@ -35,7 +38,9 @@ async function upsertUserFromUser(user) {
  * @param {User} user
  */
 async function deleteUserFromUser(user) {
-  await ezrAxios.delete(`/admin/users/${user.username}`);
+  await $fetch(`/admin/users/${user.username}`, {
+    method: 'DELETE',
+  });
 }
 
 module.exports = {

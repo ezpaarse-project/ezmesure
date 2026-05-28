@@ -1,10 +1,15 @@
-import { defineNuxtRouteMiddleware, useAuthState, navigateTo } from '#imports';
+import {
+  defineNuxtRouteMiddleware,
+  useAuthStore,
+  storeToRefs,
+  navigateTo,
+} from '#imports';
 
 /**
  * Checks if the user is an admin
  */
 export default defineNuxtRouteMiddleware(() => {
-  const { data: user } = useAuthState();
+  const { user } = storeToRefs(useAuthStore());
   if (user.value?.isAdmin) {
     return true;
   }

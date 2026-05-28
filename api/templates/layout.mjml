@@ -58,9 +58,10 @@
     <mj-section>
       <mj-column>
         <mj-text align="center" font-size="12px">
-          Pour toute question, contactez-nous par mail
           {% if REPLY_TO %}
-            à <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a>
+            {{ t('emails.layout.footer.contactUsAt') }}
+          {% else %}
+            {{ t('emails.layout.footer.contactUs') }}
           {% endif %}
         </mj-text>
       </mj-column>

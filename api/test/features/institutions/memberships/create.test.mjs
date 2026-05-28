@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeEach, beforeAll, afterEach, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../../setup/ezmesure';
@@ -66,10 +68,9 @@ describe('[institutions - memberships]: Test create memberships features', () =>
   describe('As admin', () => {
     describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       it(`#01 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-          data: {
+          body: {
             permissions: readPermission,
           },
           headers: {
@@ -80,7 +81,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const membershipFromResponse = httpAppResponse.data;
+        const { _data: membershipFromResponse } = httpAppResponse;
         expect(membershipFromResponse).toHaveProperty('username', userTest.username);
         expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
         expect(membershipFromResponse).toHaveProperty('permissions', readPermission);
@@ -105,10 +106,9 @@ describe('[institutions - memberships]: Test create memberships features', () =>
 
     describe(`Add membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       it(`#02 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-          data: {
+          body: {
             permissions: allPermission,
           },
           headers: {
@@ -119,7 +119,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
         // Test API
         expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const membershipFromResponse = httpAppResponse.data;
+        const { _data: membershipFromResponse } = httpAppResponse;
         expect(membershipFromResponse).toHaveProperty('username', userTest.username);
         expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
         expect(membershipFromResponse).toHaveProperty('permissions', allPermission);
@@ -158,10 +158,9 @@ describe('[institutions - memberships]: Test create memberships features', () =>
 
       describe(`Add membership with permission [${emptyPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         it(`#03 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
+            body: {
               permissions: emptyPermission,
             },
             headers: {
@@ -172,7 +171,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
           // Test API
           expect(httpAppResponse).toHaveProperty('status', 200);
 
-          const membershipFromResponse = httpAppResponse.data;
+          const { _data: membershipFromResponse } = httpAppResponse;
           expect(membershipFromResponse).toHaveProperty('username', userTest.username);
           expect(membershipFromResponse).toHaveProperty('institutionId', institutionId);
           expect(membershipFromResponse).toHaveProperty('permissions', emptyPermission);
@@ -193,10 +192,9 @@ describe('[institutions - memberships]: Test create memberships features', () =>
 
       describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         it(`#04 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
+            body: {
               permissions: readPermission,
             },
             headers: {
@@ -230,10 +228,9 @@ describe('[institutions - memberships]: Test create memberships features', () =>
 
       describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         it(`#05 Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
-          const httpAppResponse = await ezmesure({
+          const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
             method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
+            body: {
               permissions: readPermission,
             },
             headers: {
@@ -262,10 +259,9 @@ describe('[institutions - memberships]: Test create memberships features', () =>
   describe('With random token', () => {
     describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       it(`#06 Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-          data: {
+          body: {
             permissions: readPermission,
           },
           headers: {
@@ -291,10 +287,9 @@ describe('[institutions - memberships]: Test create memberships features', () =>
   describe('Without token', () => {
     describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       it(`#07 Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
-        const httpAppResponse = await ezmesure({
+        const httpAppResponse = await ezmesure.raw(`/institutions/${institutionId}/memberships/${userTest.username}`, {
           method: 'PUT',
-          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-          data: {
+          body: {
             permissions: readPermission,
           },
         });

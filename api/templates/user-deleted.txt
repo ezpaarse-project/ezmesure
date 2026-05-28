@@ -1,8 +1,8 @@
-La suppression de votre compte est maintenant effective
+{{ t('emails.userDeleted.title') }}
 
-Cher·e utilisateur·ice,
+{{ t('emails.userDeleted.body.headline') }}
 
-Conformément à votre demande, vos données utilisateur liées à ezMESURE ont bien été supprimées.
+{{ t('emails.userDeleted.body.p1') }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

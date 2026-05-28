@@ -2,7 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireAuth, requireUserOrInstitution, requireTermsOfUse } = require('../../services/auth');
+const { requireActiveAuth, requireUserOrInstitution, requireTermsOfUse } = require('../../services/auth');
 
 const {
   list,
@@ -16,7 +16,7 @@ const upload = require('./upload');
 
 const { aggregate, counter5 } = require('./export');
 
-router.use(requireAuth, requireUserOrInstitution, requireTermsOfUse);
+router.use(requireActiveAuth, requireUserOrInstitution, requireTermsOfUse);
 
 router.route({
   method: 'GET',

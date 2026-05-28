@@ -60,10 +60,9 @@ describe('[roles] Create features', () => {
     });
 
     it('#01 Should be able to create a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRole.id}`, {
         method: 'PUT',
-        url: `/roles/${testRole.id}`,
-        data: testRole,
+        body: testRole,
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -72,7 +71,7 @@ describe('[roles] Create features', () => {
       // Test API
       expect(httpAppResponse).toHaveProperty('status', 201);
 
-      const roleFromResponse = httpAppResponse?.data;
+      const { _data: roleFromResponse } = httpAppResponse;
 
       expect(roleFromResponse).toMatchObject({
         ...testRole,
@@ -96,10 +95,9 @@ describe('[roles] Create features', () => {
     });
 
     it('#02 Should not be able to create a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRole.id}`, {
         method: 'PUT',
-        url: `/roles/${testRole.id}`,
-        data: testRole,
+        body: testRole,
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -116,10 +114,9 @@ describe('[roles] Create features', () => {
 
   describe('An unauthenticated user', () => {
     it('#03 Should not be able to create a role', async () => {
-      const httpAppResponse = await ezmesure({
+      const httpAppResponse = await ezmesure.raw(`/roles/${testRole.id}`, {
         method: 'PUT',
-        url: `/roles/${testRole.id}`,
-        data: testRole,
+        body: testRole,
       });
 
       // Check API response

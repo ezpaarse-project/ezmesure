@@ -338,7 +338,7 @@ module.exports = class SushiAlertsService extends BasePrismaService {
         try {
           appLogger.verbose(`[sushi-alerts][ENDPOINT] Getting status for [${endpoint.id}] (using COUNTER [${version}])`);
           // eslint-disable-next-line no-await-in-loop
-          let { data: statuses } = await getStatus({ ...credentials, endpoint }, version);
+          let statuses = await getStatus({ ...credentials, endpoint }, version);
           if (!Array.isArray(statuses)) {
             statuses = [statuses];
           }

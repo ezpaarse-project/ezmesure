@@ -7,7 +7,7 @@ const {
 } = require('../../entities/harvest-session.dto');
 
 const {
-  requireJwt,
+  requireActiveAuth,
   requireUser,
   requireAdmin,
 } = require('../../services/auth');
@@ -19,18 +19,16 @@ const {
   getOne,
   getManyStatus,
   createOne,
-  getStartStatus,
-  startOne,
   deleteOne,
-  getStopStatus,
-  stopOne,
   getOneCredentials,
   upsertOne,
-  getMatrix,
 } = require('./actions');
+const { getMatrix } = require('./matrix');
+const { getStartStatus, startOne } = require('./start');
+const { getStopStatus, stopOne } = require('./stop');
 
 router.use(
-  requireJwt,
+  requireActiveAuth,
   requireUser,
   requireAdmin,
 );

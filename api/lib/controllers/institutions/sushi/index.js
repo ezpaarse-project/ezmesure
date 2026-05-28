@@ -4,7 +4,7 @@ const { Joi } = require('koa-joi-router');
 const { FEATURES } = require('../../../entities/memberships.dto');
 
 const {
-  requireJwt,
+  requireActiveAuth,
   requireUser,
   fetchInstitution,
   requireMemberPermissions,
@@ -15,10 +15,10 @@ const {
 
   getAll,
   getMetrics,
-  getMatrix,
 } = require('./actions');
+const { getMatrix } = require('./matrix');
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveAuth, requireUser);
 
 router.route({
   method: 'GET',

@@ -27,6 +27,7 @@ services:
       - EZMESURE_BUSY_BACKOFF_DURATION
       - ELASTICSEARCH_PASSWORD
       - KIBANA_PASSWORD
+      - EZMESURE_USERS_DELETE_DURATION_DAYS
       - EZMESURE_ADMIN_USERNAME
       - EZMESURE_ADMIN_PASSWORD
       - EZMESURE_ADMIN_EMAIL
@@ -54,8 +55,10 @@ services:
       - EZMESURE_ENCRYPTION_SECRET
       - EZMESURE_LOG_LEVEL
       - EZMESURE_PUBLIC_URL
+      - EZMESURE_DEFAULT_LOCALE
       - NODE_ENV
       - NODE_CONFIG
+      - NODE_USE_ENV_PROXY=1
     volumes:
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
       - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
@@ -72,7 +75,6 @@ services:
       - 8080:8080
     environment:
       - NUXT_PUBLIC_CURRENT_INSTANCE
-      - NUXT_PUBLIC_SUPPORT_MAIL
       - NUXT_PUBLIC_OIDC_PROFILE_URI
       - HOST=0.0.0.0
       - PORT=8080

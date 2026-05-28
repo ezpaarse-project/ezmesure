@@ -67,7 +67,6 @@
       },
       "uris": {
         "discovery": "EZMESURE_OIDC_DISCOVERY_URI",
-
         "issuer": "EZMESURE_OIDC_ISSUER_URI",
         "authorization": "EZMESURE_OIDC_AUTH_URI",
         "token": "EZMESURE_OIDC_TOKEN_URI",
@@ -75,7 +74,10 @@
         "revocation": "EZMESURE_OIDC_REVOCATION_URI",
         "userinfo": "EZMESURE_OIDC_USERINFO_URI"
       },
-      "scopes": { "__name": "EZMESURE_OIDC_SCOPES", "__format": "json" }
+      "scopes": {
+        "__name": "EZMESURE_OIDC_SCOPES",
+        "__format": "json"
+      }
     }
   },
   "admin": {
@@ -138,7 +140,14 @@
     "clean": {
       "schedule": "EZMESURE_USERS_CLEAN_SCHEDULE"
     },
-    "deleteDurationDays": "EZMESURE_USERS_DELETE_DURATION_DAYS"
+    "deleteDurationDays": {
+      "__name": "EZMESURE_USERS_DELETE_DURATION_DAYS",
+      "__format": "number"
+    },
+    "impersonateDuration": {
+      "__name": "EZMESURE_USERS_IMPERSONATE_DURATION_SECONDS",
+      "__format": "number"
+    }
   },
   "testUsers": {
     "lifespan": {
@@ -158,12 +167,30 @@
     "secret": "EZMESURE_ENCRYPTION_SECRET"
   },
   "logs": {
+    "sse": {
+      "maxPoolSize": {
+        "__name": "EZMESURE_SSE_LOGS_MAX_POOL_SIZE",
+        "__format": "number"
+      },
+      "heartbeatInterval": {
+        "__name": "EZMESURE_SSE_LOGS_HEARTBEAT_INTERVAL",
+        "__format": "number"
+      }
+    },
     "app": {
       "Console": {
         "level": "EZMESURE_LOG_LEVEL"
+      },
+      "Buffered": {
+        "level": "EZMESURE_LOG_LEVEL",
+        "bufferSize": {
+          "__name": "EZMESURE_LOG_BUFFER_SIZE",
+          "__format": "number"
+        }
       }
     }
   },
+  "defaultLocale": "EZMESURE_DEFAULT_LOCALE",
   "appName": "EZMESURE_APP_NAME",
   "publicUrl": "EZMESURE_PUBLIC_URL"
 }

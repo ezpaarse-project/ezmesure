@@ -5,7 +5,7 @@ const defSchema = require('./schema.json');
 /**
  * Fix Registry_Record regex to allow any string, as we don't use it in ezMESURE
  *
- * Update by reference
+ * Updates by reference
  *
  * @param  {...object} schemas to fix
  */
@@ -24,7 +24,7 @@ function fixRegistryRecord(...schemas) {
 /**
  * Fix Begin_Date and End_Date to allow not providing day of date
  *
- * Update by reference
+ * Updates by reference
  *
  * @param  {...object} schemas to fix
  */
@@ -47,9 +47,51 @@ function fixPeriodDateFormat(...schemas) {
 }
 
 /**
+ * Removes restriction about ISSN case
+ *
+ * Updates by reference
+ *
+ * @param  {...object} schemas to fix
+ */
+function removeISSNCase(...schemas) {
+  const pattern = '^[0-9]{4}-[0-9]{3}[0-9Xx]$';
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const schema of schemas) {
+    if (schema?.properties?.Online_ISSN) {
+      const { Online_ISSN: item } = schema.properties;
+      item.format = undefined;
+      item.pattern = pattern;
+    }
+    if (schema?.properties?.Print_ISSN) {
+      const { Print_ISSN: item } = schema.properties;
+      item.format = undefined;
+      item.pattern = pattern;
+    }
+  }
+}
+
+/**
+ * Removes restriction that enforces Authors to be unique
+ * (in some cases multiples authors are reported as "null null")
+ *
+ * Updates by reference
+ *
+ * @param  {...object} schemas to fix
+ */
+function removeAuthorsUniqueness(...schemas) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const schema of schemas) {
+    if (schema.type === 'array' && schema.uniqueItems) {
+      schema.uniqueItems = undefined;
+    }
+  }
+}
+
+/**
  * Fix Exception having Severity (coming from R5)
  *
- * Update by reference
+ * Updates by reference
  *
  * @param  {...object} schemas to fix
  */
@@ -68,7 +110,7 @@ function fixSeverityException(...schemas) {
  * Fix performances needing at least 2 properties in schema
  * while actually needing one given the case
  *
- * Update by reference
+ * Updates by reference
  *
  * @deprecated should be fixed by R5.1.1
  *
@@ -85,9 +127,9 @@ function fixPerfMinProperties(...schemas) {
 /**
  * Fix ISBN format by removing the need of having hyphens
  *
- * Update by reference
+ * Updates by reference
  *
- * @deprecated should be fixed by R5.1.1
+ * @deprecated should be partially fixed by R5.1.1
  *
  * @param  {...object} schemas to fix
  */
@@ -96,17 +138,9 @@ function fixISBNHyphens(...schemas) {
   for (const schema of schemas) {
     if (schema.type === 'object' && !!schema.properties?.ISBN) {
       schema.properties.ISBN = {
-        oneOf: [
-          // Keep original validation
-          schema.properties.ISBN,
-          // Add un-hyphened validation
-          {
-            type: 'string',
-            pattern: '^97[89][0-9]+$',
-            minLength: 13,
-            maxLength: 13,
-          },
-        ],
+        type: 'string',
+        pattern: '^97[89][0-9-]+$',
+        minLength: 13,
       };
     }
   }
@@ -122,6 +156,10 @@ fixRegistryRecord(
 fixPeriodDateFormat(
   defSchema.definitions.Base_Report_Filters,
 );
+
+removeISSNCase(defSchema.definitions.Item_ID);
+
+removeAuthorsUniqueness(defSchema.definitions.Authors);
 
 fixSeverityException(
   defSchema.definitions.Exception,

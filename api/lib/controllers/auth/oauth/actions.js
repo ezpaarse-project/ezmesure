@@ -1,14 +1,28 @@
 const config = require('config');
 
 const openid = require('../../../utils/openid');
+const { signJWE } = require('../../../utils/jwt');
 
 const UsersService = require('../../../entities/users.service');
 const { sendWelcomeMail } = require('../mail');
 const { appLogger } = require('../../../services/logger');
+const { logoutUser, AUTH_COOKIE } = require('../../../services/kibana');
+const { createCache } = require('../../../utils/cache-manager');
 
-const cookie = config.get('auth.cookie');
+const { cookie } = config.get('auth');
 
-const loginState = new Map();
+const loginStateCache = createCache(3600 * 1000);
+
+const logoutFromKibana = async (ctx) => {
+  try {
+    await logoutUser(ctx.cookies.get(AUTH_COOKIE.name));
+  } catch (err) {
+    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user.username}: ${err}`);
+  }
+
+  // Reset cookie on client side
+  ctx.cookies.set(AUTH_COOKIE.name, '', AUTH_COOKIE.params);
+};
 
 exports.login = async (ctx) => {
   const {
@@ -16,7 +30,7 @@ exports.login = async (ctx) => {
     expected,
   } = await openid.buildAuthorizationUrl();
 
-  loginState.set(
+  await loginStateCache.set(
     expected.nonce ? `nonce:${expected.nonce}` : `state:${expected.state}`,
     { expected, query: ctx.query },
   );
@@ -27,14 +41,14 @@ exports.login = async (ctx) => {
 exports.loginCallback = async (ctx) => {
   const stateKey = ctx.query.nonce ? `nonce:${ctx.query.nonce}` : `state:${ctx.query.state}`;
 
-  const state = loginState.get(stateKey);
+  const state = await loginStateCache.get(stateKey);
   if (!state) {
     ctx.throw(400, 'Invalid state: cannot find expected state');
     return;
   }
 
   // State is valid, delete it to avoid replay attacks
-  loginState.delete(stateKey);
+  await loginStateCache.del(stateKey);
 
   // ctx.href may be unaware of the proxy
   // so we use the expected "redirectURL" and append the query parameters
@@ -52,9 +66,23 @@ exports.loginCallback = async (ctx) => {
   const usersService = new UsersService();
   let user = await usersService.findUnique({ where: { username: userProps.username } });
 
+  // Tries to logout previous sessions from Kibana
+  await logoutFromKibana(ctx);
+
+  const ezToken = await signJWE(
+    { username: userProps.username, refreshToken: auth.refresh_token },
+    { expiresIn: auth.expires_in },
+  );
+
   const next = () => {
-    ctx.cookies.set(cookie, auth.access_token, { httpOnly: true });
-    ctx.body = auth;
+    ctx.cookies.set(cookie, ezToken, { httpOnly: true });
+
+    ctx.body = {
+      refresh_token: !!auth.refresh_token,
+      expires_in: auth.expires_in,
+      token_type: 'cookie',
+    };
+
     ctx.redirect(decodeURIComponent(state.query.origin || '/'));
   };
 
@@ -65,7 +93,7 @@ exports.loginCallback = async (ctx) => {
 
     try {
       await usersService.update({
-        where: { username: user.username },
+        where: { username: userProps.username },
         data: userProps,
       });
       appLogger.info(`User [${user.username}] is updated`);
@@ -83,7 +111,7 @@ exports.loginCallback = async (ctx) => {
     ctx.action = 'user/connection';
 
     await usersService.update({
-      where: { username: user.username },
+      where: { username: userProps.username },
       data: { deletedAt: null },
     });
 
@@ -106,12 +134,58 @@ exports.loginCallback = async (ctx) => {
 };
 
 exports.logout = async (ctx) => {
+  let redirectPath = '/';
+
+  // Try to generate a logout url
   try {
-    await openid.revokeUserToken(ctx.state.jwtData.token);
+    const { url } = await openid.buildEndSessionUrl();
+    redirectPath = url.href;
   } catch (err) {
-    appLogger.error(`Failed to revoke token for ${ctx.state.user.username}: ${err}`);
+    appLogger.warn(`Failed to end session of ${ctx.state.user.username}: ${err}`);
   }
 
+  // Try to logout from kibana
+  await logoutFromKibana(ctx);
+
+  // Reset cookies anyway to at least logout on app side
   ctx.cookies.set(cookie, '', { httpOnly: true });
-  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
+  ctx.redirect(redirectPath);
+};
+
+exports.refresh = async (ctx) => {
+  const { user, authData: { data } } = ctx.state;
+
+  // Use refresh token from JWT payload
+  if (data.refreshToken) {
+    const auth = await openid.refreshTokenGrant(data.refreshToken);
+
+    const ezToken = await signJWE(
+      { username: user.username, refreshToken: auth.refresh_token },
+      { expiresIn: auth.expires_in },
+    );
+
+    ctx.cookies.set(cookie, ezToken, { httpOnly: true });
+    ctx.body = {
+      refresh_token: !!auth.refresh_token,
+      expires_in: auth.expires_in,
+      token_type: 'cookie',
+    };
+
+    return;
+  }
+
+  // Don't extend impersonating duration but don't throw error until expired
+  const expiresInMs = data.exp - Date.now();
+  if (data.impersonatedBy && expiresInMs >= 1000) {
+    ctx.body = {
+      refresh_token: true,
+      expires_in: Math.floor(expiresInMs / 1000),
+      token_type: 'cookie',
+    };
+
+    return;
+  }
+
+  // Unable to refresh session
+  ctx.throw(400, 'Invalid state: no refresh method found');
 };

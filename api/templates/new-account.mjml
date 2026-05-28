@@ -1,32 +1,32 @@
 {% extends "layout.mjml" %}
 
 {% block title %}
-<mj-title>Un nouveau collaborateur s'est inscrit</mj-title>
+<mj-title>{{ t('emails.newAccount.title') }}</mj-title>
 {% endblock %}
 
 {% block content %}
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">{{ data.newUser }} vient de créer son compte sur ezMESURE</mj-text>
+    <mj-text mj-class="headline"><mj-title>{{ t('emails.newAccount.body.headline', { name: newUser.fullName }) }}</mj-title></mj-text>
   </mj-column>
 </mj-section>
 
 <mj-section>
   <mj-column>
     <mj-text>
-      Vous pouvez dès à présent l'intégrer à vos établissements depuis l'interface de gestion des membres :
+      {{ t('emails.newAccount.body.p1') }}
 
       <ul>
-      {% for link in data.manageMemberLinks %}
+      {% for link in manageMemberLinks %}
         <li><a target="_blank" href="{{ link.href }}">{{ link.label }}</a></li>
       {% endfor %}
       </ul>
     </mj-text>
 
     <mj-text>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
+      <p>{{ t('emails.global.regards') }}</p>
+      <p>{{ t('emails.global.theTeam') }}</p>
     </mj-text>
   </mj-column>
 </mj-section>
