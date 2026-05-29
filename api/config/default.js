@@ -149,6 +149,7 @@ module.exports = {
       schedule: '0 0 0 * * *',
     },
     deleteDurationDays: 7,
+    impersonateDuration: 3 * 60 * oneMinute,
   },
   testUsers: {
     lifespan: {
@@ -178,6 +179,5 @@ module.exports = {
   },
   defaultLocale: 'en',
   appName: 'ezMESURE',
-  passwordResetValidity: 3,
   publicUrl: 'https://ezmesure.couperin.org',
 };

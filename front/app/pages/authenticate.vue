@@ -47,7 +47,8 @@ definePageMeta({
   },
 });
 
-const { isAuthenticated, signIn } = useAuth();
+const authStore = useAuthStore();
+const { isAuthenticated } = storeToRefs(authStore);
 const { query } = useRoute();
 
 if (isAuthenticated.value) {
@@ -72,7 +73,7 @@ async function goToLogin() {
 
   const origin = query?.redirect || undefined;
 
-  await signIn(origin);
+  await authStore.signIn(origin);
 
   timeoutId = setTimeout(() => {
     userIsWaiting.value = true;

@@ -95,7 +95,7 @@ const props = defineProps({
 });
 
 const { t, te } = useI18n();
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 const snacks = useSnacksStore();
 
 /** @type {Ref<Object | null>} */

@@ -13,6 +13,17 @@ const { cookie } = config.get('auth');
 
 const loginStateCache = createCache(3600 * 1000);
 
+const logoutFromKibana = async (ctx) => {
+  try {
+    await logoutUser(ctx.cookies.get(AUTH_COOKIE.name));
+  } catch (err) {
+    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user.username}: ${err}`);
+  }
+
+  // Reset cookie on client side
+  ctx.cookies.set(AUTH_COOKIE.name, '', AUTH_COOKIE.params);
+};
+
 exports.login = async (ctx) => {
   const {
     url,
@@ -55,12 +66,15 @@ exports.loginCallback = async (ctx) => {
   const usersService = new UsersService();
   let user = await usersService.findUnique({ where: { username: userProps.username } });
 
-  const next = () => {
-    const ezToken = signJWE(
-      { username: userProps.username, refreshToken: auth.refresh_token },
-      { expiresIn: auth.expires_in },
-    );
+  // Tries to logout previous sessions from Kibana
+  await logoutFromKibana(ctx);
 
+  const ezToken = await signJWE(
+    { username: userProps.username, refreshToken: auth.refresh_token },
+    { expiresIn: auth.expires_in },
+  );
+
+  const next = () => {
     ctx.cookies.set(cookie, ezToken, { httpOnly: true });
 
     ctx.body = {
@@ -131,38 +145,47 @@ exports.logout = async (ctx) => {
   }
 
   // Try to logout from kibana
-  try {
-    await logoutUser(ctx.cookies.get(AUTH_COOKIE.name));
-  } catch (err) {
-    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user.username}: ${err}`);
-  }
+  await logoutFromKibana(ctx);
 
   // Reset cookies anyway to at least logout on app side
   ctx.cookies.set(cookie, '', { httpOnly: true });
-  ctx.cookies.set(AUTH_COOKIE.name, '', AUTH_COOKIE.params);
   ctx.redirect(redirectPath);
 };
 
 exports.refresh = async (ctx) => {
-  const { jwtData, user } = ctx.state;
+  const { user, jwtData } = ctx.state;
 
-  if (!jwtData.data.refreshToken) {
-    ctx.throw(400, 'Invalid state: no refresh token found');
+  // Use refresh token from JWT payload
+  if (jwtData.data.refreshToken) {
+    const auth = await openid.refreshTokenGrant(jwtData.data.refreshToken);
+
+    const ezToken = await signJWE(
+      { username: user.username, refreshToken: auth.refresh_token },
+      { expiresIn: auth.expires_in },
+    );
+
+    ctx.cookies.set(cookie, ezToken, { httpOnly: true });
+    ctx.body = {
+      refresh_token: !!auth.refresh_token,
+      expires_in: auth.expires_in,
+      token_type: 'cookie',
+    };
+
     return;
   }
 
-  const auth = await openid.refreshTokenGrant(jwtData.data.refreshToken);
+  // Don't extend impersonating duration but don't throw error until expired
+  const expiresInMs = jwtData.data.exp - Date.now();
+  if (jwtData.data.impersonatedBy && expiresInMs >= 1000) {
+    ctx.body = {
+      refresh_token: true,
+      expires_in: Math.floor(expiresInMs / 1000),
+      token_type: 'cookie',
+    };
 
-  const token = signJWE(
-    { username: user.username, refreshToken: auth.refresh_token },
-    { expiresIn: auth.expires_in },
-  );
+    return;
+  }
 
-  ctx.cookies.set(cookie, token, { httpOnly: true });
-
-  ctx.body = {
-    refresh_token: !!auth.refresh_token,
-    expires_in: auth.expires_in,
-    token_type: 'cookie',
-  };
+  // Unable to refresh session
+  ctx.throw(400, 'Invalid state: no refresh method found');
 };

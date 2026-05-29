@@ -1,7 +1,7 @@
-import { defineNuxtPlugin, useAuth } from '#imports';
+import { defineNuxtPlugin, useAuthStore } from '#imports';
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const { bus } = useAuth();
+  const { bus } = useAuthStore();
 
   bus.on((event, payload) => {
     if (event !== 'login') {

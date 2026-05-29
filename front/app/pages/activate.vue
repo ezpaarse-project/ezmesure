@@ -74,7 +74,8 @@ import { getErrorMessage } from '@/lib/errors';
 
 const currentRoute = useRoute();
 const { t } = useI18n();
-const { isAuthenticated, refreshAuthenticatedUser } = useAuth();
+const authStore = useAuthStore();
+const { isAuthenticated } = storeToRefs(authStore);
 
 if (!isAuthenticated.value && !currentRoute.query?.token) {
   await navigateTo('/');
@@ -101,7 +102,7 @@ async function activateProfile() {
       },
     });
 
-    await refreshAuthenticatedUser();
+    await authStore.refreshAuthenticatedUser();
     await navigateTo('/myspace');
   } catch (err) {
     if (err.statusCode >= 400 && err.statusCode < 500) {

@@ -7,10 +7,11 @@
     <UserImpersonate
       :user="user"
       show-user
+      @submit="close()"
     >
       <template #actions>
         <v-btn
-          :text="$t('close')"
+          :text="$t('cancel')"
           variant="text"
           @click="close()"
         />

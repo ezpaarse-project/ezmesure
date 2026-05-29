@@ -80,7 +80,7 @@
             size="small"
             color="red"
             variant="tonal"
-            @click="signOut()"
+            @click="authStore.signOut()"
           />
         </template>
       </v-list-item>
@@ -89,7 +89,8 @@
 </template>
 
 <script setup>
-const { signOut, user } = useAuth();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { isOpen } = storeToRefs(useDrawerStore());
 const { foreignSpacesPermissions } = storeToRefs(useCurrentUserStore());
 const { openInTab } = useSingleTabLinks('kibanaSpaces');

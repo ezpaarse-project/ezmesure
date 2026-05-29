@@ -73,7 +73,8 @@ definePageMeta({
 
 const { oidcProfileUri } = useRuntimeConfig().public;
 const { data: apiConfig } = await useApiConfig();
-const { signOut, user } = useAuth();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { locale } = useI18n();
 
 const deleteDuration = computed(() => {
@@ -101,7 +102,7 @@ async function deleteAccount() {
     method: 'DELETE',
   });
 
-  await signOut({ local: true });
+  await authStore.signOut({ local: true });
   await navigateTo('/');
 }
 

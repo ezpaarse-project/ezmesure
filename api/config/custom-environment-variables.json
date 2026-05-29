@@ -67,7 +67,6 @@
       },
       "uris": {
         "discovery": "EZMESURE_OIDC_DISCOVERY_URI",
-
         "issuer": "EZMESURE_OIDC_ISSUER_URI",
         "authorization": "EZMESURE_OIDC_AUTH_URI",
         "token": "EZMESURE_OIDC_TOKEN_URI",
@@ -75,7 +74,10 @@
         "revocation": "EZMESURE_OIDC_REVOCATION_URI",
         "userinfo": "EZMESURE_OIDC_USERINFO_URI"
       },
-      "scopes": { "__name": "EZMESURE_OIDC_SCOPES", "__format": "json" }
+      "scopes": {
+        "__name": "EZMESURE_OIDC_SCOPES",
+        "__format": "json"
+      }
     }
   },
   "admin": {
@@ -140,6 +142,10 @@
     },
     "deleteDurationDays": {
       "__name": "EZMESURE_USERS_DELETE_DURATION_DAYS",
+      "__format": "number"
+    },
+    "impersonateDuration": {
+      "__name": "EZMESURE_USERS_IMPERSONATE_DURATION_SECONDS",
       "__format": "number"
     }
   },

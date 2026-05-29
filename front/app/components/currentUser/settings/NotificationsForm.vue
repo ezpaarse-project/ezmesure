@@ -126,7 +126,8 @@ const ADMIN_NOTIFICATION_TYPES = [
   'app:recent_activity',
 ];
 
-const { refreshAuthenticatedUser, user } = useAuth();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { t } = useI18n();
 
 const currentTab = shallowRef('user');
@@ -184,7 +185,7 @@ async function updateNotifications() {
         .map(([key]) => key),
     });
 
-    await refreshAuthenticatedUser();
+    await authStore.refreshAuthenticatedUser();
 
     success.value = true;
     setTimeout(() => {

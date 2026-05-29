@@ -29,7 +29,7 @@
     />
 
     <v-list-item
-      :title="$t('authenticate.impersonate')"
+      :title="$t('authenticate.impersonate.title')"
       prepend-icon="mdi-login"
       @click="impersonateUser()"
     />

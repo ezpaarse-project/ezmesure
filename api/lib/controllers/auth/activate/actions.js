@@ -1,39 +1,9 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { addHours } = require('date-fns');
-
 const UsersService = require('../../../entities/users.service');
 
 const { appLogger } = require('../../../services/logger');
 
 const { sendWelcomeMail } = require('../mail');
 const { sendNewUserToContact } = require('./mail');
-
-const passwordResetValidity = config.get('passwordResetValidity');
-const secret = config.get('auth.secret');
-
-/**
- * Generates a token for the activation of the user's account.
- *
- * @param {string} origin - Host origin.
- * @param {string} username - Username of the user who needs to activate his account.
- *
- * @returns {string}
- */
-exports.activateUserLink = function activateUserLink(origin, username) {
-  const currentDate = new Date();
-  const expiresAt = addHours(currentDate, passwordResetValidity);
-  const token = jwt.sign(
-    {
-      username,
-      createdAt: currentDate,
-      expiresAt,
-    },
-    secret,
-  );
-
-  return `${origin}/activate?token=${token}`;
-};
 
 exports.activateCurrentUser = async (ctx) => {
   const { user } = ctx.state;

@@ -1,6 +1,6 @@
 import {
   useI18n,
-  ref,
+  shallowRef,
   toValue,
   watchEffect,
   dateFormat,
@@ -28,7 +28,7 @@ import {
 export function useDateFormat(date, formatStr, options) {
   const { locale } = useI18n();
 
-  const formatted = ref('...');
+  const formatted = shallowRef('...');
 
   watchEffect(() => {
     formatted.value = dateFormat(toValue(date), locale.value, toValue(formatStr), options);
@@ -50,7 +50,7 @@ export function useDateFormat(date, formatStr, options) {
 export function useTimeAgo(date, options) {
   const { locale } = useI18n();
 
-  const formatted = ref('...');
+  const formatted = shallowRef('...');
 
   watchEffect(() => {
     formatted.value = timeAgo(toValue(date), locale.value, options);

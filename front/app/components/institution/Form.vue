@@ -501,7 +501,7 @@ const LOGO_ACCEPT = 'JPEG, PNG, SVG';
 const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2mb
 
 const { t, locale } = useI18n();
-const { user } = useAuth();
+const { user } = storeToRefs(useAuthStore());
 const snacks = useSnacksStore();
 const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
   accept: 'image/png, image/jpeg, image/svg+xml',
