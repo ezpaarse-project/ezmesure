@@ -2,12 +2,18 @@ attributes:
   displayName:
     openid: [nickname]
     saml: [displayName]
-  eduPersonTargetedID:
+  eduPersonPrincipalName:
     openid: [sub]
-    saml: [eduPersonTargetedID]
+    saml: [eduPersonPrincipalName]
+  subjectId:
+    openid: [sub]
+    saml: [subjectId]
+  pairwiseId:
+    openid: [sub]
+    saml: [pairwiseId]
   givenName:
     openid: [given_name]
-    saml: [givenName]
+    saml: [gn, givenName]
   mail:
     openid: [email]
     saml: [email, emailAddress, mail]
@@ -27,5 +33,3 @@ attributes:
   eduPersonUnit:
     openid: [unit]
     saml: [ou]
-user_id_from_attrs: [eduPersonTargetedID]
-user_id_to_attr: eduPersonTargetedID
