@@ -1,0 +1,29 @@
+/// Possible statuses of an outgoing email
+enum OutgoingEmailStatus {
+  /// The mail has been sent
+  sent
+  /// The mail has been sent and delivered
+  delivered
+  /// The mail failed to be sent
+  failed
+}
+
+/// Represent outgoing emails
+model OutgoingEmail {
+  /// Message ID
+  id         String              @id @default(cuid())
+  /// Email recipients
+  recipients String[]
+  /// Date when the email has been sent
+  sentAt     DateTime            @default(now())
+  /// Email subject
+  status     OutgoingEmailStatus
+  /// Email subject
+  subject    String?
+  /// Email locale
+  locale     String?              @db.VarChar(5)
+  /// Name of the email template
+  template   String?
+  /// The error messages, if any
+  errors     String[]
+}
