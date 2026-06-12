@@ -76,7 +76,7 @@ async function sendEmailsSummaryToAdmins() {
     } else {
       summary.totalByType[template] = 1;
     }
-  }, { totalFailed: 0, totalByType: {} });
+  });
 
   await Promise.all(
     admins.map(async (user) => {
