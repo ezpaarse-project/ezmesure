@@ -107,7 +107,6 @@ exports.deleteCurrentUser = async (ctx) => {
   try {
     await sendMail({
       to: email,
-      subject: 'Votre demande de suppression à bien été prise en compte',
       ...generateMail(
         'user-deletion-requested',
         {
