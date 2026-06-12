@@ -126,6 +126,8 @@ myspace:
           admin: An institution has been harvested
         app:recent_activity:
           admin: Recent activity on application
+        app:outgoing_emails_summary:
+          admin: Summary of sent emails
       alerts:
         updated:
           title: Your notification settings has been applied

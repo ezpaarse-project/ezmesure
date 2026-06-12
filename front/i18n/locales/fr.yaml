@@ -126,6 +126,8 @@ myspace:
           admin: Un établissement a été moissonné
         app:recent_activity:
           admin: Activité récente de l'application
+        app:outgoing_emails_summary:
+          admin: Résumé des emails envoyés
       alerts:
         updated:
           title: Vos paramètres de notifications ont été appliqués
