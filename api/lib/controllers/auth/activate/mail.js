@@ -1,8 +1,5 @@
 const { sendMail, generateMail } = require('../../../services/mail');
 
-const { getNotificationRecipients } = require('../../../utils/notifications');
-const { ADMIN_NOTIFICATION_TYPES } = require('../../../utils/notifications/constants');
-
 /**
  * @typedef {import('../../entities/users.service').User} User
  */
@@ -35,15 +32,7 @@ exports.sendActivateUserMail = (user, activateLink) => sendMail({
  *
  * @returns {Promise<void>}
  */
-exports.sendNewUserToContact = async (user, data) => {
-  const admins = await getNotificationRecipients(
-    ADMIN_NOTIFICATION_TYPES.newUserMatchingInstitution,
-    [user.email],
-  );
-
-  return sendMail({
-    to: user.email,
-    bcc: admins,
-    ...generateMail('new-account', { user, ...data }, { locale: user.language }),
-  });
-};
+exports.sendNewUserToContact = (user, data) => sendMail({
+  to: user.email,
+  ...generateMail('new-account', { user, ...data }, { locale: user.language }),
+});

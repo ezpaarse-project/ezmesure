@@ -41,11 +41,8 @@ async function sendNewAssignedRole(receiver, institutionName, role) {
     role,
   };
 
-  const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.roleAssigned, [email]);
-
   return sendMail({
     to: email,
-    bcc: admins,
     ...generateMail('assigned-role', { data }, { locale: language }),
   });
 }

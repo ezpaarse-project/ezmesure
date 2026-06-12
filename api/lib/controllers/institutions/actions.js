@@ -49,17 +49,11 @@ const { PERMISSIONS } = require('../../entities/memberships.dto');
 
 async function sendValidateInstitutionMail(receivers, data) {
   try {
-    const admins = await getNotificationRecipients(
-      ADMIN_NOTIFICATION_TYPES.institutionValidated,
-      receivers.map((receiver) => receiver.email),
-    );
-
     return await Promise.allSettled(
       receivers.map(async (receiver) => {
         try {
           await sendMail({
             to: receiver.email,
-            bcc: admins,
             ...generateMail('validate-institution', data, { locale: receiver.language }),
           });
 
