@@ -2,8 +2,6 @@
 enum OutgoingEmailStatus {
   /// The mail has been sent
   sent
-  /// The mail has been sent and delivered
-  delivered
   /// The mail failed to be sent
   failed
 }
