@@ -13,7 +13,7 @@ errors:
     noDir: Unable to set a location for files
 
   apiKey:
-    notFound: API key doesn't exists
+    notFound: API key doesn't exist
 
   harvest:
     taskExists: "COUNTER credentials [%s] already have an associated task (status: [%s])"
