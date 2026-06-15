@@ -174,7 +174,7 @@ files:
     bestPracticeLink: best practice rules
 token:
   title: Authentication token [Deprecated]
-  deprecated: This method of authentication is deprecated and will be removed in a future version of ezMESURE, please use API keys.
+  deprecated: This authentication method is deprecated and will be removed in a future version of ezMESURE. Please use API keys.
   whatDoesToken:
     text: "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
     header: "Authorization: Bearer [insert the token here]"
@@ -1389,7 +1389,7 @@ api-keys:
   expiresAt: Expires
   permissions: Permissions
   subject: Subject of the key
-  subjectDesc: As adminstrator, you must define if the API key will be related to an institution OR to an user.
+  subjectDesc: As an adminstrator, you must define if the API key is associated to an institution OR a user.
   whatDoesKey:
     text: "An API key is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
     header: 'X-API-Key: [insert key here]'
@@ -1397,13 +1397,13 @@ api-keys:
     Manage API key
     |Manage {count} API keys
   deleteN: >
-    You are about to revoke access for an API key. It will no longer be able to be used to access ezMESURE.
-    |You are about to revoke access for {count} API keys. They will no longer be able to be used to access ezMESURE.
+    You are about to revoke access for an API key. It will no longer be usable to access ezMESURE.
+    |You are about to revoke access for {count} API keys. They will no longer be usable to access ezMESURE.
   created:
     title: Your API key is ready !
     text:
       instructions: You can use it by providing the HTTP header {header} while requesting ezMESURE's API.
-      save: Remeber to save it in a safe location (a password manager like {pass} for example) because
+      save: Remember to save it in a safe location (a password manager like {pass} for example) because  {warn}
       warning: your API key will be shown only once !
   institution:
     user: Creator
