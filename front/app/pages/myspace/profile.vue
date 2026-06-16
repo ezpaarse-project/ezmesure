@@ -349,6 +349,8 @@ const { data: apiConfig } = await useApiConfig();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 const { t, locale } = useI18n();
+const snacks = useSnacksStore();
+const { isSupported: clipboard, copy } = useClipboard();
 
 const selectedKeys = ref([]);
 const apiKeyActiveLoadingMap = ref(new Map());
