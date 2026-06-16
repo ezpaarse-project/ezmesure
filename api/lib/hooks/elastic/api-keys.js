@@ -16,6 +16,8 @@ const { generateUsernameFromApiKey } = require('../utils');
   * @param {ApiKey} apiKey
   */
 const onApiKeyUpsert = async (apiKey) => {
+  if (!apiKey.institutionId) { return; }
+
   try {
     const username = await syncApiKey(apiKey);
     appLogger.verbose(`[elastic][hooks] User [${username}] (for api key [${apiKey.id}]) is upserted`);
@@ -28,6 +30,8 @@ const onApiKeyUpsert = async (apiKey) => {
  * @param {ApiKey} apiKey
  */
 const onApiKeyDelete = async (apiKey) => {
+  if (!apiKey.institutionId) { return; }
+
   try {
     const username = generateUsernameFromApiKey(apiKey);
     await elasticUsers.deleteUser(username);
