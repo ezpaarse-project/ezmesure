@@ -506,7 +506,7 @@ async function toggleKeyActiveStates(items) {
         item.active = active;
         return item;
       } catch (err) {
-        snacks.error(t('.unableToUpdate'), err);
+        snacks.error(t('api-keys.unableToUpdate'), err);
         return null;
       } finally {
         apiKeyActiveLoadingMap.value.set(item.id, false);
