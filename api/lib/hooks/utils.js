@@ -1,4 +1,4 @@
-const { client: prisma } = require("../services/prisma");
+const { client: prisma } = require('../services/prisma');
 
 /**
  * @typedef {import('../.prisma/client.mts').Space} Space
@@ -11,15 +11,13 @@ const { client: prisma } = require("../services/prisma");
  * @param {Space} space
  * @param {string} modifier
  */
-const generateRoleNameFromSpace = (space, modifier) =>
-  `space.${space.id}.${space.type}.${modifier}`;
+const generateRoleNameFromSpace = (space, modifier) => `space.${space.id}.${space.type}.${modifier}`;
 
 /**
  * @param {Repository} repository
  * @param {string} modifier
  */
-const generateRoleNameFromRepository = (repository, modifier) =>
-  `repository.${repository.pattern}.${repository.type}.${modifier}`;
+const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}`;
 
 /**
  * @param {RepositoryAlias} alias
@@ -54,9 +52,9 @@ const generateUsernameFromApiKey = (apiKey) => {
  */
 const generateElasticPermissions = (entity) => {
   if (entity.readonly) {
-    return { privileges: ["read", "view_index_metadata"] };
+    return { privileges: ['read', 'view_index_metadata'] };
   }
-  return { privileges: ["all"] };
+  return { privileges: ['all'] };
 };
 
 /**
@@ -68,24 +66,24 @@ const generateKibanaFeatures = (entity) => {
   if (entity.readonly) {
     return {
       features: {
-        discover: ["read"],
-        dashboard: ["read"],
-        canvas: ["read"],
-        maps: ["read"],
-        visualize: ["read"],
+        discover: ['read'],
+        dashboard: ['read'],
+        canvas: ['read'],
+        maps: ['read'],
+        visualize: ['read'],
       },
     };
   }
   return {
     features: {
-      discover: ["all"],
-      dashboard: ["all"],
-      canvas: ["all"],
-      maps: ["all"],
-      visualize: ["all"],
+      discover: ['all'],
+      dashboard: ['all'],
+      canvas: ['all'],
+      maps: ['all'],
+      visualize: ['all'],
 
-      indexPatterns: ["all"],
-      savedObjectsTagging: ["all"],
+      indexPatterns: ['all'],
+      savedObjectsTagging: ['all'],
     },
   };
 };
@@ -139,24 +137,19 @@ const generateUserRoles = async (username) => {
 
   const roles = new Set(
     user.memberships?.flatMap?.((membership) => {
-      const repoRoles =
-        membership?.repositoryPermissions?.map((perm) =>
-          generateRoleNameFromRepository(
-            perm.repository,
-            perm.readonly ? "readonly" : "all",
-          ),
-        ) || [];
-      const aliasRoles =
-        membership?.repositoryAliasPermissions?.map((perm) =>
-          generateRoleNameFromAlias(perm.alias),
-        ) || [];
-      const spaceRoles =
-        membership?.spacePermissions?.map((perm) =>
-          generateRoleNameFromSpace(
-            perm.space,
-            perm.readonly ? "readonly" : "all",
-          ),
-        ) || [];
+      const repoRoles = membership?.repositoryPermissions?.map(
+        (perm) => generateRoleNameFromRepository(
+          perm.repository,
+          perm.readonly ? 'readonly' : 'all',
+        ),
+      ) || [];
+      const aliasRoles = membership?.repositoryAliasPermissions?.map(
+        (perm) => generateRoleNameFromAlias(perm.alias),
+      ) || [];
+      const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(
+        perm.space,
+        perm.readonly ? 'readonly' : 'all',
+      )) || [];
       const institutionRoles = membership?.institution?.elasticRoles.map(
         (role) => role.name,
       );
@@ -172,7 +165,7 @@ const generateUserRoles = async (username) => {
   );
 
   if (user?.isAdmin) {
-    roles.add("superuser");
+    roles.add('superuser');
   }
 
   return Array.from(roles);
@@ -208,15 +201,11 @@ const generateApiKeyRoles = async (id) => {
 
   return Array.from(
     new Set([
-      ...apiKey.repositoryPermissions.map((perm) =>
-        generateRoleNameFromRepository(
-          perm.repository,
-          perm.readonly ? "readonly" : "all",
-        ),
-      ),
-      ...apiKey.repositoryAliasPermissions.map((perm) =>
-        generateRoleNameFromAlias(perm.alias),
-      ),
+      ...apiKey.repositoryPermissions.map((perm) => generateRoleNameFromRepository(
+        perm.repository,
+        perm.readonly ? 'readonly' : 'all',
+      )),
+      ...apiKey.repositoryAliasPermissions.map((perm) => generateRoleNameFromAlias(perm.alias)),
       ...apiKey.institution.elasticRoles.map((role) => role.name),
     ]),
   );
