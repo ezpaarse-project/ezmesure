@@ -1400,6 +1400,7 @@ api-keys:
   permissions: Permissions
   subject: Objet de la clé
   subjectDesc: En tant qu'administrateur, vous devez définir si la clé d'API est liée à un établissement OU à un utilisateur.
+  unableToUpdate: Impossible de mettre à jour la clé d'API
   whatDoesKey:
     text: "Une clé d'API est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}"
     header: 'X-API-Key: [insérez la clé ici]'

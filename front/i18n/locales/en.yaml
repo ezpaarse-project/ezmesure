@@ -1390,6 +1390,7 @@ api-keys:
   permissions: Permissions
   subject: Subject of the key
   subjectDesc: As an adminstrator, you must define if the API key is associated to an institution OR a user.
+  unableToUpdate: Unable to update API key
   whatDoesKey:
     text: "An API key is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
     header: 'X-API-Key: [insert key here]'
