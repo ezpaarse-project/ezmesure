@@ -251,7 +251,7 @@ function readStream(stream, index, username, splittedFields) {
               }
 
               if (i.index.error) {
-              // eslint-disable-next-line no-use-before-define
+                // eslint-disable-next-line no-use-before-define
                 addError(i.index.error);
               }
 
@@ -259,7 +259,7 @@ function readStream(stream, index, username, splittedFields) {
             });
 
             bulkInsert(callback);
-          },
+          }
         );
       };
 
@@ -300,18 +300,6 @@ module.exports = async function upload(ctx) {
     return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
-  let uploadDir;
-  if (ctx.state.user) {
-    uploadDir = path.resolve(storagePath, ctx.state.user.email.split('@')[1], username);
-  }
-  if (ctx.state.authData.data.institutionId) {
-    uploadDir = path.resolve(storagePath, ctx.state.authData.data.institutionId);
-  }
-
-  if (!uploadDir) {
-    return ctx.throw(500, ctx.$t('errors.upload.noDir'));
-  }
-
   let exists;
   try {
     ({ body: exists } = await elastic.indices.exists({ index }));
@@ -324,7 +312,10 @@ module.exports = async function upload(ctx) {
     await createIndex(index);
   }
 
-  await fse.ensureDir(uploadDir);
+  const domain = email.split('@')[1];
+  const userDir = path.resolve(storagePath, domain, username);
+
+  await fse.ensureDir(userDir);
 
   const splitHeader = ctx.request.headers['split-fields'];
   const splitReg = /([^()]+?)\((.+?)\)/ig;
@@ -342,7 +333,7 @@ module.exports = async function upload(ctx) {
     const now = new Date();
     const encoding = ctx.request.headers['content-encoding'];
     const isGzip = encoding && encoding.toLowerCase().includes('gzip');
-    const filePath = path.resolve(uploadDir, `${now.toISOString()}.csv`);
+    const filePath = path.resolve(userDir, `${now.toISOString()}.csv`);
 
     let stream = ctx.req;
 
@@ -397,7 +388,7 @@ module.exports = async function upload(ctx) {
     if (part.length) { continue; }
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
-    const filePath = path.resolve(uploadDir, part.filename.replace(/\s/g, '_'));
+    const filePath = path.resolve(userDir, part.filename.replace(/\s/g, '_'));
 
     let stream = part;
 

@@ -597,28 +597,6 @@ function extractMonthsAvailable(report) {
   };
 }
 
-/**
- * Extract first month and last month from a report in the report list
- *
- * @param {Record<string, string>} report - The report
- *
- * @returns {{ firstMonth?: string, lastMonth?: string }}
- */
-function extractMonthsAvailable(report) {
-  const firstMonth = report.First_Month_Available && format(report.First_Month_Available, 'yyyy-MM');
-  const lastMonth = report.Last_Month_Available && format(report.Last_Month_Available, 'yyyy-MM');
-
-  // Prevent lastMonth from being before firstMonth (or firstMonth after lastMonth)
-  if (firstMonth && lastMonth && lastMonth < firstMonth) {
-    return {};
-  }
-
-  return {
-    firstMonth,
-    lastMonth,
-  };
-}
-
 module.exports = {
   getSushiURL,
   getReportDownloadConfig,
