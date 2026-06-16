@@ -44,8 +44,8 @@ const includableFields = [
  */
 const createSchema = withModifiers(
   schema,
-  requireFields(['apiKeyId', 'pattern']),
   ignoreFields(immutableFields),
+  requireFields(['apiKeyId', 'pattern']),
   withDefaults({
     readonly: false,
   }),
@@ -56,8 +56,8 @@ const createSchema = withModifiers(
  */
 const upsertSchema = withModifiers(
   schema,
-  requireFields(['apiKeyId', 'pattern']),
   ignoreFields(immutableFields),
+  requireFields(['apiKeyId', 'pattern']),
   withDefaults({
     readonly: false,
   }),
