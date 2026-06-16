@@ -59,9 +59,9 @@
       <mj-column>
         <mj-text align="center" font-size="12px">
           {% if REPLY_TO %}
-            {{ t('emails.layout.footer.contactUsAt') }}
+            {{ t('emails.layout.body.footer.contactUsAt', { replyTo: REPLY_TO }) | safe }}
           {% else %}
-            {{ t('emails.layout.footer.contactUs') }}
+            {{ t('emails.layout.body.footer.contactUs') }}
           {% endif %}
         </mj-text>
       </mj-column>

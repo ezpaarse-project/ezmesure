@@ -1,7 +1,0 @@
-{
-  "file_types": {
-    "Nginx": ["**/rp/**/*.conf.template"],
-    "JSON": ["*.json.template"],
-    "YAML": ["*.yaml.template"]
-  }
-}

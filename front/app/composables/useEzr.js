@@ -4,7 +4,7 @@ import '@ezpaarse-project/ezreeport-vue/styles';
 import {
   useFetch,
   useLocalStorage,
-  ref,
+  shallowRef,
   computed,
 } from '#imports';
 
@@ -12,13 +12,14 @@ export default async function useEzr() {
   const {
     data: ezrProfile,
     error,
+    refresh,
   } = await useFetch('/api/auth/reporting_token', {
     deep: true,
   });
 
   const itemsPerPageOptions = [10, 25, 50, 100, -1];
   const itemsPerPageStored = useLocalStorage('ezm.itemsPerPage', 10);
-  const itemsPerPageInner = ref(itemsPerPageStored.value);
+  const itemsPerPageInner = shallowRef(itemsPerPageStored.value);
 
   const itemsPerPage = computed({
     get() {
