@@ -259,7 +259,7 @@ function readStream(stream, index, username, splittedFields) {
             });
 
             bulkInsert(callback);
-          }
+          },
         );
       };
 
