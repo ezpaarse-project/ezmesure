@@ -39,6 +39,7 @@ const activity = require('./activity');
 const actions = require('./actions');
 const sync = require('./sync');
 const kibanaBridge = require('./kibana-bridge');
+const outgoingEmails = require('./outgoing-emails');
 
 const openapi = require('./openapi.json');
 
@@ -97,6 +98,7 @@ app.use(kibana.prefix('/kibana').middleware());
 app.use(actions.prefix('/actions').middleware());
 app.use(activity.prefix('/activity').middleware());
 app.use(sync.prefix('/sync').middleware());
+app.use(outgoingEmails.prefix('/outgoing-emails').middleware());
 
 app.use(kibanaBridge.prefix('/_kbb').middleware());
 

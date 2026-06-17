@@ -192,6 +192,7 @@ emails:
     file: File
     index: Index
     package: Package
+    total: Total
 
   layout:
     body:
@@ -326,3 +327,28 @@ emails:
     title: An error has happened
     body:
       headline: An error has happened in ezMESURE.
+
+  outgoingEmailsSummary:
+    subject: "[Admin] Outgoing emails summary"
+    body:
+      title: Outgoing emails summary
+      headline: Outgoing emails summary
+      p1: "{{ count }} emails has recently been sent. Please find the summary below."
+      hasFailedEmails: "{{ count }} emails has encountered errors during their delivery."
+      detailedList: Detailed list
+      recipients: Recipients
+      subject: Subject
+      template: Template
+      emailsCount: "Number of emails"
+      status:
+        sent: Sent
+        failed: Failed
+      types:
+        assigned-role: New role assigned
+        harvest-end: Harvest end
+        new-account: Collaborator registration
+        request-membership: Institution join request
+        user-deleted: Account deletion confirmation
+        user-deletion-requested: Account deletion request
+        validate-institution: Institution validated
+        welcome: Welcome to ezMESURE

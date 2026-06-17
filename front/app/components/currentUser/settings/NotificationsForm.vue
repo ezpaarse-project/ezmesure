@@ -112,18 +112,16 @@ const NOTIFICATION_TYPES = [
   'institution:role_assigned',
 
   'counter:new_data_available',
-
 ];
 
 const ADMIN_NOTIFICATION_TYPES = [
+  'institution:membership_request',
   'institution:counter_ready_change',
-
-  'user:request_deletion',
-  'user:auto_deleted',
 
   'contact:form',
 
   'app:recent_activity',
+  'app:outgoing_emails_summary',
 ];
 
 const authStore = useAuthStore();
@@ -140,10 +138,7 @@ const error = ref(undefined);
 const availableOptions = computed(() => {
   const isAdmin = currentTab.value === 'admin';
 
-  const types = [
-    ...NOTIFICATION_TYPES,
-    ...(isAdmin ? ADMIN_NOTIFICATION_TYPES : []),
-  ];
+  const types = isAdmin ? ADMIN_NOTIFICATION_TYPES : NOTIFICATION_TYPES;
 
   const scopesMap = new Map();
 

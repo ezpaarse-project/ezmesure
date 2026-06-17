@@ -1,8 +1,6 @@
 const config = require('config');
 const { add } = require('date-fns');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
-const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 const { signJWE } = require('../../utils/jwt');
 
 const { appLogger } = require('../../services/logger');
@@ -311,14 +309,8 @@ exports.deleteUser = async (ctx) => {
   appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
 
   try {
-    const admins = await getNotificationRecipients(
-      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
-      [user.email],
-    );
-
     await sendMail({
       to: user.email,
-      bcc: admins,
       ...generateMail(
         'user-deletion-requested',
         {
