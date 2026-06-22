@@ -6,24 +6,18 @@ const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const UsersService = require('../../entities/users.service');
 
-const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
-const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
 const publicUrl = config.get('publicUrl');
 
 async function sendValidateInstitutionMail(receivers, data) {
   try {
-    const admins = await getNotificationRecipients(
-      ADMIN_NOTIFICATION_TYPES.institutionValidated,
-      receivers.map((receiver) => receiver.email),
-    );
-
     return await Promise.allSettled(
       receivers.map(async (receiver) => {
         try {
           await sendMail({
             to: receiver.email,
-            bcc: admins,
             ...generateMail('validate-institution', data, { locale: receiver.language }),
           });
 

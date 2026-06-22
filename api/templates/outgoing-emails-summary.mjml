@@ -1,0 +1,85 @@
+{% extends "layout.mjml" %}
+
+{% macro statusColor(status) %}
+{% if status == 'sent' %}
+#008000
+{% elif status == 'failed' %}
+#ff0000
+{% else %}
+#005eff
+{% endif %}
+{% endmacro %}
+
+{% block title %}
+<mj-title>{{ t('emails.outgoingEmailsSummary.body.title') }}</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">{{ t('emails.outgoingEmailsSummary.body.headline') }}</mj-text>
+
+    {% if summary.totalFailed > 0 %}
+    <mj-text>
+      <div style="color: #ff0000">⚠️ {{ t('emails.outgoingEmailsSummary.body.hasFailedEmails', { count: summary.totalFailed }) }}</div>
+    </mj-text>
+    {% endif %}
+
+    <mj-text>
+      {{ t('emails.outgoingEmailsSummary.body.p1', { count: emails.length }) }}
+    </mj-text>
+  <mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th>{{ t('emails.outgoingEmailsSummary.body.template') }}</th>
+          <th style="text-align: right">{{ t('emails.outgoingEmailsSummary.body.emailsCount') }}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for type, count in summary.totalByType %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          <td>{{ t('emails.outgoingEmailsSummary.body.types.' + type) }}</td>
+          <td style="text-align: right">{{ count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">{{ t('emails.outgoingEmailsSummary.body.detailedList') }}</mj-text>
+
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th>{{ t('emails.outgoingEmailsSummary.body.subject') }}</th>
+          <th style="width: 200px">{{ t('emails.outgoingEmailsSummary.body.recipients') }}</th>
+          <th style="width: 130px">{{ t('emails.global.date') }}</th>
+          <th style="width: 50px">{{ t('emails.global.status') }}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for email in emails %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          <td>{{ email.subject }}</td>
+          <td>{{ email.recipients | join(", ") }}</td>
+          <td>{{ d(email.sentAt, 'Pp') }}</td>
+          <td style="color: {{ statusColor(email.status) | trim }}">{{ t('emails.outgoingEmailsSummary.body.status.' + email.status) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

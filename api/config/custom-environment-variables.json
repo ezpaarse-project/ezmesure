@@ -48,6 +48,18 @@
       }
     }
   },
+  "emails": {
+    "summary": {
+      "schedule": "EZMESURE_EMAILS_SUMMARY_SCHEDULE"
+    },
+    "cleanup": {
+      "schedule": "EZMESURE_EMAILS_CLEANUP_SCHEDULE",
+      "maxDayAge": {
+        "__name": "EZMESURE_EMAILS_CLEANUP_MAX_DAY_AGE",
+        "__format": "number"
+      }
+    }
+  },
   "notifications": {
     "cron": "EZMESURE_NOTIFICATIONS_CRON",
     "sender": "EZMESURE_NOTIFICATIONS_SENDER",

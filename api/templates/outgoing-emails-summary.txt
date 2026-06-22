@@ -1,0 +1,20 @@
+{{ t('emails.outgoingEmailsSummary.body.headline') }}
+
+{% if summary.totalFailed > 0 %}
+⚠️ {{ t('emails.outgoingEmailsSummary.body.hasFailedEmails', { count: summary.totalFailed }) }}
+{% endif %}
+
+{{- t('emails.outgoingEmailsSummary.body.p1', { count: emails.length }) }}
+
+{% for type, count in summary.totalByType %}
+  - {{ t('emails.outgoingEmailsSummary.body.types.' + type) }}: {{ count }}
+{%- endfor %}
+
+{{ t('emails.outgoingEmailsSummary.body.detailedList') }}
+
+{%- for email in emails %}
+  - {{ email.subject }}
+    {{ email.recipients | join(", ") }}
+    {{ d(email.sentAt, 'Pp') }}
+    {{ t('emails.outgoingEmailsSummary.body.status.' + email.status) }}
+{% endfor %}

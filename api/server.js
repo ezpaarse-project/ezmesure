@@ -4,7 +4,6 @@ const Koa = require('koa');
 const mount = require('koa-mount');
 const cors = require('@koa/cors');
 const config = require('config');
-const path = require('path');
 const { setTimeout } = require('timers/promises');
 const { STATUS_CODES } = require('http');
 
@@ -26,6 +25,7 @@ const harvest = require('./lib/services/crons/harvest');
 const cronMetrics = require('./lib/services/crons/metrics');
 const users = require('./lib/services/crons/users');
 const testUsers = require('./lib/services/crons/test-users');
+const outgoingEmails = require('./lib/services/crons/outgoing-emails');
 
 /**
  * Register hooks. Must not be called elsewhere. Some services can both
@@ -156,6 +156,8 @@ function start() {
   cronMetrics.start();
   users.startDeletionCron();
   testUsers.startExpiredCron();
+  outgoingEmails.startEmailsSummaryCron();
+  outgoingEmails.startEmailsCleanupCron();
 
   const server = app.listen(config.port);
   server.setTimeout(1000 * 60 * 30);
