@@ -81,17 +81,10 @@ async function sendEndMail(session) {
     },
   });
 
-  const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.newCounterDataAvailable);
-
   await Promise.all(
     institutions.map(async (institution) => {
       try {
         const contacts = institution.memberships.map((m) => m.user);
-        const contactEmails = new Set(contacts.map((user) => user.email));
-
-        const adminEmails = admins
-          .filter(({ email }) => !contactEmails.has(email))
-          .map(({ email }) => email);
 
         // TODO: what if multiple spaces
         const spaceID = institution.spaces.at(0)?.id;
@@ -141,7 +134,6 @@ async function sendEndMail(session) {
             try {
               await sendMail({
                 to: contact.email,
-                bcc: adminEmails,
                 ...generateMail('harvest-end', data, { locale: contact.language }),
               });
 
