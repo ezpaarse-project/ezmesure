@@ -67,6 +67,7 @@ myspace:
   ezmesureTeam: équipe
   name: Nom
   mail: Mail
+  username: Nom d'utilisateur
   idp: IDP
   organization: Organisation
   unit: Unité
@@ -979,6 +980,7 @@ users:
   newUser: Nouvel utilisateur
   doesNotExist: L'utilisateur auquel vous essayez d'accéder n'est pas référencé
   unableToFetchInformations: Impossible de récupérer les informations d'utilisateur
+  authentication: Authentification
   createMailUserList: >
     Copier l'adresse mail
     |Copier les adresses mails
@@ -986,12 +988,17 @@ users:
     title: Filtrer les utilisateurs
     searchHint: Ce champ est remplacé par la barre de recherche
   user:
+    id: ID
     saved: Utilisateur sauvegardé
     general: Général
     fullName: Nom complet
     username: Nom d'utilisateur
     email: Adresse email
-    isAdmin: Est Administrateur ?
+    isAdmin: Est administrateur ?
+    acceptedTerms: A accepté les conditions d'utilisations
+    accountLinked:
+      label: Lié au fournisseur d'identification
+      description: Si l'ID est lié au fournisseur d'identification, ce dernier sera utilisé lors de la connexion. Sinon le nom d'utilisateur sera utilisé. Utile si le lien est mal construit.
     memberships: Établissements
     membershipsCount: >
       1 établissement
@@ -1426,7 +1433,6 @@ description: Description
 initials: Initiales
 language: Langue
 refresh: Actualiser
-refreshShib: Actualiser les informations
 delete: Supprimer
 revoke: Révoquer
 close: Fermer
