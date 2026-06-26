@@ -58,7 +58,7 @@ describe('[users]: Test activate users features', () => {
         expect(userFromService).toHaveProperty('isAdmin', false);
         expect(userFromService?.createdAt).not.toBeNull();
         expect(userFromService?.updatedAt).not.toBeNull();
-        expect(userFromService?.metadata).toHaveProperty('acceptedTerms', true);
+        expect(userFromService?.metadata).toBe(true);
       });
 
       afterAll(async () => {

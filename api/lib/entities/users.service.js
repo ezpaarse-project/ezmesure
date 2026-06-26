@@ -11,6 +11,7 @@ const usersPrisma = require('../services/prisma/users');
  * @typedef {import('../.prisma/client.mts').Prisma.UserUpsertArgs} UserUpsertArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserCountArgs} UserCountArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserFindFirstArgs} UserFindFirstArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserFindManyArgs} UserFindManyArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserUpdateArgs} UserUpdateArgs
@@ -87,11 +88,19 @@ module.exports = class UsersService extends BasePrismaService {
   }
 
   /**
+   * @param {UserFindFirstArgs} params
+   * @returns {Promise<User | null>}
+   */
+  findFirst(params) {
+    return usersPrisma.findFirst(params, this.prisma);
+  }
+
+  /**
    * @param {string} username
    * @returns {Promise<User | null>}
    */
   findByUsername(username) {
-    return usersPrisma.findUnique({ where: { username } }, this.prisma);
+    return usersPrisma.findByUsername(username, this.prisma);
   }
 
   /**

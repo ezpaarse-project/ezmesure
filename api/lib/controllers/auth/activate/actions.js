@@ -9,7 +9,7 @@ exports.activateCurrentUser = async (ctx) => {
   const { user } = ctx.state;
   const { email } = user;
 
-  if (user?.metadata?.acceptedTerms) {
+  if (user?.acceptedTerms) {
     ctx.throw(409, ctx.$t('errors.user.alreadyActivated'));
     return;
   }
@@ -17,8 +17,8 @@ exports.activateCurrentUser = async (ctx) => {
   const usersService = new UsersService();
 
   try {
-    const res = await usersService.acceptTerms(user.username);
-    user.metadata = res.metadata;
+    await usersService.acceptTerms(user.username);
+    user.acceptedTerms = true;
   } catch (err) {
     ctx.status = 500;
     appLogger.error(`Failed to update user: ${err}`);

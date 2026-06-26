@@ -107,6 +107,18 @@ function getUsernameFromJWT(token, data) {
 }
 
 /**
+ * Get user id from OAuth strategy (JWE)
+ *
+ * @param {string} token - The token found in request
+ * @param {unknown} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
+ */
+async function getidFromOAuth(token, data) {
+  return Promise.resolve(data.id);
+}
+
+/**
  * Check if request have a valid user
  *
  * Needs `requireActiveJwt`
@@ -123,12 +135,15 @@ const requireUser = async (ctx, next) => {
   }
 
   let username;
+  let id;
 
   try {
     switch (jwtData.type) {
-      case 'oauth':
       case 'old_jwt':
         username = await getUsernameFromJWT(jwtData.token, jwtData.data);
+        break;
+      case 'oauth':
+        id = await getidFromOAuth(jwtData.token, jwtData.data);
         break;
 
       default:
@@ -139,13 +154,15 @@ const requireUser = async (ctx, next) => {
     return;
   }
 
-  if (!username) {
+  if (!username && !id) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
     return;
   }
 
   const usersService = new UsersService();
-  const user = await usersService.findUnique({ where: { username } });
+  const user = id
+    ? await usersService.findFirst({ where: { id } })
+    : await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
@@ -160,7 +177,7 @@ const requireUser = async (ctx, next) => {
 };
 
 const requireTermsOfUse = async (ctx, next) => {
-  if (!ctx.state?.user?.metadata?.acceptedTerms) {
+  if (!ctx.state?.user?.acceptedTerms) {
     ctx.throw(403, ctx.$t('errors.termsOfUse'));
     return;
   }
