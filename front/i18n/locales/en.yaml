@@ -67,6 +67,7 @@ myspace:
   ezmesureTeam: ezMESURE team
   name: Name
   mail: Mail
+  username: Username
   idp: IDP
   organization: Organisation
   unit: Unit
@@ -969,6 +970,7 @@ users:
   newUser: New user
   doesNotExist: The user you are trying to access is not registered.
   unableToFetchInformations: Unable to retrieve institution information
+  authentication: Authentification
   createMailUserList: >
     Copy email
     |Copy emails
@@ -976,12 +978,17 @@ users:
     title: Filter users
     searchHint: This field is overridden by the search bar
   user:
+    id: ID
     saved: User saved
     general: General
     fullName: Full name
     username: Username
     email: Email address
-    isAdmin: Is Administrator ?
+    isAdmin: Is administrator ?
+    acceptedTerms: Have accepted terms
+    accountLinked:
+      label: Linked to identity provider
+      description: If ID is linked to the identity provider, the ID will be user when user is logging in. Otherwise the username will be user. Useful when the link is wrongly set.
     memberships: Institutions
     membershipsCount: >
       {count} institution
@@ -1414,7 +1421,6 @@ description: Description
 initials: Initials
 language: Language
 refresh: Refresh
-refreshShib: Refresh informations
 delete: Remove
 revoke: Revoke
 close: Close

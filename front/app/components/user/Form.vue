@@ -14,6 +14,40 @@
             @submit.prevent="save()"
           >
             <v-card
+              :title="$t('users.authentication')"
+              prepend-icon="mdi-lock"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template #text>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="user.id"
+                      :label="`${$t('users.user.id')} *`"
+                      :rules="[v => !!v || $t('fieldIsRequired')]"
+                      prepend-icon="mdi-identifier"
+                      variant="underlined"
+                      hide-details="auto"
+                    />
+                  </v-col>
+
+                  <v-col cols="12">
+                    <v-checkbox
+                      v-model="user.accountLinked"
+                      :label="$t('users.user.accountLinked.label')"
+                      density="compact"
+                      color="primary"
+                      hide-details
+                    />
+
+                    <p>{{ $t('users.user.accountLinked.description') }}</p>
+                  </v-col>
+                </v-row>
+              </template>
+            </v-card>
+
+            <v-card
               :title="$t('general')"
               prepend-icon="mdi-format-list-bulleted"
               variant="outlined"
@@ -46,9 +80,20 @@
                   <v-col cols="12" sm="6">
                     <v-text-field
                       v-model="user.fullName"
-                      :label="$t('users.user.fullName')"
+                      :label="`${$t('users.user.fullName')} *`"
+                      :rules="[v => !!v || $t('fieldIsRequired')]"
                       prepend-icon="mdi-rename"
                       variant="underlined"
+                      hide-details
+                    />
+                  </v-col>
+
+                  <v-col cols="12">
+                    <v-checkbox
+                      v-model="user.acceptedTerms"
+                      :label="$t('users.user.acceptedTerms')"
+                      density="compact"
+                      color="primary"
                       hide-details
                     />
                   </v-col>

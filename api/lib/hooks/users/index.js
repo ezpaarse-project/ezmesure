@@ -15,7 +15,7 @@ const onUserAction = async (user) => {
   // Update last activity of user
   try {
     await prisma.user.update({
-      where: { username: user.username },
+      where: { id: user.id },
       data: { lastActivity: new Date() },
     });
   } catch (err) {

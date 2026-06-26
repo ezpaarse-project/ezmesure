@@ -11,6 +11,7 @@ const IS_OAUTH2 = true; // TODO: Find out if the OIDC provider supports OAuth2
 
 /**
  * @typedef {{ code: string, state?: string, nonce?: string }} ExpectedCallbackData
+ * @typedef {import('../.prisma/client.mjs').User} User
  */
 
 /** @type {openid.Configuration | undefined} */
@@ -148,7 +149,7 @@ module.exports.getUserInfo = async (accessToken, subject) => {
  *
  * @param {openid.UserInfoResponse} userInfo
  *
- * @returns {Omit<import('../.prisma/client.mjs').User, 'createdAt' | 'updatedAt' | 'lastActivity'>}
+ * @returns {Omit<User, 'isAdmin' | 'createdAt' | 'updatedAt' | 'lastActivity'>}
  */
 module.exports.getUserFromInfo = (userInfo) => {
   if (!userInfo.email) {
@@ -166,13 +167,14 @@ module.exports.getUserFromInfo = (userInfo) => {
   }
 
   return {
+    id: userInfo.sub,
     username,
+    accountLinked: true,
     fullName: fullName || username,
     email: userInfo.email,
-    isAdmin: false,
+    acceptedTerms: false,
     excludeNotifications: [],
     metadata: {
-      uid: userInfo.sub,
       idp: userInfo.idp,
       org: userInfo.organisation,
       unit: userInfo.unit,

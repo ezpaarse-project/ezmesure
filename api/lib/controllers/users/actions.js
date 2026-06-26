@@ -59,11 +59,9 @@ exports.list = async (ctx) => {
 
   if (permissions != null) {
     prismaQuery.where.memberships = {
-      ...prismaQuery.where.memberships ?? {},
-      ...{
-        some: {
-          permissions: arrayFilter(permissions, hasSomePermissions),
-        },
+      ...prismaQuery.where.memberships,
+      some: {
+        permissions: arrayFilter(permissions, hasSomePermissions),
       },
     };
   }
@@ -123,7 +121,7 @@ exports.createOrReplaceUser = async (ctx) => {
 
   const user = await usersService.upsert({
     where: { username },
-    update: { ...body, username },
+    update: { ...body },
     create: { ...body, username },
   });
   appLogger.verbose(`User [${user.username}] is upserted`);
@@ -195,7 +193,7 @@ exports.importUsers = async (ctx) => {
             },
           },
           create: {
-            ...(membership ?? {}),
+            ...membership,
             institutionId: undefined,
 
             institution: {

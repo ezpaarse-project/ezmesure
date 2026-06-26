@@ -19,7 +19,8 @@ import AuthExpiredDialog from '../components/skeleton/AuthExpiredDialog.vue';
  * @property {string} updatedAt
  * @property {boolean} isAdmin
  * @property {string[]} excludeNotifications
- * @property {{ acceptedTerms?: boolean }?} metadata
+ * @property {boolean} acceptedTerms
+ * @property {{}} metadata
  */
 
 /**

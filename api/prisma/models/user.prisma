@@ -1,7 +1,11 @@
 /// A user
 model User {
+  /// The ID of the user in IDP ("sub" claim of id_token) or generated if not linked
+  id                   String        @unique @default(dbgenerated("concat('ezm:', gen_random_uuid())"))
   /// The username
   username             String        @id
+  /// Is the user linked to IDP
+  accountLinked        Boolean       @default(false)
   /// Full name
   fullName             String
   /// Email
@@ -18,7 +22,9 @@ model User {
   lastActivity         DateTime      @default(now())
   /// Whether the user has admin access or not
   isAdmin              Boolean       @default(false)
-  /// Arbitrary metadata
+  /// Has user accepted terms
+  acceptedTerms        Boolean       @default(false)
+  /// Arbitrary metadata from IDP
   metadata             Json          @default("{}")
   /// User memberships
   memberships          Membership[]
@@ -28,4 +34,6 @@ model User {
   excludeNotifications String[]      @default([])
   /// Actions that were triggered by the user
   actions              Action[]
+
+  @@index([id])
 }
