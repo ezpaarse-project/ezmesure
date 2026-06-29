@@ -96,7 +96,7 @@ exports.loginCallback = async (ctx) => {
     ctx.action = 'user/connection';
 
     await usersService.update({
-      where: { id: userProps.id },
+      where: { id: user.id },
       data: {
         ...userProps,
         // Don't change options specified by user

@@ -125,7 +125,6 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
  * @returns {Promise<User>}
  */
 function update(params, tx = prisma) {
-  console.log(params);
   return tx.user.update(params);
 }
 
