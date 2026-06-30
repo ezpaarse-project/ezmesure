@@ -35,7 +35,7 @@ const institution = ref(undefined);
 
 async function open(s, opts) {
   space.value = s;
-  institution.value = opts.institution;
+  institution.value = opts?.institution;
   isOpen.value = true;
 }
 

@@ -11,6 +11,17 @@
       <template #filters-panel="props">
         <SpaceApiFilters v-bind="props" />
       </template>
+
+      <v-btn
+        v-if="spaceFormDialogRef"
+        v-tooltip="$t('add')"
+        icon="mdi-plus"
+        variant="tonal"
+        density="comfortable"
+        color="green"
+        class="mr-2"
+        @click="spaceFormDialogRef.open()"
+      />
     </SkeletonPageBar>
 
     <v-data-table-server
@@ -50,7 +61,7 @@
               v-if="spaceFormDialogRef"
               :title="$t('modify')"
               prepend-icon="mdi-pencil"
-              @click="spaceFormDialogRef.open(item, { institution: item.institution })"
+              @click="spaceFormDialogRef.open(item)"
             />
             <v-list-item
               :title="$t('delete')"

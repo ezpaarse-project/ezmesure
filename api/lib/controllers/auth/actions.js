@@ -1,10 +1,8 @@
 const config = require('config');
-const { add, format } = require('date-fns');
-const { fr } = require('date-fns/locale');
+const { add } = require('date-fns');
 
 const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
-const { getNotificationRecipients } = require('../../utils/notifications');
-const { EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { EVENT_TYPES } = require('../../utils/notifications/constants');
 const { signJWT } = require('../../utils/jwt');
 
 const UsersService = require('../../entities/users.service');
@@ -23,6 +21,7 @@ const { schema: membershipSchema, includableFields: includableMembershipFields }
 const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
 
 const { deleteDurationDays } = config.get('users');
+const publicUrl = config.get('publicUrl');
 
 // Query params for sub routes
 
@@ -92,7 +91,7 @@ exports.getCurrentUserElasticRoles = async (ctx) => {
 };
 
 exports.deleteCurrentUser = async (ctx) => {
-  const { username, email } = ctx.state.user;
+  const { username, email, language } = ctx.state.user;
 
   const deletedAt = add(new Date(), { days: deleteDurationDays });
 
@@ -106,19 +105,20 @@ exports.deleteCurrentUser = async (ctx) => {
   appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
 
   try {
-    const admins = await getNotificationRecipients(
-      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
-      [email],
-    );
-
     await sendMail({
       to: email,
-      bcc: admins,
-      subject: 'Votre demande de suppression à bien été prise en compte',
-      ...generateMail('user-deletion-requested', {
-        deletedAt: format(deletedAt, 'PPPp', { locale: fr }),
-        isFromUser: true,
-      }),
+      ...generateMail(
+        'user-deletion-requested',
+        {
+          loginURL: new URL('/authenticate', publicUrl).href,
+          deletedAt,
+          isFromUser: true,
+        },
+        {
+          locale: language,
+          subjectKey: 'subject.fromUser',
+        },
+      ),
     });
   } catch (err) {
     appLogger.error(`Failed to send mail to ${email}: ${err}`);

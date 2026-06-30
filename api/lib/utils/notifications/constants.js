@@ -23,16 +23,12 @@ const NOTIFICATION_TYPES = {
 };
 
 const ADMIN_NOTIFICATION_TYPES = applyModifier({
-  ...NOTIFICATION_TYPES,
+  membershipRequest: NOTIFICATION_TYPES.membershipRequest,
 
   counterReadyChange: 'institution:counter_ready_change',
-
-  userRequestDeletion: 'user:request_deletion',
-  userDeleted: 'user:auto_deleted',
-
   contactForm: 'contact:form',
-
   appRecentActivity: 'app:recent_activity',
+  emailsSummary: 'app:outgoing_emails_summary',
 }, 'admin');
 
 const NOTIFICATION_KEYS = [

@@ -1,13 +1,24 @@
 <template>
   <v-card
     :title="$t('repositories.givePermissions')"
-    :subtitle="$t('repositories.nPermissions', modelValue?.size ?? 0)"
+    :subtitle="status !== 'pending' ? $t('repositories.nPermissions', modelValue?.size ?? 0) : ''"
     :loading="status === 'pending' && 'primary'"
     prepend-icon="mdi-account-lock"
     variant="outlined"
   >
     <template #text>
-      <v-table density="comfortable" height="300px" fixed-header>
+      <v-empty-state v-if="status === 'pending'" :title="$t('pleaseWait')">
+        <template #media>
+          <v-progress-circular
+            color="primary"
+            size="64"
+            indeterminate
+            class="mb-4"
+          />
+        </template>
+      </v-empty-state>
+
+      <v-table v-else density="comfortable" height="300px" fixed-header>
         <thead>
           <tr>
             <th class="text-left">
@@ -104,7 +115,7 @@ const allValue = shallowRef('');
 const {
   status,
   data: memberships,
-} = useFetch(`/api/institutions/${props.institution.id}/memberships`, {
+} = await useFetch(() => `/api/institutions/${props.institution.id}/memberships`, {
   lazy: true,
   query: {
     include: ['user'],

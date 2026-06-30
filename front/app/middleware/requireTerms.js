@@ -10,7 +10,7 @@ import {
  */
 export default defineNuxtRouteMiddleware(() => {
   const { user } = storeToRefs(useAuthStore());
-  if (user.value?.metadata?.acceptedTerms) {
+  if (user.value?.acceptedTerms) {
     return true;
   }
   return navigateTo('/activate');

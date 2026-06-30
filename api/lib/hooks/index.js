@@ -8,5 +8,6 @@ require('./harvest');
 require('./users');
 require('./api-keys');
 require('./onboarding');
+require('./emails');
 
 module.exports = hookEmitter;

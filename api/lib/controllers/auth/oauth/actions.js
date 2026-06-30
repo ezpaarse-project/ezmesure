@@ -63,14 +63,18 @@ exports.loginCallback = async (ctx) => {
   );
 
   ctx.metadata = { username: userProps.username };
-  const usersService = new UsersService();
-  let user = await usersService.findUnique({ where: { username: userProps.username } });
+  let user = await UsersService.$transaction(async (users) => {
+    const byId = await users.findFirst({ where: { id: userProps.id } });
+    return byId || users.findUnique({
+      where: { accountLinked: false, username: userProps.username },
+    });
+  });
 
   // Tries to logout previous sessions from Kibana
   await logoutFromKibana(ctx);
 
   const ezToken = await signJWE(
-    { username: userProps.username, refreshToken: auth.refresh_token },
+    { id: userProps.id, refreshToken: auth.refresh_token },
     { expiresIn: auth.expires_in },
   );
 
@@ -86,33 +90,21 @@ exports.loginCallback = async (ctx) => {
     ctx.redirect(decodeURIComponent(state.query.origin || '/'));
   };
 
-  if (state.query.refresh) {
-    ctx.action = 'user/refresh';
-
-    userProps.metadata.acceptedTerms = user.metadata.acceptedTerms;
-
-    try {
-      await usersService.update({
-        where: { username: userProps.username },
-        data: userProps,
-      });
-      appLogger.info(`User [${user.username}] is updated`);
-    } catch (err) {
-      appLogger.error(`User [${user.username}] cannot be updated: ${err.message}`);
-      ctx.throw(500, err);
-      return;
-    }
-
-    next();
-    return;
-  }
+  const usersService = new UsersService();
 
   if (user) {
     ctx.action = 'user/connection';
 
     await usersService.update({
-      where: { username: userProps.username },
-      data: { deletedAt: null },
+      where: { id: user.id },
+      data: {
+        ...userProps,
+        // Don't change options specified by user
+        excludeNotifications: user.excludeNotifications,
+        language: user.language,
+        // Migrate acceptedTerms from metadata
+        acceptedTerms: user.metadata?.acceptedTerms || user.acceptedTerms,
+      },
     });
 
     next();
@@ -120,8 +112,6 @@ exports.loginCallback = async (ctx) => {
   }
 
   ctx.action = 'user/register';
-
-  userProps.metadata.acceptedTerms = false;
 
   user = await usersService.create({ data: userProps });
 
@@ -160,7 +150,7 @@ exports.refresh = async (ctx) => {
     const auth = await openid.refreshTokenGrant(data.refreshToken);
 
     const ezToken = await signJWE(
-      { username: user.username, refreshToken: auth.refresh_token },
+      { id: user.id, refreshToken: auth.refresh_token },
       { expiresIn: auth.expires_in },
     );
 

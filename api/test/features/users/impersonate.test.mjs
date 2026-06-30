@@ -21,7 +21,8 @@ const targetUser = {
   email: 'target.user@test.fr',
   fullName: 'Target User',
   isAdmin: false,
-  metadata: { acceptedTerms: true },
+  acceptedTerms: true,
+  metadata: {},
 };
 
 // A regular user with no admin privileges
@@ -30,7 +31,8 @@ const regularUser = {
   email: 'regular.user@test.fr',
   fullName: 'Test User',
   isAdmin: false,
-  metadata: { acceptedTerms: true },
+  acceptedTerms: true,
+  metadata: {},
 };
 
 let adminToken;

@@ -9,19 +9,30 @@
     </template>
 
     <template #text>
-      <v-row>
-        <v-col>
-          <v-form
-            id="spaceForm"
-            ref="formRef"
-            v-model="valid"
-            @submit.prevent="save()"
-          >
+      <v-form
+        id="spaceForm"
+        ref="formRef"
+        v-model="valid"
+        @submit.prevent="save()"
+      >
+        <v-row v-if="!props.institution">
+          <v-col>
+            <InstitutionAutoComplete
+              v-model="space.institution"
+              :required="true"
+              class="py-1"
+              @update:model-value="onInstitutionChange()"
+            />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
             <v-row>
               <v-col cols="12">
                 <v-text-field
                   v-model="space.id"
-                  :placeholder="institution.namespace"
+                  :placeholder="institution?.namespace"
                   :label="`${$t('spaces.id')} *`"
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
@@ -149,13 +160,18 @@
                 </v-input>
               </v-col>
             </v-row>
-          </v-form>
-        </v-col>
+          </v-col>
 
-        <v-col cols="12" lg="7">
-          <PermissionManager v-model="permissions" :institution="institution" />
-        </v-col>
-      </v-row>
+          <v-slide-x-reverse-transition>
+            <v-col v-if="institution" cols="12" lg="7">
+              <PermissionManager
+                v-model="permissions"
+                :institution="institution"
+              />
+            </v-col>
+          </v-slide-x-reverse-transition>
+        </v-row>
+      </v-form>
     </template>
 
     <template #actions>
@@ -188,7 +204,7 @@ const props = defineProps({
   },
   institution: {
     type: Object,
-    required: true,
+    default: () => undefined,
   },
   showSpace: {
     type: Boolean,
@@ -214,20 +230,12 @@ const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
 
 const loading = shallowRef(false);
 const valid = shallowRef(false);
-const space = ref({ ...(props.modelValue ?? {}) });
+const space = ref({ ...props.modelValue });
 
 const logoPreview = shallowRef('');
 const logoErrorMessage = shallowRef('');
 const isDraggingLogo = shallowRef(false);
 const logoSrc = computed(() => logoPreview.value || space.value.imageUrl);
-
-const types = computed(() => {
-  const keys = Array.from(repoColors.keys());
-  return keys.map((type) => ({
-    value: type,
-    title: t(`spaces.types.${type}`),
-  }));
-});
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -256,18 +264,41 @@ const { data: permissions } = await useAsyncData(
   },
 );
 
+const institution = computed(() => props.institution || space.value.institution);
+
 const isEditing = computed(() => !!props.modelValue?.id);
+
+const types = computed(() => {
+  const keys = Array.from(repoColors.keys());
+  return keys.map((type) => ({
+    value: type,
+    title: t(`spaces.types.${type}`),
+  }));
+});
 
 function applyPreset() {
   const spaceDesc = te(`spaces.descriptions.${space.value.type}`) ? t(`spaces.descriptions.${space.value.type}`) : space.value.type;
-  space.value.name = `${props.institution.name} (${space.value.type})`;
+  const institutionName = institution.value?.name;
+  space.value.name = `${institutionName} (${space.value.type})`;
   space.value.description = `${spaceDesc} (id: ${space.value.id})`;
+}
+
+function onInstitutionChange() {
+  permissions.value.clear();
+  if (institution.value && space.value.type) {
+    applyPreset();
+  }
 }
 
 async function save() {
   loading.value = true;
 
   try {
+    const institutionId = institution.value?.id;
+    if (!institutionId) {
+      throw new Error(t('institutions.institutionRequired'));
+    }
+
     const newSpace = await $fetch(isEditing.value ? `/api/kibana-spaces/${space.value.id}` : '/api/kibana-spaces', {
       method: isEditing.value ? 'PATCH' : 'POST',
       body: {
@@ -276,7 +307,7 @@ async function save() {
         name: space.value.name,
         description: space.value.description,
         disabledFeatures: space.value.disabledFeatures,
-        institutionId: props.institution.id,
+        institutionId,
         imageUrl: logoPreview.value ? space.value.imageUrl : undefined,
       },
     });

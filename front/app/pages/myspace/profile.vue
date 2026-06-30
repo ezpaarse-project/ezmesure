@@ -22,13 +22,6 @@
                   />
                 </template>
               </ConfirmPopover>
-
-              <v-btn
-                :text="$t('refreshShib')"
-                :href="refreshProfileURL"
-                prepend-icon="mdi-refresh"
-                variant="text"
-              />
             </template>
 
             <template #text>
@@ -399,13 +392,9 @@ const deleteDuration = computed(() => {
   return timeAgo(deleteDurationDays * millisecondsInDay, locale.value) ?? '...';
 });
 
-const refreshProfileURL = computed(() => {
-  const currentLocation = encodeURIComponent(window.location.href);
-  return `/api/auth/oauth/login?refresh=1&origin=${currentLocation}`;
-});
-
 const fields = computed(
   () => [
+    { name: 'username', value: user.value?.username, icon: 'mdi-form-textbox' },
     { name: 'name', value: user.value?.fullName, icon: 'mdi-account' },
     { name: 'mail', value: user.value?.email, icon: 'mdi-email' },
     { name: 'idp', value: user.value?.metadata?.idp, icon: 'mdi-web' },

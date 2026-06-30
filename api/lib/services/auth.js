@@ -166,6 +166,18 @@ function getUsernameFromJWT(token, data) {
 }
 
 /**
+ * Get user id from OAuth strategy (JWE)
+ *
+ * @param {string} token - The token found in request
+ * @param {unknown} data - The data of the token
+ *
+ * @returns {Promise<string>} - The username found in data. Returns a promise to be uniform.
+ */
+function getIdFromOAuth(token, data) {
+  return Promise.resolve(data.id);
+}
+
+/**
  * Get username from api key
  *
  * @param {string} token - The token found in request
@@ -197,11 +209,14 @@ async function getUserFromAuthData({ type, token, data }) {
     return undefined;
   }
 
+  let id = '';
   let username = '';
   switch (type) {
-    case 'oauth':
     case 'old_jwt':
       username = await getUsernameFromJWT(token, data);
+      break;
+    case 'oauth':
+      id = await getIdFromOAuth(token, data);
       break;
     case 'api_key':
       username = await getUsernameFromApiKey(token, data);
@@ -212,7 +227,13 @@ async function getUserFromAuthData({ type, token, data }) {
   }
 
   const service = new UsersService();
-  return service.findUnique({ where: { username } });
+  if (id) {
+    return service.findFirst({ where: { id } });
+  }
+  if (username) {
+    return service.findUnique({ where: { username } });
+  }
+  return undefined;
 }
 
 /**
@@ -358,7 +379,7 @@ const requireTermsOfUse = async (ctx, next) => {
     ctx.throw(403, ctx.$t('errors.termsOfUse'));
     return;
   }
-  if (ctx.state?.user && !ctx.state.user.metadata?.acceptedTerms) {
+  if (ctx.state?.user && !ctx.state.user?.acceptedTerms) {
     ctx.throw(403, ctx.$t('errors.termsOfUse'));
     return;
   }

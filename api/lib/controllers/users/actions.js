@@ -1,8 +1,6 @@
 const config = require('config');
 const { add } = require('date-fns');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
-const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 const { signJWE } = require('../../utils/jwt');
 
 const { appLogger } = require('../../services/logger');
@@ -61,11 +59,9 @@ exports.list = async (ctx) => {
 
   if (permissions != null) {
     prismaQuery.where.memberships = {
-      ...prismaQuery.where.memberships ?? {},
-      ...{
-        some: {
-          permissions: arrayFilter(permissions, hasSomePermissions),
-        },
+      ...prismaQuery.where.memberships,
+      some: {
+        permissions: arrayFilter(permissions, hasSomePermissions),
       },
     };
   }
@@ -125,7 +121,7 @@ exports.createOrReplaceUser = async (ctx) => {
 
   const user = await usersService.upsert({
     where: { username },
-    update: { ...body, username },
+    update: { ...body },
     create: { ...body, username },
   });
   appLogger.verbose(`User [${user.username}] is upserted`);
@@ -197,7 +193,7 @@ exports.importUsers = async (ctx) => {
             },
           },
           create: {
-            ...(membership ?? {}),
+            ...membership,
             institutionId: undefined,
 
             institution: {
@@ -311,14 +307,8 @@ exports.deleteUser = async (ctx) => {
   appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
 
   try {
-    const admins = await getNotificationRecipients(
-      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
-      [user.email],
-    );
-
     await sendMail({
       to: user.email,
-      bcc: admins,
       ...generateMail(
         'user-deletion-requested',
         {

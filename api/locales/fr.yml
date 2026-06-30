@@ -192,6 +192,7 @@ emails:
     file: Fichier
     index: Index
     package: Package
+    total: Total
 
   layout:
     body:
@@ -326,3 +327,28 @@ emails:
     title: Une erreur est survenue
     body:
       headline: Une erreur est survenue sur ezMESURE.
+
+  outgoingEmailsSummary:
+    subject: "[Admin] Rapport des envois de mails"
+    body:
+      title: Rapport des envois de mails
+      headline: Rapport des envois de mails
+      p1: "{{ count }} emails ont récemment été envoyés. Voici un résumé de ces envois :"
+      hasFailedEmails: "{{ count }} emails ont rencontré des problèmes lors de leur envoi."
+      detailedList: Liste détaillée
+      recipients: Destinataires
+      subject: Objet
+      template: Modèle
+      emailsCount: Nombre d'emails
+      status:
+        sent: Envoyé
+        failed: Échec
+      types:
+        assigned-role: Nouveau rôle assigné
+        harvest-end: Fin de moissonnage
+        new-account: Inscription d'un collaborateur
+        request-membership: Demande d'intégration à un établissement
+        user-deleted: Confirmation de suppression de compte
+        user-deletion-requested: Demande de suppression de compte
+        validate-institution: Établissement validé
+        welcome: Bienvenue sur ezMESURE

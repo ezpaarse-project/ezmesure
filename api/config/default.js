@@ -34,6 +34,15 @@ module.exports = {
     secure: false,
     ignoreTLS: false,
   },
+  emails: {
+    summary: {
+      schedule: '0 0 * * * *',
+    },
+    cleanup: {
+      schedule: '0 0 * * * *',
+      maxDayAge: 7,
+    },
+  },
   ezreeport: {
     host: 'reporting',
     port: 8080,
