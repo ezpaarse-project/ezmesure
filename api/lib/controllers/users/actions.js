@@ -340,7 +340,7 @@ exports.impersonateUser = async (ctx) => {
   }
 
   const ezToken = await signJWE(
-    { username, impersonatedBy: user.username },
+    { id: targetUser.id, impersonatedBy: user.username },
     { expiresIn: impersonateDuration },
   );
 
