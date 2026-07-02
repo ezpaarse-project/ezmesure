@@ -1057,7 +1057,8 @@ repositories:
   manageRepositories: >
     Gérer les entrepôts
     |Gérer {count} entrepôts
-  newRepository: Nouveau entrepôt
+  newRepository: Nouvel entrepôt
+  addInstitution: Ajouter un établissement
   updateForm:
     title: Mettre à jour l'entrepôt
     mapping:

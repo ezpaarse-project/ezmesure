@@ -18,7 +18,7 @@
       <template #append>
         <InstitutionAddMenu
           :model-value="institutions"
-          :title="$t('repository.addInstitution')"
+          :title="$t('repositories.addInstitution')"
           @institution-add="linkInstitution($event)"
         >
           <template #activator="{ props: menu }">

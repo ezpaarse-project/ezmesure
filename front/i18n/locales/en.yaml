@@ -1045,6 +1045,7 @@ repositories:
     1 repository
     |{count} repositories
   newRepository: New repository
+  addInstitution: Add institution
   updateForm:
     title: Update repository
     mapping:
