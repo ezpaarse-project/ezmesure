@@ -319,7 +319,7 @@ import { formatDate } from 'date-fns';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['sidebase-auth', 'terms', 'admin'],
+  middleware: ['require-auth', 'require-terms', 'require-admin'],
 });
 
 const MAX_PERIOD = formatDate(new Date(), 'yyyy-MM');

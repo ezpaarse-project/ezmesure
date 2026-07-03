@@ -2,10 +2,10 @@ const ActionsService = require('../../entities/actions.service');
 const HarvestSessionService = require('../../entities/harvest-session.service');
 
 const { harvestQueue } = require('../../services/jobs');
+const { createCache } = require('../../utils/cache-manager');
 
-const JOBS_CACHE_DURATION = 5 * 60 * 1000;
-
-const jobsStarted = new Map();
+const CACHE_DURATION = 5 * 60 * 1000;
+const cache = createCache(CACHE_DURATION);
 
 async function startSession(session, options = {}) {
   const service = new HarvestSessionService();
@@ -19,7 +19,7 @@ async function startSession(session, options = {}) {
     // eslint-disable-next-line no-restricted-syntax
     for await (const harvestJob of harvestJobs) {
       jobs.push(harvestJob);
-      jobsStarted.set(session.id, {
+      await cache.set(session.id, {
         status: 'starting',
         error: undefined,
         jobs,
@@ -44,7 +44,7 @@ async function startSession(session, options = {}) {
       );
     }
 
-    jobsStarted.set(session.id, {
+    await cache.set(session.id, {
       status: 'running',
       jobs,
     });
@@ -60,7 +60,7 @@ async function startSession(session, options = {}) {
       },
     };
 
-    jobsStarted.set(session.id, data);
+    await cache.set(session.id, data);
 
     if (!options.dryRun) {
       await service.update({
@@ -69,10 +69,6 @@ async function startSession(session, options = {}) {
       });
     }
   }
-
-  setTimeout(() => {
-    jobsStarted.delete(session.id);
-  }, JOBS_CACHE_DURATION);
 }
 
 exports.getStartStatus = async (ctx) => {
@@ -90,7 +86,7 @@ exports.getStartStatus = async (ctx) => {
   }
 
   ctx.status = 200;
-  ctx.body = jobsStarted.get(session.id) ?? {
+  ctx.body = (await cache.get(session.id)) ?? {
     status: session.status,
     jobs: session.jobs,
   };
@@ -121,7 +117,7 @@ exports.startOne = async (ctx) => {
     return;
   }
 
-  jobsStarted.set(session.id, { status: 'starting', jobs: [] });
+  await cache.set(session.id, { status: 'starting', jobs: [] });
 
   // Don't await promise so it runs in the background
   startSession(session, {

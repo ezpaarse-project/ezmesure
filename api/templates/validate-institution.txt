@@ -1,8 +1,8 @@
-Bonjour,
+{{ t('emails.validateInstitution.body.headline') }}
 
-Nous vous informons que l'établissement auquel vous êtes rattachés a été validé.
+{{ t('emails.validateInstitution.body.p1') }}
 
-En tant que correspondant, vous pouvez à présent gérer les membres de votre établissement et saisir vos identifiants COUNTER.
+{{ t('emails.validateInstitution.body.p2') | striptags }}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

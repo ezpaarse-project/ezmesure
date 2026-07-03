@@ -107,6 +107,28 @@ function fixSeverityException(...schemas) {
 }
 
 /**
+ * Fix const values of arrays
+ *
+ * Updates by reference
+ *
+ * @deprecated should be fixed by R5.1.1
+ *
+ * @param  {...object} schemas to fix
+ */
+function fixConstArrays(...schemas) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const schema of schemas) {
+    if (schema?.type === 'array' && !!schema?.const) {
+      schema.minItems = schema.const.length;
+      schema.maxItems = schema.const.length;
+      schema.uniqueItems = true;
+      schema.items.enum = schema.const;
+      schema.const = undefined;
+    }
+  }
+}
+
+/**
  * Fix performances needing at least 2 properties in schema
  * while actually needing one given the case
  *
@@ -129,7 +151,7 @@ function fixPerfMinProperties(...schemas) {
  *
  * Updates by reference
  *
- * @deprecated should be fixed by R5.1.1
+ * @deprecated should be partially fixed by R5.1.1
  *
  * @param  {...object} schemas to fix
  */
@@ -138,17 +160,9 @@ function fixISBNHyphens(...schemas) {
   for (const schema of schemas) {
     if (schema.type === 'object' && !!schema.properties?.ISBN) {
       schema.properties.ISBN = {
-        oneOf: [
-          // Keep original validation
-          schema.properties.ISBN,
-          // Add un-hyphened validation
-          {
-            type: 'string',
-            pattern: '^97[89][0-9]+$',
-            minLength: 13,
-            maxLength: 13,
-          },
-        ],
+        type: 'string',
+        pattern: '^97[89][0-9-]+$',
+        minLength: 13,
       };
     }
   }
@@ -193,6 +207,25 @@ fixSeverityException(
   defSchema.definitions.Exception_3062,
   defSchema.definitions.Exception_3063,
   defSchema.definitions.Exception_3070,
+);
+
+fixConstArrays(
+  defSchema.definitions.PR_P1_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.DR_D1_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.DR_D2_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.TR_B1_Report_Filters.allOf[1].properties?.Data_Type,
+  defSchema.definitions.TR_B1_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.TR_B2_Report_Filters.allOf[1].properties?.Data_Type,
+  defSchema.definitions.TR_B2_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.TR_B3_Report_Filters.allOf[1].properties?.Data_Type,
+  defSchema.definitions.TR_B3_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.TR_J1_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.TR_J2_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.TR_J3_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.TR_J4_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.IR_A1_Report_Filters.allOf[1].properties?.Metric_Type,
+  defSchema.definitions.IR_M1_Report_Filters.allOf[1].properties?.Data_Type,
+  defSchema.definitions.IR_M1_Report_Filters.allOf[1].properties?.Metric_Type,
 );
 
 fixPerfMinProperties(

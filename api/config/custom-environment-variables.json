@@ -48,6 +48,18 @@
       }
     }
   },
+  "emails": {
+    "summary": {
+      "schedule": "EZMESURE_EMAILS_SUMMARY_SCHEDULE"
+    },
+    "cleanup": {
+      "schedule": "EZMESURE_EMAILS_CLEANUP_SCHEDULE",
+      "maxDayAge": {
+        "__name": "EZMESURE_EMAILS_CLEANUP_MAX_DAY_AGE",
+        "__format": "number"
+      }
+    }
+  },
   "notifications": {
     "cron": "EZMESURE_NOTIFICATIONS_CRON",
     "sender": "EZMESURE_NOTIFICATIONS_SENDER",
@@ -59,7 +71,26 @@
   },
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
-    "cookie": "EZMESURE_AUTH_COOKIE"
+    "cookie": "EZMESURE_AUTH_COOKIE",
+    "oidc": {
+      "client": {
+        "id": "EZMESURE_OIDC_CLIENT_ID",
+        "secret": "EZMESURE_OIDC_CLIENT_SECRET"
+      },
+      "uris": {
+        "discovery": "EZMESURE_OIDC_DISCOVERY_URI",
+        "issuer": "EZMESURE_OIDC_ISSUER_URI",
+        "authorization": "EZMESURE_OIDC_AUTH_URI",
+        "token": "EZMESURE_OIDC_TOKEN_URI",
+        "introspection": "EZMESURE_OIDC_INTROSPECTION_URI",
+        "revocation": "EZMESURE_OIDC_REVOCATION_URI",
+        "userinfo": "EZMESURE_OIDC_USERINFO_URI"
+      },
+      "scopes": {
+        "__name": "EZMESURE_OIDC_SCOPES",
+        "__format": "json"
+      }
+    }
   },
   "admin": {
     "username": "EZMESURE_ADMIN_USERNAME",
@@ -124,6 +155,10 @@
     "deleteDurationDays": {
       "__name": "EZMESURE_USERS_DELETE_DURATION_DAYS",
       "__format": "number"
+    },
+    "impersonateDuration": {
+      "__name": "EZMESURE_USERS_IMPERSONATE_DURATION_SECONDS",
+      "__format": "number"
     }
   },
   "testUsers": {
@@ -167,6 +202,7 @@
       }
     }
   },
+  "defaultLocale": "EZMESURE_DEFAULT_LOCALE",
   "appName": "EZMESURE_APP_NAME",
   "publicUrl": "EZMESURE_PUBLIC_URL"
 }

@@ -1,9 +1,9 @@
-{{ data.newUser }} vient de créer son compte sur ezMESURE
-Vous pouvez dès à présent l'intégrer à vos établissements depuis l'interface de gestion des membres :
+{{ t('emails.newAccount.body.headline', { name: newUser.fullName }) }}
+{{ t('emails.newAccount.body.p1') }}
 
-{% for link in data.manageMemberLinks %}
+{% for link in manageMemberLinks %}
 {{ link.label }}: {{ link.href }}
 {% endfor %}
 
-Cordialement,
-L'équipe ezMESURE.
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

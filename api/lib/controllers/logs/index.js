@@ -2,7 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireJwt, requireUser, requireTermsOfUse } = require('../../services/auth');
+const { requireActiveJwt, requireUser, requireTermsOfUse } = require('../../services/auth');
 
 const {
   list, deleteIndice, deleteEvents, tops,
@@ -11,7 +11,7 @@ const search = require('./search');
 const upload = require('./upload');
 const { aggregate, counter5 } = require('./export');
 
-router.use(requireJwt, requireUser, requireTermsOfUse);
+router.use(requireActiveJwt, requireUser, requireTermsOfUse);
 
 router.get('/', list);
 router.get('/:index/tops', tops);

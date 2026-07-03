@@ -1,0 +1,9 @@
+resolver ${NGINX_RESOLVER};
+
+include /etc/nginx/conf.d/00-upstreams.d/*.conf;
+
+# ezMESURE config
+include /etc/nginx/conf.d/default/protocols/${NGINX_PROTOCOL}.conf;
+
+# satosa config
+include /etc/nginx/conf.d/satosa/protocols/${NGINX_PROTOCOL}.conf;

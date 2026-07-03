@@ -3,7 +3,7 @@ const { Joi } = require('koa-joi-router');
 
 const config = require('config');
 
-const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
+const { requireActiveJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   getManyTestUsers,
   createTestUser,
@@ -13,7 +13,7 @@ const {
 const maxLifespan = Number.parseInt(config.get('testUsers.lifespan.max'), 10);
 const defaultLifespan = Number.parseInt(config.get('testUsers.lifespan.default'), 10);
 
-router.use(requireJwt, requireUser, requireAdmin);
+router.use(requireActiveJwt, requireUser, requireAdmin);
 
 router.route({
   method: 'GET',

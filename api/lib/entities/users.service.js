@@ -1,14 +1,9 @@
 // @ts-check
 const config = require('config');
-const jwt = require('jsonwebtoken');
-const { addHours } = require('date-fns');
 
 const BasePrismaService = require('./base-prisma.service');
 const elasticUsers = require('../services/elastic/users');
 const usersPrisma = require('../services/prisma/users');
-
-const secret = config.get('auth.secret');
-const passwordResetValidity = config.get('passwordResetValidity');
 
 /* eslint-disable max-len */
 /**
@@ -16,6 +11,7 @@ const passwordResetValidity = config.get('passwordResetValidity');
  * @typedef {import('../.prisma/client.mts').Prisma.UserUpsertArgs} UserUpsertArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserCountArgs} UserCountArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.UserFindFirstArgs} UserFindFirstArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserFindManyArgs} UserFindManyArgs
  * @typedef {import('../.prisma/client.mts').Prisma.UserUpdateArgs} UserUpdateArgs
@@ -35,17 +31,6 @@ module.exports = class UsersService extends BasePrismaService {
    */
   static async updatePassword(username, password) {
     await elasticUsers.updatePassword(username, password);
-  }
-
-  static async generateTokenForActivate(username) {
-    const currentDate = new Date();
-    const expiresAt = addHours(currentDate, passwordResetValidity);
-
-    return jwt.sign({
-      username,
-      createdAt: currentDate,
-      expiresAt,
-    }, secret);
   }
 
   /**
@@ -103,11 +88,19 @@ module.exports = class UsersService extends BasePrismaService {
   }
 
   /**
+   * @param {UserFindFirstArgs} params
+   * @returns {Promise<User | null>}
+   */
+  findFirst(params) {
+    return usersPrisma.findFirst(params, this.prisma);
+  }
+
+  /**
    * @param {string} username
    * @returns {Promise<User | null>}
    */
   findByUsername(username) {
-    return usersPrisma.findUnique({ where: { username } }, this.prisma);
+    return usersPrisma.findByUsername(username, this.prisma);
   }
 
   /**
@@ -201,19 +194,6 @@ module.exports = class UsersService extends BasePrismaService {
     const deletedUser = usersPrisma.removeByUsername(username);
     this.triggerHooks('user:delete', deletedUser);
     return deletedUser;
-  }
-
-  /**
-   * @param {string} username
-   * @returns {Promise<string | null>}
-   */
-  async generateToken(username) {
-    const user = await this.findByUsername(username);
-    if (!user) {
-      // TODO throw ?
-      return null;
-    }
-    return jwt.sign({ username: user.username, email: user.email }, secret);
   }
 
   /**

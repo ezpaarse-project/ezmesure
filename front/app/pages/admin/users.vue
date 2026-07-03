@@ -52,6 +52,10 @@
         <v-icon v-if="item.isAdmin" icon="mdi-security" />
       </template>
 
+      <template #[`item.lastActivity`]="{ item }">
+        <LocalDate :model-value="item.lastActivity" />
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ props: menu }">
@@ -120,7 +124,7 @@ import UserFormDialog from '~/components/user/FormDialog.vue';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['sidebase-auth', 'terms', 'admin'],
+  middleware: ['require-auth', 'require-terms', 'require-admin'],
 });
 
 const { data: apiConfig } = await useApiConfig();
@@ -189,6 +193,12 @@ const headers = computed(() => [
   {
     title: t('users.user.memberships'),
     value: 'memberships',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('users.user.lastActivity'),
+    value: 'lastActivity',
     align: 'center',
     sortable: true,
   },

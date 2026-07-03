@@ -87,6 +87,7 @@ const triggerHooks = (event, ...payload) => {
 const registerHook = (event, handler, opts = {}) => {
   const safeHandler = async (...params) => {
     try {
+      appLogger.verbose(`[hooks] "${event}" running`);
       await handler(...params);
     } catch (error) {
       appLogger.error(`[hooks] "${event}" encountered an error: ${error.message}`);

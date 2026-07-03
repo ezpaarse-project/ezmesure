@@ -1,5 +1,7 @@
-const { addDays, isAfter } = require('date-fns');
 const config = require('config');
+
+const { createCache } = require('../../utils/cache-manager');
+
 const InstitutionService = require('../../entities/institutions.service');
 
 const $fetchEzr = require('../../services/ezreeport/http');
@@ -8,11 +10,8 @@ const { appLogger } = require('../../services/logger');
 const { username } = config.get('admin');
 let reportingAdminToken;
 
-/**
- * key is institution id, value is if a reporting was
- * @type {Map<string, { value: boolean, date: Date }>}
- */
-const reportingCache = new Map();
+const REPORTING_CACHE_DURATION = 24 * 3600 * 1000;
+const reportingCache = createCache(REPORTING_CACHE_DURATION);
 
 const getTokenOfAdmin = async () => {
   if (!reportingAdminToken) {
@@ -31,10 +30,9 @@ const getTokenOfAdmin = async () => {
  * @returns Is the institution have an enabled report in ezREEPORT
  */
 const institutionHasReport = async (institutionId, adminToken) => {
-  const now = new Date();
-  const cacheEntry = reportingCache.get(institutionId);
-  if (cacheEntry && isAfter(addDays(cacheEntry.date, 1), now)) {
-    return cacheEntry.value;
+  const cacheEntry = await reportingCache.get(institutionId);
+  if (cacheEntry) {
+    return cacheEntry;
   }
 
   let found = false;
@@ -49,7 +47,7 @@ const institutionHasReport = async (institutionId, adminToken) => {
     appLogger.warn(`Couldn't get reports of [${institutionId}]: ${error}`);
   }
 
-  reportingCache.set(institutionId, { value: found, date: now });
+  reportingCache.set(institutionId, found);
   return found;
 };
 

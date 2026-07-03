@@ -34,6 +34,15 @@ module.exports = {
     secure: false,
     ignoreTLS: false,
   },
+  emails: {
+    summary: {
+      schedule: '0 0 * * * *',
+    },
+    cleanup: {
+      schedule: '0 0 * * * *',
+      maxDayAge: 7,
+    },
+  },
   ezreeport: {
     host: 'reporting',
     port: 8080,
@@ -74,6 +83,22 @@ module.exports = {
   auth: {
     secret: 'some-secret',
     cookie: 'eztoken',
+    oidc: {
+      client: {
+        id: 'changeme',
+        secret: 'changeme',
+      },
+      uris: {
+        discovery: '',
+        // or
+        issuer: '',
+        authorization: '',
+        token: '',
+        introspection: '',
+        userinfo: '',
+      },
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
+    },
   },
   admin: {
     username: 'ezmesure-admin',
@@ -133,6 +158,7 @@ module.exports = {
       schedule: '0 0 0 * * *',
     },
     deleteDurationDays: 7,
+    impersonateDuration: 3 * 60 * oneMinute,
   },
   testUsers: {
     lifespan: {
@@ -160,7 +186,7 @@ module.exports = {
   cypher: {
     secret: 'some-secret',
   },
+  defaultLocale: 'en',
   appName: 'ezMESURE',
-  passwordResetValidity: 3,
   publicUrl: 'https://ezmesure.couperin.org',
 };

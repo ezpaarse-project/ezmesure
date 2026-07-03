@@ -4,7 +4,7 @@ const { Joi } = require('koa-joi-router');
 const { FEATURES } = require('../../entities/memberships.dto');
 
 const {
-  requireJwt,
+  requireActiveJwt,
   requireUser,
   fetchInstitution,
   requireAdmin,
@@ -46,7 +46,7 @@ router.use(spaces.prefix('/:institutionId/spaces').middleware());
 router.use(elasticRoles.prefix('/:institutionId/elastic-roles').middleware());
 router.use(memberships.prefix('/:institutionId/').middleware()); // Weird prefix cause of contact route
 
-router.use(requireJwt, requireUser);
+router.use(requireActiveJwt, requireUser);
 
 router.route({
   method: 'GET',

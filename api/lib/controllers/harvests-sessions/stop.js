@@ -4,10 +4,10 @@ const HarvestSessionService = require('../../entities/harvest-session.service');
 const ActionsService = require('../../entities/actions.service');
 
 const { harvestQueue } = require('../../services/jobs');
+const { createCache } = require('../../utils/cache-manager');
 
-const JOBS_CACHE_DURATION = 5 * 60 * 1000;
-
-const jobsStopped = new Map();
+const CACHE_DURATION = 5 * 60 * 1000;
+const cache = createCache(CACHE_DURATION);
 
 async function stopSession(session) {
   const service = new HarvestSessionService();
@@ -21,7 +21,7 @@ async function stopSession(session) {
     for await (const harvestJob of harvestJobs) {
       try {
         jobs.push(harvestJob);
-        jobsStopped.set(session.id, {
+        await cache.set(session.id, {
           status: 'stopping',
           jobs,
         });
@@ -50,7 +50,7 @@ async function stopSession(session) {
       }
     }
 
-    jobsStopped.set(session.id, {
+    await cache.set(session.id, {
       status: 'stopped',
       jobs,
     });
@@ -66,17 +66,13 @@ async function stopSession(session) {
       },
     };
 
-    jobsStopped.set(session.id, data);
+    await cache.set(session.id, data);
 
     await service.update({
       where: { id: session.id },
       data,
     });
   }
-
-  setTimeout(() => {
-    jobsStopped.delete(session.id);
-  }, JOBS_CACHE_DURATION);
 }
 
 exports.getStopStatus = async (ctx) => {
@@ -94,7 +90,7 @@ exports.getStopStatus = async (ctx) => {
   }
 
   ctx.status = 200;
-  ctx.body = jobsStopped.get(session.id) ?? {
+  ctx.body = (await cache.get(session.id)) ?? {
     status: session.status,
     jobs: session.jobs,
   };
@@ -120,7 +116,7 @@ exports.stopOne = async (ctx) => {
     return;
   }
 
-  jobsStopped.set(session.id, { status: 'stopping', jobs: [] });
+  await cache.set(session.id, { status: 'stopping', jobs: [] });
 
   // Don't await promise so it runs in the background
   stopSession(session);

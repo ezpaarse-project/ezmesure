@@ -12,7 +12,9 @@ const {
  * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
+  id: Joi.string().min(1),
   username: Joi.string().min(1),
+  accountLinked: Joi.boolean(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
   deletedAt: Joi.date().allow(null),
@@ -21,8 +23,11 @@ const schema = {
   email: Joi.string().email(),
   isAdmin: Joi.boolean(),
   excludeNotifications: Joi.array().items(Joi.string()),
+  language: Joi.string().valid(null, 'fr', 'en'),
+  acceptedTerms: Joi.boolean(),
 
   metadata: Joi.object(),
+  lastActivity: Joi.date(),
 
   memberships: Joi.array().items(Joi.object()),
   elasticRoles: Joi.array().items(Joi.object()),
@@ -33,9 +38,9 @@ const schema = {
  * Fields that cannot be changed but could be found in request body
  */
 const immutableFields = [
-  'username',
   'updatedAt',
   'createdAt',
+  'lastActivity',
   'deletedAt',
   'memberships',
   'historyEntries',
@@ -72,6 +77,7 @@ const adminCreateSchema = withModifiers(
  */
 const adminUpdateSchema = withModifiers(
   schema,
+  ignoreFields(['id', 'username', 'accountLinked']),
   ignoreFields(immutableFields),
   { deletedAt: () => schema.deletedAt },
 );

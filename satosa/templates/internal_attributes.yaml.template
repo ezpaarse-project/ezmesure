@@ -1,0 +1,35 @@
+attributes:
+  displayName:
+    openid: [nickname]
+    saml: [displayName]
+  eduPersonPrincipalName:
+    openid: [sub]
+    saml: [eduPersonPrincipalName]
+  subjectId:
+    openid: [sub]
+    saml: [subjectId]
+  pairwiseId:
+    openid: [sub]
+    saml: [pairwiseId]
+  givenName:
+    openid: [given_name]
+    saml: [gn, givenName]
+  mail:
+    openid: [email]
+    saml: [email, emailAddress, mail]
+  name:
+    openid: [name]
+    saml: [cn]
+  surname:
+    openid: [family_name]
+    saml: [sn, surname]
+
+  eduPersonIdp:
+    openid: [idp]
+    saml: [idp, schacHomeOrganization]
+  eduPersonOrganization:
+    openid: [organisation]
+    saml: [o]
+  eduPersonUnit:
+    openid: [unit]
+    saml: [ou]

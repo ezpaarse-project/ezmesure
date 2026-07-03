@@ -1,10 +1,7 @@
-const jwt = require('jsonwebtoken');
 const config = require('config');
-const { add, format } = require('date-fns');
-const { fr } = require('date-fns/locale');
+const { add } = require('date-fns');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
-const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { signJWE } = require('../../utils/jwt');
 
 const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
@@ -12,12 +9,10 @@ const { sendMail, generateMail } = require('../../services/mail');
 const UsersService = require('../../entities/users.service');
 const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
 
-const { sendActivateUserMail } = require('../auth/mail');
-const { activateUserLink } = require('../auth/password');
-
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');
 const { stringToArray } = require('../../services/utils');
+const { logoutUser, AUTH_COOKIE } = require('../../services/kibana');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -27,16 +22,8 @@ const standardQueryParams = prepareStandardQueryParams({
 exports.standardQueryParams = standardQueryParams;
 
 const publicUrl = config.get('publicUrl');
-const secret = config.get('auth.secret');
-const cookie = config.get('auth.cookie');
-const { deleteDurationDays = 7 } = config.get('users');
-
-function generateToken(user) {
-  if (!user) { return null; }
-
-  const { username, email } = user;
-  return jwt.sign({ username, email }, secret);
-}
+const { cookie } = config.get('auth');
+const { deleteDurationDays = 7, impersonateDuration } = config.get('users');
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
@@ -72,11 +59,9 @@ exports.list = async (ctx) => {
 
   if (permissions != null) {
     prismaQuery.where.memberships = {
-      ...prismaQuery.where.memberships ?? {},
-      ...{
-        some: {
-          permissions: arrayFilter(permissions, hasSomePermissions),
-        },
+      ...prismaQuery.where.memberships,
+      some: {
+        permissions: arrayFilter(permissions, hasSomePermissions),
       },
     };
   }
@@ -136,23 +121,12 @@ exports.createOrReplaceUser = async (ctx) => {
 
   const user = await usersService.upsert({
     where: { username },
-    update: { ...body, username },
+    update: { ...body },
     create: { ...body, username },
   });
   appLogger.verbose(`User [${user.username}] is upserted`);
 
   ctx.body = user;
-
-  if (!userExists) {
-    const origin = ctx.get('origin');
-    const link = activateUserLink(origin, username);
-    const userData = { username, email: body.email };
-    try {
-      await sendActivateUserMail(userData, link);
-    } catch (err) {
-      appLogger.error(`Failed to send mail: ${err}`);
-    }
-  }
 
   ctx.status = userExists ? 200 : 201;
 };
@@ -219,7 +193,7 @@ exports.importUsers = async (ctx) => {
             },
           },
           create: {
-            ...(membership ?? {}),
+            ...membership,
             institutionId: undefined,
 
             institution: {
@@ -333,19 +307,19 @@ exports.deleteUser = async (ctx) => {
   appLogger.verbose(`User [${username}] will be deleted at [${deletedAt.toISOString()}]`);
 
   try {
-    const admins = await getNotificationRecipients(
-      ADMIN_NOTIFICATION_TYPES.userRequestDeletion,
-      [user.email],
-    );
-
     await sendMail({
       to: user.email,
-      bcc: admins,
-      subject: "Un administrateur d'ezMESURE a effectué une action sur votre compte",
-      ...generateMail('user-deletion-requested', {
-        loginURL: new URL('/authenticate', publicUrl).href,
-        deletedAt: format(deletedAt, 'PPP', { locale: fr }),
-      }),
+      ...generateMail(
+        'user-deletion-requested',
+        {
+          loginURL: new URL('/authenticate', publicUrl).href,
+          deletedAt,
+        },
+        {
+          locale: user.language,
+          subjectKey: 'subject.fromAdmin',
+        },
+      ),
     });
   } catch (err) {
     appLogger.error(`Failed to send mail to ${user.email}: ${err}`);
@@ -356,16 +330,31 @@ exports.deleteUser = async (ctx) => {
 };
 
 exports.impersonateUser = async (ctx) => {
+  const { user } = ctx.state;
   const { username } = ctx.params;
 
   const usersService = new UsersService();
-  const user = await usersService.findUnique({ where: { username } });
-
-  if (!user) {
+  const targetUser = await usersService.findUnique({ where: { username } });
+  if (!targetUser) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
-  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
+  const ezToken = await signJWE(
+    { id: targetUser.id, impersonatedBy: user.username },
+    { expiresIn: impersonateDuration },
+  );
+
+  // Try to logout from kibana
+  try {
+    await logoutUser(ctx.cookies.get(AUTH_COOKIE.name));
+  } catch (err) {
+    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user.username}: ${err}`);
+  }
+
+  // Reset cookie on client side
+  ctx.cookies.set(AUTH_COOKIE.name, '', AUTH_COOKIE.params);
+
+  ctx.cookies.set(cookie, ezToken, { httpOnly: true });
   ctx.body = user;
   ctx.status = 200;
 };

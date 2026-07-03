@@ -1,0 +1,3 @@
+location / {
+  proxy_pass  http://satosa_server;
+}

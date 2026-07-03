@@ -1,73 +1,65 @@
-const { isValid, isBefore, addHours } = require('date-fns');
 const { ofetch } = require('ofetch');
+const { createCache } = require('../utils/cache-manager');
 
 const registry = ofetch.create({
   baseURL: 'https://registry.countermetrics.org/api/v1',
 });
 
-/** @type {{ cachedAt: Date, platforms: object[] } | undefined} */
-let platformsCache;
-/** @type {Map<string, { cachedAt: Date, dataHost: object }>} */
-const dataHostCache = new Map();
+const cache = createCache(24 * 3600 * 1000);
 
 /**
- * Check if cache is invalid, cache lasts 1 hour
- *
- * @param {Date | undefined} cachedAt
- *
- * @returns {boolean}
- */
-const isCacheInvalid = (cachedAt) => !cachedAt
-  || !isValid(cachedAt)
-  || isBefore(addHours(cachedAt, 1), new Date());
-
-/**
- * Get all platforms from counter registry, and cache them for 1 hour
+ * Get all platforms from counter registry, and cache them for 1 day
  *
  * @returns {Promise<object[]>}
  */
 async function getAllPlatforms() {
-  if (isCacheInvalid(platformsCache?.cachedAt)) {
-    const data = await registry('/platform');
-    platformsCache = {
-      platforms: data,
-      cachedAt: new Date(),
-    };
+  const cached = await cache.get('platforms:*');
+  if (cached) {
+    return cached;
   }
 
-  return platformsCache.platforms;
+  const data = await registry('/platform');
+  await cache.set('platforms:*', data);
+
+  return data;
 }
 
 /**
- * Get specific platform from counter registry
- *
- * We don't use cache to get newest data
+ * Get specific platform from counter registry, and cache them for 1 hour
  *
  * @param {string} id Id of the platform
  *
  * @returns {Promise<object>}
  */
 async function getPlatform(id) {
+  const cached = await cache.get(`platforms:${id}`);
+  if (cached) {
+    return cached;
+  }
+
   const data = await registry(`/platform/${id}`);
+  await cache.set(`platforms:${id}`, data, 3600 * 1000);
+
   return data;
 }
 
 /**
- * Get specific data host, and cache them for 1 hour
+ * Get specific data host, and cache them for 1 day
  *
  * @param {string} id Id of the data host
  *
  * @returns {Promise<object>}
  */
 async function getDataHost(id) {
-  let { dataHost, cachedAt } = dataHostCache.get(id) ?? {};
-  if (isCacheInvalid(cachedAt)) {
-    (dataHost = await registry(`/usage-data-host/${id}`));
-    cachedAt = new Date();
-
-    dataHostCache.set(id, { dataHost, cachedAt });
+  const cached = await cache.get(`data-hosts:${id}`);
+  if (cached) {
+    return cached;
   }
-  return dataHost;
+
+  const data = await registry(`/usage-data-host/${id}`);
+  await cache.set(`data-hosts:${id}`, data);
+
+  return data;
 }
 
 module.exports = {

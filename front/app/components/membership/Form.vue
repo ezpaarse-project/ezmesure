@@ -277,7 +277,7 @@ const emit = defineEmits({
 });
 
 const { t } = useI18n();
-const { data: user } = useAuthState();
+const { user } = storeToRefs(useAuthStore());
 const { hasPermission } = useCurrentUserStore();
 const snacks = useSnacksStore();
 

@@ -112,21 +112,20 @@ const NOTIFICATION_TYPES = [
   'institution:role_assigned',
 
   'counter:new_data_available',
-
 ];
 
 const ADMIN_NOTIFICATION_TYPES = [
+  'institution:membership_request',
   'institution:counter_ready_change',
-
-  'user:request_deletion',
-  'user:auto_deleted',
 
   'contact:form',
 
   'app:recent_activity',
+  'app:outgoing_emails_summary',
 ];
 
-const { getSession, data: user } = useAuth();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { t } = useI18n();
 
 const currentTab = shallowRef('user');
@@ -139,10 +138,7 @@ const error = ref(undefined);
 const availableOptions = computed(() => {
   const isAdmin = currentTab.value === 'admin';
 
-  const types = [
-    ...NOTIFICATION_TYPES,
-    ...(isAdmin ? ADMIN_NOTIFICATION_TYPES : []),
-  ];
+  const types = isAdmin ? ADMIN_NOTIFICATION_TYPES : NOTIFICATION_TYPES;
 
   const scopesMap = new Map();
 
@@ -177,14 +173,14 @@ async function updateNotifications() {
   error.value = undefined;
   success.value = false;
   try {
-    await $fetch('/api/profile/excludeNotifications', {
+    await $fetch('/api/auth/excludeNotifications', {
       method: 'PUT',
       body: Object.entries(data.value)
         .filter(([, value]) => value === false)
         .map(([key]) => key),
     });
 
-    await getSession({ force: true });
+    await authStore.refreshAuthenticatedUser();
 
     success.value = true;
     setTimeout(() => {

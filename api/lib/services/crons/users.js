@@ -3,9 +3,6 @@ const { CronJob } = require('cron');
 const config = require('config');
 const { isValid, startOfDay } = require('date-fns');
 
-const { getNotificationRecipients } = require('../../utils/notifications');
-const { ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
-
 const UsersService = require('../../entities/users.service');
 
 const { appLogger } = require('../logger');
@@ -55,19 +52,12 @@ async function deleteMarkedUsers() {
 
   appLogger.verbose(`[user-deletion] Deleted ${deletedUsers.length} users`);
 
-  const admins = await getNotificationRecipients(
-    ADMIN_NOTIFICATION_TYPES.userDeleted,
-    // No need to exclude as users are deleted
-  );
-
   await Promise.all(
     deletedUsers.map(async (user) => {
       try {
         await sendMail({
           to: user.email,
-          bcc: admins,
-          subject: 'La suppression de votre compte est maintenant effective',
-          ...generateMail('user-deleted'),
+          ...generateMail('user-deleted', {}, { locale: user.language }),
         });
       } catch (err) {
         appLogger.error(`[user-deletion] Failed to send mail to [${user.email}]`, err);

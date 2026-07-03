@@ -28,5 +28,11 @@
     "vue"
   ],
   "i18n-ally.keystyle": "nested",
-  "i18n-ally.sourceLanguage": "fr"
+  "i18n-ally.sourceLanguage": "fr",
+  // custom file associations
+  "files.associations": {
+    "**/rp/**/*.conf.template": "nginx",
+    "*.json.template": "json",
+    "*.yaml.template": "yaml"
+  }
 }

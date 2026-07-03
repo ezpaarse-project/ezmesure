@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const {
-  requireJwt,
+  requireActiveJwt,
   requireUser,
   fetchSpace,
   requireAdmin,
@@ -27,7 +27,7 @@ const permissions = require('./permissions');
 
 router.use(permissions.prefix('/:spaceId/permissions').middleware());
 
-router.use(requireJwt, requireUser, requireAdmin);
+router.use(requireActiveJwt, requireUser, requireAdmin);
 
 router.get('/', {
   method: 'GET',

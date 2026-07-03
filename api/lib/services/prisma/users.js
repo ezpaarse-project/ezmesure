@@ -14,6 +14,7 @@ const { getNotificationMembershipWhere } = require('../../utils/notifications');
  * @typedef {import('../../.prisma/client.mjs').Prisma.UserUpsertArgs} UserUpsertArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.UserCountArgs} UserCountArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.UserFindFirstArgs} UserFindFirstArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.UserFindManyArgs} UserFindManyArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.UserUpdateArgs} UserUpdateArgs
@@ -56,6 +57,14 @@ function findMany(params, tx = prisma) {
 function findUnique(params, tx = prisma) {
   return tx.user.findUnique(params);
 }
+/**
+ * @param {UserFindFirstArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<User | null>}
+ */
+function findFirst(params, tx = prisma) {
+  return tx.user.findFirst(params);
+}
 
 /**
  * @param {string} username
@@ -87,6 +96,7 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
   return tx.user.findMany({
     select: {
       email: true,
+      language: true,
       memberships: {
         select: {
           institution: {
@@ -128,7 +138,7 @@ function acceptTerms(username, tx = prisma) {
   return tx.user.update({
     where: { username },
     data: {
-      metadata: { acceptedTerms: true },
+      acceptedTerms: true,
     },
   });
 }
@@ -222,6 +232,7 @@ module.exports = {
   create,
   findMany,
   findUnique,
+  findFirst,
   findByUsername,
   findUniqueOrThrow,
   findEmailOfCorrespondentsWithDomain,

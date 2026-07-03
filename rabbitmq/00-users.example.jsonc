@@ -6,7 +6,7 @@
   "users": [
     {
       "name": "ezreeport",
-      "password_hash": "",
+      "password_hash": "<replace me>",
       "tags": []
     }
   ]

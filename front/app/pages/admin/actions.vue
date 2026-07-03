@@ -205,7 +205,7 @@ import {
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['sidebase-auth', 'terms', 'admin'],
+  middleware: ['require-auth', 'require-terms', 'require-admin'],
 });
 
 const DATE_FORMAT = 'yyyy-MM-dd';
