@@ -13,12 +13,7 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: [
-    '@nuxtjs/i18n',
-    'vuetify-nuxt-module',
-    '@pinia/nuxt',
-    '@vueuse/nuxt',
-  ],
+  modules: ['@nuxtjs/i18n', 'vuetify-nuxt-module', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/fonts'],
 
   i18n: i18nOptions,
 
@@ -34,6 +29,10 @@ export default defineNuxtConfig({
   devServer: {
     host: '0.0.0.0',
     port: 8080,
+  },
+
+  fonts: {
+    weights: ['100 900'],
   },
 
   vite: {
