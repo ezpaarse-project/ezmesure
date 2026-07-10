@@ -55,12 +55,12 @@ home:
     title: Bienvenue sur ezMESURE
     subtitle: Agrégez - Comparez - Visualisez - Valorisez
     chip: Un outil de la suite ReadMetrics
-    text: ezMESURE est une plateforme qui collecte développée et quantifie les accès aux ressources numériques à l'échelle d'un consortium, tout en permettant de visualiser ces données cumulatives sous forme de tableaux de bord dynamiques et personnalisables des indicateurs nationaux, régionaux et par établissement des ressources documentaires consultées, par grandes catégories d’utilisateurs.
+    text: ezMESURE est une plateforme qui collecte et quantifie les accès aux ressources numériques à l'échelle d'un consortium, tout en permettant de visualiser ces données cumulatives sous forme de tableaux de bord dynamiques et personnalisables des indicateurs nationaux, régionaux et par établissement des ressources documentaires consultées, par grandes catégories d’utilisateurs.
     actions:
       start: Accéder à votre espace
   features:
     title: Une plateforme adaptée à vos besoins
-    subtitle: Des outils pour mesurer les usages de la doc éléc'
+    subtitle: Des outils pour mesurer les usages de la doc élec'
     text: Découvrez une solution flexible pour mesurer les usages de vos ressources documentaires électroniques. Des indicateurs en temps réel personnalisables pour répondre précisément à vos besoins.
     items:
       dashboard:
@@ -88,11 +88,11 @@ home:
       data: Données centralisées
       users: Utilisateurs
       institutions: Établissements
-      dataHosts: Points d'accès COUNTER moissonnable
+      dataHosts: Points d'accès COUNTER moissonnables
   counter:
     title: Une plateforme pensée avec COUNTER
     subtitle: Intègre ezCOUNTER
-    text: Depuis 2021, ezMESURE est capable de rapatrier automatiquement des rapports COUNTER 5 et 5.1 directement dans vos tableaux de bord habituel vous permettant de vous concentrer sur ce que vos statistiques représentent, pas sur comment les récupérer.
+    text: Depuis 2021, ezMESURE est capable de rapatrier automatiquement des rapports COUNTER 5 et 5.1 directement dans vos tableaux de bord habituels, vous permettant de vous concentrer sur ce que vos statistiques représentent, pas sur comment les récupérer.
     chip:
       title: ReadMetrics fait partie de la « Code Team » de COUNTER !
       text: ReadMetrics fait partie de la « Code Team » de la société COUNTER, permettant à ezMESURE d'être toujours à jour des dernières avancées du standard.
