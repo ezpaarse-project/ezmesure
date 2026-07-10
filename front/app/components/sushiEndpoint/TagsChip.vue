@@ -1,13 +1,12 @@
 <template>
   <v-chip
-    v-for="version in modelValue.counterVersions"
-    :key="version"
-    v-tooltip="$t('endpoints.counterVersionTooltip', { version })"
-    :text="version"
-    :color="counterVersionsColors.get(version) || 'secondary'"
-    :size="size"
+    v-for="tag in modelValue.tags ?? []"
+    :key="tag"
+    :text="tag"
     :density="density"
-    variant="flat"
+    :size="size"
+    color="accent"
+    variant="outlined"
     label
     :class="[end ? 'ml-2' : 'mr-2']"
   />

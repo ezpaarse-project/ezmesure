@@ -48,21 +48,11 @@
               {{ item.endpoint.vendor }}
             </nuxt-link>
             <span v-else>{{ item.endpoint.vendor }}</span>
+
+            <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" class="ml-2" />
           </div>
 
-          <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" />
-
-          <v-chip
-            v-for="tag in item.endpoint.tags ?? []"
-            :key="tag"
-            :text="tag"
-            color="accent"
-            density="comfortable"
-            variant="outlined"
-            size="small"
-            label
-            class="mr-2"
-          />
+          <SushiEndpointTagsChip :model-value="item.endpoint" size="small" />
         </div>
       </template>
 
