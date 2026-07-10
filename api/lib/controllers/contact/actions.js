@@ -19,6 +19,7 @@ exports.contact = async (ctx) => {
         await sendMail({
           from: body.email,
           to: admin.email,
+          replyTo: undefined,
           ...generateMail('contact', { body, appName }, { locale: admin.language }),
         });
 
