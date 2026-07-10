@@ -366,8 +366,8 @@ const router = useRouter();
 const goTo = useGoTo();
 const { public: { homepage } } = useRuntimeConfig();
 
-const { openDialog } = useDialogStore();
 const snacks = useSnacksStore();
+
 if (router.currentRoute.value.query.error) {
   const err = JSON.parse(atob(router.currentRoute.value.query.error));
   snacks.error(t('authenticate.failed'), err);
