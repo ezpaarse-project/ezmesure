@@ -14,8 +14,8 @@ const repositoryAliasTemplatesPrisma = require('../services/prisma/repository-al
 /** @typedef {import('../.prisma/client.mts').Prisma.RepositoryAliasTemplateDeleteArgs} RepositoryAliasTemplateDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class RepositoriesService extends BasePrismaService {
-  /** @type {BasePrismaService.TransactionFnc<RepositoriesService>} */
+module.exports = class RepoAliasTemplatesService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<RepoAliasTemplatesService>} */
   static $transaction = super.$transaction;
 
   /**
