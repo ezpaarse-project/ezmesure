@@ -46,7 +46,7 @@
             />
           </template>
 
-          <template #item="{ item: { raw: item }, props: listItem }">
+          <template #item="{ item, props: listItem }">
             <v-list-item
               :disabled="membershipIds.has(item.id)"
               v-bind="listItem"

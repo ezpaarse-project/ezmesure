@@ -15,7 +15,7 @@
     return-object
     @click:clear="selected = null"
   >
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item
         :title="item.vendor"
         :subtitle="item.website"

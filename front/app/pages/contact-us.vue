@@ -170,7 +170,7 @@
                         <InstitutionAvatar :institution="additionalData.institution" size="small" />
                       </template>
 
-                      <template #item="{ item: { raw: item }, props: listItem }">
+                      <template #item="{ item, props: listItem }">
                         <v-list-item v-bind="listItem">
                           <template #prepend>
                             <InstitutionAvatar :institution="item" />
@@ -196,7 +196,7 @@
                         return-object
                         required
                       >
-                        <template #item="{ item: { raw: item }, props: listItem }">
+                        <template #item="{ item, props: listItem }">
                           <v-list-item :subtitle="item.description" v-bind="listItem" />
                         </template>
                       </v-select>

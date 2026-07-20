@@ -20,7 +20,7 @@
     return-object
     @update:model-value="$emit('update:modelValue', $event);"
   >
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item
         :title="item.name"
         lines="two"
