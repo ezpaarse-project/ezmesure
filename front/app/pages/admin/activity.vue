@@ -14,7 +14,7 @@
     >
       <template #top>
         <v-toolbar color="transparent">
-          <div class="d-flex align-center text-h4 mx-4" style="gap: 1rem">
+          <div class="d-flex align-center text-headline-large mx-4" style="gap: 1rem">
             <v-btn
               icon="mdi-arrow-left"
               color="primary"
@@ -71,7 +71,7 @@
                 label
                 v-bind="props"
               />
-              <span v-if="index === 1" class="text-grey text-caption">
+              <span v-if="index === 1" class="text-grey text-body-small">
                 {{ $t('nbOthers', { count: query.action.length - 1 }) }}
               </span>
             </template>

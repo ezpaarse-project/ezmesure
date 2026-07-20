@@ -18,7 +18,7 @@
 
       <v-row v-if="error">
         <v-col>
-          <p class="text-subtitle-2">
+          <p class="text-title-small">
             {{ $t('reason', { reason: error.reason }) }}
           </p>
           <p>{{ error.meaning }}</p>
@@ -27,7 +27,7 @@
 
       <v-row v-if="(modelValue?.exceptions?.length ?? 0) > 0">
         <v-col>
-          <p class="text-subtitle-2">
+          <p class="text-title-small">
             {{ $t('sushi.messagesFromEndpoint') }}
           </p>
 

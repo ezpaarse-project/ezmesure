@@ -45,13 +45,13 @@
 
             <template #append="{ item }">
               <template v-if="item.children">
-                <span class="text-caption">
+                <span class="text-body-small">
                   {{ $t('sushi.files.nbFiles', item.children.length) }}
                 </span>
               </template>
 
               <template v-else>
-                <span class="text-caption mr-2">
+                <span class="text-body-small mr-2">
                   {{ prettySize(item.size) }} - <LocalDate :model-value="item.mtime" format="Pp" />
                 </span>
 

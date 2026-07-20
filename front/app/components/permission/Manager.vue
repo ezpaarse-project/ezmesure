@@ -68,7 +68,7 @@
                   label
                 />
               </div>
-              <div class="text-caption text-secondary">
+              <div class="text-body-small text-secondary">
                 {{ member.user.email }}
               </div>
             </td>

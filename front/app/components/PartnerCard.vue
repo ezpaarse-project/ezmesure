@@ -17,7 +17,7 @@
       <template v-if="contacts.length > 0">
         <v-divider class="mb-3" />
 
-        <div class="text-subtitle-1">
+        <div class="text-body-large">
           {{ $t('partners.correspondents') }}
         </div>
 

@@ -32,7 +32,7 @@
           class="value-chip my-1"
           @click:close="remValue(item.id)"
         >
-          <span class="text-overline text-grey mr-2">{{ i + 1 }}.</span>
+          <span class="text-label-medium text-grey mr-2">{{ i + 1 }}.</span>
 
           <v-text-field
             :model-value="item.value"

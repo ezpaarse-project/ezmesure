@@ -4,23 +4,23 @@
     :icon="dot.icon"
     size="small"
   >
-    <div class="text-subtitle-2">
+    <div class="text-title-small">
       {{ label }}
     </div>
 
-    <div v-if="date" class="text-caption">
+    <div v-if="date" class="text-body-small">
       {{ $t('tasks.steps.startedOn', { date }) }}
     </div>
-    <div v-if="duration" class="text-caption">
+    <div v-if="duration" class="text-body-small">
       {{ $t('tasks.steps.terminatedIn', { duration }) }}
     </div>
-    <div v-if="modelValue.data?.processedReportItems" class="text-caption">
+    <div v-if="modelValue.data?.processedReportItems" class="text-body-small">
       {{ $t('tasks.steps.processedItems', { n: modelValue.data.processedReportItems }) }}
     </div>
-    <div v-if="modelValue.data?.deletedItems" class="text-caption">
+    <div v-if="modelValue.data?.deletedItems" class="text-body-small">
       {{ $t('tasks.steps.deletedItems', { n: modelValue.data.deletedItems }) }}
     </div>
-    <div v-if="(modelValue.data?.progress ?? 100) < 100" class="text-caption">
+    <div v-if="(modelValue.data?.progress ?? 100) < 100" class="text-body-small">
       {{ $t('tasks.steps.progress', { progress: modelValue.data.progress }) }}
     </div>
 
@@ -31,7 +31,7 @@
       rounded
       elevation="1"
     >
-      <div class="text-subtitle-2">
+      <div class="text-title-small">
         {{ $t('url') }}
       </div>
 

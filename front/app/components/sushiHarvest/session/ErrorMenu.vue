@@ -50,7 +50,7 @@
 
         <v-row>
           <v-col>
-            <p class="text-subtitle-2">
+            <p class="text-title-small">
               {{ $t('harvest.sessions.status.errors.api.title') }}
             </p>
 

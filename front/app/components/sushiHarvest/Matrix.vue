@@ -40,7 +40,7 @@
             @click="periodAsYear -= 1"
           />
 
-          <span class="text-h4 mx-3">
+          <span class="text-headline-large mx-3">
             {{ periodAsYear }}
           </span>
 

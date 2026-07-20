@@ -45,7 +45,7 @@
                 :color="item.current ? 'primary' : undefined"
                 :disabled="item.disabled"
                 density="comfortable"
-                class="text-h6"
+                class="text-title-large"
                 @click="viewYear = item.value"
               >
                 {{ item.value }}

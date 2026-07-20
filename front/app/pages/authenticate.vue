@@ -19,7 +19,7 @@
         <template #actions>
           <v-slide-y-transition>
             <v-row v-if="userIsWaiting" class="text-center mx-auto" style="max-width: 500px;">
-              <v-col cols="12" class="text-body-2">
+              <v-col cols="12" class="text-body-medium">
                 {{ $t('authenticate.longLoadingDesc') }}
               </v-col>
 

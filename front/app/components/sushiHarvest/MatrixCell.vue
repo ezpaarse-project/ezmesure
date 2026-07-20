@@ -72,7 +72,7 @@
 
         <v-row v-if="(modelValue.sushiExceptions?.length ?? 0) > 0">
           <v-col>
-            <p class="text-subtitle-2">
+            <p class="text-title-small">
               {{ $t('sushi.messagesFromEndpoint') }}
             </p>
 

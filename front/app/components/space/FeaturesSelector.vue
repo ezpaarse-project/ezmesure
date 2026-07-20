@@ -54,7 +54,7 @@
     @update:model-value="onSelectionChange($event)"
   >
     <template #append="{ item }">
-      <span v-if="item?.children" class="text-caption text-grey">
+      <span v-if="item?.children" class="text-body-small text-grey">
         {{ nbActiveChildren.get(item.id) }} / {{ item.children.length }}
       </span>
     </template>
