@@ -101,7 +101,7 @@ const {
   itemsPerPage,
   itemsPerPageOptions,
   vPaginationOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/harvests-sessions',
   },

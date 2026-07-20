@@ -88,7 +88,7 @@ const {
   status,
   data: tasks,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/tasks',
     query: {

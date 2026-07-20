@@ -60,7 +60,7 @@ const {
   refresh,
   itemLength,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/sushi-alerts',
     query: {

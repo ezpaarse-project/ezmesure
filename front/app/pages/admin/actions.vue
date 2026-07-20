@@ -215,7 +215,7 @@ const {
   query,
   refresh,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/actions',
     query: {

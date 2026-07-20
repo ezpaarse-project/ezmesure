@@ -251,7 +251,7 @@ const {
   itemLength, // Total number of items
   query, // Query parameters
   vDataTableOptions, // Options to pass to v-data-table
-} = await useServerSidePagination({
+} = useServerSidePagination({
   // Fetch options to pass to $fetch
   fetch: {
     url: '/api/institutions',

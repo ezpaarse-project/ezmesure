@@ -129,7 +129,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/custom-fields',
     query: { include: '_count.institutionProperties' },

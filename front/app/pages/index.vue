@@ -100,7 +100,7 @@
         </p>
       </v-responsive>
 
-      <v-row justify="center">
+      <v-row class="justify-center">
         <v-col v-for="(feat, i) in features" :key="i" cols="12" sm="6" md="4">
           <v-card
             :title="feat.title"
@@ -363,7 +363,7 @@ import prettySize from 'pretty-bytes';
 
 const { t, locale } = useI18n();
 const router = useRouter();
-const goTo = useGoTo();
+const goTo = useVGoTo();
 const { public: { homepage } } = useRuntimeConfig();
 
 const snacks = useSnacksStore();

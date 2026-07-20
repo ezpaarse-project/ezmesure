@@ -317,7 +317,7 @@ const {
   data: sushis,
   status,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: `/api/institutions/${props.institution.id}/sushi`,
     query: {

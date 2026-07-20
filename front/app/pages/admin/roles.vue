@@ -118,7 +118,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/roles',
     query: { include: '_count.membershipRoles' },
