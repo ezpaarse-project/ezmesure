@@ -7,18 +7,18 @@
         v-bind="dialog"
       >
         <template #prepend>
-          <v-avatar icon="mdi-plus-circle-outline" border="0" />
+          <v-avatar icon="$mdi-plus-circle-outline" border="0" />
         </template>
       </v-list-item>
     </template>
 
     <v-card
       :title="$t('institutions.askToJoinAnInstitution')"
-      prepend-icon="mdi-domain-switch"
+      prepend-icon="$mdi-domain-switch"
     >
       <template #append>
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           color="secondary"
           variant="text"
           density="comfortable"
@@ -41,7 +41,7 @@
           <template #no-data>
             <v-list-item
               :title="$t('institutions.institutionFoundDeclareNewInstitution')"
-              prepend-icon="mdi-plus"
+              prepend-icon="$mdi-plus"
               @click="$emit('click:create'); isOpen = false"
             />
           </template>
@@ -59,7 +59,7 @@
               <template v-if="item.openAccess" #append>
                 <v-chip
                   :text="$t('institutions.institution.openAccess.title')"
-                  prepend-icon="mdi-lock-open-outline"
+                  prepend-icon="$mdi-lock-open-outline"
                   color="success"
                   size="small"
                 />
@@ -126,7 +126,7 @@ async function askToJoinAnInstitution(institution) {
   await openConfirm({
     text: `${t('institutions.joinInstitution', { institution: institution.name })} ${t('institutions.joinInstitutionEmail')}`,
     agreeText: t('yes'),
-    agreeIcon: 'mdi-email-fast-outline',
+    agreeIcon: '$mdi-email-fast-outline',
     onAgree: async () => {
       try {
         await $fetch(`/api/institutions/${institution.id}/_request_membership`, {

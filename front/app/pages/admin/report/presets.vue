@@ -16,7 +16,7 @@
       >
         <template #prepend>
           <v-btn
-            icon="mdi-menu"
+            icon="$mdi-menu"
             @click="toggle()"
           />
         </template>

@@ -9,7 +9,7 @@
     no-data-text="endpoints.searchRegistryDataHint"
     item-value="id"
     item-title="name"
-    prepend-icon="mdi-database-search"
+    prepend-icon="$mdi-database-search"
     hide-details="auto"
     clearable
     return-object

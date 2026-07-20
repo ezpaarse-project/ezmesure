@@ -40,7 +40,7 @@
       <v-btn
         v-if="clipboard"
         :text="$t('clipboard.copy')"
-        prepend-icon="mdi-clipboard-text"
+        prepend-icon="$mdi-clipboard-text"
         variant="outlined"
         color="primary"
         size="x-small"
@@ -65,7 +65,7 @@ const { isSupported: clipboard, copy } = useClipboard();
 const date = useDateFormat(() => props.modelValue.startedAt, 'PPPpp');
 const duration = useTimeAgo(() => props.modelValue.runningTime);
 
-const dot = computed(() => harvestStatus.get(props.modelValue.status) ?? { color: 'grey', icon: 'mdi-progress-question' });
+const dot = computed(() => harvestStatus.get(props.modelValue.status) ?? { color: 'grey', icon: '$mdi-progress-question' });
 const label = computed(() => {
   const key = `tasks.steps.labels.${props.modelValue.label}`;
   if (te(key)) {

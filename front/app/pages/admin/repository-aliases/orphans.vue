@@ -30,7 +30,7 @@
           location="left top"
         >
           <template #activator="{ props }">
-            <v-icon icon="mdi-filter" size="small" v-bind="props" />
+            <v-icon icon="$mdi-filter" size="small" v-bind="props" />
           </template>
 
           <v-textarea
@@ -50,7 +50,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -61,7 +61,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyToClipboard(item.alias)"
             />
           </v-list>

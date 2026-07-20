@@ -36,7 +36,7 @@
               <v-btn
                 v-if="institutionFormDialogRef"
                 v-tooltip="$t('modify')"
-                icon="mdi-pencil"
+                icon="$mdi-pencil"
                 variant="text"
                 density="comfortable"
                 color="blue"

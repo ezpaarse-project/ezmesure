@@ -7,7 +7,7 @@
     >
       <template #prepend>
         <v-btn
-          icon="mdi-menu"
+          icon="$mdi-menu"
           @click="toggle()"
         />
       </template>
@@ -17,7 +17,7 @@
           <template #activator="{ props: dialog }">
             <v-btn
               :text="$t('menu.bar.documentation.entries.api')"
-              prepend-icon="mdi-file-document-outline"
+              prepend-icon="$mdi-file-document-outline"
               color="primary"
               variant="tonal"
               class="mr-4"
@@ -43,7 +43,7 @@
           <template #activator="{ props: dialog }">
             <v-btn
               :text="$t('report.health')"
-              prepend-icon="mdi-heart-outline"
+              prepend-icon="$mdi-heart-outline"
               color="green"
               variant="tonal"
               class="mr-4"

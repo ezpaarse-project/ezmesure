@@ -8,7 +8,7 @@
 
             <v-spacer />
 
-            <v-icon icon="mdi-email-edit" />
+            <v-icon icon="$mdi-email-edit" />
           </v-card-title>
 
           <v-card-text class="pt-4">
@@ -22,7 +22,7 @@
                       v => !!v || $t('contact.rules.email.required'),
                       v => /.+@.+\..+/.test(v) || $t('contact.rules.email.valid'),
                     ]"
-                    prepend-icon="mdi-at"
+                    prepend-icon="$mdi-at"
                     variant="underlined"
                     hide-details="auto"
                     required
@@ -37,7 +37,7 @@
                     :rules="[
                       v => !!v || $t('contact.rules.subject.required'),
                     ]"
-                    prepend-icon="mdi-pencil"
+                    prepend-icon="$mdi-pencil"
                     variant="underlined"
                     hide-details="auto"
                     required
@@ -51,7 +51,7 @@
                   <v-col cols="12">
                     <v-card
                       :title="$t('contact.types.sushi-endpoint.fields.endpoint.title')"
-                      prepend-icon="mdi-api"
+                      prepend-icon="$mdi-api"
                       variant="outlined"
                     >
                       <template #text>
@@ -64,7 +64,7 @@
                               :rules="[
                                 v => !!v || $t('fieldIsRequired'),
                               ]"
-                              prepend-icon="mdi-rename"
+                              prepend-icon="$mdi-rename"
                               variant="underlined"
                               hide-details="auto"
                               required
@@ -79,7 +79,7 @@
                                 v => !!v || $t('fieldIsRequired'),
                                 v => isValidUrl(v) || $t('enterValidUrl'),
                               ]"
-                              prepend-icon="mdi-link-variant"
+                              prepend-icon="$mdi-link-variant"
                               variant="underlined"
                               hide-details="auto"
                               required
@@ -93,7 +93,7 @@
                   <v-col cols="12">
                     <v-card
                       :title="$t('contact.types.sushi-endpoint.fields.credentials.title')"
-                      prepend-icon="mdi-lock"
+                      prepend-icon="$mdi-lock"
                       variant="outlined"
                     >
                       <template #text>
@@ -109,7 +109,7 @@
                               v-model="additionalData.customerId"
                               :label="$t('contact.types.sushi-endpoint.fields.credentials.fields.customerId')"
                               :error-messages="sushiRule"
-                              prepend-icon="mdi-account"
+                              prepend-icon="$mdi-account"
                               variant="underlined"
                               hide-details="auto"
                               required
@@ -121,7 +121,7 @@
                               v-model="additionalData.requestorId"
                               :label="$t('contact.types.sushi-endpoint.fields.credentials.fields.requestorId')"
                               :error-messages="sushiRule"
-                              prepend-icon="mdi-account-arrow-down"
+                              prepend-icon="$mdi-account-arrow-down"
                               variant="underlined"
                               hide-details="auto"
                               required
@@ -133,7 +133,7 @@
                               v-model="additionalData.apiKey"
                               :label="$t('contact.types.sushi-endpoint.fields.credentials.fields.apiKey')"
                               :error-messages="sushiRule"
-                              prepend-icon="mdi-key-variant"
+                              prepend-icon="$mdi-key-variant"
                               variant="underlined"
                               hide-details="auto"
                               required
@@ -190,7 +190,7 @@
                           v => !!v || $t('fieldIsRequired'),
                         ]"
                         item-title="label"
-                        prepend-icon="mdi-tag-outline"
+                        prepend-icon="$mdi-tag-outline"
                         variant="underlined"
                         hide-details="auto"
                         return-object
@@ -212,7 +212,7 @@
                         :rules="[
                           v => v?.length > 0 || $t('fieldIsRequired'),
                         ]"
-                        prepend-icon="mdi-form-textbox"
+                        prepend-icon="$mdi-form-textbox"
                         variant="underlined"
                         hide-details="auto"
                         required
@@ -227,7 +227,7 @@
                 <v-col cols="12">
                   <v-textarea
                     v-model="message"
-                    prepend-icon="mdi-image-text"
+                    prepend-icon="$mdi-image-text"
                     variant="underlined"
                     hide-details="auto"
                     v-bind="messageArea"

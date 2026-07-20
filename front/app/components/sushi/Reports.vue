@@ -2,7 +2,7 @@
   <v-card
     :title="$t('reports.supportedReportsOnPlatform')"
     :loading="status === 'pending' && 'primary'"
-    prepend-icon="mdi-file-search"
+    prepend-icon="$mdi-file-search"
   >
     <template v-if="showSushi" #subtitle>
       <SushiSubtitle :model-value="sushi" />
@@ -12,7 +12,7 @@
       <v-btn
         :text="$t('refresh')"
         :loading="status === 'pending'"
-        prepend-icon="mdi-reload"
+        prepend-icon="$mdi-reload"
         variant="tonal"
         color="primary"
         class="mr-2"
@@ -101,7 +101,7 @@
       <v-row v-else-if="status !== 'pending'">
         <v-col>
           <v-empty-state
-            icon="mdi-file-hidden"
+            icon="$mdi-file-hidden"
             :title="$t('reports.failedToFetchReports')"
             :text="$t('reports.supportedReportsUnavailable')"
           />

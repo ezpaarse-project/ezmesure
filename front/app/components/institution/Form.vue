@@ -3,7 +3,7 @@
     :loading="loading && 'primary'"
     :title="isEditing ? $t('institutions.updateInstitution') : $t('institutions.newInstitution')"
     :subtitle="showInstitution ? originalName : undefined"
-    prepend-icon="mdi-office-building-plus"
+    prepend-icon="$mdi-office-building-plus"
   >
     <template #text>
       <v-row>
@@ -25,7 +25,7 @@
           >
             <v-card
               :title="$t('institutions.institution.general')"
-              prepend-icon="mdi-format-list-bulleted"
+              prepend-icon="$mdi-format-list-bulleted"
               variant="outlined"
             >
               <template #text>
@@ -35,7 +35,7 @@
                       v-model="institution.name"
                       :label="`${$t('name')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
-                      prepend-icon="mdi-rename"
+                      prepend-icon="$mdi-rename"
                       variant="underlined"
                       hide-details="auto"
                       required
@@ -46,7 +46,7 @@
                     <v-text-field
                       v-model="institution.acronym"
                       :label="$t('institutions.institution.acronym')"
-                      prepend-icon="mdi-alphabetical-variant"
+                      prepend-icon="$mdi-alphabetical-variant"
                       variant="underlined"
                       hide-details
                     />
@@ -56,7 +56,7 @@
                     <v-text-field
                       v-model="institution.websiteUrl"
                       :label="$t('institutions.institution.homepage')"
-                      prepend-icon="mdi-web"
+                      prepend-icon="$mdi-web"
                       variant="underlined"
                       hide-details
                     />
@@ -66,7 +66,7 @@
                     <v-text-field
                       v-model="institution.city"
                       :label="$t('institutions.institution.city')"
-                      prepend-icon="mdi-city-variant"
+                      prepend-icon="$mdi-city-variant"
                       variant="underlined"
                       hide-details
                     />
@@ -76,7 +76,7 @@
                     <v-text-field
                       v-model="institution.type"
                       :label="$t('institutions.institution.type')"
-                      prepend-icon="mdi-tag"
+                      prepend-icon="$mdi-tag"
                       variant="underlined"
                       hide-details
                     />
@@ -87,7 +87,7 @@
                       v-model="institution.uai"
                       :label="$t('institutions.institution.uai')"
                       :hint="$t('institutions.institution.uaiDescription')"
-                      prepend-icon="mdi-identifier"
+                      prepend-icon="$mdi-identifier"
                       variant="underlined"
                       hide-details
                     />
@@ -98,7 +98,7 @@
 
             <v-card
               :title="$t('institutions.institution.socialNetworks')"
-              prepend-icon="mdi-account-network"
+              prepend-icon="$mdi-account-network"
               variant="outlined"
               class="mt-4"
             >
@@ -108,7 +108,7 @@
                     <v-text-field
                       v-model="institution.social.twitterUrl"
                       :label="$t('institutions.institution.twitterUrl')"
-                      prepend-icon="mdi-twitter"
+                      prepend-icon="$mdi-twitter"
                       variant="underlined"
                       hide-details
                     />
@@ -118,7 +118,7 @@
                     <v-text-field
                       v-model="institution.social.linkedinUrl"
                       :label="$t('institutions.institution.linkedinUrl')"
-                      prepend-icon="mdi-linkedin"
+                      prepend-icon="$mdi-linkedin"
                       variant="underlined"
                       hide-details
                     />
@@ -128,7 +128,7 @@
                     <v-text-field
                       v-model="institution.social.youtubeUrl"
                       :label="$t('institutions.institution.youtubeUrl')"
-                      prepend-icon="mdi-youtube"
+                      prepend-icon="$mdi-youtube"
                       variant="underlined"
                       hide-details
                     />
@@ -138,7 +138,7 @@
                     <v-text-field
                       v-model="institution.social.facebookUrl"
                       :label="$t('institutions.institution.facebookUrl')"
-                      prepend-icon="mdi-facebook"
+                      prepend-icon="$mdi-facebook"
                       variant="underlined"
                       hide-details
                     />
@@ -150,7 +150,7 @@
             <v-card
               v-if="user?.isAdmin"
               :title="$t('institutions.institution.tags')"
-              prepend-icon="mdi-tag-outline"
+              prepend-icon="$mdi-tag-outline"
               variant="outlined"
               class="mt-4"
             >
@@ -167,7 +167,7 @@
                   :items="availableTags"
                   :loading="loadingTags && 'primary'"
                   :hide-no-data="!tagSearch"
-                  prepend-icon="mdi-tag"
+                  prepend-icon="$mdi-tag"
                   variant="underlined"
                   multiple
                   chips
@@ -195,7 +195,7 @@
 
             <v-card
               :title="$t('institutions.institution.customProperties')"
-              prepend-icon="mdi-tag-text-outline"
+              prepend-icon="$mdi-tag-text-outline"
               variant="outlined"
               class="mt-4"
             >
@@ -210,7 +210,7 @@
                   <template #activator="{ props: menu }">
                     <v-btn
                       v-tooltip="showCustomPropMenu ? $t('close') : $t('add')"
-                      :icon="showCustomPropMenu ? 'mdi-close' : 'mdi-plus'"
+                      :icon="showCustomPropMenu ? '$mdi-close' : '$mdi-plus'"
                       variant="tonal"
                       :color="showCustomPropMenu ? undefined : 'green'"
                       density="comfortable"
@@ -281,7 +281,7 @@
 
                   <div v-if="user?.isAdmin" class="flex-shrink-1">
                     <v-btn
-                      icon="mdi-delete"
+                      icon="$mdi-delete"
                       variant="text"
                       density="comfortable"
                       size="small"
@@ -296,7 +296,7 @@
             <v-card
               :title="$t('institutions.institution.logo')"
               :subtitle="$t('institutions.institution.logoHint', { ratioW: LOGO_RATIO.w, ratioH: LOGO_RATIO.h, accept: LOGO_ACCEPT })"
-              prepend-icon="mdi-image"
+              prepend-icon="$mdi-image"
               variant="outlined"
               class="mt-4"
               @dragover.prevent="isDraggingLogo = true"
@@ -307,7 +307,7 @@
                 <v-btn
                   v-if="logoPreview || institution.logoId"
                   :text="$t('delete')"
-                  prepend-icon="mdi-delete"
+                  prepend-icon="$mdi-delete"
                   variant="tonal"
                   color="red"
                   class="mr-2"
@@ -315,7 +315,7 @@
                 />
                 <v-btn
                   :text="$t('modify')"
-                  prepend-icon="mdi-pencil"
+                  prepend-icon="$mdi-pencil"
                   variant="tonal"
                   color="primary"
                   @click="openFileDialog()"
@@ -361,7 +361,7 @@
             <v-card
               v-if="user?.isAdmin"
               :title="$t('administration')"
-              prepend-icon="mdi-security"
+              prepend-icon="$mdi-security"
               variant="outlined"
               class="mt-4"
             >
@@ -373,7 +373,7 @@
                       :label="$t('institutions.institution.namespace')"
                       :hint="$t('institutions.institution.namespaceHint')"
                       :rules="namespaceRules"
-                      prepend-icon="mdi-backspace"
+                      prepend-icon="$mdi-backspace"
                       variant="underlined"
                       density="compact"
                       persistent-hint
@@ -412,7 +412,7 @@
 
                         <v-icon
                           v-tooltip:right="$t('institutions.institution.onboarding.description')"
-                          icon="mdi-information-outline"
+                          icon="$mdi-information-outline"
                           size="x-small"
                           color="info"
                           end
@@ -434,7 +434,7 @@
 
                         <v-icon
                           v-tooltip:right="$t('institutions.institution.openAccess.description')"
-                          icon="mdi-information-outline"
+                          icon="$mdi-information-outline"
                           size="x-small"
                           color="info"
                           end
@@ -460,7 +460,7 @@
         :text="isEditing ? $t('update') : $t('create')"
         :disabled="!valid"
         :loading="loading"
-        prepend-icon="mdi-content-save"
+        prepend-icon="$mdi-content-save"
         type="submit"
         form="institutionForm"
         variant="elevated"

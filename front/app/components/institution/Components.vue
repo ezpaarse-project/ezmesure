@@ -2,7 +2,7 @@
   <v-card
     :title="$t('components.components')"
     :subtitle="showInstitution ? institution.name : undefined"
-    prepend-icon="mdi-home-group"
+    prepend-icon="$mdi-home-group"
   >
     <template #append>
       <InstitutionAddMenu
@@ -13,7 +13,7 @@
         <template #activator="{ props: menu }">
           <v-btn
             v-tooltip="$t('add')"
-            icon="mdi-plus"
+            icon="$mdi-plus"
             variant="text"
             density="comfortable"
             color="green"
@@ -50,7 +50,7 @@
               <template #activator="{ props: confirm }">
                 <v-btn
                   v-tooltip="$t('delete')"
-                  icon="mdi-delete"
+                  icon="$mdi-delete"
                   variant="text"
                   size="small"
                   density="comfortable"

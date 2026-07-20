@@ -2,7 +2,7 @@
   <v-card
     :title="$t('sushi.files.title')"
     :loading="status === 'pending' && 'primary'"
-    prepend-icon="mdi-file-tree"
+    prepend-icon="$mdi-file-tree"
   >
     <template v-if="showSushi" #subtitle>
       <SushiSubtitle :model-value="sushi" />
@@ -12,7 +12,7 @@
       <v-btn
         :text="$t('refresh')"
         :loading="status === 'pending'"
-        prepend-icon="mdi-reload"
+        prepend-icon="$mdi-reload"
         variant="tonal"
         color="primary"
         class="mr-2"
@@ -24,7 +24,7 @@
       <v-row v-if="(files?.length ?? 0) <= 0">
         <v-col class="text-center">
           <v-empty-state
-            icon="mdi-file-hidden"
+            icon="$mdi-file-hidden"
             :title="$t('sushi.files.noFilesAvailable')"
           />
         </v-col>
@@ -39,8 +39,8 @@
             open-on-click
           >
             <template #prepend="{ item, isOpen }">
-              <v-icon v-if="item.children" :icon="isOpen ? 'mdi-folder-open' : 'mdi-folder'" />
-              <v-icon v-else icon="mdi-file-outline" />
+              <v-icon v-if="item.children" :icon="isOpen ? '$mdi-folder-open' : '$mdi-folder'" />
+              <v-icon v-else icon="$mdi-file-outline" />
             </template>
 
             <template #append="{ item }">
@@ -61,7 +61,7 @@
                   :href="item.href"
                   target="_blank"
                   rel="noopener noreferrer"
-                  icon="mdi-download"
+                  icon="$mdi-download"
                   color="primary"
                   variant="flat"
                   density="comfortable"

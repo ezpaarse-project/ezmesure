@@ -8,7 +8,7 @@
     :error="hasError"
     :error-messages="hasError ? [$t('institutions.institution.searchFailed')] : []"
     no-data-text="institutions.institution.searchOpenDataHint"
-    prepend-icon="mdi-database-search"
+    prepend-icon="$mdi-database-search"
     hide-details="auto"
     no-filter
     clearable

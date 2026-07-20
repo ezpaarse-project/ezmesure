@@ -6,11 +6,11 @@
     <v-card
       :title="$t('sushi.globalHarvestState.title')"
       :loading="loading && 'primary'"
-      prepend-icon="mdi-table-headers-eye"
+      prepend-icon="$mdi-table-headers-eye"
     >
       <template #append>
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           variant="text"
           @click="isOpen = false"
         />
@@ -21,13 +21,13 @@
           <v-tab
             :value="TABS.institutions"
             :text="$t('menu.admin.institutions')"
-            prepend-icon="mdi-domain"
+            prepend-icon="$mdi-domain"
           />
 
           <v-tab
             :value="TABS.endpoints"
             :text="$t('menu.admin.sushiEndpoints')"
-            prepend-icon="mdi-api"
+            prepend-icon="$mdi-api"
           />
         </v-tabs>
 
@@ -73,7 +73,7 @@
                         <tbody>
                           <tr>
                             <td>
-                              <v-icon icon="mdi-file-outline" color="primary" start />
+                              <v-icon icon="$mdi-file-outline" color="primary" start />
 
                               {{ $t('tasks.status.harvested') }}
                             </td>
@@ -87,7 +87,7 @@
 
                           <tr>
                             <td>
-                              <v-icon icon="mdi-help" color="primary" start style="opacity: var(--v-border-opacity);" />
+                              <v-icon icon="$mdi-help" color="primary" start style="opacity: var(--v-border-opacity);" />
 
                               {{ $t('tasks.status.unharvested') }}
                             </td>
@@ -110,7 +110,7 @@
                         <template #activator="{ props: menu, isActive }">
                           <v-btn
                             :text="$t('sushi.globalHarvestState.showUnharvested')"
-                            :prepend-icon="isActive ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                            :prepend-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
                             color="secondary"
                             block
                             v-bind="menu"

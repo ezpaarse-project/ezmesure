@@ -15,7 +15,7 @@
       <v-btn
         v-if="templateFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -44,7 +44,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!templateFormDialogRef"
-          prepend-icon="mdi-filter"
+          prepend-icon="$mdi-filter"
           size="small"
           @click="templateFormDialogRef?.open(item.id)"
         />
@@ -55,7 +55,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!templateFormDialogRef"
-          prepend-icon="mdi-format-list-checks"
+          prepend-icon="$mdi-format-list-checks"
           size="small"
           @click="templateFormDialogRef?.open(item.id)"
         />
@@ -65,7 +65,7 @@
         <v-chip
           :text="`${value}`"
           :variant="!value ? 'outlined' : undefined"
-          prepend-icon="mdi-database-eye"
+          prepend-icon="$mdi-database-eye"
           size="small"
           @click="templateFormDialogRef?.open(item.id)"
         />
@@ -75,7 +75,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -86,20 +86,20 @@
             <v-list-item
               v-if="templateFormDialogRef"
               :title="$t('apply')"
-              prepend-icon="mdi-play-circle-outline"
+              prepend-icon="$mdi-play-circle-outline"
               @click="templateApplyDialogRef.open(item.id)"
             />
 
             <v-list-item
               v-if="templateFormDialogRef"
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="templateFormDialogRef.open(item.id)"
             />
 
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteItems([item])"
             />
 
@@ -108,7 +108,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyToClipboard(item.id)"
             />
           </v-list>
@@ -135,7 +135,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteItems()"
         />
 
@@ -143,7 +143,7 @@
 
         <v-list-item
           :title="$t('activeSwitch')"
-          prepend-icon="mdi-toggle-switch"
+          prepend-icon="$mdi-toggle-switch"
           @click="toggleActiveStates()"
         />
       </template>
@@ -287,7 +287,7 @@ function deleteItems(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

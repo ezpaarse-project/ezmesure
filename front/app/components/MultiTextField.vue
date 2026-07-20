@@ -12,7 +12,7 @@
           v-for="(message, i) in errorMessages"
           :key="`err${i}`"
           :text="message"
-          prepend-icon="mdi-alert-circle"
+          prepend-icon="$mdi-alert-circle"
           density="comfortable"
           variant="elevated"
           class="value-chip my-1"
@@ -49,7 +49,7 @@
       <v-chip
         v-if="!readonly"
         :text="addLabel || $t('$ezreeport.addMultiValue')"
-        prepend-icon="mdi-plus"
+        prepend-icon="$mdi-plus"
         density="comfortable"
         variant="elevated"
         class="value-chip mt-1"

@@ -21,7 +21,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-left"
+            icon="$mdi-arrow-left"
             @click="currentHarvestYear -= 1"
           />
 
@@ -34,7 +34,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-right"
+            icon="$mdi-arrow-right"
             @click="currentHarvestYear += 1"
           />
         </div>
@@ -115,7 +115,7 @@
           <v-icon
             v-if="!item.endpoint.active"
             v-tooltip="$t('endpoints.inactiveDescription')"
-            icon="mdi-api-off"
+            icon="$mdi-api-off"
             color="warning"
           />
         </div>
@@ -125,7 +125,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -137,20 +137,20 @@
               v-if="sushiFormRef"
               :title="$t('modify')"
               :disabled="!canEdit"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="openForm(item)"
             />
             <v-list-item
               v-if="sushiFormRef"
               :title="$t('duplicate')"
               :disabled="!canEdit"
-              prepend-icon="mdi-content-copy"
+              prepend-icon="$mdi-content-copy"
               @click="openForm({ ...item, id })"
             />
             <v-list-item
               :title="$t('archive')"
               :disabled="!canEdit"
-              prepend-icon="mdi-archive"
+              prepend-icon="$mdi-archive"
               @click="archiveSushis([item])"
             />
 
@@ -158,51 +158,51 @@
 
             <v-list-item
               :title="$t('institutions.sushi.checkCredentials')"
-              prepend-icon="mdi-connection"
+              prepend-icon="$mdi-connection"
               @click="checkConnections([item])"
             />
             <v-list-item
               v-if="user?.isAdmin"
               :title="$t('institutions.sushi.resetChecks')"
-              prepend-icon="mdi-restore"
+              prepend-icon="$mdi-restore"
               @click="resetConnections([item])"
             />
             <v-list-item
               v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
-              prepend-icon="mdi-table-headers-eye"
+              prepend-icon="$mdi-table-headers-eye"
               @click="harvestMatrixRef?.open(item)"
             />
             <v-list-item
               v-if="reportsRef"
               :title="$t('reports.supportedReports')"
-              prepend-icon="mdi-file-search"
+              prepend-icon="$mdi-file-search"
               @click="reportsRef?.open(item)"
             />
             <v-list-item
               v-if="filesRef"
               :title="$t('sushi.showFiles')"
-              prepend-icon="mdi-file-tree"
+              prepend-icon="$mdi-file-tree"
               @click="filesRef?.open(item)"
             />
             <v-list-item
               v-if="historyRef"
               :title="$t('tasks.history')"
-              prepend-icon="mdi-history"
+              prepend-icon="$mdi-history"
               @click="historyRef?.open(item)"
             />
             <v-list-item
               v-if="item.endpoint.registryId"
               :title="$t('endpoints.goToRegistry')"
               :href="generateRegistryURL(item).href"
-              prepend-icon="mdi-open-in-new"
+              prepend-icon="$mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
             />
             <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copySushiId(item)"
             />
           </v-list>
@@ -226,7 +226,7 @@
         <v-list-item
           :title="$t('archive')"
           :disabled="!canEdit"
-          prepend-icon="mdi-archive"
+          prepend-icon="$mdi-archive"
           @click="archiveSushis()"
         />
 
@@ -235,18 +235,18 @@
         <v-list-item
           :title="$t('institutions.sushi.activeSwitch')"
           :disabled="!canEdit"
-          prepend-icon="mdi-toggle-switch"
+          prepend-icon="$mdi-toggle-switch"
           @click="toggleActiveStates()"
         />
         <v-list-item
           :title="$t('institutions.sushi.checkCredentials')"
-          prepend-icon="mdi-connection"
+          prepend-icon="$mdi-connection"
           @click="checkConnections()"
         />
         <v-list-item
           v-if="user?.isAdmin"
           :title="$t('institutions.sushi.resetChecks')"
-          prepend-icon="mdi-restore"
+          prepend-icon="$mdi-restore"
           @click="resetConnections()"
         />
       </template>
@@ -557,7 +557,7 @@ async function archiveSushis(items) {
       toArchive.length,
     ),
     agreeText: t('archive'),
-    agreeIcon: 'mdi-archive',
+    agreeIcon: '$mdi-archive',
     onAgree: async () => {
       const results = await Promise.all(
         toArchive.map(async (item) => {
@@ -619,7 +619,7 @@ async function resetConnections(items) {
       toReset.length,
     ),
     agreeText: t('reset'),
-    agreeIcon: 'mdi-restore',
+    agreeIcon: '$mdi-restore',
     onAgree: async () => {
       await Promise.all(
         toReset.map(

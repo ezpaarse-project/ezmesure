@@ -12,7 +12,7 @@
     :hint="modelValue?.sushiUrl"
     item-title="vendor"
     item-value="id"
-    prepend-icon="mdi-api"
+    prepend-icon="$mdi-api"
     variant="underlined"
     persistent-hint
     no-filter
@@ -50,7 +50,7 @@
       <v-list-item
         :title="$t('endpoints.noEndpointFound')"
         :subtitle="$t('endpoints.clickToDeclareOne')"
-        prepend-icon="mdi-plus-circle-outline"
+        prepend-icon="$mdi-plus-circle-outline"
         to="/contact-us?subject=sushi-endpoint"
         lines="two"
       />

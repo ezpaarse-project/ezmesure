@@ -2,7 +2,7 @@
   <v-card
     :loading="loading && 'primary'"
     :title="$t(isEditing ? 'repoAliasTemplates.modifyTemplate' : 'repoAliasTemplates.newTemplate')"
-    prepend-icon="mdi-eye-plus"
+    prepend-icon="$mdi-eye-plus"
   >
     <template #append>
       <v-switch
@@ -33,7 +33,7 @@
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9_-]+$/i.test(v) || $t('invalidFormat'),
                   ]"
-                  prepend-icon="mdi-form-textbox"
+                  prepend-icon="$mdi-form-textbox"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -48,7 +48,7 @@
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9_-]+$/i.test(v?.replace(/{{.+?}}/g), 'abc') || $t('invalidFormat'),
                   ]"
-                  prepend-icon="mdi-form-textbox"
+                  prepend-icon="$mdi-form-textbox"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -58,7 +58,7 @@
               <v-col cols="12">
                 <RepositoryAutoComplete
                   :label="`${$t('repoAliasTemplates.target')} *`"
-                  prepend-icon="mdi-database"
+                  prepend-icon="$mdi-database"
                   :model-value="repository"
                   @update:model-value="applyRepository($event)"
                 />
@@ -72,7 +72,7 @@
                   :title="$t('repoAliasTemplates.conditions')"
                   :subtitle="$t('repoAliasTemplates.conditionsDescription')"
                   variant="outlined"
-                  prepend-icon="mdi-format-list-checks"
+                  prepend-icon="$mdi-format-list-checks"
                   disable-advanced
                 />
               </v-col>
@@ -99,7 +99,7 @@
 
       <v-btn
         :text="isEditing ? $t('save') : $t('create')"
-        :prepend-icon="isEditing ? 'mdi-content-save' : 'mdi-plus'"
+        :prepend-icon="isEditing ? '$mdi-content-save' : '$mdi-plus'"
         :disabled="!valid"
         :loading="loading"
         type="submit"

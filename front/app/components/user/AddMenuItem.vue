@@ -2,7 +2,7 @@
   <v-list-item
     :title="modelValue.fullName"
     :subtitle="modelValue.email"
-    prepend-icon="mdi-account-circle"
+    prepend-icon="$mdi-account-circle"
     lines="two"
   >
     <template #append>
@@ -11,7 +11,7 @@
           <v-chip
             v-if="modelValue.memberships.length > 0"
             :text="`${modelValue.memberships.length}`"
-            append-icon="mdi-domain"
+            append-icon="$mdi-domain"
             class="mr-4"
             v-bind="menu"
           />
@@ -34,7 +34,7 @@
       <v-btn
         :disabled="isAlreadyAssigned"
         :loading="loading"
-        icon="mdi-account-plus"
+        icon="$mdi-account-plus"
         color="primary"
         variant="tonal"
         size="small"

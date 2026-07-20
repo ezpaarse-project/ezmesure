@@ -9,7 +9,7 @@
     <v-empty-state
       v-else-if="itemLength.total <= 0"
       :title="$t('sushi.alerts.endpoint.empty')"
-      icon="mdi-check"
+      icon="$mdi-check"
       color="green"
     />
 
@@ -19,9 +19,9 @@
       v-bind="vDataTableOptions"
     >
       <template #[`item.severity`]="{ value }">
-        <v-icon v-if="value === 'info'" color="info" icon="mdi-information-outline" />
-        <v-icon v-else-if="value === 'warning'" color="warning" icon="mdi-alert-outline" />
-        <v-icon v-else color="error" icon="mdi-alert-outline" />
+        <v-icon v-if="value === 'info'" color="info" icon="$mdi-information-outline" />
+        <v-icon v-else-if="value === 'warning'" color="warning" icon="$mdi-alert-outline" />
+        <v-icon v-else color="error" icon="$mdi-alert-outline" />
       </template>
 
       <template #[`item.context.endpoint.vendor`]="{ item, value }">

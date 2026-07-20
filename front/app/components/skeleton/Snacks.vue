@@ -16,7 +16,7 @@
 
     <template #actions>
       <v-btn
-        icon="mdi-window-close"
+        icon="$mdi-window-close"
         variant="text"
         right
         @click="visible = false"

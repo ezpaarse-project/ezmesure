@@ -1,5 +1,5 @@
 <template>
-  <v-card :title="$t('myspace.settings.notifications.title')" prepend-icon="mdi-email">
+  <v-card :title="$t('myspace.settings.notifications.title')" prepend-icon="$mdi-email">
     <template #text>
       <v-row>
         <v-col>
@@ -40,13 +40,13 @@
           <v-tabs v-model="currentTab" color="accent">
             <v-tab
               :text="$t('myspace.settings.notifications.modifiers.user')"
-              prepend-icon="mdi-account"
+              prepend-icon="$mdi-account"
               value="user"
             />
             <v-tab
               v-if="user.isAdmin"
               :text="$t('myspace.settings.notifications.modifiers.admin')"
-              prepend-icon="mdi-security"
+              prepend-icon="$mdi-security"
               value="admin"
             />
           </v-tabs>
@@ -94,7 +94,7 @@
       <v-btn
         :text="$t('myspace.settings.notifications.buttons.save')"
         :loading="loading"
-        prepend-icon="mdi-content-save"
+        prepend-icon="$mdi-content-save"
         color="primary"
         @click="updateNotifications()"
       />

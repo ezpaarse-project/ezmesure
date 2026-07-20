@@ -11,7 +11,7 @@
         <template #activator="{ props }">
           <v-btn
             v-tooltip="$t('institutions.harvestable.settings')"
-            icon="mdi-cog"
+            icon="$mdi-cog"
             variant="tonal"
             density="comfortable"
             color="primary"
@@ -22,7 +22,7 @@
 
         <v-card
           :title="$t('institutions.harvestable.settings')"
-          prepend-icon="mdi-cog"
+          prepend-icon="$mdi-cog"
         >
           <template #text>
             <v-row>
@@ -79,7 +79,7 @@
           <v-col cols="3">
             <SimpleMetric
               :title="$t('institutions.harvestable.harvestableInstitutions')"
-              icon="mdi-check"
+              icon="$mdi-check"
               color="success"
             >
               <template #value>
@@ -182,7 +182,7 @@
           :text="`${value}`"
           :to="`/admin/institutions/${item.institution.id}/members`"
           :color="!value ? 'orange' : undefined"
-          prepend-icon="mdi-account-multiple"
+          prepend-icon="$mdi-account-multiple"
           size="small"
         />
       </template>
@@ -191,7 +191,7 @@
         <v-chip
           :text="`${value}`"
           :color="!value ? 'red' : undefined"
-          prepend-icon="mdi-database-outline"
+          prepend-icon="$mdi-database-outline"
           size="small"
           @click="institutionRepositoriesDialogRef?.open(item.institution)"
         />
@@ -201,7 +201,7 @@
         <v-chip
           :text="`${value}`"
           :color="!value ? 'orange' : undefined"
-          prepend-icon="mdi-tab"
+          prepend-icon="$mdi-tab"
           size="small"
           @click="institutionSpacesDialogRef?.open(item.institution)"
         />
@@ -212,7 +212,7 @@
           :text="`${value}`"
           :to="`/admin/institutions/${item.institution.id}/sushi`"
           :color="!value ? 'red' : undefined"
-          prepend-icon="mdi-key"
+          prepend-icon="$mdi-key"
           size="small"
         />
       </template>
@@ -226,7 +226,7 @@
           <template #activator="{ props }">
             <v-chip
               :text="value ? $t('institutions.harvestable.status.harvestable') : $t('institutions.harvestable.status.non-harvestable')"
-              :prepend-icon="value ? 'mdi-check' : 'mdi-close'"
+              :prepend-icon="value ? '$mdi-check' : '$mdi-close'"
               :color="value ? 'green' : 'red'"
               variant="text"
               v-bind="props"
@@ -240,7 +240,7 @@
                   v-for="reason of item.harvestable.reasons"
                   :key="reason"
                   :title="$t(`sushi.isNotHarvestable.reasons.${reason}`)"
-                  prepend-icon="mdi-alert"
+                  prepend-icon="$mdi-alert"
                 />
               </v-list>
             </template>
@@ -252,7 +252,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -265,7 +265,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyInstitutionId(item)"
             />
           </v-list>
@@ -280,14 +280,14 @@
       <template #actions>
         <v-list-item
           :title="$t('users.createMailUserList', 2)"
-          prepend-icon="mdi-email-multiple"
+          prepend-icon="$mdi-email-multiple"
           @click="copyMailList()"
         />
 
         <v-list-item
           v-if="harvestSessionFormDialogRef"
           :title="$t('harvest.sessions.form.title:add')"
-          prepend-icon="mdi-tractor"
+          prepend-icon="$mdi-tractor"
           @click="harvestSessionFormDialogRef.open({
             credentialsQuery: { institutionIds: selected },
           })"
@@ -422,19 +422,19 @@ const loaders = computed(() => [
     key: 'selectable',
     originalValue: selectableInstitutions.value.length,
     color: 'green',
-    icon: 'mdi-check',
+    icon: '$mdi-check',
   },
   {
     key: 'harvested',
     originalValue: harvestedInstitutions.value.length,
     color: 'blue',
-    icon: 'mdi-cloud',
+    icon: '$mdi-cloud',
   },
   {
     key: 'harvestable',
     originalValue: harvestableInstitutions.value.length - selectableInstitutions.value.length,
     color: 'orange',
-    icon: 'mdi-alert',
+    icon: '$mdi-alert',
   },
   {
     key: 'non-harvestable',
@@ -443,7 +443,7 @@ const loaders = computed(() => [
         - harvestableInstitutions.value.length
         - harvestedInstitutions.value.length,
     color: 'red',
-    icon: 'mdi-close',
+    icon: '$mdi-close',
   },
 ].map((loader) => ({
   ...loader,

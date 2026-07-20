@@ -32,7 +32,6 @@
                 density="comfortable"
                 variant="flat"
                 size="small"
-                class="text-black"
                 label
                 class="text-black"
               />
@@ -47,7 +46,7 @@
             :placeholder="$t('endpoints.undefinedAvailable')"
             variant="underlined"
             density="compact"
-            prepend-icon="mdi-calendar-start"
+            prepend-icon="$mdi-calendar-start"
             hide-details
             clearable
             @update:model-value="patchSupportedVersion(version, $event)"
@@ -68,7 +67,7 @@
           <v-btn
             :text="$t('endpoints.addCustomVersion')"
             color="secondary"
-            prepend-icon="mdi-plus"
+            prepend-icon="$mdi-plus"
             block
             class="mt-2"
             v-bind="menu"
@@ -92,7 +91,7 @@
                     v-model="customVersion"
                     :label="$t('endpoints.customVersion')"
                     :rules="versionRules"
-                    prepend-icon="mdi-numeric"
+                    prepend-icon="$mdi-numeric"
                     variant="underlined"
                     hide-details="auto"
                     autofocus
@@ -109,7 +108,7 @@
               :text="$t('add')"
               :disabled="!customVersion"
               color="success"
-              prepend-icon="mdi-plus"
+              prepend-icon="$mdi-plus"
               variant="text"
               type="submit"
               form="additionalVersionForm"

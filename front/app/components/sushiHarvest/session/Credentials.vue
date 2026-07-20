@@ -13,7 +13,7 @@
         <v-col cols="6" class="pt-0">
           <v-list density="compact" lines="two" max-height="300" class="pt-0">
             <v-list-subheader sticky>
-              <v-icon icon="mdi-domain" />
+              <v-icon icon="$mdi-domain" />
               {{ $t('institutions.toolbarTitle', { count: institutions.length }) }}
             </v-list-subheader>
 
@@ -23,7 +23,7 @@
               :title="item.name"
               :subtitle="item.acronym"
               :to="`/admin/institutions/${item.id}/sushi`"
-              append-icon="mdi-open-in-new"
+              append-icon="$mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -39,7 +39,7 @@
         <v-col cols="6" class="pt-0">
           <v-list density="compact" lines="two" max-height="300" class="pt-0">
             <v-list-subheader sticky>
-              <v-icon icon="mdi-api" />
+              <v-icon icon="$mdi-api" />
               {{ $t('endpoints.toolbarTitle', { count: endpoints.length }) }}
             </v-list-subheader>
 
@@ -48,7 +48,7 @@
               :key="item.id"
               :title="item.vendor"
               :to="`/admin/endpoints/${item.id}`"
-              append-icon="mdi-open-in-new"
+              append-icon="$mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
             >

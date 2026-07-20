@@ -2,7 +2,7 @@
   <v-card
     :title="isEditing ? $t('endpoints.updateEndpoint') : $t('endpoints.addEndpoint')"
     :subtitle="showEndpoint ? modelValue?.vendor : undefined"
-    prepend-icon="mdi-server-plus"
+    prepend-icon="$mdi-server-plus"
   >
     <template #text>
       <v-row v-if="!isEditing">
@@ -24,7 +24,7 @@
           >
             <v-card
               :title="$t('endpoints.endpoint')"
-              prepend-icon="mdi-api"
+              prepend-icon="$mdi-api"
               variant="outlined"
             >
               <template #text>
@@ -34,7 +34,7 @@
                       v-model="endpoint.vendor"
                       :label="`${$t('name')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
-                      prepend-icon="mdi-rename"
+                      prepend-icon="$mdi-rename"
                       variant="underlined"
                       hide-details="auto"
                     />
@@ -45,7 +45,7 @@
                       :model-value="endpoint.sushiUrl"
                       :label="`${$t('url')} *`"
                       :rules="sushiUrlRules"
-                      prepend-icon="mdi-link-variant"
+                      prepend-icon="$mdi-link-variant"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="changeSushiUrl($event)"
@@ -56,7 +56,7 @@
                     <v-alert
                       :text="alert"
                       type="warning"
-                      icon="mdi-alert-outline"
+                      icon="$mdi-alert-outline"
                       density="compact"
                       variant="outlined"
                       transition="scale-transition"
@@ -98,7 +98,7 @@
 
             <v-card
               :title="$t('general')"
-              prepend-icon="mdi-format-list-bulleted"
+              prepend-icon="$mdi-format-list-bulleted"
               variant="outlined"
               class="mt-4"
             >
@@ -108,7 +108,7 @@
                     <v-text-field
                       v-model="endpoint.technicalProvider"
                       :label="$t('endpoints.technicalProvider')"
-                      prepend-icon="mdi-toolbox"
+                      prepend-icon="$mdi-toolbox"
                       variant="underlined"
                       hide-details
                     />
@@ -119,14 +119,14 @@
                       v-model="endpoint.registryId"
                       :label="$t('endpoints.registryId')"
                       :hint="$t('endpoints.registryIdHint')"
-                      prepend-icon="mdi-identifier"
+                      prepend-icon="$mdi-identifier"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="extractIdFromUrl($event)"
                     >
                       <template v-if="endpoint.registryId" #append>
                         <v-btn
-                          icon="mdi-open-in-new"
+                          icon="$mdi-open-in-new"
                           :href="`https://registry.countermetrics.org/platform/${endpoint.registryId}`"
                           target="_blank"
                           rel="noopener noreferrer"
@@ -146,7 +146,7 @@
                       :items="availableTags"
                       :loading="loadingTags && 'primary'"
                       :hide-no-data="!tagSearch"
-                      prepend-icon="mdi-tag"
+                      prepend-icon="$mdi-tag"
                       variant="underlined"
                       multiple
                       chips
@@ -174,7 +174,7 @@
                     <v-textarea
                       v-model="endpoint.description"
                       :label="$t('endpoints.description')"
-                      prepend-icon="mdi-image-text"
+                      prepend-icon="$mdi-image-text"
                       variant="underlined"
                       hide-details="auto"
                     />
@@ -185,7 +185,7 @@
 
             <v-card
               :title="$t('endpoints.counterVersion')"
-              prepend-icon="mdi-numeric"
+              prepend-icon="$mdi-numeric"
               variant="outlined"
               class="mt-4"
             >
@@ -203,7 +203,7 @@
 
             <v-card
               :title="$t('endpoints.harvestedReports')"
-              prepend-icon="mdi-file"
+              prepend-icon="$mdi-file"
               variant="outlined"
               class="mt-4"
             >
@@ -225,7 +225,7 @@
                       v-model="endpoint.testedReport"
                       :label="$t('endpoints.testedReport')"
                       :endpoint="modelValue"
-                      prepend-icon="mdi-connection"
+                      prepend-icon="$mdi-connection"
                       placeholder="pr"
                       variant="underlined"
                       hide-details="auto"
@@ -248,7 +248,7 @@
 
             <v-card
               :title="$t('advancedSettings')"
-              prepend-icon="mdi-tools"
+              prepend-icon="$mdi-tools"
               variant="outlined"
               class="mt-4"
             >
@@ -270,7 +270,7 @@
                       v-model="endpoint.harvestDateFormat"
                       :label="$t('endpoints.dateFormat')"
                       :items="['yyyy-MM', 'yyyy-MM-dd']"
-                      prepend-icon="mdi-calendar"
+                      prepend-icon="$mdi-calendar"
                       variant="underlined"
                       hide-details="auto"
                       clearable
@@ -302,7 +302,7 @@
                       v-model="endpoint.paramSeparator"
                       :label="$t('endpoints.paramSeparator')"
                       placeholder="|"
-                      prepend-icon="mdi-cursor-text"
+                      prepend-icon="$mdi-cursor-text"
                       variant="underlined"
                       hide-details
                     />
@@ -340,7 +340,7 @@
         <SushiEndpointConnectionForm :endpoint="endpoint">
           <template #append>
             <v-btn
-              icon="mdi-close"
+              icon="$mdi-close"
               color="secondary"
               variant="text"
               density="comfortable"
@@ -356,7 +356,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="saving"
         type="submit"

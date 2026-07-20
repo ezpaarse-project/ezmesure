@@ -10,7 +10,7 @@
             <v-btn
               v-if="globalHarvestMatrixRef"
               v-tooltip="$t('sushi.globalHarvestState.title')"
-              icon="mdi-table-headers-eye"
+              icon="$mdi-table-headers-eye"
               variant="tonal"
               density="comfortable"
               color="primary"
@@ -21,7 +21,7 @@
             <v-btn
               v-tooltip="$t('refresh')"
               :loading="status === 'pending'"
-              icon="mdi-reload"
+              icon="$mdi-reload"
               variant="tonal"
               density="comfortable"
               color="primary"
@@ -102,7 +102,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -113,13 +113,13 @@
             <v-list-item
               :title="$t('cancel')"
               :disabled="!cancellableStatus.has(item.status)"
-              prepend-icon="mdi-cancel"
+              prepend-icon="$mdi-cancel"
               @click="cancelJob(item)"
             />
             <v-list-item
               :disabled="unDeletableStatus.has(item.status)"
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteJob(item)"
             />
 
@@ -128,13 +128,13 @@
             <v-list-item
               v-if="historyRef"
               :title="$t('tasks.history')"
-              prepend-icon="mdi-history"
+              prepend-icon="$mdi-history"
               @click="historyRef?.open(item)"
             />
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyId(item)"
             />
           </v-list>
@@ -286,7 +286,7 @@ async function cancelJob(job) {
   const confirmed = await openConfirm({
     title: t('areYouSure'),
     agreeText: t('cancel'),
-    agreeIcon: 'mdi-cancel',
+    agreeIcon: '$mdi-cancel',
   });
 
   if (!confirmed) {
@@ -307,7 +307,7 @@ async function deleteJob(job) {
   const confirmed = await openConfirm({
     title: t('areYouSure'),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
   });
 
   if (!confirmed) {

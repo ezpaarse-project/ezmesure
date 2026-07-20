@@ -15,7 +15,7 @@
 
       <v-btn
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -42,14 +42,14 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
-          prepend-icon="mdi-domain"
+          prepend-icon="$mdi-domain"
           size="small"
           @click="membershipsDialogRef?.open(item)"
         />
       </template>
 
       <template #[`item.isAdmin`]="{ item }">
-        <v-icon v-if="item.isAdmin" icon="mdi-security" />
+        <v-icon v-if="item.isAdmin" icon="$mdi-security" />
       </template>
 
       <template #[`item.lastActivity`]="{ item }">
@@ -60,7 +60,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -82,25 +82,25 @@
       <template #actions>
         <v-list-item
           :title="$t('users.createMailUserList', 2)"
-          prepend-icon="mdi-email-multiple"
+          prepend-icon="$mdi-email-multiple"
           @click="copyMailList()"
         />
 
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteUsers()"
         />
 
         <v-list-item
           :title="$t('users.actions.disable.title')"
-          prepend-icon="mdi-account-cancel"
+          prepend-icon="$mdi-account-cancel"
           @click="disableUsers()"
         />
 
         <v-list-item
           :title="$t('users.actions.restore.title')"
-          prepend-icon="mdi-account-check"
+          prepend-icon="$mdi-account-check"
           @click="restoreUsers()"
         />
       </template>
@@ -271,7 +271,7 @@ async function deleteUsers(items) {
   await bulkActionWithConfirm(toDelete, {
     text: t('users.deleteNbUsers', toDelete.length),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
 
     action: (item) => $fetch(`/api/users/${item.username}`, { method: 'DELETE', query: { force: true } }),
     error: (item) => t('cannotDeleteItem', { id: item.username }),
@@ -294,7 +294,7 @@ async function disableUsers(items) {
   await bulkActionWithConfirm(toDisable, {
     text: t('users.actions.disable.confirm.text', { duration: deleteDuration.value }),
     agreeText: t('users.actions.disable.confirm.agree'),
-    agreeIcon: 'mdi-account-cancel',
+    agreeIcon: '$mdi-account-cancel',
 
     action: (item) => $fetch(`/api/users/${item.username}`, { method: 'DELETE' }),
     error: (item) => t('users.actions.disable.error', { id: item.username }),
@@ -317,7 +317,7 @@ async function restoreUsers(items) {
   await bulkActionWithConfirm(toRestore, {
     text: t('users.actions.restore.confirm.text', toRestore.length),
     agreeText: t('users.actions.restore.confirm.agree'),
-    agreeIcon: 'mdi-account-check',
+    agreeIcon: '$mdi-account-check',
 
     action: (item) => $fetch(`/api/users/${item.username}`, { method: 'PATCH', body: { deletedAt: null } }),
     error: (item) => t('users.actions.restore.error', { id: item.username }),

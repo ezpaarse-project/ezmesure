@@ -11,7 +11,7 @@
       <v-btn
         v-if="roleFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -40,7 +40,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!usersDialogRef"
-          prepend-icon="mdi-account-multiple"
+          prepend-icon="$mdi-account-multiple"
           size="small"
           @click="usersDialogRef?.open(item)"
         />
@@ -53,11 +53,11 @@
           size="small"
           @click="institutionsDialogRef?.open(item)"
         >
-          <v-icon icon="mdi-domain" start />
+          <v-icon icon="$mdi-domain" start />
           {{ value.length }}
 
           <template v-if="(item.conditions?.length ?? 0) > 0">
-            <v-icon icon="mdi-format-list-checks" start class="ml-2" />
+            <v-icon icon="$mdi-format-list-checks" start class="ml-2" />
             {{ item.conditions.length }}
           </template>
         </v-chip>
@@ -68,7 +68,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!permissionsDialogRef"
-          prepend-icon="mdi-database-outline"
+          prepend-icon="$mdi-database-outline"
           size="small"
           @click="permissionsDialogRef?.open(item)"
         />
@@ -79,7 +79,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!permissionsDialogRef"
-          prepend-icon="mdi-database-eye-outline"
+          prepend-icon="$mdi-database-eye-outline"
           size="small"
           @click="permissionsDialogRef?.open(item)"
         />
@@ -90,7 +90,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!permissionsDialogRef"
-          prepend-icon="mdi-tab"
+          prepend-icon="$mdi-tab"
           size="small"
           @click="permissionsDialogRef?.open(item)"
         />
@@ -100,7 +100,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -110,7 +110,7 @@
           <v-list>
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteRoles([item])"
             />
 
@@ -118,38 +118,38 @@
 
             <v-list-item
               :title="$t('menu.admin.users')"
-              prepend-icon="mdi-account-multiple"
+              prepend-icon="$mdi-account-multiple"
               @click="usersDialogRef?.open(item)"
             />
 
             <v-list-item
               :title="$t('repositories.institutions')"
-              prepend-icon="mdi-domain"
+              prepend-icon="$mdi-domain"
               @click="institutionsDialogRef?.open(item)"
             />
 
             <v-list-item
               :title="$t('repositories.repositories')"
-              prepend-icon="mdi-database-outline"
+              prepend-icon="$mdi-database-outline"
               @click="permissionsDialogRef?.open(item)"
             />
 
             <v-list-item
               :title="$t('repositoryAliases.aliases')"
-              prepend-icon="mdi-database-eye-outline"
+              prepend-icon="$mdi-database-eye-outline"
               @click="permissionsDialogRef?.open(item)"
             />
 
             <v-list-item
               :title="$t('spaces.spaces')"
-              prepend-icon="mdi-tab"
+              prepend-icon="$mdi-tab"
               @click="permissionsDialogRef?.open(item)"
             />
 
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyRoleName(item)"
             />
           </v-list>
@@ -164,7 +164,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteRoles()"
         />
       </template>
@@ -312,7 +312,7 @@ function deleteRoles(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

@@ -2,13 +2,13 @@
   <v-card
     :title="$t('repositoryAliases.aliases')"
     :subtitle="showInstitution ? institution.name : undefined"
-    prepend-icon="mdi-database-eye"
+    prepend-icon="$mdi-database-eye"
   >
     <template #append>
       <v-btn
         v-if="aliasFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="text"
         density="comfortable"
         color="green"
@@ -24,7 +24,7 @@
       <template v-else>
         <v-list v-if="sortedAliases.length > 0" density="compact">
           <v-list-subheader v-if="sortedForeignAliases.length > 0">
-            <v-icon icon="mdi-database-eye" start />
+            <v-icon icon="$mdi-database-eye" start />
             {{ $t('repositoryAliases.ownedAliases') }}
           </v-list-subheader>
 
@@ -36,7 +36,7 @@
             <template #title>
               {{ alias.pattern }}
 
-              <v-icon v-if="!!alias.filters" icon="mdi-filter" size="small" start />
+              <v-icon v-if="!!alias.filters" icon="$mdi-filter" size="small" start />
             </template>
 
             <template v-if="alias.repository" #subtitle>
@@ -49,7 +49,7 @@
               <v-btn
                 v-if="filtersFormDialogRef"
                 v-tooltip="$t('repositoryAliases.filtersForm.editFilter')"
-                icon="mdi-filter"
+                icon="$mdi-filter"
                 variant="text"
                 size="small"
                 density="comfortable"
@@ -65,7 +65,7 @@
                 <template #activator="{ props: confirm }">
                   <v-btn
                     v-tooltip="$t('delete')"
-                    icon="mdi-delete"
+                    icon="$mdi-delete"
                     variant="text"
                     size="small"
                     density="comfortable"
@@ -82,7 +82,7 @@
 
         <v-list v-if="sortedForeignAliases.length > 0" density="compact">
           <v-list-subheader>
-            <v-icon icon="mdi-database-plus" start />
+            <v-icon icon="$mdi-database-plus" start />
             {{ $t('repositoryAliases.foreignAliases') }}
           </v-list-subheader>
 
@@ -100,7 +100,7 @@
               <v-chip
                 v-tooltip:left="$t('shares.grantedBy')"
                 :text="elasticRole.name"
-                append-icon="mdi-account-tag"
+                append-icon="$mdi-account-tag"
                 color="secondary"
                 variant="outlined"
                 size="small"

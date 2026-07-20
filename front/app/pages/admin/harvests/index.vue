@@ -11,7 +11,7 @@
       <v-btn
         v-if="harvestSessionFormDialogRef"
         v-tooltip="$t('harvest.sessions.form.title:add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -22,7 +22,7 @@
       <v-btn
         v-if="globalHarvestMatrixRef"
         v-tooltip="$t('sushi.globalHarvestState.title')"
-        icon="mdi-table-headers-eye"
+        icon="$mdi-table-headers-eye"
         variant="tonal"
         density="comfortable"
         color="primary"

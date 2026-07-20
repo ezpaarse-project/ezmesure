@@ -2,7 +2,7 @@
   <v-card
     :title="$t('tasks.history')"
     :loading="status === 'pending' && 'primary'"
-    prepend-icon="mdi-history"
+    prepend-icon="$mdi-history"
   >
     <template v-if="showSushi" #subtitle>
       <SushiSubtitle :model-value="sushi" />
@@ -12,7 +12,7 @@
       <v-btn
         :text="$t('refresh')"
         :loading="status === 'pending'"
-        prepend-icon="mdi-reload"
+        prepend-icon="$mdi-reload"
         variant="tonal"
         color="primary"
         class="mr-2"

@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="mb-4">
       <v-col class="text-center">
-        <v-icon icon="mdi-charity" size="100" color="pink" />
+        <v-icon icon="$mdi-charity" size="100" color="pink" />
 
         <h1>{{ title }}</h1>
 
@@ -10,7 +10,7 @@
           v-model="search"
           :label="$t('partners.search')"
           variant="outlined"
-          append-inner-icon="mdi-magnify"
+          append-inner-icon="$mdi-magnify"
           hide-details
           class="my-3"
         />

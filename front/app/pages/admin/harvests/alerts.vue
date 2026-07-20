@@ -9,7 +9,7 @@
       <v-expansion-panels>
         <v-expansion-panel>
           <template #title>
-            <v-icon icon="mdi-file-alert" start />
+            <v-icon icon="$mdi-file-alert" start />
 
             {{ $t('sushi.alerts.unsupportedButHarvested.title') }}
 
@@ -18,7 +18,7 @@
             <v-btn
               v-if="panelsRefresh.unsupportedButHarvested"
               :loading="panelsRefresh.unsupportedButHarvested.status === 'pending'"
-              icon="mdi-reload"
+              icon="$mdi-reload"
               variant="tonal"
               color="primary"
               density="comfortable"
@@ -36,7 +36,7 @@
 
         <v-expansion-panel>
           <template #title>
-            <v-icon icon="mdi-api" start />
+            <v-icon icon="$mdi-api" start />
 
             {{ $t('sushi.alerts.endpoint.title') }}
 
@@ -45,7 +45,7 @@
             <v-btn
               v-if="panelsRefresh.endpoint"
               :loading="panelsRefresh.endpoint.status === 'pending'"
-              icon="mdi-reload"
+              icon="$mdi-reload"
               variant="tonal"
               color="primary"
               density="comfortable"

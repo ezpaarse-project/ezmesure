@@ -67,7 +67,7 @@
                   v-if="firstMonthAvailable"
                   v-tooltip:top="$t('endpoints.firstMonthAvailable')"
                   :text="firstMonthAvailable"
-                  prepend-icon="mdi-calendar-start"
+                  prepend-icon="$mdi-calendar-start"
                   color="info"
                   density="comfortable"
                   variant="flat"
@@ -84,7 +84,7 @@
                   >
                     {{ url }}
                     <v-icon
-                      icon="mdi-open-in-new"
+                      icon="$mdi-open-in-new"
                       color="secondary"
                       size="small"
                       class="ml-1"

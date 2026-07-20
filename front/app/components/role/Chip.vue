@@ -2,7 +2,7 @@
   <v-chip
     :key="role.id"
     :text="role.label"
-    :prepend-icon="role.icon || 'mdi-tag-outline'"
+    :prepend-icon="role.icon ? `$${role.icon}` : '$mdi-tag-outline'"
     :color="role.color"
   />
 </template>

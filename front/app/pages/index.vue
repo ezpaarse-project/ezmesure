@@ -35,7 +35,7 @@
           <v-btn
             :text="$t('home.head.actions.start')"
             to="/myspace"
-            append-icon="mdi-chevron-right"
+            append-icon="$mdi-chevron-right"
             variant="elevated"
             color="primary"
           />
@@ -116,7 +116,7 @@
             <template v-if="feat.to" #actions>
               <v-btn
                 :text="$t('home.features.actions.seeMore')"
-                append-icon="mdi-arrow-right"
+                append-icon="$mdi-arrow-right"
                 variant="tonal"
                 size="small"
                 color="accent"
@@ -196,7 +196,7 @@
           <template #activator="{ props }">
             <v-chip
               :text="$t('home.counter.chip.title')"
-              append-icon="mdi-information"
+              append-icon="$mdi-information"
               size="small"
               color="secondary"
               variant="flat"
@@ -212,7 +212,7 @@
               <v-btn
                 :text="$t('home.features.actions.seeMore')"
                 href="https://www.countermetrics.org/about/how-we-work/"
-                append-icon="mdi-open-in-new"
+                append-icon="$mdi-open-in-new"
                 variant="flat"
                 color="primary"
                 size="small"
@@ -288,7 +288,7 @@
             <v-btn
               :text="$t('home.git.actions.contribute')"
               href="https://github.com/ezpaarse-project/ezmesure"
-              append-icon="mdi-github"
+              append-icon="$mdi-github"
               variant="flat"
               color="accent"
               class="mt-6"
@@ -378,15 +378,15 @@ const YEAR = new Date().getFullYear();
 
 const SOCIALS = [
   {
-    icon: 'mdi-github',
+    icon: '$mdi-github',
     href: 'https://github.com/ezpaarse-project/ezmesure',
   },
   {
-    icon: 'mdi-message-text',
+    icon: '$mdi-message-text',
     href: 'https://blog.readmetrics.net/',
   },
   {
-    icon: 'mdi-youtube',
+    icon: '$mdi-youtube',
     href: 'https://www.youtube.com/channel/UCcR-0UE9WjYiwS4fMG2T4tQ',
   },
 ];
@@ -494,12 +494,12 @@ const gitItems = computed(() => [
     order: 1,
     items: [
       {
-        icon: 'mdi-license',
+        icon: '$mdi-license',
         title: t('home.git.items.license'),
         value: 'CeCILL (GPL)',
       },
       {
-        icon: 'mdi-alert-circle-outline',
+        icon: '$mdi-alert-circle-outline',
         title: t('home.git.items.issues'),
         value: formatter.value.format(metrics.value?.git?.issues ?? 0),
       },
@@ -509,12 +509,12 @@ const gitItems = computed(() => [
     order: 3,
     items: [
       {
-        icon: 'mdi-source-branch',
+        icon: '$mdi-source-branch',
         title: t('home.git.items.commits'),
         value: dateFormat(metrics.value?.git?.updatedAt, locale.value, 'PPP'),
       },
       {
-        icon: 'mdi-account-supervisor',
+        icon: '$mdi-account-supervisor',
         title: t('home.git.items.contributors'),
         value: formatter.value.format(metrics.value?.git?.contributors ?? 0),
       },
@@ -524,33 +524,33 @@ const gitItems = computed(() => [
 
 const features = computed(() => [
   {
-    icon: 'mdi-view-dashboard',
+    icon: '$mdi-view-dashboard',
     title: t('home.features.items.dashboard.title'),
     text: t('home.features.items.dashboard.text'),
     hide: !homepage.features.dashboard,
   },
   {
-    icon: 'mdi-database',
+    icon: '$mdi-database',
     title: t('home.features.items.repository.title'),
     text: t('home.features.items.repository.text'),
     hide: !homepage.features.repository,
     to: '#metrics',
   },
   {
-    icon: 'mdi-file-document',
+    icon: '$mdi-file-document',
     title: t('home.features.items.ezpaarse.title'),
     text: t('home.features.items.ezpaarse.text'),
     hide: !homepage.features.ezpaarse,
   },
   {
-    icon: 'mdi-api',
+    icon: '$mdi-api',
     title: t('home.features.items.counter.title'),
     text: t('home.features.items.counter.text'),
     hide: !homepage.features.counter,
     to: '#counter',
   },
   {
-    icon: 'mdi-file-chart-outline',
+    icon: '$mdi-file-chart-outline',
     title: t('home.features.items.reporting.title'),
     text: t('home.features.items.reporting.text'),
     hide: !homepage.features.reporting,

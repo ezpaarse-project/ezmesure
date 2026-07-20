@@ -48,7 +48,7 @@
                 v-if="helpUrl"
                 :href="helpUrl"
                 :text="$t('sushi.openHelpPage')"
-                append-icon="mdi-open-in-new"
+                append-icon="$mdi-open-in-new"
                 color="accent"
                 size="x-small"
                 target="_blank"

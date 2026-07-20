@@ -12,7 +12,7 @@
       <ezr-task-cards :namespace-id="params.id">
         <template #prepend>
           <v-btn
-            icon="mdi-menu"
+            icon="$mdi-menu"
             @click="toggle()"
           />
         </template>

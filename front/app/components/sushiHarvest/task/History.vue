@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('tasks.history')"
-    prepend-icon="mdi-history"
+    prepend-icon="$mdi-history"
     dark
   >
     <template v-if="showTask" #subtitle>

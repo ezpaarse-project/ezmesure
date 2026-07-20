@@ -16,7 +16,7 @@
         <v-toolbar color="transparent">
           <div class="d-flex align-center text-headline-large mx-4" style="gap: 1rem">
             <v-btn
-              icon="mdi-arrow-left"
+              icon="$mdi-arrow-left"
               color="primary"
               @click="addDayToCurrent(-1)"
             />
@@ -38,7 +38,7 @@
 
             <v-btn
               :disabled="isNextPeriodDisabled"
-              icon="mdi-arrow-right"
+              icon="$mdi-arrow-right"
               color="primary"
               @click="addDayToCurrent(1)"
             />
@@ -51,7 +51,7 @@
             :label="$t('activity.action')"
             :items="availableActions"
             :return-object="false"
-            prepend-inner-icon="mdi-lightning-bolt"
+            prepend-inner-icon="$mdi-lightning-bolt"
             variant="outlined"
             density="comfortable"
             item-value="value"
@@ -80,7 +80,7 @@
           <v-combobox
             v-model="query.authorId"
             :label="$t('activity.user')"
-            prepend-inner-icon="mdi-account"
+            prepend-inner-icon="$mdi-account"
             variant="outlined"
             density="comfortable"
             hide-details
@@ -119,7 +119,7 @@
           <template #activator="{ props }">
             <v-chip
               :text="value"
-              prepend-icon="mdi-account"
+              prepend-icon="$mdi-account"
               size="small"
               variant="outlined"
               v-bind="props"
@@ -130,7 +130,7 @@
             <template #actions>
               <v-btn
                 :text="$t('filter')"
-                prepend-icon="mdi-filter"
+                prepend-icon="$mdi-filter"
                 color="primary"
                 variant="text"
                 density="comfortable"
@@ -155,7 +155,7 @@
 
               <v-btn
                 v-if="isHovering"
-                icon="mdi-filter"
+                icon="$mdi-filter"
                 color="primary"
                 variant="text"
                 size="x-small"
@@ -182,7 +182,7 @@
         <v-btn
           v-if="rawItemDialog"
           text="JSON"
-          prepend-icon="mdi-code-json"
+          prepend-icon="$mdi-code-json"
           variant="text"
           size="small"
           @click="rawItemDialog.open(item)"

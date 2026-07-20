@@ -13,7 +13,7 @@
     :error-messages="error?.message"
     item-title="pattern"
     item-value="pattern"
-    prepend-icon="mdi-form-textbox"
+    prepend-icon="$mdi-form-textbox"
     variant="underlined"
     hide-details="auto"
     no-filter

@@ -23,7 +23,7 @@
           @click="openFileDialog()"
         >
           <v-card-text class="text-center text-grey">
-            <v-icon icon="mdi-cloud-upload" />
+            <v-icon icon="$mdi-cloud-upload" />
 
             <div>
               {{ $t('files.clickOrDeposit') }}
@@ -60,7 +60,7 @@
       <template #actions>
         <v-btn
           :text="$t('files.deleteCompleted')"
-          prepend-icon="mdi-notification-clear-all"
+          prepend-icon="$mdi-notification-clear-all"
           variant="outlined"
           @click="filesFinished = []"
         />

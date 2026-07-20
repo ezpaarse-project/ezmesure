@@ -37,7 +37,7 @@
         <v-btn
           v-if="user?.isAdmin"
           v-tooltip:top="$t('tasks.history')"
-          icon="mdi-history"
+          icon="$mdi-history"
           color="primary"
           variant="text"
           density="comfortable"

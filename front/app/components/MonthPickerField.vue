@@ -30,7 +30,7 @@
           <v-row>
             <v-col class="d-flex justify-center align-center">
               <v-btn
-                icon="mdi-chevron-left"
+                icon="$mdi-chevron-left"
                 variant="text"
                 color="primary"
                 density="comfortable"
@@ -52,7 +52,7 @@
               </v-btn>
 
               <v-btn
-                icon="mdi-chevron-right"
+                icon="$mdi-chevron-right"
                 variant="text"
                 color="primary"
                 density="comfortable"

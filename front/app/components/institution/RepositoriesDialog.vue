@@ -67,7 +67,7 @@ async function open(i) {
       institution.value.repositories = await $fetch(`/api/institutions/${i.id}/repositories`);
     } catch (err) {
       errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
-      errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
+      errorIcon.value = err?.statusCode === 404 ? '$mdi-file-hidden' : '$mdi-alert-circle';
     }
     loading.value = false;
   }

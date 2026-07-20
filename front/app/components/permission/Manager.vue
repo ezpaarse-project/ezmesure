@@ -3,7 +3,7 @@
     :title="$t('repositories.givePermissions')"
     :subtitle="status !== 'pending' ? $t('repositories.nPermissions', modelValue?.size ?? 0) : ''"
     :loading="status === 'pending' && 'primary'"
-    prepend-icon="mdi-account-lock"
+    prepend-icon="$mdi-account-lock"
     variant="outlined"
   >
     <template #text>
@@ -25,7 +25,7 @@
               <v-text-field
                 v-model="search"
                 :placeholder="$t('search')"
-                prepend-inner-icon="mdi-magnify"
+                prepend-inner-icon="$mdi-magnify"
                 density="compact"
                 variant="outlined"
                 hide-details

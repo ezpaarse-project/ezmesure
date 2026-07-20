@@ -8,7 +8,7 @@
       <v-row>
         <v-col class="pt-0">
           <v-list-subheader>
-            <v-icon icon="mdi-file" size="small" />
+            <v-icon icon="$mdi-file" size="small" />
             {{ $t('harvest.sessions.counts.reportTypes', props.session.reportTypes.length) }}
           </v-list-subheader>
 
@@ -27,7 +27,7 @@
           <v-row>
             <v-col>
               <v-list-subheader>
-                <v-icon icon="mdi-calendar-range" size="small" />
+                <v-icon icon="$mdi-calendar-range" size="small" />
                 {{ $t('harvest.jobs.period') }}
               </v-list-subheader>
 
@@ -38,7 +38,7 @@
           <v-row>
             <v-col class="pt-0">
               <v-list-subheader>
-                <v-icon icon="mdi-numeric" size="small" />
+                <v-icon icon="$mdi-numeric" size="small" />
                 {{ $t('harvest.sessions.counts.counterVersions', props.session.allowedCounterVersions.length) }}
               </v-list-subheader>
 

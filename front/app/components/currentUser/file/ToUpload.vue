@@ -14,7 +14,7 @@
 
     <template v-if="modelValue.status !== 'running'" #append>
       <v-btn
-        icon="mdi-delete"
+        icon="$mdi-delete"
         density="comfortable"
         variant="text"
         color="red"
@@ -27,7 +27,7 @@
       >
         <template #activator="{ props: confirm }">
           <v-btn
-            icon="mdi-close"
+            icon="$mdi-close"
             density="comfortable"
             variant="text"
             v-bind="confirm"
@@ -44,7 +44,7 @@
               :model-value="modelValue.target?.repository"
               :label="$t('files.affectedRepository')"
               :items="repositories"
-              prepend-icon="mdi-database-arrow-up"
+              prepend-icon="$mdi-database-arrow-up"
               variant="underlined"
               density="comfortable"
               hide-details
@@ -57,7 +57,7 @@
               :model-value="modelValue.target?.index"
               :label="$t('files.affectedIndex')"
               :items="indices ?? []"
-              prepend-icon="mdi-harddisk"
+              prepend-icon="$mdi-harddisk"
               variant="underlined"
               density="comfortable"
               hide-details
@@ -96,15 +96,15 @@ const formRef = useTemplateRef('formRef');
 const statusIcon = computed(() => {
   switch (props.modelValue.status) {
     case 'failed':
-      return { icon: 'mdi-alert-circle-outline', color: 'error' };
+      return { icon: '$mdi-alert-circle-outline', color: 'error' };
     case 'cancelled':
-      return { icon: 'mdi-cancel', color: 'error' };
+      return { icon: '$mdi-cancel', color: 'error' };
     case 'running':
-      return { icon: 'mdi-progress-upload', color: 'info' };
+      return { icon: '$mdi-progress-upload', color: 'info' };
     case 'finished':
-      return { icon: 'mdi-check', color: 'success' };
+      return { icon: '$mdi-check', color: 'success' };
     default:
-      return { icon: 'mdi-dots-horizontal' };
+      return { icon: '$mdi-dots-horizontal' };
   }
 });
 

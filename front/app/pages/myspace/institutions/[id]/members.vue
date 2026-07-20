@@ -26,7 +26,7 @@
           <v-btn
             :text="$t('add')"
             :disabled="!canEdit"
-            prepend-icon="mdi-plus"
+            prepend-icon="$mdi-plus"
             variant="tonal"
             color="green"
             class="mr-2"
@@ -55,7 +55,7 @@
           <v-icon
             v-if="item.comment"
             v-tooltip:right="{ text: item.comment, maxWidth: 500 }"
-            icon="mdi-information-outline"
+            icon="$mdi-information-outline"
             color="grey-darken-2"
           />
         </div>
@@ -78,7 +78,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!canEdit || !membershipFormDialogRef"
-          prepend-icon="mdi-database-outline"
+          prepend-icon="$mdi-database-outline"
           size="small"
           @click="openMembershipFormDialog(item)"
         />
@@ -89,7 +89,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!canEdit || !membershipFormDialogRef"
-          prepend-icon="mdi-database-eye-outline"
+          prepend-icon="$mdi-database-eye-outline"
           size="small"
           @click="openMembershipFormDialog(item)"
         />
@@ -100,7 +100,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!canEdit || !membershipFormDialogRef"
-          prepend-icon="mdi-tab"
+          prepend-icon="$mdi-tab"
           size="small"
           @click="openMembershipFormDialog(item)"
         />
@@ -114,7 +114,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -125,7 +125,7 @@
             <v-list-item
               :title="$t('revoke')"
               :disabled="!canEdit"
-              prepend-icon="mdi-account-off"
+              prepend-icon="$mdi-account-off"
               @click="deleteMembers([item])"
             />
 
@@ -135,7 +135,7 @@
               v-if="membershipFormDialogRef"
               :title="$t('institutions.members.changePermissions')"
               :disabled="!canEdit"
-              prepend-icon="mdi-shield"
+              prepend-icon="$mdi-shield"
               @click="membershipFormDialogRef.open(item, { institution })"
             />
 
@@ -147,7 +147,7 @@
                   <v-list-item
                     v-bind="props"
                     :title="$t('moreActions')"
-                    prepend-icon="mdi-account-cog"
+                    prepend-icon="$mdi-account-cog"
                   />
                 </template>
 
@@ -170,13 +170,13 @@
         <v-list-item
           :title="$t('revoke')"
           :disabled="!canEdit"
-          prepend-icon="mdi-account-off"
+          prepend-icon="$mdi-account-off"
           @click="deleteMembers()"
         />
         <v-list-item
           v-if="clipboard"
           :title="$t('institutions.members.createMailList')"
-          prepend-icon="mdi-email-multiple"
+          prepend-icon="$mdi-email-multiple"
           @click="copyEmails()"
         />
       </template>
@@ -368,7 +368,7 @@ function deleteMembers(items) {
       toDelete.length,
     ),
     agreeText: t('revoke'),
-    agreeIcon: 'mdi-account-off',
+    agreeIcon: '$mdi-account-off',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

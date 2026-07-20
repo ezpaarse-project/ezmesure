@@ -2,7 +2,7 @@
   <v-card
     :title="$t('sushi.harvestState')"
     :loading="status === 'pending' && 'primary'"
-    prepend-icon="mdi-table-headers-eye"
+    prepend-icon="$mdi-table-headers-eye"
   >
     <template v-if="showSushi" #subtitle>
       <SushiSubtitle :model-value="sushi" />
@@ -12,7 +12,7 @@
       <v-btn
         :text="$t('refresh')"
         :loading="status === 'pending'"
-        prepend-icon="mdi-reload"
+        prepend-icon="$mdi-reload"
         variant="tonal"
         color="primary"
         class="mr-2"
@@ -36,7 +36,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-left"
+            icon="$mdi-arrow-left"
             @click="periodAsYear -= 1"
           />
 
@@ -49,7 +49,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-right"
+            icon="$mdi-arrow-right"
             @click="periodAsYear += 1"
           />
         </v-col>
@@ -58,7 +58,7 @@
       <v-row v-if="(harvests?.length ?? 0) <= 0">
         <v-col class="d-flex justify-center">
           <v-empty-state
-            icon="mdi-table-headers-eye-off"
+            icon="$mdi-table-headers-eye-off"
             :title="$t('sushi.noMatrix.title')"
             :text="$t('sushi.noMatrix.description')"
           />

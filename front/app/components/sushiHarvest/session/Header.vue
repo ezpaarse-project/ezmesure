@@ -11,7 +11,7 @@
             :text="$t('harvest.sessions.counts.credentials', status?._count?.credentials?.harvestable ?? status?._count?.credentials?.all ?? 0)"
             :color="(status?._count?.credentials?.harvestable ?? 0) > 0 ? 'success' : 'error'"
             :disabled="!status"
-            prepend-icon="mdi-key"
+            prepend-icon="$mdi-key"
             size="small"
             variant="flat"
             class="mr-2 mt-1"
@@ -22,7 +22,7 @@
         <SushiHarvestSessionCredentials :session="modelValue" :status="status">
           <template #append>
             <v-btn
-              icon="mdi-close"
+              icon="$mdi-close"
               color="secondary"
               variant="text"
               density="comfortable"
@@ -41,7 +41,7 @@
           <v-chip
             :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
             :color="props.modelValue.reportTypes.length > 0 ? 'accent' : 'error'"
-            prepend-icon="mdi-file"
+            prepend-icon="$mdi-file"
             size="small"
             variant="flat"
             class="mr-2 mt-1"
@@ -52,7 +52,7 @@
         <SushiHarvestSessionReports :session="modelValue" :status="status">
           <template #append>
             <v-btn
-              icon="mdi-close"
+              icon="$mdi-close"
               color="secondary"
               variant="text"
               density="comfortable"
@@ -69,14 +69,14 @@
         variant="outlined"
         class="mr-2 mt-1"
       >
-        <v-icon icon="mdi-email" />
+        <v-icon icon="$mdi-email" />
       </v-chip>
 
       <v-chip
         v-if="status?.runningTime"
         v-tooltip:top="$t('harvest.sessions.startedAt', { date: dateFormat(modelValue?.startedAt, locale) })"
         :text="runningTime"
-        prepend-icon="mdi-timer-outline"
+        prepend-icon="$mdi-timer-outline"
         size="small"
         variant="outlined"
         class="mr-2 mt-1"
@@ -116,7 +116,7 @@
       <v-menu>
         <template #activator="{ props: menu }">
           <v-btn
-            icon="mdi-dots-horizontal"
+            icon="$mdi-dots-horizontal"
             variant="plain"
             density="compact"
             v-bind="menu"
@@ -127,13 +127,13 @@
           <v-list-item
             :title="$t('modify')"
             :disabled="modelValue.status === 'starting' ? !modelValue.error : modelValue.status !== 'prepared'"
-            prepend-icon="mdi-pencil"
+            prepend-icon="$mdi-pencil"
             @click="emit('click:update', modelValue)"
           />
 
           <v-list-item
             :title="$t('delete')"
-            prepend-icon="mdi-delete"
+            prepend-icon="$mdi-delete"
             @click="deleteSession()"
           />
 
@@ -142,21 +142,21 @@
           <v-list-item
             :title="$t('harvest.sessions.start')"
             :disabled="modelValue.status === 'starting' ? !modelValue.error : modelValue.status !== 'prepared'"
-            prepend-icon="mdi-play"
+            prepend-icon="$mdi-play"
             @click="startSession()"
           />
 
           <v-list-item
             :title="$t('harvest.sessions.stop')"
             :disabled="modelValue.status !== 'running'"
-            prepend-icon="mdi-stop"
+            prepend-icon="$mdi-stop"
             @click="stopSession()"
           />
 
           <v-list-item
             v-if="clipboard"
             :title="$t('copyId')"
-            prepend-icon="mdi-identifier"
+            prepend-icon="$mdi-identifier"
             @click="copyId()"
           />
         </v-list>

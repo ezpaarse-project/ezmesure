@@ -12,7 +12,7 @@
             indeterminate
             class="mb-4"
           >
-            <v-icon icon="mdi-login" />
+            <v-icon icon="$mdi-login" />
           </v-progress-circular>
         </template>
 
@@ -27,7 +27,7 @@
                 <v-btn
                   :text="$t('authenticate.longLoadingBtn')"
                   :href="redirectUrl.href"
-                  append-icon="mdi-login-variant"
+                  append-icon="$mdi-login-variant"
                   variant="outlined"
                   color="primary"
                 />
