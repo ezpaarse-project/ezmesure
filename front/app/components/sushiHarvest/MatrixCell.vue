@@ -31,6 +31,7 @@
           density="comfortable"
           variant="flat"
           label
+          class="text-black"
         />
 
         <v-btn

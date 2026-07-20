@@ -33,6 +33,7 @@
             variant="flat"
             size="small"
             label
+            class="text-black"
           />
         </template>
 

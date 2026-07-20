@@ -32,10 +32,13 @@
         :value="version"
       >
         COUNTER
-        <v-badge
-          :content="version"
+        <v-chip
+          :text="version"
           :color="counterVersionsColors.get(version) || 'secondary'"
-          inline
+          density="compact"
+          size="small"
+          variant="flat"
+          class="ml-1 text-black"
         />
       </v-tab>
     </v-tabs>

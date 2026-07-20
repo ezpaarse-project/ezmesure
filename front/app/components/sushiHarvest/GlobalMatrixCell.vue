@@ -53,7 +53,7 @@
                 density="compact"
                 variant="flat"
                 label
-                class="ml-1 mt-1"
+                class="ml-1 mt-1 text-black"
               />
             </DetailsField>
           </v-col>

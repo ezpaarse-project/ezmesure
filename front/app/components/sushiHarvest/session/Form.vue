@@ -287,6 +287,7 @@
                             variant="flat"
                             density="compact"
                             label
+                            class="text-black"
                           />
                         </template>
                       </v-list-item>

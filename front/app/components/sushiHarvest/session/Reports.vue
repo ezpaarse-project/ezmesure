@@ -51,7 +51,7 @@
                 density="comfortable"
                 variant="flat"
                 label
-                class="mr-1"
+                class="mr-1 text-black"
               />
             </v-col>
           </v-row>

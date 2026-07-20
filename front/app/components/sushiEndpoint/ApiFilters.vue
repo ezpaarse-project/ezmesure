@@ -72,6 +72,7 @@
                 density="comfortable"
                 variant="flat"
                 label
+                class="text-black"
               />
             </template>
           </ApiFiltersSelect>

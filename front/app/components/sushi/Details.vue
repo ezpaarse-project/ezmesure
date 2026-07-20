@@ -58,7 +58,7 @@
                   density="comfortable"
                   variant="flat"
                   label
-                  class="mr-1"
+                  class="mr-1 text-black"
                 />
               </td>
 

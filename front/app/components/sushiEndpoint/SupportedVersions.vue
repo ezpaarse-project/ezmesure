@@ -32,7 +32,9 @@
                 density="comfortable"
                 variant="flat"
                 size="small"
+                class="text-black"
                 label
+                class="text-black"
               />
             </template>
           </v-checkbox>
