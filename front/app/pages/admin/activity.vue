@@ -207,11 +207,6 @@ import {
   addDays,
 } from 'date-fns';
 
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const DATE_FORMAT = 'yyyy-MM-dd';
 const DATE_NOW = Date.now();
 const DATE_MAX = format(DATE_NOW, 'yyyy-MM-dd');

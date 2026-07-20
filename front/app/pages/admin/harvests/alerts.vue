@@ -66,10 +66,5 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const panelsRefresh = ref({});
 </script>

@@ -122,11 +122,6 @@ import UserFormDialog from '~/components/user/FormDialog.vue';
  * @typedef {import('~/stores/confirm').ConfirmData} DialogData
  */
 
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { data: apiConfig } = await useApiConfig();
 const { t, locale } = useI18n();
 const { copy } = useClipboard();

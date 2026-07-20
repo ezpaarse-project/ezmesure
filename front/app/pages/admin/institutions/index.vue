@@ -229,8 +229,6 @@
 
 <script setup>
 definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
   alias: ['/admin/'],
 });
 

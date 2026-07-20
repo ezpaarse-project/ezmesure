@@ -31,6 +31,11 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/admin/**': { appLayout: 'admin', appMiddleware: ['require-auth', 'require-terms', 'require-admin'] },
+    '/myspace/**': { appLayout: 'space', appMiddleware: ['require-auth', 'require-terms'] },
+  },
+
   modules: ['@nuxtjs/i18n', 'vuetify-nuxt-module', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/fonts'],
 
   i18n: i18nOptions,

@@ -115,11 +115,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t, locale } = useI18n();
 const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();

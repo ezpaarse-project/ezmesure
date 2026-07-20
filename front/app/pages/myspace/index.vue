@@ -64,10 +64,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
 
 const currentUser = useCurrentUserStore();
 const { hasMemberships, memberships } = storeToRefs(currentUser);

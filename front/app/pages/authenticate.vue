@@ -41,12 +41,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  auth: {
-    unauthenticatedOnly: true,
-  },
-});
-
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
 const { query } = useRoute();

@@ -401,11 +401,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const MAX_HARVEST_YEAR = new Date().getFullYear();
 
 const { params } = useRoute();

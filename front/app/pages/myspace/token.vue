@@ -41,11 +41,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
-
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();

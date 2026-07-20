@@ -59,11 +59,6 @@
 <script setup>
 import { millisecondsInDay } from 'date-fns/constants';
 
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
-
 const { oidcProfileUri } = useRuntimeConfig().public;
 const { data: apiConfig } = await useApiConfig();
 const authStore = useAuthStore();

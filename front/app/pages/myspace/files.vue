@@ -21,10 +21,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
 
 const tab = shallowRef(0);
 </script>

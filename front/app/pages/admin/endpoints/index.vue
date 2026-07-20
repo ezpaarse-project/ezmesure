@@ -165,11 +165,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t, locale } = useI18n();
 const { public: { counterRegistryUrl } } = useRuntimeConfig();
 const { isSupported: clipboard, copy } = useClipboard();

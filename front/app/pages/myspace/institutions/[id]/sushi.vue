@@ -253,8 +253,6 @@ import ActiveTable from '@/components/sushi/credentials/ActiveTable.vue';
 import ArchivedTable from '@/components/sushi/credentials/ArchivedTable.vue';
 
 definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
   alias: ['/admin/institutions/:id/sushi'],
 });
 

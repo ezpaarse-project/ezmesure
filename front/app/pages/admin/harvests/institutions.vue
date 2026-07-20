@@ -317,11 +317,6 @@
 <script setup>
 import { formatDate } from 'date-fns';
 
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const MAX_PERIOD = formatDate(new Date(), 'yyyy-MM');
 
 const { t, locale } = useI18n();
