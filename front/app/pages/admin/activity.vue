@@ -320,84 +320,78 @@ const headers = computed(() => [
 
 const availableActions = computed(() => {
   const actions = [
-    { header: 'users' },
-    'user/register',
-    'user/refresh',
-    'user/connection',
-    { header: 'files' },
-    'file/upload',
-    'file/list',
-    'file/delete',
-    'file/delete-many',
-    { header: 'institutions' },
-    'institutions/create',
-    'institutions/update',
-    'institutions/delete',
-    'institutions/addMember',
-    'institutions/removeMember',
-    'institutions/import',
-    { header: 'spaces' },
-    'spaces/import',
-    { header: 'exports' },
-    'export/aggregate',
-    'export/counter5',
-    'events/delete',
-    { header: 'indices' },
-    'indices/tops',
-    'indices/list',
-    'indices/delete',
-    'indices/search',
-    'indices/insert',
-    { header: 'sushi' },
-    'sushi/create',
-    'sushi/update',
-    'sushi/delete',
-    'sushi/delete-many',
-    'sushi/download-report',
-    'sushi/harvest',
-    'sushi/import',
-    'sushi/check-connection',
-    { header: 'endpoints' },
-    'endpoint/create',
-    'endpoint/update',
-    'endpoint/delete',
-    'endpoint/import',
-    { header: 'harvest' },
-    'harvest-sessions/create',
-    'harvest-sessions/upsert',
-    'harvest-sessions/start',
-    'harvest-sessions/delete',
-    'harvest-sessions/stop',
-    { header: 'reporting' },
-    'reporting/index',
-    'reporting/getDashboards',
-    'reporting/list',
-    'reporting/store',
-    'reporting/update',
-    'reporting/delete',
-    'reporting/history',
+    { value: 'users', type: 'subheader' },
+    { value: 'user/register' },
+    { value: 'user/refresh' },
+    { value: 'user/connection' },
+
+    { value: 'files', type: 'subheader' },
+    { value: 'file/upload' },
+    { value: 'file/list' },
+    { value: 'file/delete' },
+    { value: 'file/delete-many' },
+
+    { value: 'institutions', type: 'subheader' },
+    { value: 'institutions/create' },
+    { value: 'institutions/update' },
+    { value: 'institutions/delete' },
+    { value: 'institutions/addMember' },
+    { value: 'institutions/removeMember' },
+    { value: 'institutions/import' },
+
+    { value: 'spaces', type: 'subheader' },
+    { value: 'spaces/import' },
+
+    { value: 'exports', type: 'subheader' },
+    { value: 'export/aggregate' },
+    { value: 'export/counter5' },
+    { value: 'events/delete' },
+
+    { value: 'indices', type: 'subheader' },
+    { value: 'indices/tops' },
+    { value: 'indices/list' },
+    { value: 'indices/delete' },
+    { value: 'indices/search' },
+    { value: 'indices/insert' },
+
+    { value: 'sushi', type: 'subheader' },
+    { value: 'sushi/create' },
+    { value: 'sushi/update' },
+    { value: 'sushi/delete' },
+    { value: 'sushi/delete-many' },
+    { value: 'sushi/download-report' },
+    { value: 'sushi/harvest' },
+    { value: 'sushi/import' },
+    { value: 'sushi/check-connection' },
+
+    { value: 'endpoints', type: 'subheader' },
+    { value: 'endpoint/create' },
+    { value: 'endpoint/update' },
+    { value: 'endpoint/delete' },
+    { value: 'endpoint/import' },
+
+    { value: 'harvest', type: 'subheader' },
+    { value: 'harvest-sessions/create' },
+    { value: 'harvest-sessions/upsert' },
+    { value: 'harvest-sessions/start' },
+    { value: 'harvest-sessions/delete' },
+    { value: 'harvest-sessions/stop' },
+
+    { value: 'reporting', type: 'subheader' },
+    { value: 'reporting/index' },
+    { value: 'reporting/getDashboards' },
+    { value: 'reporting/list' },
+    { value: 'reporting/store' },
+    { value: 'reporting/update' },
+    { value: 'reporting/delete' },
+    { value: 'reporting/history' },
   ];
 
-  return actions.map((item) => {
-    if (item.header) {
-      // There's no way to add "headers", "groups" or "children" into a
-      // VSelect (and other derivate), so headers are items with custom style
-      return {
-        title: t(`activity.actionTypes.${item.header}`),
-        value: item,
-        props: {
-          disabled: true,
-          style: {
-            marginLeft: '-2.8rem',
-          },
-        },
-      };
-    }
-    return {
-      title: t(`activity.actions.${item}`),
-      value: item,
-    };
-  });
+  return actions.map(({ type, value }) => ({
+    type,
+    title: t(`activity.${type ? 'actionTypes' : 'actions'}.${value}`),
+    value,
+  }));
 });
 
 function addDayToCurrent(modifier) {

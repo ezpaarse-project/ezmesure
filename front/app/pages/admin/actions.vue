@@ -318,39 +318,25 @@ const headers = computed(() => [
 
 const availableActions = computed(() => {
   const actions = [
-    { header: 'sushi' },
-    'sushi/create',
-    'sushi/update',
-    'sushi/update',
-    'sushi/delete',
-    { header: 'harvest' },
-    'harvest-sessions/create',
-    'harvest-sessions/upsert',
-    'harvest-sessions/delete',
-    'harvest-sessions/start',
-    'harvest-sessions/stop',
+    { value: 'sushi', type: 'subheader' },
+    { value: 'sushi/create' },
+    { value: 'sushi/update' },
+    { value: 'sushi/update' },
+    { value: 'sushi/delete' },
+
+    { value: 'harvest', type: 'subheader' },
+    { value: 'harvest-sessions/create' },
+    { value: 'harvest-sessions/upsert' },
+    { value: 'harvest-sessions/delete' },
+    { value: 'harvest-sessions/start' },
+    { value: 'harvest-sessions/stop' },
   ];
 
-  return actions.map((item) => {
-    if (item.header) {
-      // There's no way to add "headers", "groups" or "children" into a
-      // VSelect (and other derivate), so headers are items with custom style
-      return {
-        title: t(`activity.actionTypes.${item.header}`),
-        value: item,
-        props: {
-          disabled: true,
-          style: {
-            marginLeft: '-2.8rem',
-          },
-        },
-      };
-    }
-    return {
-      title: t(`activity.actions.${item}`),
-      value: item,
-    };
-  });
+  return actions.map(({ type, value }) => ({
+    type,
+    title: t(`activity.${type ? 'actionTypes' : 'actions'}.${value}`),
+    value,
+  }));
 });
 
 function addDayToCurrent(modifier) {

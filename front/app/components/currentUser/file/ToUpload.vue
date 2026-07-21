@@ -160,37 +160,27 @@ const repositories = computed(() => {
 
   const reposPerInstitution = Object.groupBy(repos, (r) => r.institutionId);
 
-  return Object.values(reposPerInstitution).map((r) => [
-    // There's no way to add "headers", "groups" or "children" into a
-    // VSelect (and other derivate), so headers are items with custom style
-    {
-      title: r[0].institution?.name || 'Unknown',
-      value: r[0].institution?.id,
-      props: {
-        disabled: true,
+  return Object.values(reposPerInstitution)
+    .flatMap((r) => [
+      {
+        type: 'subheader',
+        title: r[0].institution?.name || 'Unknown',
       },
-    },
-
-    ...r.map(({ pattern }) => ({
-      title: pattern,
-      value: pattern,
-      props: {
-        style: {
-          paddingLeft: '2rem',
-        },
-      },
-    })),
-  ]).flat();
+      ...r.map(({ pattern }) => ({
+        title: pattern,
+        value: pattern,
+      })),
+    ]);
 });
 
 function updateRepository(pattern) {
-  const target = { ...(props.modelValue.target ?? {}) };
+  const target = { ...props.modelValue.target };
   target.repository = pattern;
   emit('update:target', target);
 }
 
 function updateIndex(index) {
-  const target = { ...(props.modelValue.target ?? {}) };
+  const target = { ...props.modelValue.target };
   target.index = index;
   emit('update:target', target);
 }
