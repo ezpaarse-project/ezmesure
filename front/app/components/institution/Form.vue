@@ -234,7 +234,7 @@
                     @update:model-value="addCustomProp"
                   >
                     <template #item="{ props: itemProps, item }">
-                      <v-list-item v-bind="itemProps" :subtitle="item.raw.id" />
+                      <v-list-item v-bind="itemProps" :subtitle="item.id" />
                     </template>
                   </v-autocomplete>
                 </v-menu>
