@@ -92,7 +92,7 @@ home:
   counter:
     title: A platform designed with COUNTER
     subtitle: Integrates ezCOUNTER
-    text: Since 2021, ezMESURE has been able to automatically retrieve COUNTER 5 and 5.1 reports directly into your usual dashboards, allowing you to focus on what your statistics represent, not on how to retrieve them.
+    text: Since 2021, ezMESURE has been able to automatically retrieve COUNTER reports directly into your usual dashboards, allowing you to focus on what your usage statistics represent, not on how to retrieve them.
     chip:
       title: ReadMetrics is part of the COUNTER "Code Team"!
       text: ReadMetrics is part of the COUNTER's "Code Team", ensuring that ezMESURE is always up to date with the latest advancements in the standard.

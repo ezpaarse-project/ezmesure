@@ -92,7 +92,7 @@ home:
   counter:
     title: Une plateforme pensée avec COUNTER
     subtitle: Intègre ezCOUNTER
-    text: Depuis 2021, ezMESURE est capable de rapatrier automatiquement des rapports COUNTER 5 et 5.1 directement dans vos tableaux de bord habituels, vous permettant de vous concentrer sur ce que vos statistiques représentent, pas sur comment les récupérer.
+    text: Depuis 2021, ezMESURE est capable de rapatrier automatiquement des rapports COUNTER directement dans vos tableaux de bord habituels, vous permettant de vous concentrer sur ce que vos données d'usages signifient, pas sur comment les récupérer.
     chip:
       title: ReadMetrics fait partie de la « Code Team » de COUNTER !
       text: ReadMetrics fait partie de la « Code Team » de la société COUNTER, permettant à ezMESURE d'être toujours à jour des dernières avancées du standard.
