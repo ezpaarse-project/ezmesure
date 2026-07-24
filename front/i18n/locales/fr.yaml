@@ -55,35 +55,34 @@ home:
     title: Bienvenue sur ezMESURE
     subtitle: Agrégez - Comparez - Visualisez - Valorisez
     chip: Un outil de la suite ReadMetrics
-    text: ezMESURE est une plateforme qui collecte et quantifie les accès aux ressources numériques à l'échelle d'un consortium, tout en permettant de visualiser ces données cumulatives sous forme de tableaux de bord dynamiques et personnalisables des indicateurs nationaux, régionaux et par établissement des ressources documentaires consultées, par grandes catégories d’utilisateurs.
+    text: ezMESURE est un service basé sur des solutions libres et open source qui collecte, agrège et présente des rapports d'usages quantifiant les accès utilisateurs aux ressources numériques à une échelle consortiale et ventilées par établissement. Des tableaux de bord dynamiques et personnalisables permettent de visualiser et de comprendre plus facilement ces données à différents niveaux.
     actions:
       start: Accéder à votre espace
   features:
     title: Une plateforme adaptée à vos besoins
-    subtitle: Des outils pour mesurer les usages de la doc élec'
-    text: Découvrez une solution flexible pour mesurer les usages de vos ressources documentaires électroniques. Des indicateurs en temps réel personnalisables pour répondre précisément à vos besoins.
+    subtitle: Suivi de l'utilisation de vos ressources électroniques
     items:
       dashboard:
         title: Visualisations dynamiques en ligne
         text: Les tableaux de bord dynamiques propulsés par Kibana facilitent la fouille et l'analyse des données d'usage au niveau d'un établissement ou d'un consortium.
       repository:
         title: Dépôt centralisé
-        text: ezMESURE est un entrepôt centralisant les statistiques d'usage de la documentation numérique des établissements.
+        text: ezMESURE est un entrepôt centralisant les données d'usage de la documentation numérique des établissements.
       ezpaarse:
         title: Données produites par ezPAARSE
-        text: Les données sont produites par les différentes installations d'ezPAARSE avant d'être agrégées dans ezMESURE.
+        text: Les données sont produites par les différentes installations locales d'ezPAARSE dans les établissements avant d'être agrégées dans ezMESURE.
       counter:
         title: Moissonnage COUNTER
         text: ezMESURE embarque tous les outils pour moissonner des rapports conformes au standard COUNTER directement depuis les plateformes des éditeurs avant de les agréger dans vos tableaux de bord.
       reporting:
         title: Rapports PDF réguliers
-        text: Besoin de recevoir régulièrement les statistiques d'usages de votre politique documentaire ? ezMESURE est capable d'envoyer des rapports condensés au format PDF de manière récurrente.
+        text: Besoin de recevoir régulièrement les données d'usage de votre politique documentaire ? ezMESURE est capable d'envoyer des rapports condensés au format PDF de manière récurrente.
     actions:
       seeMore: En savoir plus
   metrics:
     title: Des données unifiées, une communauté engagée
-    text: La force d'ezMESURE réside dans sa capacité à centraliser les données, pour permettre aux acteurs de la documentation électronique de suivre et mesurer l'impact de leur politique documentaire. Découvrez l’étendue de son réseau et l’ampleur de son impact.
-    chip: Statistiques mises à jour le {date}
+    text: La force d'ezMESURE réside dans sa capacité à centraliser les données, pour permettre aux acteurs de la documentation électronique de suivre et mesurer l'impact de leur politique documentaire.
+    chip: Métriques mises à jour le {date}
     items:
       data: Données centralisées
       users: Utilisateurs
@@ -91,18 +90,18 @@ home:
       dataHosts: Points d'accès COUNTER moissonnables
   counter:
     title: Une plateforme pensée avec COUNTER
-    subtitle: Intègre ezCOUNTER
-    text: Depuis 2021, ezMESURE est capable de rapatrier automatiquement des rapports COUNTER 5 et 5.1 directement dans vos tableaux de bord habituels, vous permettant de vous concentrer sur ce que vos statistiques représentent, pas sur comment les récupérer.
+    subtitle: Inclut ezCOUNTER
+    text: Depuis 2021, ezMESURE est capable de rapatrier automatiquement des rapports COUNTER directement dans vos tableaux de bord, vous permettant de vous concentrer sur ce que vos données d'usages contiennent.
     chip:
       title: ReadMetrics fait partie de la « Code Team » de COUNTER !
       text: ReadMetrics fait partie de la « Code Team » de la société COUNTER, permettant à ezMESURE d'être toujours à jour des dernières avancées du standard.
       actions:
         seeMore: En savoir plus
   git:
-    title: Open Source & Libre
-    subtitle: Libre, Transparent, Ouvert
+    title: Des modules activement maintenus
+    subtitle: Libre & Open Source
     text: >
-      ezMESURE est une solution 100% Open Source : son code est public, auditable et librement réutilisable. Maintenu par une équipe de passionnés, à l'écoute pour adapter la plateforme à vos besoins spécifiques.
+      ezMESURE est une solution 100% Open Source : son code est public, auditable et librement réutilisable. Développée par une équipe agile et à l'écoute pour adapter la plateforme à vos besoins spécifiques.
     items:
       issues: Issues
       commits: Dernière activité
@@ -112,10 +111,14 @@ home:
       contribute: Contribuer
   reporting:
     title: Vos tableaux de bord, directement dans votre boîte mail
-    subtitle: Intègre ezREEPORT
-    text: ezMESURE est capable de générer et envoyer vos tableaux de bords via des rapports par mail, selon la fréquence de votre choix (quotidienne, hebdomadaire, mensuelle, etc.). Personnalisez les destinataires et les filtres pour recevoir un aperçu correspondant à vos besoins.
+    subtitle: Inclut ezREEPORT
+    text: ezREEPORT est capable de générer et envoyer vos tableaux de bord ezMESURE via des rapports par mail, selon la fréquence de votre choix. Personnalisez les destinataires et les filtres pour recevoir un aperçu correspondant à vos besoins.
   footer:
     rights: Tous droits réservés
+    socials:
+      github: GitHub
+      blog: Blog
+      youtube: YouTube
 myspace:
   title: Mon profil
   noMemberships: Vous ne faites partie d'aucun établissement.
@@ -313,7 +316,7 @@ activity:
     endpoint/delete: Suppression de point d'accès
     endpoint/import: Import de points d'accès
     reporting/index: Ping du service de reporting
-    reporting/getDashboards: Consultation de la liste des tableaux de bords
+    reporting/getDashboards: Consultation de la liste des tableaux de bord
     reporting/list: Consultation des tâches de reporting
     reporting/store: Création d'une tâche de reporting
     reporting/update: Mise à jour d'une tâche de reporting
