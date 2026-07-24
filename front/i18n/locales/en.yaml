@@ -51,15 +51,74 @@ menu:
       tooltip: New version of the activity, actions will being rolled out progressively
     activity: Activity
 home:
-  whatDoesEzMESURE: What does ezMESURE ?
-  supportedBy: This service is supported by
-  discoverOurPartners: Discover our partners
-  dynamicOnlineVisualizations: Dynamic online visualizations
-  dynamicOnlineVisualizationsText: Dynamic dashboards powered by Kibana make it easy to search and analyze usage data.
-  centralizedRepository: Centralized repository
-  centralizedRepositoryText: ezMESURE is a national repository centralizing the usage statistics of the digital documentation of higher education and research institutions (HEIs).
-  dataProducedByEzPAARSE: Data produced by ezPAARSE
-  dataProducedByEzPAARSEText: Data are produced by the different ezPAARSE facilities in the HEIs before being aggregated in ezMESURE.
+  head:
+    title: Welcome to ezMESURE
+    subtitle: Aggregate - Compare - Visualize - Highlight
+    chip: A tool from the ReadMetrics suite
+    text: ezMESURE is a service based on free and open source software that collects, aggregates and presents usage reports quantifying users' access to digital resources on a consortium scale and broken down by institution. Dynamic and customizable dashboards make it easier to visualize and understand that data at different levels.
+    actions:
+      start: Access to your space
+  features:
+    title: A platform tailored to your needs
+    subtitle: Monitoring the usage of online content
+    items:
+      dashboard:
+        title: Dynamic online visualizations
+        text: Dynamic dashboards powered by Kibana make it easy to search and analyze usage data at the level of an institution or consortium.
+      repository:
+        title: Centralized repository
+        text: ezMESURE is a repository centralizing the usage data of electronic documentation of higher education and research institutions.
+      ezpaarse:
+        title: Data produced by ezPAARSE
+        text: The data is produced by the various local institutional ezPAARSE entities before being aggregated in ezMESURE.
+      counter:
+        title: COUNTER harvesting
+        text: ezMESURE includes all the tools to harvest COUNTER-compliant reports directly from publisher platforms before aggregating them into your dashboards.
+      reporting:
+        title: Regular PDF reports
+        text: Need to regularly receive the usage data of your documentary policy? ezMESURE can send condensed reports in PDF format on a recurring basis.
+    actions:
+      seeMore: Learn more
+  metrics:
+    title: Unified data, an engaged community
+    text: The strength of ezMESURE lies in its ability to centralize data, allowing stakeholders to monitor and measure the impact of their electronic resources.
+    chip: Metrics updated on {date}
+    items:
+      data: Centralized data
+      users: Users
+      institutions: Institutions
+      dataHosts: Harvestable COUNTER access points
+  counter:
+    title: A platform designed with COUNTER
+    subtitle: Includes ezCOUNTER
+    text: Since 2021, ezMESURE has been able to automatically retrieve COUNTER reports directly into your dashboards, allowing you to focus on what your usage data contains.
+    chip:
+      title: ReadMetrics is part of the COUNTER "Code Team"!
+      text: ReadMetrics is part of the COUNTER's "Code Team", ensuring that ezMESURE is always up to date with the latest advancements in the standard.
+      actions:
+        seeMore: Learn more
+  git:
+    title: Actively maintained modules
+    subtitle: Free & Open Source software
+    text: >
+      ezMESURE is a 100% Open Source solution: its code is public, auditable, and freely reusable. Developed by an agile and responsive team ready to adapt the platform to your specific needs.
+    items:
+      issues: Issues
+      commits: Latest activity
+      contributors: Contributors
+      license: License
+    actions:
+      contribute: Contribute
+  reporting:
+    title: Your dashboards, directly in your inbox
+    subtitle: Includes ezREEPORT
+    text: ezREEPORT can generate and send your ezMESURE dashboards as reports by email, according to your chosen frequency. Customize the recipients and filters to receive a preview tailored to your needs.
+  footer:
+    rights: All rights reserved
+    socials:
+      github: GitHub
+      blog: Blog
+      youtube: YouTube
 myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
@@ -1045,6 +1104,7 @@ repositories:
     1 repository
     |{count} repositories
   newRepository: New repository
+  addInstitution: Add institution
   updateForm:
     title: Update repository
     mapping:

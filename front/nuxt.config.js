@@ -10,15 +10,28 @@ export default defineNuxtConfig({
       currentInstance: '',
       oidcProfileUri: '',
       counterRegistryUrl: 'https://registry.countermetrics.org',
+      homepage: {
+        features: {
+          dashboard: true,
+          repository: true,
+          ezpaarse: true,
+          counter: true,
+          reporting: true,
+        },
+        logos: {
+          SLSP: true,
+          CSAL: true,
+          EPFL: true,
+          UNIGE: true,
+          CNRS: true,
+          COUPERIN: true,
+          INIST: false,
+        },
+      },
     },
   },
 
-  modules: [
-    '@nuxtjs/i18n',
-    'vuetify-nuxt-module',
-    '@pinia/nuxt',
-    '@vueuse/nuxt',
-  ],
+  modules: ['@nuxtjs/i18n', 'vuetify-nuxt-module', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/fonts'],
 
   i18n: i18nOptions,
 
@@ -34,6 +47,10 @@ export default defineNuxtConfig({
   devServer: {
     host: '0.0.0.0',
     port: 8080,
+  },
+
+  fonts: {
+    weights: ['100 900'],
   },
 
   vite: {

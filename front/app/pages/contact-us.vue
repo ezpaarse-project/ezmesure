@@ -416,7 +416,7 @@ function generateSushiEndpointMail() {
   const meta = additionalData.value;
 
   const parts = [
-    `${t('contact.types.sushi-endpoint.fields.endpoint.fields.vendor')}:`, meta.endpointVendor,
+    `${t('contact.types.sushi-endpoint.fields.endpoint.fields.vendor.label')}:`, meta.endpointVendor,
     `${t('contact.types.sushi-endpoint.fields.endpoint.fields.url')}:`, meta.endpointUrl,
     '',
     `${t('institutions.sushi.requestorId')}:`, meta.requestorId,
