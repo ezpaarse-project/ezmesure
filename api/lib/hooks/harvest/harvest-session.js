@@ -134,7 +134,7 @@ async function sendEndMail(session) {
             try {
               await sendMail({
                 to: contact.email,
-                ...generateMail('harvest-end', data, { locale: contact.language }),
+                ...await generateMail('harvest-end', data, { locale: contact.language }),
               });
 
               appLogger.verbose(`[harvest-session][hooks] Mail sent to ${contact.email} for ${institution.name}`);

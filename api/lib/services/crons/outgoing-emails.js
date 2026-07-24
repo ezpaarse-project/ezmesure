@@ -83,7 +83,7 @@ async function sendEmailsSummaryToAdmins() {
       try {
         await sendMail({
           to: user.email,
-          ...generateMail(
+          ...await generateMail(
             'outgoing-emails-summary',
             {
               emails: outgoingEmails,
