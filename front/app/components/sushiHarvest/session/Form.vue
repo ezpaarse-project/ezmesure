@@ -576,7 +576,7 @@ const emit = defineEmits({
 
 const snacks = useSnacksStore();
 const { t, locale } = useI18n();
-const { mdAndUp } = useDisplay();
+const { mdAndUp } = useVDisplay();
 
 const institutionsSearch = shallowRef('');
 const endpointsSearch = shallowRef('');

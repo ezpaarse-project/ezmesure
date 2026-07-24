@@ -9,8 +9,8 @@
     </template>
 
     <template #text>
-      <v-row class="mt-2">
-        <v-col cols="6" class="pt-0">
+      <v-row class="mt-2" gap="0">
+        <v-col cols="6" class="pt-0 institution-list">
           <v-list density="compact" lines="two" max-height="300" class="pt-0">
             <v-list-subheader sticky>
               <v-icon icon="$mdi-domain" />
@@ -34,9 +34,7 @@
           </v-list>
         </v-col>
 
-        <v-divider vertical />
-
-        <v-col cols="6" class="pt-0">
+        <v-col cols="6" class="pt-0 endpoint-list">
           <v-list density="compact" lines="two" max-height="300" class="pt-0">
             <v-list-subheader sticky>
               <v-icon icon="$mdi-api" />
@@ -125,3 +123,17 @@ const endpoints = computed(() => {
   return [...map.values()].sort((a, b) => a.vendor.localeCompare(b.vendor));
 });
 </script>
+
+<style scoped>
+.institution-list {
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+
+  /* Apply half gap to center divider */
+  padding-right: 12px;
+}
+
+.endpoint-list {
+  /* Apply half gap to center divider */
+  padding-left: 12px;
+}
+</style>

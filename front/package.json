@@ -11,6 +11,7 @@
     "lintfix": "npm run lint --fix"
   },
   "devDependencies": {
+    "@ezpaarse-project/ezreeport-vue": "^3.3.0",
     "@mdi/js": "^7.4.47",
     "@nuxt/devtools": "^3.2.4",
     "@nuxt/eslint-config": "^0.7.6",
