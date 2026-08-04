@@ -12,30 +12,15 @@ const {
  */
 const schema = {
   id: Joi.string().trim(),
+
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
-  institutionId: Joi.string().trim(),
-  institution: Joi.object(),
-
-  type: Joi.string().trim().min(1),
   name: Joi.string().trim().min(1),
   description: Joi.string().trim().allow('').empty(null),
-  initials: Joi.string().trim().allow('').max(2)
-    .empty(null),
-  color: Joi.string().trim().allow('').empty(null),
-  imageUrl: Joi.string().trim().base64().allow(null),
 
-  disabledFeatures: Joi.array().items(Joi.string().trim().min(1)),
-
-  indexPatterns: Joi.array().items(Joi.object({
-    title: Joi.string().required().min(1),
-    timeFieldName: Joi.string(),
-  })),
-
-  permissions: Joi.array().items(Joi.object()),
-  elasticRolePermissions: Joi.array().items(Joi.object()),
-  dashboardCollections: Joi.array().items(Joi.object()),
+  dashboards: Joi.array().items(Joi.object()),
+  spaces: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -43,25 +28,18 @@ const schema = {
  */
 const immutableFields = [
   'id',
-  'type',
   'updatedAt',
   'createdAt',
-  'institution',
-  'permissions',
-  'elasticRolePermissions',
-  'dashboardCollections',
+  'dashboards',
+  'spaces',
 ];
 
 /**
  * Fields that can be populated with related items
  */
 const includableFields = [
-  'permissions',
-  'institution',
-  'institution.repositories',
-  'elasticRolePermissions',
-  'dashboardCollections',
-  'dashboardCollections.collection',
+  'dashboards',
+  'spaces',
 ];
 
 /**
@@ -70,11 +48,8 @@ const includableFields = [
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  {
-    id: () => schema.id,
-    type: () => schema.type,
-  },
-  requireFields(['id', 'name', 'type', 'institutionId']),
+  { id: () => schema.id },
+  requireFields(['id', 'name']),
 );
 
 /**
@@ -92,7 +67,7 @@ const adminImportSchema = withModifiers(
   adminCreateSchema,
   {
     id: () => schema.id,
-    permissions: () => schema.permissions,
+    collections: () => schema.collections,
   },
 );
 

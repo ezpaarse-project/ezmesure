@@ -128,6 +128,8 @@ errors:
     notFound: Tableau de bord [%s] introuvable
     failedToExport: Impossible d'exporter les tableaux de bord [%s] depuis l'espace [%s]
     failedToImport: Impossible d'importer les tableaux de bord dans l'espace [%s]
+    noSourceDashboard: Pas de tableau de bord source associé
+    sourceDashboardNotFound: Le tableau de bord source [%s] n'existe pas
 
   index:
     notFound: Index [%s] introuvable
