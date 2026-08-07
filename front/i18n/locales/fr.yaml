@@ -38,6 +38,10 @@ menu:
     shares: Partages
     sushiEndpoints: Points d'accès COUNTER
     customFields: Champs personnalisés
+    dashboards:
+      title: Tableaux de bord
+      templates: Modèles
+      collections: Collections
     harvest:
       title: Moissonnage
       entries:
@@ -1260,6 +1264,12 @@ spaces:
   deleteSpace: Vous allez supprimer l'espace "{spaceName}", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible.
   filters:
     title: Filtrer les espaces
+  collections: Collections
+  collectionsDialog:
+    empty:
+      title: Pas de collections
+      text: Aucune collection de tableaux de bord n'a encore été attribuée à cet espace
+      action: Ajouter une collection
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
@@ -1470,6 +1480,52 @@ admin:
     title: Journaux applicatifs
     connecting: Connexion...
     connectionError: Erreur de connexion
+dashboardCollections:
+  toolbarTitle: Collections de tableaux de bord ({count})
+  pageDesc: Créez ici les collections de tableaux de bord que vous souhaitez pouvoir intégrer dans les espaces.
+  updateCollection: Modifier la collection
+  newCollection: Nouvelle collection
+  repositorySelection: Choix de l'entrepôt
+  noRepositories: Pas d'entrepôts disponibles
+  manageCollections: >
+    Gérer la collection
+    |Gérer {count} collections
+  search:
+    empty: Aucune collection ne correspond à votre recherche
+  actions:
+    delete:
+      title: Supprimer 1 collection ?|Supprimer {count} collections ?
+      text: Les modèles associés seront également supprimés.
+dashboards:
+  toolbarTitle: Modèles de tableaux de bord ({count})
+  pageDesc: Dans cette page, vous pouvez sauvegarder des tableaux de bord issus de Kibana. Associez les ensuite à une collection pour les intégrer dans les espaces.
+  updateDashboard: Modifier le tableau de bord
+  newDashboard: Nouveau tableau de bord
+  sourceSpace: Espace source
+  sourceSpaceHint: Identifiant de l'espace d'où provient le tableau de bord
+  sourceDashboardId: Identifiant du tableau de bord
+  collection: Collection
+  templates: Modèles
+  noCollection: Pas de collection
+  kibanaVersion: Version de Kibana
+  tags: Étiquettes
+  manageDashboards: Gérer 1 tableau de bord|Gérer {count} tableaux de bord
+  addCollection: Ajouter une collection
+  cannotAddToCollection: Impossible d'ajouter le tableau de bord dans la collection
+  cannotRemoveFromCollection: Impossible de supprimer le tableau de bord de la collection
+  actions:
+    update:
+      title: Mettre à jour 1 tableau de bord ?|Mettre à jour {count} tableaux de bord ?
+      text: >
+        La version actuelle sera remplacée par celle présente dans Kibana.
+        |Les versions actuelles seront remplacées par celles présentes dans Kibana.
+      confirm: Mettre à jour
+    delete:
+      title: Supprimer 1 tableau de bord ?|Supprimer {count} tableaux de bord ?
+      text: >
+        Le modèle actuellement sauvegardé sera supprimé. Le tableau de bord Kibana ayant servi à sa création sera pas affecté.
+        |Les modèles actuellement sauvegardés seront supprimés. Les tableaux de bord Kibana ayant servi à leur création ne seront pas affectés.
+      confirm: Supprimer
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type

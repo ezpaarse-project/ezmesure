@@ -14,7 +14,6 @@
     item-value="id"
     prepend-icon="mdi-form-textbox"
     variant="underlined"
-    hide-details="auto"
     no-filter
     required
     return-object
@@ -42,7 +41,7 @@
 <script setup>
 const props = defineProps({
   modelValue: {
-    type: Object,
+    type: [Object, String],
     default: () => undefined,
   },
 });

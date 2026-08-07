@@ -59,6 +59,30 @@
         prepend-icon="mdi-account-group"
       />
 
+      <v-list-group value="dashboards">
+        <template #activator="{ props }">
+          <v-list-item
+            :title="$t('menu.admin.dashboards.title')"
+            prepend-icon="mdi-monitor-dashboard"
+            v-bind="props"
+          />
+        </template>
+
+        <v-list-item
+          :title="$t('menu.admin.dashboards.templates')"
+          to="/admin/dashboards"
+          prepend-icon="mdi-view-dashboard"
+          exact
+        />
+
+        <v-list-item
+          :title="$t('menu.admin.dashboards.collections')"
+          to="/admin/dashboard-collections"
+          prepend-icon="mdi-folder-table"
+          exact
+        />
+      </v-list-group>
+
       <v-list-item
         :title="$t('menu.admin.shares')"
         to="/admin/elastic-roles"

@@ -68,6 +68,16 @@
                   </template>
                 </ConfirmPopover>
               </template>
+
+              <template #actions>
+                <v-btn
+                  append-icon="mdi-view-dashboard"
+                  text="Collections"
+                  variant="text"
+                  size="small"
+                  @click="openCollections(space.id)"
+                />
+              </template>
             </SpaceCard>
           </v-col>
         </v-row>
@@ -120,6 +130,8 @@
 </template>
 
 <script setup>
+import SpacesDashboardCollectionsDialog from '~/components/space/DashboardCollectionsDialog.vue';
+
 const props = defineProps({
   institution: {
     type: Object,
@@ -142,6 +154,7 @@ const emit = defineEmits({
 const { t } = useI18n();
 const { user } = storeToRefs(useAuthStore());
 const snacks = useSnacksStore();
+const { openDialog } = useDialogStore();
 
 /** @type {Ref<object[]>} */
 const spaces = ref(props.institution.spaces || []);
@@ -186,5 +199,12 @@ async function removeSpace(item) {
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   }
+}
+
+function openCollections(spaceId) {
+  openDialog({
+    component: SpacesDashboardCollectionsDialog,
+    data: { spaceId },
+  });
 }
 </script>

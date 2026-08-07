@@ -8,50 +8,47 @@
       icons
       @update:model-value="debouncedRefresh()"
     >
-      <template #filters-panel="props">
-        <SpaceApiFilters v-bind="props" />
-      </template>
-
       <v-btn
-        v-if="spaceFormDialogRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
         class="mr-2"
-        @click="spaceFormDialogRef.open()"
+        @click="openCollectionForm()"
       />
     </SkeletonPageBar>
 
+    <v-container fluid>
+      <v-row>
+        <v-col>
+          <p>{{ $t('dashboardCollections.pageDesc') }}</p>
+        </v-col>
+      </v-row>
+    </v-container>
+
     <v-data-table-server
-      v-model="selectedSpaces"
+      v-model="selectedCollections"
       :headers="headers"
       show-select
       return-object
       v-bind="vDataTableOptions"
     >
-      <template #[`item.type`]="{ value }">
-        <v-chip
-          :text="$te(`spaces.types.${value}`) ? $t(`spaces.types.${value}`) : value"
-          :color="repoColors.get(value)"
-          size="small"
-        />
-      </template>
-
-      <template #[`item.institution.name`]="{ value, item }">
-        <nuxt-link :to="`/admin/institutions/${item.institutionId}`">
-          {{ value }}
-        </nuxt-link>
-      </template>
-
-      <template #[`item._count.dashboardCollections`]="{ value, item }">
+      <template #[`item._count.dashboards`]="{ value }">
         <v-chip
           :text="`${value ?? 0}`"
           :variant="!value ? 'outlined' : undefined"
           prepend-icon="mdi-view-dashboard"
           size="small"
-          @click="openCollections(item.id)"
+        />
+      </template>
+
+      <template #[`item._count.spaces`]="{ value }">
+        <v-chip
+          :text="`${value ?? 0}`"
+          :variant="!value ? 'outlined' : undefined"
+          prepend-icon="mdi-folder-outline"
+          size="small"
         />
       </template>
 
@@ -68,30 +65,23 @@
 
           <v-list>
             <v-list-item
-              v-if="spaceFormDialogRef"
               :title="$t('modify')"
               prepend-icon="mdi-pencil"
-              @click="spaceFormDialogRef.open(item)"
+              @click="openCollectionForm(item.id)"
             />
             <v-list-item
               :title="$t('delete')"
               prepend-icon="mdi-delete"
-              @click="deleteSpaces([item])"
+              @click="deleteCollections([item])"
             />
 
             <v-divider />
 
             <v-list-item
-              :title="$t('open')"
-              :href="`/kibana/s/${item.id}`"
-              prepend-icon="mdi-open-in-app"
-            />
-
-            <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
               prepend-icon="mdi-identifier"
-              @click="copySpaceId(item)"
+              @click="copyToClipboard(item.id)"
             />
           </v-list>
         </v-menu>
@@ -99,27 +89,22 @@
     </v-data-table-server>
 
     <SelectionMenu
-      v-model="selectedSpaces"
-      :text="$t('spaces.manageSpaces', selectedSpaces.length)"
+      v-model="selectedCollections"
+      :text="$t('dashboardCollections.manageCollections', selectedCollections.length)"
     >
       <template #actions>
         <v-list-item
           :title="$t('delete')"
           prepend-icon="mdi-delete"
-          @click="deleteSpaces()"
+          @click="deleteCollections()"
         />
       </template>
     </SelectionMenu>
-
-    <SpaceFormDialog
-      ref="spaceFormDialogRef"
-      @submit="refresh()"
-    />
   </div>
 </template>
 
 <script setup>
-import SpacesDashboardCollectionsDialog from '~/components/space/DashboardCollectionsDialog.vue';
+import DashboardCollectionFormDialog from '~/components/dashboardCollection/FormDialog.vue';
 
 definePageMeta({
   layout: 'admin',
@@ -132,9 +117,7 @@ const { openConfirm } = useConfirmStore();
 const { openDialog } = useDialogStore();
 const snacks = useSnacksStore();
 
-const selectedSpaces = ref([]);
-
-const spaceFormDialogRef = useTemplateRef('spaceFormDialogRef');
+const selectedCollections = ref([]);
 
 const {
   refresh,
@@ -143,18 +126,18 @@ const {
   vDataTableOptions,
 } = await useServerSidePagination({
   fetch: {
-    url: '/api/kibana-spaces',
+    url: '/api/dashboard-collections',
     query: {
-      include: ['institution', '_count.dashboardCollections'],
+      include: ['_count.dashboards', '_count.spaces'],
     },
   },
   sortMapping: {
-    '_count.dashboardCollections': 'dashboardCollections._count',
+    dashboards: 'dashboards._count',
+    spaces: 'spaces._count',
   },
   data: {
     sortBy: [
       { key: 'name', order: 'asc' },
-      { key: 'institution.name', order: 'asc' },
       { key: 'createdAt', order: 'desc' },
     ],
   },
@@ -170,25 +153,19 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('spaces.id'),
-    value: 'id',
+    title: t('description'),
+    value: 'description',
     sortable: true,
   },
   {
-    title: t('spaces.type'),
-    value: 'type',
+    title: t('dashboards.templates'),
+    value: '_count.dashboards',
     align: 'center',
     sortable: true,
   },
   {
-    title: t('institutions.title'),
-    value: 'institution.name',
-    sortable: true,
-  },
-  {
-    title: t('spaces.collections'),
-    value: '_count.dashboardCollections',
-    align: 'center',
+    title: t('spaces.spaces'),
+    value: '_count.spaces',
     sortable: true,
   },
   {
@@ -205,7 +182,7 @@ const toolbarTitle = computed(() => {
   if (itemLength.value.current !== itemLength.value.total) {
     count = `${itemLength.value.current}/${itemLength.value.total}`;
   }
-  return t('spaces.toolbarTitle', { count: count ?? '?' });
+  return t('dashboardCollections.toolbarTitle', { count: count ?? '?' });
 });
 
 /**
@@ -213,29 +190,39 @@ const toolbarTitle = computed(() => {
  */
 const debouncedRefresh = useDebounceFn(refresh, 250);
 
+function openCollectionForm(collectionId) {
+  openDialog({
+    component: DashboardCollectionFormDialog,
+    data: { collectionId },
+    listeners: {
+      submit: () => {
+        debouncedRefresh();
+      },
+    },
+  });
+}
+
 /**
  * Delete multiple spaces
  *
  * @param {Object[]} [items] List of items to delete, if none it'll fall back to selected
  */
-function deleteSpaces(items) {
-  const toDelete = items || selectedSpaces.value;
+function deleteCollections(items) {
+  const toDelete = items || selectedCollections.value;
+
   if (toDelete.length <= 0) {
     return;
   }
 
   openConfirm({
-    title: t('areYouSure'),
-    text: t(
-      'spaces.deleteNbSpaces',
-      toDelete.length,
-    ),
+    title: t('dashboardCollections.actions.delete.title', toDelete.length),
+    text: t('dashboardCollections.actions.delete.text'),
     agreeText: t('delete'),
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(
-          (item) => $fetch(`/api/kibana-spaces/${item.id}`, { method: 'DELETE' })
+          (item) => $fetch(`/api/dashboard-collections/${item.id}`, { method: 'DELETE' })
             .catch((err) => {
               snacks.error(t('cannotDeleteItem', { id: item.id }), err);
               return null;
@@ -248,7 +235,7 @@ function deleteSpaces(items) {
       }
 
       if (!items) {
-        selectedSpaces.value = [];
+        selectedCollections.value = [];
       }
 
       await refresh();
@@ -256,25 +243,16 @@ function deleteSpaces(items) {
   });
 }
 
-function openCollections(spaceId) {
-  openDialog({
-    component: SpacesDashboardCollectionsDialog,
-    data: { spaceId },
-  });
-}
-
 /**
- * Put space ID into clipboard
+ * Copy text into the clipboard
  *
- * @param {object} param0 Space
+ * @param {object} text - The text we want to copy
  */
-async function copySpaceId({ id }) {
-  if (!id) {
-    return;
-  }
+async function copyToClipboard(text) {
+  if (!text) { return; }
 
   try {
-    await copy(id);
+    await copy(text);
   } catch (err) {
     snacks.error(t('clipboard.unableToCopy'), err);
     return;
