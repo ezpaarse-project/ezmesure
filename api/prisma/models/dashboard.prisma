@@ -33,7 +33,7 @@ model DashboardCollection {
   /// Name of the collection
   name        String
   /// Description of the collection
-  description String
+  description String?
   /// Creation date
   createdAt   DateTime                   @default(now())
   /// Latest update date
