@@ -35,9 +35,11 @@ const schema = {
 const immutableFields = [
   'updatedAt',
   'createdAt',
+  'data',
+  'tags',
   'kibanaVersion',
-  'description',
   'name',
+  'description',
   'collection',
 ];
 
