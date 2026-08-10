@@ -49,7 +49,7 @@ const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
   { id: () => schema.id },
-  requireFields(['id', 'name']),
+  requireFields(['name']),
 );
 
 /**

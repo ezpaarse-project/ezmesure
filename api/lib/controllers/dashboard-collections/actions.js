@@ -38,6 +38,16 @@ exports.getOne = async (ctx) => {
   ctx.body = collection;
 };
 
+exports.createOne = async (ctx) => {
+  const { body } = ctx.request;
+
+  ctx.type = 'json';
+  ctx.status = 201;
+  ctx.body = await (new DashboardCollectionsService()).create({
+    data: { ...body },
+  });
+};
+
 exports.upsertOne = async (ctx) => {
   const { id } = ctx.params;
   const { body } = ctx.request;

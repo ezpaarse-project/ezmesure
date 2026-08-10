@@ -7,13 +7,14 @@ const {
   requireAdmin,
 } = require('../../services/auth');
 
-const { adminUpsertSchema } = require('../../entities/dashboard-collection.dto');
+const { adminCreateSchema, adminUpsertSchema } = require('../../entities/dashboard-collection.dto');
 
 const {
   standardQueryParams,
 
   getAll,
   getOne,
+  createOne,
   upsertOne,
   deleteOne,
   importMany,
@@ -45,6 +46,16 @@ router.route({
 });
 
 router.use(requireAdmin);
+
+router.route({
+  method: 'POST',
+  path: '/',
+  handler: createOne,
+  validate: {
+    type: 'json',
+    body: adminCreateSchema,
+  },
+});
 
 router.route({
   method: 'PUT',
