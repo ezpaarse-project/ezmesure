@@ -31,6 +31,11 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/admin/**': { appLayout: 'admin', appMiddleware: ['require-auth', 'require-terms', 'require-admin'] },
+    '/myspace/**': { appLayout: 'space', appMiddleware: ['require-auth', 'require-terms'] },
+  },
+
   modules: ['@nuxtjs/i18n', 'vuetify-nuxt-module', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/fonts'],
 
   i18n: i18nOptions,
@@ -51,10 +56,5 @@ export default defineNuxtConfig({
 
   fonts: {
     weights: ['100 900'],
-  },
-
-  vite: {
-    // Prevent Vite from optimizing ezreeport in dev, allowing to replace it with a local version
-    optimizeDeps: process.env.NODE_ENV !== 'production' ? { exclude: ['@ezpaarse-project/ezreeport-vue'] } : undefined,
   },
 });

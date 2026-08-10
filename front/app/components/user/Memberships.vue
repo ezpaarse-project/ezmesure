@@ -3,12 +3,12 @@
     :title="$t('users.user.memberships')"
     :subtitle="showUser ? user.fullName : undefined"
     :loading="status === 'pending' && 'primary'"
-    prepend-icon="mdi-domain"
+    prepend-icon="$mdi-domain"
   >
     <template #append>
       <v-btn
         v-tooltip="$t('refresh')"
-        icon="mdi-reload"
+        icon="$mdi-reload"
         variant="text"
         density="comfortable"
         color="primary"
@@ -53,7 +53,7 @@
             <v-btn
               v-if="membershipFormDialogRef"
               v-tooltip="$t('update')"
-              icon="mdi-pencil"
+              icon="$mdi-pencil"
               variant="text"
               size="small"
               density="comfortable"
@@ -72,7 +72,7 @@
               <template #activator="{ props: confirm }">
                 <v-btn
                   v-tooltip="$t('revoke')"
-                  icon="mdi-account-off"
+                  icon="$mdi-account-off"
                   variant="text"
                   size="small"
                   density="comfortable"

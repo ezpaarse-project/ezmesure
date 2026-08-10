@@ -20,7 +20,7 @@ exports.contact = async (ctx) => {
           from: body.email,
           to: admin.email,
           replyTo: undefined,
-          ...generateMail('contact', { body, appName }, { locale: admin.language }),
+          ...await generateMail('contact', { body, appName }, { locale: admin.language }),
         });
 
         appLogger.verbose(`[contact] Mail sent to ${admin.email}`);

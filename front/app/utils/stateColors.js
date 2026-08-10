@@ -10,21 +10,21 @@ export const serviceColors = new Map([
 ]);
 
 export const sushiStatus = new Map([
-  ['success', { color: 'green', icon: 'mdi-check' }],
-  ['untested', { color: 'grey', icon: 'mdi-lan-pending' }],
-  ['unauthorized', { color: 'orange', icon: 'mdi-key-alert-outline' }],
-  ['failed', { color: 'red', icon: 'mdi-close' }],
+  ['success', { color: 'green', icon: '$mdi-check' }],
+  ['untested', { color: 'grey', icon: '$mdi-lan-pending' }],
+  ['unauthorized', { color: 'orange', icon: '$mdi-key-alert-outline' }],
+  ['failed', { color: 'red', icon: '$mdi-close' }],
 ]);
 
 export const harvestStatus = new Map([
-  ['missing', { color: 'orange', icon: 'mdi-file-hidden' }],
-  ['finished', { color: 'green', icon: 'mdi-check' }],
-  ['running', { color: 'blue', icon: 'mdi-play' }],
-  ['delayed', { color: 'blue', icon: 'mdi-update' }],
-  ['failed', { color: 'red', icon: 'mdi-exclamation' }],
-  ['interrupted', { color: 'red', icon: 'mdi-progress-close' }],
-  ['cancelled', { color: 'red', icon: 'mdi-cancel' }],
-  ['waiting', { color: 'grey', icon: 'mdi-clock-outline' }],
+  ['missing', { color: 'orange', icon: '$mdi-file-hidden' }],
+  ['finished', { color: 'green', icon: '$mdi-check' }],
+  ['running', { color: 'blue', icon: '$mdi-play' }],
+  ['delayed', { color: 'blue', icon: '$mdi-update' }],
+  ['failed', { color: 'red', icon: '$mdi-exclamation' }],
+  ['interrupted', { color: 'red', icon: '$mdi-progress-close' }],
+  ['cancelled', { color: 'red', icon: '$mdi-cancel' }],
+  ['waiting', { color: 'grey', icon: '$mdi-clock-outline' }],
 ]);
 
 export const counterVersionsColors = new Map([
@@ -35,13 +35,13 @@ export const counterVersionsColors = new Map([
 export const httpStatusColors = {
   get: (code) => {
     if (code < 200) {
-      return { color: 'blue', icon: 'mdi-information' };
+      return { color: 'blue', icon: '$mdi-information' };
     }
     if (code < 400) {
-      return { color: 'green', icon: 'mdi-check' };
+      return { color: 'green', icon: '$mdi-check' };
     }
     if (code < 600) {
-      return { color: 'red', icon: 'mdi-close' };
+      return { color: 'red', icon: '$mdi-close' };
     }
     return undefined;
   },

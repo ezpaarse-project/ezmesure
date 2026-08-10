@@ -4,7 +4,7 @@
   <v-card v-else-if="institutionsError || endpointsError">
     <v-empty-state
       :title="getErrorMessage(institutionsError || endpointsError, t('anErrorOccurred'))"
-      icon="mdi-alert-circle"
+      icon="$mdi-alert-circle"
     >
       <template #actions>
         <v-btn
@@ -26,7 +26,7 @@
     v-else
     :title="isEditing ? $t('harvest.sessions.form.title:update') : $t('harvest.sessions.form.title:add')"
     :subtitle="modelValue?.id"
-    prepend-icon="mdi-tractor"
+    prepend-icon="$mdi-tractor"
   >
     <template #text>
       <v-row>
@@ -39,7 +39,7 @@
           >
             <v-card
               :title="$t('harvest.sessions.form.credentials.title')"
-              prepend-icon="mdi-key"
+              prepend-icon="$mdi-key"
               variant="outlined"
             >
               <template #text>
@@ -63,7 +63,7 @@
                     >
                       <div class="credentials-list-header">
                         <v-list-subheader>
-                          <v-icon icon="mdi-domain" />
+                          <v-icon icon="$mdi-domain" />
                           {{ $t('harvest.sessions.form.credentials.institutions.title', { count: institutionsCount }) }}
 
                           <v-spacer />
@@ -72,7 +72,7 @@
                             <v-text-field
                               v-model="institutionsSearch"
                               :placeholder="$t('search')"
-                              append-inner-icon="mdi-magnify"
+                              append-inner-icon="$mdi-magnify"
                               variant="outlined"
                               density="compact"
                               hide-details
@@ -135,7 +135,7 @@
                     >
                       <div class="credentials-list-header">
                         <v-list-subheader>
-                          <v-icon icon="mdi-api" />
+                          <v-icon icon="$mdi-api" />
                           {{ $t('harvest.sessions.form.credentials.endpoints.title', { count: endpointsCount }) }}
 
                           <v-spacer />
@@ -144,7 +144,7 @@
                             <v-text-field
                               v-model="endpointsSearch"
                               :placeholder="$t('search')"
-                              append-inner-icon="mdi-magnify"
+                              append-inner-icon="$mdi-magnify"
                               variant="outlined"
                               density="compact"
                               hide-details
@@ -221,7 +221,7 @@
 
             <v-card
               :title="$t('harvest.sessions.form.reports.title')"
-              prepend-icon="mdi-download"
+              prepend-icon="$mdi-download"
               variant="outlined"
               class="mt-4"
             >
@@ -233,7 +233,7 @@
                       :label="`${$t('harvest.sessions.form.reports.beginDate')} *`"
                       :max="endDate"
                       variant="underlined"
-                      prepend-icon="mdi-calendar-start"
+                      prepend-icon="$mdi-calendar-start"
                       required
                     />
                   </v-col>
@@ -244,7 +244,7 @@
                       :label="`${$t('harvest.sessions.form.reports.endDate')} *`"
                       :min="beginDate"
                       variant="underlined"
-                      prepend-icon="mdi-calendar-end"
+                      prepend-icon="$mdi-calendar-end"
                       required
                     />
                   </v-col>
@@ -261,7 +261,7 @@
                       class="pa-0"
                     >
                       <v-list-subheader sticky>
-                        <v-icon icon="mdi-numeric" size="small" />
+                        <v-icon icon="$mdi-numeric" size="small" />
                         {{ $t('harvest.sessions.counts.counterVersions', counterVersions.length) }}
                       </v-list-subheader>
 
@@ -287,6 +287,7 @@
                             variant="flat"
                             density="compact"
                             label
+                            class="text-black"
                           />
                         </template>
                       </v-list-item>
@@ -303,7 +304,7 @@
                         <v-btn
                           :text="$t('endpoints.addCustomVersion')"
                           color="secondary"
-                          prepend-icon="mdi-plus"
+                          prepend-icon="$mdi-plus"
                           block
                           class="mt-2"
                           v-bind="menu"
@@ -330,7 +331,7 @@
                                   v-model="customVersion"
                                   :label="$t('endpoints.customVersion')"
                                   :rules="versionRules"
-                                  prepend-icon="mdi-numeric"
+                                  prepend-icon="$mdi-numeric"
                                   variant="underlined"
                                   hide-details="auto"
                                   autofocus
@@ -347,7 +348,7 @@
                             :text="$t('add')"
                             :disabled="!customVersion"
                             color="success"
-                            prepend-icon="mdi-plus"
+                            prepend-icon="$mdi-plus"
                             variant="text"
                             type="submit"
                             form="additionalVersionForm"
@@ -367,7 +368,7 @@
                       class="pa-0"
                     >
                       <v-list-subheader sticky>
-                        <v-icon icon="mdi-file" size="small" />
+                        <v-icon icon="$mdi-file" size="small" />
                         {{ $t('harvest.sessions.counts.reportTypes', reportTypes.length) }}
                       </v-list-subheader>
 
@@ -400,7 +401,7 @@
                         <v-btn
                           :text="$t('endpoints.addAdditionalReport')"
                           color="secondary"
-                          prepend-icon="mdi-plus"
+                          prepend-icon="$mdi-plus"
                           block
                           class="mt-2"
                           v-bind="menu"
@@ -426,7 +427,7 @@
                                 <v-text-field
                                   v-model="additionalReport"
                                   :label="$t('harvest.jobs.reportType')"
-                                  prepend-icon="mdi-file"
+                                  prepend-icon="$mdi-file"
                                   variant="underlined"
                                   hide-details="auto"
                                   autofocus
@@ -443,7 +444,7 @@
                             :text="$t('add')"
                             :disabled="!additionalReport"
                             color="success"
-                            prepend-icon="mdi-plus"
+                            prepend-icon="$mdi-plus"
                             variant="text"
                             type="submit"
                             form="additionalReportForm"
@@ -487,7 +488,7 @@
 
             <v-card
               :title="$t('harvest.sessions.form.settings.title')"
-              prepend-icon="mdi-cog"
+              prepend-icon="$mdi-cog"
               variant="outlined"
               class="mt-4"
             >
@@ -499,7 +500,7 @@
                       :label="`${$t('identifier')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
                       :disabled="isEditing"
-                      prepend-icon="mdi-rename"
+                      prepend-icon="$mdi-rename"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="hasIdChanged = true"
@@ -523,7 +524,7 @@
                       :min="0"
                       :rules="[(v) => !Number.isNaN(Number.parseInt(v, 10)) || $t('invalidFormat')]"
                       type="number"
-                      prepend-icon="mdi-timer"
+                      prepend-icon="$mdi-timer"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="timeout = Number.parseInt($event, 10)"
@@ -544,7 +545,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!isValid"
         :loading="saving"
         type="submit"
@@ -575,7 +576,7 @@ const emit = defineEmits({
 
 const snacks = useSnacksStore();
 const { t, locale } = useI18n();
-const { mdAndUp } = useDisplay();
+const { mdAndUp } = useVDisplay();
 
 const institutionsSearch = shallowRef('');
 const endpointsSearch = shallowRef('');

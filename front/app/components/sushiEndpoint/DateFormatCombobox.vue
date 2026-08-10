@@ -10,7 +10,7 @@
       </div>
     </template>
 
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item :title="item" v-bind="listItem">
         <template #append>
           <LocalDate :model-value="now" :format="item" />

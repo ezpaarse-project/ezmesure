@@ -8,14 +8,14 @@
     :error="hasError"
     :error-messages="hasError ? [$t('institutions.institution.searchFailed')] : []"
     no-data-text="institutions.institution.searchOpenDataHint"
-    prepend-icon="mdi-database-search"
+    prepend-icon="$mdi-database-search"
     hide-details="auto"
     no-filter
     clearable
     return-object
     @update:search="selectedName !== $event && fetchData()"
   >
-    <template #item="{ item: { raw: item }, props: { active, onClick } }">
+    <template #item="{ item, props: { active, onClick } }">
       <InstitutionOpenDataSearchItem
         :item="item"
         :active="active"

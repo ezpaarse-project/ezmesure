@@ -18,7 +18,7 @@
           <div v-if="checkState" class="mr-2">
             <v-icon
               v-if="checkState === 'queued'"
-              icon="mdi-dots-horizontal"
+              icon="$mdi-dots-horizontal"
               size="small"
             />
             <v-progress-circular
@@ -42,7 +42,7 @@
           :text="$t('institutions.sushi.checkCredentials')"
           :disabled="disabled"
           :loading="checkState"
-          prepend-icon="mdi-connection"
+          prepend-icon="$mdi-connection"
           variant="text"
           color="primary"
           @click="checkConnection()"

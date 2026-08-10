@@ -3,7 +3,7 @@
     <SkeletonPageBar :title="$t('files.title')">
       <template #extension>
         <v-tabs v-model="tab" color="primary" grow>
-          <v-tab prepend-icon="mdi-tray-arrow-down">
+          <v-tab prepend-icon="$mdi-tray-arrow-down">
             {{ $t('files.submit') }}
           </v-tab>
         </v-tabs>
@@ -21,10 +21,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
 
 const tab = shallowRef(0);
 </script>

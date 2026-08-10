@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="isEditing ? $t('customFields.editField') : $t('customFields.newField')"
-    prepend-icon="mdi-tag-plus"
+    prepend-icon="$mdi-tag-plus"
   >
     <template #text>
       <v-form
@@ -15,7 +15,7 @@
               v-model="customField.id"
               :label="`${$t('identifier')} *`"
               :rules="idRules"
-              prepend-icon="mdi-key-variant"
+              prepend-icon="$mdi-key-variant"
               variant="underlined"
               hide-details="auto"
             />
@@ -25,7 +25,7 @@
             <v-text-field
               v-model="customField.labelFr"
               :label="$t('customFields.labelFr')"
-              prepend-icon="mdi-label-outline"
+              prepend-icon="$mdi-label-outline"
               variant="underlined"
               hide-details="auto"
             />
@@ -35,7 +35,7 @@
             <v-text-field
               v-model="customField.labelEn"
               :label="$t('customFields.labelEn')"
-              prepend-icon="mdi-label-outline"
+              prepend-icon="$mdi-label-outline"
               variant="underlined"
               hide-details="auto"
             />
@@ -45,7 +45,7 @@
             <v-text-field
               v-model="customField.descriptionFr"
               :label="$t('customFields.descriptionFr')"
-              prepend-icon="mdi-book-open-page-variant"
+              prepend-icon="$mdi-book-open-page-variant"
               variant="underlined"
               hide-details
             />
@@ -55,7 +55,7 @@
             <v-text-field
               v-model="customField.descriptionEn"
               :label="$t('customFields.descriptionEn')"
-              prepend-icon="mdi-book-open-page-variant"
+              prepend-icon="$mdi-book-open-page-variant"
               variant="underlined"
               hide-details
             />
@@ -66,7 +66,7 @@
               v-model="customField.helpUrl"
               :label="$t('customFields.helpUrl')"
               placeholder="https://example.com/about"
-              prepend-icon="mdi-link-variant"
+              prepend-icon="$mdi-link-variant"
               variant="underlined"
               hide-details
             />
@@ -77,7 +77,7 @@
               v-model="customField.itemUrl"
               :label="$t('customFields.itemUrl')"
               placeholder="https://example.com/org/{value}"
-              prepend-icon="mdi-link-variant"
+              prepend-icon="$mdi-link-variant"
               variant="underlined"
               hide-details
             />
@@ -89,7 +89,7 @@
               :label="$t('customFields.multivalued')"
               density="compact"
               color="primary"
-              prepend-icon="mdi-label-multiple-outline"
+              prepend-icon="$mdi-label-multiple-outline"
               hide-details
             />
 
@@ -98,7 +98,7 @@
               :label="$t('customFields.editableByUsers')"
               density="compact"
               color="primary"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               hide-details
             />
 
@@ -107,7 +107,7 @@
               :label="$t('customFields.visibleToUsers')"
               density="compact"
               color="primary"
-              prepend-icon="mdi-eye"
+              prepend-icon="$mdi-eye"
               hide-details
             />
           </v-col>
@@ -122,7 +122,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="saving"
         type="submit"

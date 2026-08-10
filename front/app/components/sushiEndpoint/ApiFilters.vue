@@ -5,18 +5,18 @@
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-api" end />
+        <v-icon icon="$mdi-api" end />
       </template>
 
       <template #append>
         <v-btn
           v-tooltip="$t('reset')"
-          icon="mdi-filter-off"
+          icon="$mdi-filter-off"
           @click="clearFilters"
         />
 
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           @click="$emit('update:show', false)"
         />
       </template>
@@ -35,7 +35,7 @@
             chips
             closable-chips
             multiple
-            prepend-icon="mdi-tag"
+            prepend-icon="$mdi-tag"
           />
         </v-col>
 
@@ -43,7 +43,7 @@
           <ApiFiltersButtonsGroup
             v-model="isDisabled"
             :label="$t('endpoints.disabled')"
-            prepend-icon="mdi-download-off"
+            prepend-icon="$mdi-download-off"
           />
         </v-col>
 
@@ -51,7 +51,7 @@
           <ApiFiltersButtonsGroup
             v-model="filters.active"
             :label="$t('endpoints.active')"
-            prepend-icon="mdi-toggle-switch"
+            prepend-icon="$mdi-toggle-switch"
           />
         </v-col>
 
@@ -63,7 +63,7 @@
             :label="$t('endpoints.counterVersion')"
             :return-object="false"
             multiple
-            prepend-icon="mdi-numeric"
+            prepend-icon="$mdi-numeric"
           >
             <template #selection="{ item: { value: version } }">
               <v-chip
@@ -72,6 +72,7 @@
                 density="comfortable"
                 variant="flat"
                 label
+                class="text-black"
               />
             </template>
           </ApiFiltersSelect>

@@ -30,7 +30,7 @@ import {
 /**
  * @param {Params} params Params to setup pagination, not reactive.
  */
-export default async function useServerSidePagination(params = {}) {
+export default function useServerSidePagination(params = {}) {
   if (!params?.fetch?.url) {
     throw new Error('Please provide a URL to fetch');
   }

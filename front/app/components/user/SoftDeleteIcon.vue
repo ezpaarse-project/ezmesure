@@ -2,7 +2,7 @@
   <v-tooltip v-if="modelValue.deletedAt" location="start">
     <template #activator="{ props: tooltip }">
       <v-icon
-        icon="mdi-delete"
+        icon="$mdi-delete"
         color="grey"
         v-bind="tooltip"
       />

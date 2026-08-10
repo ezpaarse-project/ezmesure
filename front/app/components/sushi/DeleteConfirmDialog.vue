@@ -37,7 +37,7 @@
                 :label="$t('sushi.deleteReason')"
                 :items="availableReasons"
                 :rules="[(v) => !!v || $t('fieldIsRequired')]"
-                prepend-icon="mdi-delete-circle-outline"
+                prepend-icon="$mdi-delete-circle-outline"
                 variant="underlined"
               />
             </v-form>
@@ -60,7 +60,7 @@
           :text="$t('delete')"
           :disabled="disagreeLoading || !isValid"
           :loading="agreeLoading"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           size="small"
           color="primary"
           type="submit"

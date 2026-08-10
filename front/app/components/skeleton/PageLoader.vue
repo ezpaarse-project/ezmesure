@@ -18,7 +18,7 @@
       <v-row v-else>
         <v-col>
           <v-empty-state
-            icon="mdi-emoticon-sad-outline"
+            icon="$mdi-emoticon-sad-outline"
             :title="$t('errors.generic')"
             :text="$te(`errors.${error.statusCode}`) ? $t(`errors.${error.statusCode}`) : error.statusMessage"
             :action-text="showRefresh ? $t('refresh') : undefined"

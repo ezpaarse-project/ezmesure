@@ -15,7 +15,7 @@
       <v-btn
         v-if="aliasFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -44,7 +44,7 @@
           :text="`${value?.length ?? 0}`"
           :variant="!value?.length ? 'outlined' : undefined"
           :disabled="!aliasFormDialogRef"
-          prepend-icon="mdi-filter"
+          prepend-icon="$mdi-filter"
           size="small"
           @click="openFiltersDialog(item)"
         />
@@ -54,7 +54,7 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
-          prepend-icon="mdi-domain"
+          prepend-icon="$mdi-domain"
           size="small"
           @click="aliasInstitutionsDialogRef?.open(item)"
         />
@@ -64,7 +64,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -75,13 +75,13 @@
             <v-list-item
               v-if="filtersFormDialogRef"
               :title="$t('repositoryAliases.filtersForm.editFilter')"
-              prepend-icon="mdi-filter"
+              prepend-icon="$mdi-filter"
               @click="openFiltersDialog(item)"
             />
 
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteAliases([item])"
             />
 
@@ -90,7 +90,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyAliasPattern(item)"
             />
           </v-list>
@@ -105,7 +105,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteAliases()"
         />
       </template>
@@ -138,11 +138,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
@@ -161,7 +156,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/repository-aliases',
     query: {
@@ -259,7 +254,7 @@ function deleteAliases(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(
