@@ -94,10 +94,6 @@
         <h3 class="text-headline-large font-weight-bold mb-4">
           {{ $t('home.features.title') }}
         </h3>
-
-        <p class="body-1 text-medium-emphasis">
-          {{ $t('home.features.text') }}
-        </p>
       </v-responsive>
 
       <v-row class="justify-center">
@@ -347,8 +343,9 @@
       <v-spacer />
 
       <v-btn
-        v-for="(link, i) in SOCIALS"
+        v-for="(link, i) in socials"
         :key="i"
+        v-tooltip:top="link.tooltip"
         :icon="link.icon"
         :href="link.href"
         variant="text"
@@ -375,21 +372,6 @@ if (router.currentRoute.value.query.error) {
 }
 
 const YEAR = new Date().getFullYear();
-
-const SOCIALS = [
-  {
-    icon: '$mdi-github',
-    href: 'https://github.com/ezpaarse-project/ezmesure',
-  },
-  {
-    icon: '$mdi-message-text',
-    href: 'https://blog.readmetrics.net/',
-  },
-  {
-    icon: '$mdi-youtube',
-    href: 'https://www.youtube.com/channel/UCcR-0UE9WjYiwS4fMG2T4tQ',
-  },
-];
 
 const PARTNERS = [
   [
@@ -558,9 +540,23 @@ const features = computed(() => [
   },
 ].filter((item) => !item.hide));
 
-function onImageClick() {
-  // TODO
-}
+const socials = computed(() => [
+  {
+    tooltip: t('home.footer.socials.github'),
+    icon: '$mdi-github',
+    href: 'https://github.com/ezpaarse-project/ezmesure',
+  },
+  {
+    tooltip: t('home.footer.socials.blog'),
+    icon: '$mdi-message-text',
+    href: 'https://blog.readmetrics.net/',
+  },
+  {
+    tooltip: t('home.footer.socials.youtube'),
+    icon: '$mdi-youtube',
+    href: 'https://www.youtube.com/channel/UCcR-0UE9WjYiwS4fMG2T4tQ',
+  },
+]);
 </script>
 
 <style lang="css" scoped>
