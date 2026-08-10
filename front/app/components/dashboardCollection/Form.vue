@@ -77,11 +77,19 @@ async function save() {
   saving.value = true;
 
   try {
-    const newCollection = await $fetch(`/api/dashboard-collections/${collection.value.id}`, {
-      method: 'PUT',
-      body: { ...collection.value },
-    });
-    emit('submit', newCollection);
+    if (isEditing.value) {
+      const newCollection = await $fetch(`/api/dashboard-collections/${initialData.value.id}`, {
+        method: 'PUT',
+        body: { ...collection.value },
+      });
+      emit('submit', newCollection);
+    } else {
+      const newCollection = await $fetch('/api/dashboard-collections', {
+        method: 'POST',
+        body: { ...collection.value },
+      });
+      emit('submit', newCollection);
+    }
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   }
