@@ -120,7 +120,7 @@ const props = defineProps({
 const affectedCollections = defineModel({ type: Array, default: () => [] });
 
 const emit = defineEmits({
-  'add-collection': (collection) => collection?.id,
+  'add-collection': (payload) => (payload?.collection?.id && payload?.pattern),
 });
 
 const isOpen = defineModel('open', { type: Boolean, default: false });
