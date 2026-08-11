@@ -2,25 +2,25 @@
 model Dashboard {
   /// The ID of the dashboard
   id                    String               @id @default(cuid())
-  /// The ID of the source dashboard, if different
+  /// The ID of the source dashboard
   sourceDashboardId     String?
   /// The space where the source dashboard comes from
   sourceSpaceId         String?
-  /// The dashboard definition, ie. the saved objects exported from Kibana
+  /// The dashboard definition (exported from Kibana)
   data                  Json                 @default("[]")
-  /// The dashboard tags, extracted from the Kibana export
+  /// The dashboard tags (extracted from the Kibana export)
   tags                  Json[]
-  /// The Kibana version from which the dashboard was exported
+  /// The Kibana version from which the dashboard was exported (extracted from the Kibana export)
   kibanaVersion         String?
-  /// The dashboard name
+  /// The dashboard name (extracted from the Kibana export)
   name                  String?
-  /// The dashboard description
+  /// The dashboard description (extracted from the Kibana export)
   description           String?
   /// Creation date
   createdAt             DateTime             @default(now())
   /// Latest update date
   updatedAt             DateTime             @updatedAt
-  /// The ID of the collection that contains this dashboard
+  /// ID of the collection the dashboard belongs to
   collectionId          String?
   /// The collection that contains this dashboard
   collection            DashboardCollection? @relation(fields: [collectionId], references: [id])
