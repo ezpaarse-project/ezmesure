@@ -57,7 +57,7 @@ async function deleteMarkedUsers() {
       try {
         await sendMail({
           to: user.email,
-          ...generateMail('user-deleted', {}, { locale: user.language }),
+          ...await generateMail('user-deleted', {}, { locale: user.language }),
         });
       } catch (err) {
         appLogger.error(`[user-deletion] Failed to send mail to [${user.email}]`, err);

@@ -2,7 +2,7 @@
   <v-card
     :loading="loading && 'primary'"
     :title="isEditing ? $t('institutions.sushi.updateCredentials') : $t('institutions.sushi.addCredentials')"
-    prepend-icon="mdi-key-plus"
+    prepend-icon="$mdi-key-plus"
   >
     <template v-if="showSushi" #subtitle>
       <SushiSubtitle :model-value="modelValue" />
@@ -25,7 +25,7 @@
 
             <v-card
               :title="$t('sushi.auth')"
-              prepend-icon="mdi-lock"
+              prepend-icon="$mdi-lock"
               variant="outlined"
               class="mt-4"
             >
@@ -39,7 +39,7 @@
                       :rules="authFields.customerId.rules"
                       :persistent-hint="authFields.customerId.required"
                       :disabled="!sushi.endpoint"
-                      prepend-icon="mdi-account"
+                      prepend-icon="$mdi-account"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="sushi.connection = undefined"
@@ -54,7 +54,7 @@
                       :rules="authFields.requestorId.rules"
                       :persistent-hint="authFields.requestorId.required"
                       :disabled="!sushi.endpoint"
-                      prepend-icon="mdi-account-arrow-down"
+                      prepend-icon="$mdi-account-arrow-down"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="sushi.connection = undefined"
@@ -69,7 +69,7 @@
                       :rules="authFields.apiKey.rules"
                       :persistent-hint="authFields.apiKey.required"
                       :disabled="!sushi.endpoint"
-                      prepend-icon="mdi-key-variant"
+                      prepend-icon="$mdi-key-variant"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="sushi.connection = undefined"
@@ -81,7 +81,7 @@
 
             <v-card
               :title="$t('general')"
-              prepend-icon="mdi-format-list-bulleted"
+              prepend-icon="$mdi-format-list-bulleted"
               variant="outlined"
               class="mt-4"
             >
@@ -100,7 +100,7 @@
                         (v) => (v?.length ?? 0) <= 1 || $t('institutions.sushi.onlyOnePackage'),
                       ]"
                       :hide-no-data="!packageSearch"
-                      prepend-icon="mdi-tag"
+                      prepend-icon="$mdi-tag"
                       variant="underlined"
                       required
                       multiple
@@ -129,7 +129,7 @@
                     <v-textarea
                       v-model="sushi.comment"
                       :label="$t('institutions.sushi.comment')"
-                      prepend-icon="mdi-image-text"
+                      prepend-icon="$mdi-image-text"
                       variant="underlined"
                       hide-details="auto"
                     />
@@ -141,13 +141,13 @@
 
           <v-card
             :title="$t('advancedSettings')"
-            prepend-icon="mdi-tools"
+            prepend-icon="$mdi-tools"
             variant="outlined"
             class="mt-4"
           >
             <template #append>
               <v-btn
-                :icon="isAdvancedOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                :icon="isAdvancedOpen ? '$mdi-chevron-up' : '$mdi-chevron-down'"
                 density="compact"
                 variant="text"
                 @click="isAdvancedOpen = !isAdvancedOpen"
@@ -196,7 +196,7 @@
       <div v-tooltip="{ text: $t('sushi.checkBeforeSave'), disabled: !!sushi.connection, location: 'top' }">
         <v-btn
           :text="!isEditing ? $t('add') : $t('save')"
-          :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+          :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
           :disabled="!valid || !sushi.connection"
           :loading="saving"
           type="submit"

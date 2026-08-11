@@ -14,9 +14,9 @@
     >
       <template #top>
         <v-toolbar color="transparent">
-          <div class="d-flex align-center text-h4 mx-4" style="gap: 1rem">
+          <div class="d-flex align-center text-headline-large mx-4" style="gap: 1rem">
             <v-btn
-              icon="mdi-arrow-left"
+              icon="$mdi-arrow-left"
               color="primary"
               @click="addDayToCurrent(-1)"
             />
@@ -38,7 +38,7 @@
 
             <v-btn
               :disabled="isNextPeriodDisabled"
-              icon="mdi-arrow-right"
+              icon="$mdi-arrow-right"
               color="primary"
               @click="addDayToCurrent(1)"
             />
@@ -51,7 +51,7 @@
             :label="$t('activity.action')"
             :items="availableActions"
             :return-object="false"
-            prepend-inner-icon="mdi-lightning-bolt"
+            prepend-inner-icon="$mdi-lightning-bolt"
             variant="outlined"
             density="comfortable"
             item-value="value"
@@ -71,7 +71,7 @@
                 label
                 v-bind="props"
               />
-              <span v-if="index === 1" class="text-grey text-caption">
+              <span v-if="index === 1" class="text-grey text-body-small">
                 {{ $t('nbOthers', { count: query.action.length - 1 }) }}
               </span>
             </template>
@@ -80,7 +80,7 @@
           <v-combobox
             v-model="query.authorId"
             :label="$t('activity.user')"
-            prepend-inner-icon="mdi-account"
+            prepend-inner-icon="$mdi-account"
             variant="outlined"
             density="comfortable"
             hide-details
@@ -119,7 +119,7 @@
           <template #activator="{ props }">
             <v-chip
               :text="value"
-              prepend-icon="mdi-account"
+              prepend-icon="$mdi-account"
               size="small"
               variant="outlined"
               v-bind="props"
@@ -130,7 +130,7 @@
             <template #actions>
               <v-btn
                 :text="$t('filter')"
-                prepend-icon="mdi-filter"
+                prepend-icon="$mdi-filter"
                 color="primary"
                 variant="text"
                 density="comfortable"
@@ -155,7 +155,7 @@
 
               <v-btn
                 v-if="isHovering"
-                icon="mdi-filter"
+                icon="$mdi-filter"
                 color="primary"
                 variant="text"
                 size="x-small"
@@ -182,7 +182,7 @@
         <v-btn
           v-if="rawItemDialog"
           text="JSON"
-          prepend-icon="mdi-code-json"
+          prepend-icon="$mdi-code-json"
           variant="text"
           size="small"
           @click="rawItemDialog.open(item)"
@@ -203,11 +203,6 @@ import {
   addDays,
 } from 'date-fns';
 
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const DATE_FORMAT = 'yyyy-MM-dd';
 const DATE_NOW = Date.now();
 const DATE_MAX = format(DATE_NOW, 'yyyy-MM-dd');
@@ -220,7 +215,7 @@ const {
   query,
   refresh,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/actions',
     query: {
@@ -323,39 +318,25 @@ const headers = computed(() => [
 
 const availableActions = computed(() => {
   const actions = [
-    { header: 'sushi' },
-    'sushi/create',
-    'sushi/update',
-    'sushi/update',
-    'sushi/delete',
-    { header: 'harvest' },
-    'harvest-sessions/create',
-    'harvest-sessions/upsert',
-    'harvest-sessions/delete',
-    'harvest-sessions/start',
-    'harvest-sessions/stop',
+    { value: 'sushi', type: 'subheader' },
+    { value: 'sushi/create' },
+    { value: 'sushi/update' },
+    { value: 'sushi/update' },
+    { value: 'sushi/delete' },
+
+    { value: 'harvest', type: 'subheader' },
+    { value: 'harvest-sessions/create' },
+    { value: 'harvest-sessions/upsert' },
+    { value: 'harvest-sessions/delete' },
+    { value: 'harvest-sessions/start' },
+    { value: 'harvest-sessions/stop' },
   ];
 
-  return actions.map((item) => {
-    if (item.header) {
-      // There's no way to add "headers", "groups" or "children" into a
-      // VSelect (and other derivate), so headers are items with custom style
-      return {
-        title: t(`activity.actionTypes.${item.header}`),
-        value: item,
-        props: {
-          disabled: true,
-          style: {
-            marginLeft: '-2.8rem',
-          },
-        },
-      };
-    }
-    return {
-      title: t(`activity.actions.${item}`),
-      value: item,
-    };
-  });
+  return actions.map(({ type, value }) => ({
+    type,
+    title: t(`activity.${type ? 'actionTypes' : 'actions'}.${value}`),
+    value,
+  }));
 });
 
 function addDayToCurrent(modifier) {

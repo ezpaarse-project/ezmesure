@@ -14,9 +14,9 @@
     >
       <template #top>
         <v-toolbar color="transparent">
-          <div class="d-flex align-center text-h4 mx-4" style="gap: 1rem">
+          <div class="d-flex align-center text-headline-large mx-4" style="gap: 1rem">
             <v-btn
-              icon="mdi-arrow-left"
+              icon="$mdi-arrow-left"
               color="primary"
               @click="addDayToCurrent(-1)"
             />
@@ -38,7 +38,7 @@
 
             <v-btn
               :disabled="isNextPeriodDisabled"
-              icon="mdi-arrow-right"
+              icon="$mdi-arrow-right"
               color="primary"
               @click="addDayToCurrent(1)"
             />
@@ -51,7 +51,7 @@
             :label="$t('activity.action')"
             :items="availableActions"
             :return-object="false"
-            prepend-inner-icon="mdi-lightning-bolt"
+            prepend-inner-icon="$mdi-lightning-bolt"
             variant="outlined"
             density="comfortable"
             item-value="value"
@@ -71,7 +71,7 @@
                 label
                 v-bind="props"
               />
-              <span v-if="index === 1" class="text-grey text-caption">
+              <span v-if="index === 1" class="text-grey text-body-small">
                 {{ $t('nbOthers', { count: query.action.length - 1 }) }}
               </span>
             </template>
@@ -80,7 +80,7 @@
           <v-combobox
             v-model="query.username"
             :label="$t('activity.user')"
-            prepend-inner-icon="mdi-account"
+            prepend-inner-icon="$mdi-account"
             variant="outlined"
             density="comfortable"
             hide-details
@@ -119,7 +119,7 @@
           <template #activator="{ props }">
             <v-chip
               :text="value"
-              prepend-icon="mdi-account"
+              prepend-icon="$mdi-account"
               size="small"
               variant="outlined"
               v-bind="props"
@@ -130,7 +130,7 @@
             <template #actions>
               <v-btn
                 :text="$t('filter')"
-                prepend-icon="mdi-filter"
+                prepend-icon="$mdi-filter"
                 color="primary"
                 variant="text"
                 density="comfortable"
@@ -155,7 +155,7 @@
 
               <v-btn
                 v-if="isHovering"
-                icon="mdi-filter"
+                icon="$mdi-filter"
                 color="primary"
                 variant="text"
                 size="x-small"
@@ -186,7 +186,7 @@
         <v-btn
           v-if="rawItemDialog"
           text="JSON"
-          prepend-icon="mdi-code-json"
+          prepend-icon="$mdi-code-json"
           variant="text"
           size="small"
           @click="rawItemDialog.open(item)"
@@ -207,11 +207,6 @@ import {
   addDays,
 } from 'date-fns';
 
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const DATE_FORMAT = 'yyyy-MM-dd';
 const DATE_NOW = Date.now();
 const DATE_MAX = format(DATE_NOW, 'yyyy-MM-dd');
@@ -225,7 +220,7 @@ const {
   refresh,
   itemLength,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/activity',
     transform: ({ items, total }) => {
@@ -325,84 +320,78 @@ const headers = computed(() => [
 
 const availableActions = computed(() => {
   const actions = [
-    { header: 'users' },
-    'user/register',
-    'user/refresh',
-    'user/connection',
-    { header: 'files' },
-    'file/upload',
-    'file/list',
-    'file/delete',
-    'file/delete-many',
-    { header: 'institutions' },
-    'institutions/create',
-    'institutions/update',
-    'institutions/delete',
-    'institutions/addMember',
-    'institutions/removeMember',
-    'institutions/import',
-    { header: 'spaces' },
-    'spaces/import',
-    { header: 'exports' },
-    'export/aggregate',
-    'export/counter5',
-    'events/delete',
-    { header: 'indices' },
-    'indices/tops',
-    'indices/list',
-    'indices/delete',
-    'indices/search',
-    'indices/insert',
-    { header: 'sushi' },
-    'sushi/create',
-    'sushi/update',
-    'sushi/delete',
-    'sushi/delete-many',
-    'sushi/download-report',
-    'sushi/harvest',
-    'sushi/import',
-    'sushi/check-connection',
-    { header: 'endpoints' },
-    'endpoint/create',
-    'endpoint/update',
-    'endpoint/delete',
-    'endpoint/import',
-    { header: 'harvest' },
-    'harvest-sessions/create',
-    'harvest-sessions/upsert',
-    'harvest-sessions/start',
-    'harvest-sessions/delete',
-    'harvest-sessions/stop',
-    { header: 'reporting' },
-    'reporting/index',
-    'reporting/getDashboards',
-    'reporting/list',
-    'reporting/store',
-    'reporting/update',
-    'reporting/delete',
-    'reporting/history',
+    { value: 'users', type: 'subheader' },
+    { value: 'user/register' },
+    { value: 'user/refresh' },
+    { value: 'user/connection' },
+
+    { value: 'files', type: 'subheader' },
+    { value: 'file/upload' },
+    { value: 'file/list' },
+    { value: 'file/delete' },
+    { value: 'file/delete-many' },
+
+    { value: 'institutions', type: 'subheader' },
+    { value: 'institutions/create' },
+    { value: 'institutions/update' },
+    { value: 'institutions/delete' },
+    { value: 'institutions/addMember' },
+    { value: 'institutions/removeMember' },
+    { value: 'institutions/import' },
+
+    { value: 'spaces', type: 'subheader' },
+    { value: 'spaces/import' },
+
+    { value: 'exports', type: 'subheader' },
+    { value: 'export/aggregate' },
+    { value: 'export/counter5' },
+    { value: 'events/delete' },
+
+    { value: 'indices', type: 'subheader' },
+    { value: 'indices/tops' },
+    { value: 'indices/list' },
+    { value: 'indices/delete' },
+    { value: 'indices/search' },
+    { value: 'indices/insert' },
+
+    { value: 'sushi', type: 'subheader' },
+    { value: 'sushi/create' },
+    { value: 'sushi/update' },
+    { value: 'sushi/delete' },
+    { value: 'sushi/delete-many' },
+    { value: 'sushi/download-report' },
+    { value: 'sushi/harvest' },
+    { value: 'sushi/import' },
+    { value: 'sushi/check-connection' },
+
+    { value: 'endpoints', type: 'subheader' },
+    { value: 'endpoint/create' },
+    { value: 'endpoint/update' },
+    { value: 'endpoint/delete' },
+    { value: 'endpoint/import' },
+
+    { value: 'harvest', type: 'subheader' },
+    { value: 'harvest-sessions/create' },
+    { value: 'harvest-sessions/upsert' },
+    { value: 'harvest-sessions/start' },
+    { value: 'harvest-sessions/delete' },
+    { value: 'harvest-sessions/stop' },
+
+    { value: 'reporting', type: 'subheader' },
+    { value: 'reporting/index' },
+    { value: 'reporting/getDashboards' },
+    { value: 'reporting/list' },
+    { value: 'reporting/store' },
+    { value: 'reporting/update' },
+    { value: 'reporting/delete' },
+    { value: 'reporting/history' },
   ];
 
-  return actions.map((item) => {
-    if (item.header) {
-      // There's no way to add "headers", "groups" or "children" into a
-      // VSelect (and other derivate), so headers are items with custom style
-      return {
-        title: t(`activity.actionTypes.${item.header}`),
-        value: item,
-        props: {
-          disabled: true,
-          style: {
-            marginLeft: '-2.8rem',
-          },
-        },
-      };
-    }
-    return {
-      title: t(`activity.actions.${item}`),
-      value: item,
-    };
-  });
+  return actions.map(({ type, value }) => ({
+    type,
+    title: t(`activity.${type ? 'actionTypes' : 'actions'}.${value}`),
+    value,
+  }));
 });
 
 function addDayToCurrent(modifier) {

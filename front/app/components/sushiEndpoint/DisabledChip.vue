@@ -2,7 +2,7 @@
   <v-chip
     v-if="isDisabled"
     v-tooltip="$t('endpoints.disabledUntilDesc')"
-    prepend-icon="mdi-download-off"
+    prepend-icon="$mdi-download-off"
     size="small"
   >
     {{ disabledUntil }}

@@ -19,7 +19,7 @@
         </a>
 
         <v-icon
-          icon="mdi-open-in-new"
+          icon="$mdi-open-in-new"
           size="small"
           color="secondary"
           end

@@ -9,13 +9,13 @@
     no-data-text="endpoints.searchRegistryDataHint"
     item-value="id"
     item-title="name"
-    prepend-icon="mdi-database-search"
+    prepend-icon="$mdi-database-search"
     hide-details="auto"
     clearable
     return-object
     @click:clear="selected = null"
   >
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item
         :title="item.vendor"
         :subtitle="item.website"

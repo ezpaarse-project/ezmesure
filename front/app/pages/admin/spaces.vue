@@ -15,7 +15,7 @@
       <v-btn
         v-if="spaceFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -59,7 +59,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -70,12 +70,12 @@
             <v-list-item
               v-if="spaceFormDialogRef"
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="spaceFormDialogRef.open(item)"
             />
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteSpaces([item])"
             />
 
@@ -84,13 +84,13 @@
             <v-list-item
               :title="$t('open')"
               :href="`/kibana/s/${item.id}`"
-              prepend-icon="mdi-open-in-app"
+              prepend-icon="$mdi-open-in-app"
             />
 
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copySpaceId(item)"
             />
           </v-list>
@@ -105,7 +105,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteSpaces()"
         />
       </template>
@@ -120,11 +120,6 @@
 
 <script setup>
 import SpacesDashboardCollectionsDialog from '~/components/space/DashboardCollectionsDialog.vue';
-
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
@@ -141,7 +136,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/kibana-spaces',
     query: {
@@ -231,7 +226,7 @@ function deleteSpaces(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

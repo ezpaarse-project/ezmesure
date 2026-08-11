@@ -3,14 +3,14 @@
     :title="$t('authenticate.impersonate.title')"
     :subtitle="showUser ? user.fullName : undefined"
     :loading="loadingTestUsers && 'primary'"
-    prepend-icon="mdi-account"
+    prepend-icon="$mdi-account"
   >
     <template #append>
       <v-scale-transition>
         <v-btn
           v-if="windowId === 'kibana'"
           v-tooltip:left="$t('refresh')"
-          icon="mdi-reload"
+          icon="$mdi-reload"
           variant="text"
           @click="refresh()"
         />
@@ -35,7 +35,7 @@
       <v-btn
         :text="$t('authenticate.impersonate.actions.agree')"
         :loading="impersonating"
-        prepend-icon="mdi-login"
+        prepend-icon="$mdi-login"
         size="small"
         color="primary"
         @click="impersonateUser()"

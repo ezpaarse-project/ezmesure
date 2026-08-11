@@ -3,10 +3,10 @@
     <v-container fluid class="pa-6 home-background home-background--primary">
       <v-row class="align-center pa-12">
         <v-col md="6" class="position-relative">
-          <h4 class="text-h6 font-weight-light">
+          <h4 class="text-body-large font-weight-light">
             {{ $t('home.head.subtitle') }}
           </h4>
-          <h1 class="text-h4">
+          <h1 class="text-headline-large">
             {{ $t('home.head.title') }}
           </h1>
 
@@ -28,14 +28,14 @@
             </template>
           </v-chip>
 
-          <p class="text-body-1 text-medium-emphasis my-6">
+          <p class="text-body-large text-medium-emphasis my-6">
             {{ $t('home.head.text') }}
           </p>
 
           <v-btn
             :text="$t('home.head.actions.start')"
             to="/myspace"
-            append-icon="mdi-chevron-right"
+            append-icon="$mdi-chevron-right"
             variant="elevated"
             color="primary"
           />
@@ -91,12 +91,12 @@
         <h4 class="font-weight-medium text-primary mb-2">
           {{ $t('home.features.subtitle') }}
         </h4>
-        <h3 class="text-h4 font-weight-bold mb-4">
+        <h3 class="text-headline-large font-weight-bold mb-4">
           {{ $t('home.features.title') }}
         </h3>
       </v-responsive>
 
-      <v-row justify="center">
+      <v-row class="justify-center">
         <v-col v-for="(feat, i) in features" :key="i" cols="12" sm="6" md="4">
           <v-card
             :title="feat.title"
@@ -112,7 +112,7 @@
             <template v-if="feat.to" #actions>
               <v-btn
                 :text="$t('home.features.actions.seeMore')"
-                append-icon="mdi-arrow-right"
+                append-icon="$mdi-arrow-right"
                 variant="tonal"
                 size="small"
                 color="accent"
@@ -137,11 +137,11 @@
         <div class="flex-1-1">
           <v-row>
             <v-col cols="12" md="6">
-              <h3 class="font-weight-bold text-h5">
+              <h3 class="font-weight-bold text-headline-small">
                 {{ $t('home.metrics.title') }}
               </h3>
 
-              <p class="text-subtitle-2">
+              <p class="text-title-small">
                 {{ $t('home.metrics.text') }}
               </p>
             </v-col>
@@ -159,7 +159,7 @@
                 class="ml-2 mb-2"
               />
               <v-list-item v-else>
-                <v-list-item-title class="text-h4 font-weight-bold">
+                <v-list-item-title class="text-headline-large font-weight-bold">
                   {{ metric.value }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
@@ -184,7 +184,7 @@
         <div class="font-weight-medium text-primary mb-2">
           {{ $t('home.counter.subtitle') }}
         </div>
-        <h3 class="text-h4 font-weight-bold mb-2">
+        <h3 class="text-headline-large font-weight-bold mb-2">
           {{ $t('home.counter.title') }}
         </h3>
 
@@ -192,7 +192,7 @@
           <template #activator="{ props }">
             <v-chip
               :text="$t('home.counter.chip.title')"
-              append-icon="mdi-information"
+              append-icon="$mdi-information"
               size="small"
               color="secondary"
               variant="flat"
@@ -208,7 +208,7 @@
               <v-btn
                 :text="$t('home.features.actions.seeMore')"
                 href="https://www.countermetrics.org/about/how-we-work/"
-                append-icon="mdi-open-in-new"
+                append-icon="$mdi-open-in-new"
                 variant="flat"
                 color="primary"
                 size="small"
@@ -236,7 +236,7 @@
         <div class="font-weight-medium text-primary mb-2">
           {{ $t('home.git.subtitle') }}
         </div>
-        <h3 class="text-h4 font-weight-bold mb-4">
+        <h3 class="text-headline-large font-weight-bold mb-4">
           {{ $t('home.git.title') }}
         </h3>
       </v-responsive>
@@ -276,7 +276,7 @@
         </v-col>
 
         <v-col cols="12" lg="6" class="order-3 order-lg-2">
-          <v-sheet border rounded class="d-flex flex-column align-center justify-center text-body-2 pa-4">
+          <v-sheet border rounded class="d-flex flex-column align-center justify-center text-body-medium pa-4">
             <p class="text-center">
               {{ $t('home.git.text') }}
             </p>
@@ -284,7 +284,7 @@
             <v-btn
               :text="$t('home.git.actions.contribute')"
               href="https://github.com/ezpaarse-project/ezmesure"
-              append-icon="mdi-github"
+              append-icon="$mdi-github"
               variant="flat"
               color="accent"
               class="mt-6"
@@ -306,7 +306,7 @@
         <div class="font-weight-medium text-primary mb-2">
           {{ $t('home.reporting.subtitle') }}
         </div>
-        <h3 class="text-h4 font-weight-bold mb-2">
+        <h3 class="text-headline-large font-weight-bold mb-2">
           {{ $t('home.reporting.title') }}
         </h3>
 
@@ -336,7 +336,7 @@
     </v-container>
 
     <v-footer color="secondary">
-      <div class="text-caption">
+      <div class="text-body-small">
         © 2016 ~ {{ YEAR }} ReadMetrics — {{ $t('home.footer.rights') }}
       </div>
 
@@ -360,7 +360,7 @@ import prettySize from 'pretty-bytes';
 
 const { t, locale } = useI18n();
 const router = useRouter();
-const goTo = useGoTo();
+const goTo = useVGoTo();
 const { public: { homepage } } = useRuntimeConfig();
 
 const snacks = useSnacksStore();
@@ -476,12 +476,12 @@ const gitItems = computed(() => [
     order: 1,
     items: [
       {
-        icon: 'mdi-license',
+        icon: '$mdi-license',
         title: t('home.git.items.license'),
         value: 'CeCILL (GPL)',
       },
       {
-        icon: 'mdi-alert-circle-outline',
+        icon: '$mdi-alert-circle-outline',
         title: t('home.git.items.issues'),
         value: formatter.value.format(metrics.value?.git?.issues ?? 0),
       },
@@ -491,12 +491,12 @@ const gitItems = computed(() => [
     order: 3,
     items: [
       {
-        icon: 'mdi-source-branch',
+        icon: '$mdi-source-branch',
         title: t('home.git.items.commits'),
         value: dateFormat(metrics.value?.git?.updatedAt, locale.value, 'PPP'),
       },
       {
-        icon: 'mdi-account-supervisor',
+        icon: '$mdi-account-supervisor',
         title: t('home.git.items.contributors'),
         value: formatter.value.format(metrics.value?.git?.contributors ?? 0),
       },
@@ -506,33 +506,33 @@ const gitItems = computed(() => [
 
 const features = computed(() => [
   {
-    icon: 'mdi-view-dashboard',
+    icon: '$mdi-view-dashboard',
     title: t('home.features.items.dashboard.title'),
     text: t('home.features.items.dashboard.text'),
     hide: !homepage.features.dashboard,
   },
   {
-    icon: 'mdi-database',
+    icon: '$mdi-database',
     title: t('home.features.items.repository.title'),
     text: t('home.features.items.repository.text'),
     hide: !homepage.features.repository,
     to: '#metrics',
   },
   {
-    icon: 'mdi-file-document',
+    icon: '$mdi-file-document',
     title: t('home.features.items.ezpaarse.title'),
     text: t('home.features.items.ezpaarse.text'),
     hide: !homepage.features.ezpaarse,
   },
   {
-    icon: 'mdi-api',
+    icon: '$mdi-api',
     title: t('home.features.items.counter.title'),
     text: t('home.features.items.counter.text'),
     hide: !homepage.features.counter,
     to: '#counter',
   },
   {
-    icon: 'mdi-file-chart-outline',
+    icon: '$mdi-file-chart-outline',
     title: t('home.features.items.reporting.title'),
     text: t('home.features.items.reporting.text'),
     hide: !homepage.features.reporting,
@@ -543,17 +543,17 @@ const features = computed(() => [
 const socials = computed(() => [
   {
     tooltip: t('home.footer.socials.github'),
-    icon: 'mdi-github',
+    icon: '$mdi-github',
     href: 'https://github.com/ezpaarse-project/ezmesure',
   },
   {
     tooltip: t('home.footer.socials.blog'),
-    icon: 'mdi-message-text',
+    icon: '$mdi-message-text',
     href: 'https://blog.readmetrics.net/',
   },
   {
     tooltip: t('home.footer.socials.youtube'),
-    icon: 'mdi-youtube',
+    icon: '$mdi-youtube',
     href: 'https://www.youtube.com/channel/UCcR-0UE9WjYiwS4fMG2T4tQ',
   },
 ]);

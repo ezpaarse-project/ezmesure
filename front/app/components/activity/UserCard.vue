@@ -1,11 +1,11 @@
 <template>
   <v-card
     :title="user.name || user.username"
-    prepend-icon="mdi-account-circle"
+    prepend-icon="$mdi-account-circle"
   >
     <template #text>
       <v-list lines="2" density="compact">
-        <v-list-item v-if="otherRoles.length > 0" :subtitle="$t('users.user.roles')" prepend-icon="mdi-shield">
+        <v-list-item v-if="otherRoles.length > 0" :subtitle="$t('users.user.roles')" prepend-icon="$mdi-shield">
           <template #title>
             <v-chip
               v-for="role in otherRoles"
@@ -19,13 +19,13 @@
           </template>
         </v-list-item>
 
-        <v-list-item v-if="repositoryRoles.length > 0" :subtitle="$t('repositories.repositories')" prepend-icon="mdi-database">
+        <v-list-item v-if="repositoryRoles.length > 0" :subtitle="$t('repositories.repositories')" prepend-icon="$mdi-database">
           <template #title>
             <v-chip
               v-for="role in repositoryRoles"
               :key="role.repositoryPattern"
               :text="role.repositoryPattern"
-              :append-icon="role.readonly ? 'mdi-book' : 'mdi-book-edit'"
+              :append-icon="role.readonly ? '$mdi-book' : '$mdi-book-edit'"
               size="small"
               density="comfortable"
               label
@@ -34,13 +34,13 @@
           </template>
         </v-list-item>
 
-        <v-list-item v-if="aliasRoles.length > 0" :subtitle="$t('repositoryAliases.alias')" prepend-icon="mdi-database-eye">
+        <v-list-item v-if="aliasRoles.length > 0" :subtitle="$t('repositoryAliases.alias')" prepend-icon="$mdi-database-eye">
           <template #title>
             <v-chip
               v-for="role in aliasRoles"
               :key="role.aliasPattern"
               :text="role.aliasPattern"
-              append-icon="mdi-book"
+              append-icon="$mdi-book"
               size="small"
               density="comfortable"
               label
@@ -49,13 +49,13 @@
           </template>
         </v-list-item>
 
-        <v-list-item v-if="spaceRoles.length > 0" :subtitle="$t('spaces.spaces')" prepend-icon="mdi-tab">
+        <v-list-item v-if="spaceRoles.length > 0" :subtitle="$t('spaces.spaces')" prepend-icon="$mdi-tab">
           <template #title>
             <v-chip
               v-for="role in spaceRoles"
               :key="role.spaceId"
               :text="role.spaceId"
-              :append-icon="role.readonly ? 'mdi-book' : 'mdi-book-edit'"
+              :append-icon="role.readonly ? '$mdi-book' : '$mdi-book-edit'"
               size="small"
               density="comfortable"
               label
@@ -68,7 +68,7 @@
           v-if="isUserAdmin"
           :title="$t('yes')"
           :subtitle="$t('users.user.isAdmin')"
-          prepend-icon="mdi-security"
+          prepend-icon="$mdi-security"
         />
       </v-list>
     </template>

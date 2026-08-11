@@ -12,14 +12,14 @@
     :error-messages="error?.message"
     item-title="name"
     item-value="id"
-    prepend-icon="mdi-form-textbox"
+    prepend-icon="$mdi-form-textbox"
     variant="underlined"
     no-filter
     required
     return-object
     @update:model-value="$emit('update:modelValue', $event);"
   >
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item
         :title="item.name"
         lines="two"

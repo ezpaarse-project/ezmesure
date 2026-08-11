@@ -1,6 +1,6 @@
 // @ts-check
 const { ofetch, createFetchError } = require('ofetch');
-const { parse: parseCookie, serialize: serializeCookie } = require('cookie');
+const { parseSetCookie, stringifySetCookie } = require('cookie');
 const config = require('config');
 
 const username = config.get('elasticsearch.user');
@@ -639,19 +639,15 @@ async function loginUser(user, passwd, currentURL) {
     },
   });
 
-  const cookies = response.headers.getSetCookie().map((str) => {
-    const cookie = parseCookie(str);
-    const [[name, value], ...options] = Object.entries(cookie);
-    return { name, value: value || '', params: Object.fromEntries(options) };
-  });
-
+  const cookies = response.headers.getSetCookie().map((str) => parseSetCookie(str));
   const authCookie = cookies.find((cookie) => cookie.name === AUTH_COOKIE.name);
   if (!authCookie) {
     throw new Error('Auth cookie not found in Kibana response');
   }
 
   // Keep track of params used to set cookie
-  return authCookie;
+  const { name, value, ...params } = authCookie;
+  return { name, value: value || '', params };
 }
 
 /**
@@ -668,7 +664,7 @@ async function logoutUser(authToken) {
     method: 'GET',
     baseURL: `http://${host}:${port}`,
     headers: {
-      Cookies: serializeCookie({
+      Cookies: stringifySetCookie({
         name: AUTH_COOKIE.name,
         value: authToken,
         ...AUTH_COOKIE.params,

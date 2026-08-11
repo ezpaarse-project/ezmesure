@@ -12,11 +12,11 @@
       :title="title"
       :subtitle="subtitle"
       :loading="status === 'pending' && 'primary'"
-      prepend-icon="mdi-account-plus"
+      prepend-icon="$mdi-account-plus"
       min-height="250"
     >
       <template #append>
-        <v-btn variant="text" icon="mdi-close" @click="isOpen = false" />
+        <v-btn variant="text" icon="$mdi-close" @click="isOpen = false" />
       </template>
 
       <template #text>
@@ -27,7 +27,7 @@
               :label="$t('search')"
               :error="!!error"
               :error-messages="error"
-              prepend-icon="mdi-account-search"
+              prepend-icon="$mdi-account-search"
               density="comfortable"
               hide-details
               autofocus
@@ -38,7 +38,7 @@
         <v-row v-if="!users || users.length <= 0">
           <v-col>
             <v-empty-state
-              icon="mdi-account-question"
+              icon="$mdi-account-question"
               :title="$t('institutions.members.personNotRegistered')"
             />
           </v-col>

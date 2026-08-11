@@ -9,11 +9,11 @@
     </template>
 
     <template #text>
-      <v-row class="mt-2">
-        <v-col cols="6" class="pt-0">
+      <v-row class="mt-2" gap="0">
+        <v-col cols="6" class="pt-0 institution-list">
           <v-list density="compact" lines="two" max-height="300" class="pt-0">
             <v-list-subheader sticky>
-              <v-icon icon="mdi-domain" />
+              <v-icon icon="$mdi-domain" />
               {{ $t('institutions.toolbarTitle', { count: institutions.length }) }}
             </v-list-subheader>
 
@@ -23,7 +23,7 @@
               :title="item.name"
               :subtitle="item.acronym"
               :to="`/admin/institutions/${item.id}/sushi`"
-              append-icon="mdi-open-in-new"
+              append-icon="$mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -34,12 +34,10 @@
           </v-list>
         </v-col>
 
-        <v-divider vertical />
-
-        <v-col cols="6" class="pt-0">
+        <v-col cols="6" class="pt-0 endpoint-list">
           <v-list density="compact" lines="two" max-height="300" class="pt-0">
             <v-list-subheader sticky>
-              <v-icon icon="mdi-api" />
+              <v-icon icon="$mdi-api" />
               {{ $t('endpoints.toolbarTitle', { count: endpoints.length }) }}
             </v-list-subheader>
 
@@ -48,7 +46,7 @@
               :key="item.id"
               :title="item.vendor"
               :to="`/admin/endpoints/${item.id}`"
-              append-icon="mdi-open-in-new"
+              append-icon="$mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -125,3 +123,17 @@ const endpoints = computed(() => {
   return [...map.values()].sort((a, b) => a.vendor.localeCompare(b.vendor));
 });
 </script>
+
+<style scoped>
+.institution-list {
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+
+  /* Apply half gap to center divider */
+  padding-right: 12px;
+}
+
+.endpoint-list {
+  /* Apply half gap to center divider */
+  padding-left: 12px;
+}
+</style>

@@ -2,7 +2,7 @@
   <v-card
     :loading="loading && 'primary'"
     :title="isEditing ? $t('spaces.editSpace') : $t('spaces.newSpace')"
-    prepend-icon="mdi-tab-plus"
+    prepend-icon="$mdi-tab-plus"
   >
     <template v-if="showSpace" #subtitle>
       <SpaceSubtitle :model-value="modelValue" />
@@ -38,7 +38,7 @@
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9*_-]+$/i.test(v) || $t('invalidFormat'),
                   ]"
-                  prepend-icon="mdi-identifier"
+                  prepend-icon="$mdi-identifier"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -54,7 +54,7 @@
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
                   ]"
-                  prepend-icon="mdi-tag"
+                  prepend-icon="$mdi-tag"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -69,7 +69,7 @@
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
                   ]"
-                  prepend-icon="mdi-form-textbox"
+                  prepend-icon="$mdi-form-textbox"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -80,7 +80,7 @@
                 <v-textarea
                   v-model="space.description"
                   :label="$t('description')"
-                  prepend-icon="mdi-image-text"
+                  prepend-icon="$mdi-image-text"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -90,7 +90,7 @@
               <v-col cols="12">
                 <v-input
                   :error-messages="logoErrorMessage"
-                  prepend-icon="mdi-image"
+                  prepend-icon="$mdi-image"
                   hide-details="auto"
                 >
                   <v-card
@@ -107,7 +107,7 @@
                         size="64"
                       >
                         <v-img v-if="logoSrc" :src="logoSrc" />
-                        <v-icon v-else size="64" icon="mdi-image-off-outline" />
+                        <v-icon v-else size="64" icon="$mdi-image-off-outline" />
                       </v-avatar>
                     </div>
 
@@ -118,7 +118,7 @@
                         size="small"
                         variant="tonal"
                         color="red"
-                        prepend-icon="mdi-delete"
+                        prepend-icon="$mdi-delete"
                         :text="$t('delete')"
                         @click="removeLogo()"
                       />
@@ -126,7 +126,7 @@
                         size="small"
                         variant="tonal"
                         color="primary"
-                        prepend-icon="mdi-pencil"
+                        prepend-icon="$mdi-pencil"
                         :text="$t('modify')"
                         @click="openFileDialog()"
                       />
@@ -147,7 +147,7 @@
 
               <v-col cols="12">
                 <v-input
-                  prepend-icon="mdi-shape"
+                  prepend-icon="$mdi-shape"
                   hide-details="auto"
                 >
                   <v-card
@@ -181,7 +181,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="loading"
         type="submit"
