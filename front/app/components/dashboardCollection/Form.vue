@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="isEditing ? $t('dashboardCollections.updateCollection') : $t('dashboardCollections.newCollection')"
-    prepend-icon="mdi-folder-plus"
+    prepend-icon="$mdi-folder-plus"
   >
     <template #text>
       <v-row>
@@ -17,7 +17,7 @@
                   v-model="collection.name"
                   :label="`${$t('name')} *`"
                   :rules="[v => !!v || $t('fieldIsRequired')]"
-                  prepend-icon="mdi-form-textbox"
+                  prepend-icon="$mdi-form-textbox"
                   variant="underlined"
                   hide-details="auto"
                 />
@@ -27,7 +27,7 @@
                 <v-textarea
                   v-model="collection.description"
                   :label="$t('description')"
-                  prepend-icon="mdi-book-open-page-variant"
+                  prepend-icon="$mdi-book-open-page-variant"
                   variant="underlined"
                   hide-details
                 />
@@ -45,7 +45,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="saving"
         type="submit"

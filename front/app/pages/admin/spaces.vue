@@ -49,7 +49,7 @@
         <v-chip
           :text="`${value ?? 0}`"
           :variant="!value ? 'outlined' : undefined"
-          prepend-icon="mdi-view-dashboard"
+          prepend-icon="$mdi-view-dashboard"
           size="small"
           @click="openCollections(item.id)"
         />

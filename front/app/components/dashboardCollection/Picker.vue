@@ -15,7 +15,7 @@
     >
       <v-text-field
         v-model="search"
-        append-inner-icon="mdi-magnify"
+        append-inner-icon="$mdi-magnify"
         :label="$t('search')"
         :error="!!error"
         :error-messages="error"
@@ -25,7 +25,7 @@
       <v-container>
         <v-empty-state
           v-if="!collections || collections.length <= 0"
-          icon="mdi-monitor-dashboard"
+          icon="$mdi-monitor-dashboard"
           :title="$t('dashboardCollections.search.empty')"
         />
 

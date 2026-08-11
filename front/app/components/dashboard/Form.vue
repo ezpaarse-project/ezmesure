@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="isEditing ? $t('dashboards.updateDashboard') : $t('dashboards.newDashboard')"
-    prepend-icon="mdi-view-dashboard-edit"
+    prepend-icon="$mdi-view-dashboard-edit"
   >
     <template #text>
       <v-form
@@ -14,7 +14,7 @@
           :label="$t('dashboards.sourceSpace')"
           :return-object="false"
           :rules="[]"
-          prepend-icon="mdi-form-textbox"
+          prepend-icon="$mdi-form-textbox"
           variant="underlined"
           @update:model-value="dashboard.sourceDashboardId = undefined"
         />
@@ -26,7 +26,7 @@
           :rules="[v => !!v || $t('fieldIsRequired')]"
           :return-object="false"
           :space-id="dashboard.sourceSpaceId"
-          prepend-icon="mdi-form-textbox"
+          prepend-icon="$mdi-form-textbox"
           variant="underlined"
         />
       </v-form>
@@ -39,7 +39,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="saving"
         type="submit"

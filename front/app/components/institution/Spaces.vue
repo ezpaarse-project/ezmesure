@@ -22,7 +22,7 @@
       </div>
 
       <template v-else>
-        <v-row v-if="sortedSpaces.length > 0" dense>
+        <v-row v-if="sortedSpaces.length > 0" density="comfortable">
           <v-col v-if="sortedForeignSpaces.length > 0" cols="12" class="pt-0">
             <v-list-subheader>
               <v-icon icon="$mdi-tab" start />
@@ -71,7 +71,7 @@
 
               <template #actions>
                 <v-btn
-                  append-icon="mdi-view-dashboard"
+                  append-icon="$mdi-view-dashboard"
                   text="Collections"
                   variant="text"
                   size="small"
@@ -84,7 +84,7 @@
 
         <v-divider v-if="sortedForeignSpaces.length > 0 && sortedSpaces.length > 0" class="mt-4 mb-2" />
 
-        <v-row v-if="sortedForeignSpaces.length > 0" dense>
+        <v-row v-if="sortedForeignSpaces.length > 0" density="comfortable">
           <v-col cols="12">
             <v-list-subheader>
               <v-icon icon="$mdi-tab-plus" start />

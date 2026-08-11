@@ -10,7 +10,7 @@
     >
       <v-btn
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -44,7 +44,7 @@
             <v-chip
               :text="`${value?.name ?? '...'}`"
               :variant="!value ? 'outlined' : undefined"
-              prepend-icon="mdi-folder-table"
+              prepend-icon="$mdi-folder-table"
               size="small"
               v-bind="props"
             />
@@ -71,7 +71,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -81,17 +81,17 @@
           <v-list>
             <v-list-item
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="openDashboardForm(item.id)"
             />
             <v-list-item
               :title="$t('update')"
-              prepend-icon="mdi-sync"
+              prepend-icon="$mdi-sync"
               @click="updateDashboards([item])"
             />
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteDashboards([item])"
             />
 
@@ -100,7 +100,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyToClipboard(item.id)"
             />
           </v-list>
@@ -115,12 +115,12 @@
       <template #actions>
         <v-list-item
           :title="$t('update')"
-          prepend-icon="mdi-sync"
+          prepend-icon="$mdi-sync"
           @click="updateDashboards()"
         />
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteDashboards()"
         />
       </template>
@@ -250,7 +250,7 @@ function updateDashboards(items) {
     title: t('dashboards.actions.update.title', toUpdate.length),
     text: t('dashboards.actions.update.text', toUpdate.length),
     agreeText: t('dashboards.actions.update.confirm'),
-    agreeIcon: 'mdi-sync',
+    agreeIcon: '$mdi-sync',
     onAgree: async () => {
       const results = await Promise.all(
         toUpdate.map(
@@ -290,7 +290,7 @@ function deleteDashboards(items) {
     title: t('dashboards.actions.delete.title', toDelete.length),
     text: t('dashboards.actions.delete.text', toDelete.length),
     agreeText: t('dashboards.actions.delete.confirm'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

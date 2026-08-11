@@ -12,11 +12,11 @@
       :title="props.title"
       :subtitle="props.subtitle"
       :loading="status === 'pending' && 'primary'"
-      prepend-icon="mdi-folder-plus"
+      prepend-icon="$mdi-folder-plus"
       min-height="250"
     >
       <template #append>
-        <v-btn variant="text" icon="mdi-close" @click="isOpen = false" />
+        <v-btn variant="text" icon="$mdi-close" @click="isOpen = false" />
       </template>
 
       <template #text>
@@ -25,7 +25,7 @@
           :label="$t('search')"
           :error="!!error"
           :error-messages="error"
-          prepend-inner-icon="mdi-magnify"
+          prepend-inner-icon="$mdi-magnify"
           density="compact"
           variant="outlined"
           hide-details
@@ -34,7 +34,7 @@
 
         <v-empty-state
           v-if="!collections || collections.length <= 0"
-          icon="mdi-monitor-dashboard"
+          icon="$mdi-magnify"
           :title="$t('dashboardCollections.search.empty')"
         />
 
@@ -60,7 +60,7 @@
                 <template #activator="{ props: menuProps }">
                   <v-btn
                     :loading="props.loadingItems.has(collection.id)"
-                    icon="mdi-folder-plus"
+                    icon="$mdi-folder-plus"
                     color="primary"
                     variant="tonal"
                     size="small"
@@ -84,7 +84,7 @@
                     :key="index"
                     :value="pattern"
                     :title="pattern"
-                    prepend-icon="mdi-database"
+                    prepend-icon="$mdi-database"
                     @click="addCollection(collection, pattern)"
                   />
                 </v-list>

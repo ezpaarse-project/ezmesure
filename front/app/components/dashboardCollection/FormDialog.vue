@@ -82,7 +82,7 @@ const {
 
 const loading = computed(() => status.value === 'pending');
 const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) : undefined));
-const errorIcon = computed(() => (error?.value?.statusCode === 404 ? 'mdi-ghost-outline' : 'mdi-alert-circle'));
+const errorIcon = computed(() => (error?.value?.statusCode === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
 
 watch(show, (isOpen) => {
   if (isOpen) { refresh(); }

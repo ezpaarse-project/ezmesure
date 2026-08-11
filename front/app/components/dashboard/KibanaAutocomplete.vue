@@ -12,7 +12,7 @@
     :error-messages="error?.message"
     item-title="attributes.title"
     item-value="id"
-    prepend-icon="mdi-form-textbox"
+    prepend-icon="$mdi-form-textbox"
     variant="underlined"
     no-filter
     required

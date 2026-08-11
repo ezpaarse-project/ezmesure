@@ -49,7 +49,7 @@
           <template #activator="{ props: menu }">
             <v-btn
               v-tooltip="$t('add')"
-              icon="mdi-plus"
+              icon="$mdi-plus"
               variant="text"
               color="success"
               density="comfortable"
@@ -69,7 +69,7 @@
             :text="$t('spaces.collectionsDialog.empty.action')"
             size="small"
             variant="tonal"
-            prepend-icon="mdi-folder-plus"
+            prepend-icon="$mdi-folder-plus"
             @click="addMenuOpened = true"
           />
         </template>
@@ -100,7 +100,7 @@
               v-tooltip="$t('delete')"
               color="red"
               density="comfortable"
-              icon="mdi-delete"
+              icon="$mdi-delete"
               size="small"
               variant="text"
               :loading="loadingCollections.has(spaceCol.collection.id)"
@@ -177,7 +177,7 @@ const subtitle = computed(() => props.subtitle ?? spaceData.value.name);
 
 const loading = computed(() => status.value === 'pending');
 const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) : undefined));
-const errorIcon = computed(() => (error?.value?.statusCode === 404 ? 'mdi-ghost-outline' : 'mdi-alert-circle'));
+const errorIcon = computed(() => (error?.value?.statusCode === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
 
 const initialLoading = shallowRef(true);
 const unwatchLoading = watch(loading, () => {

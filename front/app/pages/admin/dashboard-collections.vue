@@ -10,7 +10,7 @@
     >
       <v-btn
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -38,7 +38,7 @@
         <v-chip
           :text="`${value ?? 0}`"
           :variant="!value ? 'outlined' : undefined"
-          prepend-icon="mdi-view-dashboard"
+          prepend-icon="$mdi-view-dashboard"
           size="small"
         />
       </template>
@@ -47,7 +47,7 @@
         <v-chip
           :text="`${value ?? 0}`"
           :variant="!value ? 'outlined' : undefined"
-          prepend-icon="mdi-folder-outline"
+          prepend-icon="$mdi-folder-outline"
           size="small"
         />
       </template>
@@ -56,7 +56,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -66,12 +66,12 @@
           <v-list>
             <v-list-item
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="openCollectionForm(item.id)"
             />
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteCollections([item])"
             />
 
@@ -80,7 +80,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyToClipboard(item.id)"
             />
           </v-list>
@@ -95,7 +95,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteCollections()"
         />
       </template>
@@ -218,7 +218,7 @@ function deleteCollections(items) {
     title: t('dashboardCollections.actions.delete.title', toDelete.length),
     text: t('dashboardCollections.actions.delete.text'),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

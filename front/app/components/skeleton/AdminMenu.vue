@@ -63,7 +63,7 @@
         <template #activator="{ props }">
           <v-list-item
             :title="$t('menu.admin.dashboards.title')"
-            prepend-icon="mdi-monitor-dashboard"
+            prepend-icon="$mdi-monitor-dashboard"
             v-bind="props"
           />
         </template>
@@ -71,14 +71,14 @@
         <v-list-item
           :title="$t('menu.admin.dashboards.templates')"
           to="/admin/dashboards"
-          prepend-icon="mdi-view-dashboard"
+          prepend-icon="$mdi-view-dashboard"
           exact
         />
 
         <v-list-item
           :title="$t('menu.admin.dashboards.collections')"
           to="/admin/dashboard-collections"
-          prepend-icon="mdi-folder-table"
+          prepend-icon="$mdi-folder-table"
           exact
         />
       </v-list-group>
