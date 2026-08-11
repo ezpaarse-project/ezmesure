@@ -150,7 +150,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/dashboard-templates',
     query: {
