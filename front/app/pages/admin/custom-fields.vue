@@ -11,7 +11,7 @@
       <v-btn
         v-if="customFieldFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -39,21 +39,21 @@
         <v-icon
           v-tooltip:top="$t('customFields.multivalued')"
           :color="item.multiple ? 'primary' : 'grey-lighten-2'"
-          icon="mdi-label-multiple"
+          icon="$mdi-label-multiple"
           class="ml-1"
         />
 
         <v-icon
           v-tooltip:top="$t('customFields.editableByUsers')"
           :color="item.editable ? 'primary' : 'grey-lighten-2'"
-          icon="mdi-pencil"
+          icon="$mdi-pencil"
           class="ml-1"
         />
 
         <v-icon
           v-tooltip:top="$t('customFields.visibleToUsers')"
           :color="item.visible ? 'primary' : 'grey-lighten-2'"
-          icon="mdi-eye"
+          icon="$mdi-eye"
           class="ml-1"
         />
       </template>
@@ -62,7 +62,7 @@
         <v-chip
           :text="`${value}`"
           :variant="!value ? 'outlined' : undefined"
-          prepend-icon="mdi-tag"
+          prepend-icon="$mdi-tag"
           size="small"
           @click="institutionsDialogRef?.open(item)"
         />
@@ -72,7 +72,7 @@
         <v-btn
           v-tooltip:top="$t('modify')"
           :disabled="!customFieldFormDialogRef"
-          icon="mdi-pencil"
+          icon="$mdi-pencil"
           variant="text"
           density="comfortable"
           color="blue"
@@ -80,7 +80,7 @@
         />
         <v-btn
           v-tooltip:top="$t('delete')"
-          icon="mdi-delete"
+          icon="$mdi-delete"
           variant="text"
           density="comfortable"
           color="red"
@@ -96,7 +96,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteCustomField()"
         />
       </template>
@@ -115,11 +115,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t, locale } = useI18n();
 const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
@@ -134,7 +129,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/custom-fields',
     query: { include: '_count.institutionProperties' },
@@ -217,7 +212,7 @@ function deleteCustomField(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

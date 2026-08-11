@@ -309,7 +309,7 @@ exports.deleteUser = async (ctx) => {
   try {
     await sendMail({
       to: user.email,
-      ...generateMail(
+      ...await generateMail(
         'user-deletion-requested',
         {
           loginURL: new URL('/authenticate', publicUrl).href,

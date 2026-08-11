@@ -22,7 +22,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-left"
+            icon="$mdi-arrow-left"
             @click="currentHarvestYear -= 1"
           />
 
@@ -35,7 +35,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-right"
+            icon="$mdi-arrow-right"
             @click="currentHarvestYear += 1"
           />
         </div>
@@ -96,7 +96,7 @@
           width="2"
         >
           <div class="d-flex align-center justify-center">
-            <v-icon icon="mdi-trash-can-outline" />
+            <v-icon icon="$mdi-trash-can-outline" />
           </div>
         </v-progress-circular>
       </template>
@@ -106,7 +106,7 @@
           <template #activator="{ props: menu }">
             <v-btn
               :disabled="!!item.deletedAt"
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -117,13 +117,13 @@
             <v-list-item
               :title="$t('unarchive')"
               :disabled="!canEdit"
-              prepend-icon="mdi-archive-off"
+              prepend-icon="$mdi-archive-off"
               @click="unarchiveSushis([item])"
             />
             <v-list-item
               :title="$t('delete')"
               :disabled="!canEdit"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteSushis([item])"
             />
 
@@ -131,43 +131,43 @@
 
             <v-list-item
               :title="$t('institutions.sushi.checkCredentials')"
-              prepend-icon="mdi-connection"
+              prepend-icon="$mdi-connection"
               @click="checkConnections([item])"
             />
             <v-list-item
               v-if="user?.isAdmin"
               :title="$t('institutions.sushi.resetChecks')"
-              prepend-icon="mdi-restore"
+              prepend-icon="$mdi-restore"
               @click="resetConnections([item])"
             />
             <v-list-item
               v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
-              prepend-icon="mdi-table-headers-eye"
+              prepend-icon="$mdi-table-headers-eye"
               @click="harvestMatrixRef?.open(item)"
             />
             <v-list-item
               v-if="reportsRef"
               :title="$t('reports.supportedReports')"
-              prepend-icon="mdi-file-search"
+              prepend-icon="$mdi-file-search"
               @click="reportsRef?.open(item)"
             />
             <v-list-item
               v-if="filesRef"
               :title="$t('sushi.showFiles')"
-              prepend-icon="mdi-file-tree"
+              prepend-icon="$mdi-file-tree"
               @click="filesRef?.open(item)"
             />
             <v-list-item
               v-if="historyRef"
               :title="$t('tasks.history')"
-              prepend-icon="mdi-history"
+              prepend-icon="$mdi-history"
               @click="historyRef?.open(item)"
             />
             <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copySushiId(item)"
             />
           </v-list>
@@ -191,13 +191,13 @@
         <v-list-item
           :title="$t('unarchive')"
           :disabled="!canEdit"
-          prepend-icon="mdi-archive-off"
+          prepend-icon="$mdi-archive-off"
           @click="unarchiveSushis()"
         />
         <v-list-item
           :title="$t('delete')"
           :disabled="!canEdit"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteSushis()"
         />
 
@@ -205,13 +205,13 @@
 
         <v-list-item
           :title="$t('institutions.sushi.checkCredentials')"
-          prepend-icon="mdi-connection"
+          prepend-icon="$mdi-connection"
           @click="checkConnections()"
         />
         <v-list-item
           v-if="user?.isAdmin"
           :title="$t('institutions.sushi.resetChecks')"
-          prepend-icon="mdi-restore"
+          prepend-icon="$mdi-restore"
           @click="resetConnections()"
         />
       </template>
@@ -281,7 +281,7 @@ const {
   data: sushis,
   status,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: `/api/institutions/${params.id}/sushi`,
     query: {
@@ -493,7 +493,7 @@ async function resetConnections(items) {
       toReset.length,
     ),
     agreeText: t('reset'),
-    agreeIcon: 'mdi-restore',
+    agreeIcon: '$mdi-restore',
     onAgree: async () => {
       await Promise.all(
         toReset.map(

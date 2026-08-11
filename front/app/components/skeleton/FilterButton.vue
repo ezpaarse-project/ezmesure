@@ -9,7 +9,7 @@
       <v-btn
         v-if="icon"
         v-tooltip="$t('filter')"
-        icon="mdi-filter"
+        icon="$mdi-filter"
         variant="tonal"
         density="comfortable"
         color="primary"
@@ -19,7 +19,7 @@
       <v-btn
         v-else
         :text="$t('filter')"
-        prepend-icon="mdi-filter"
+        prepend-icon="$mdi-filter"
         variant="tonal"
         color="primary"
         class="mr-2"

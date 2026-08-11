@@ -9,10 +9,13 @@
             :value="version"
           >
             COUNTER
-            <v-badge
-              :content="version"
+            <v-chip
+              :text="version"
               :color="counterVersionsColors.get(version) || 'secondary'"
-              inline
+              density="compact"
+              size="small"
+              variant="flat"
+              class="ml-1 text-black"
             />
           </v-tab>
         </v-tabs>
@@ -27,7 +30,7 @@
       v-if="rows.length <= 0"
       :title="$t('endpoints.noSupportedData')"
       :text="$t('endpoints.noSupportedDataDesc')"
-      icon="mdi-file-outline"
+      icon="$mdi-file-outline"
     />
 
     <tbody v-else>
@@ -42,7 +45,7 @@
             :placeholder="$t('applyToAll')"
             variant="underlined"
             density="compact"
-            prepend-icon="mdi-calendar-start"
+            prepend-icon="$mdi-calendar-start"
             hide-details
             clearable
             @update:model-value="patchToAll({ firstMonthAvailable: $event })"
@@ -55,7 +58,7 @@
             :placeholder="$t('applyToAll')"
             variant="underlined"
             density="compact"
-            prepend-icon="mdi-calendar-end"
+            prepend-icon="$mdi-calendar-end"
             hide-details
             clearable
             @update:model-value="patchToAll({ lastMonthAvailable: $event })"
@@ -77,7 +80,7 @@
             <template v-if="data.supported?.manual" #append>
               <v-btn
                 v-tooltip:top="$t('endpoints.undoReport')"
-                icon="mdi-undo"
+                icon="$mdi-undo"
                 density="comfortable"
                 size="small"
                 variant="plain"
@@ -96,7 +99,7 @@
               :placeholder="$t('endpoints.undefinedAvailable')"
               variant="underlined"
               density="compact"
-              prepend-icon="mdi-calendar-start"
+              prepend-icon="$mdi-calendar-start"
               hide-details
               clearable
               @update:model-value="patchSupportedData(reportId, { firstMonthAvailable: $event })"
@@ -104,7 +107,7 @@
               <template v-if="data.firstMonthAvailable?.manual" #append>
                 <v-btn
                   v-tooltip:top="$t('endpoints.undoReport')"
-                  icon="mdi-undo"
+                  icon="$mdi-undo"
                   density="comfortable"
                   size="small"
                   variant="plain"
@@ -124,7 +127,7 @@
               :placeholder="$t('endpoints.undefinedAvailable')"
               variant="underlined"
               density="compact"
-              prepend-icon="mdi-calendar-end"
+              prepend-icon="$mdi-calendar-end"
               hide-details
               clearable
               @update:model-value="patchSupportedData(reportId, { lastMonthAvailable: $event })"
@@ -132,7 +135,7 @@
               <template v-if="data.lastMonthAvailable?.manual" #append>
                 <v-btn
                   v-tooltip:top="$t('endpoints.undoReport')"
-                  icon="mdi-undo"
+                  icon="$mdi-undo"
                   density="comfortable"
                   size="small"
                   variant="plain"
@@ -157,7 +160,7 @@
           <v-btn
             :text="$t('endpoints.addAdditionalReport')"
             color="secondary"
-            prepend-icon="mdi-plus"
+            prepend-icon="$mdi-plus"
             block
             class="mt-2"
             v-bind="menu"
@@ -180,7 +183,7 @@
                   <v-text-field
                     v-model="additionalReport"
                     :label="$t('harvest.jobs.reportType')"
-                    prepend-icon="mdi-file"
+                    prepend-icon="$mdi-file"
                     variant="underlined"
                     hide-details="auto"
                     autofocus
@@ -197,7 +200,7 @@
               :text="$t('add')"
               :disabled="!additionalReport"
               color="success"
-              prepend-icon="mdi-plus"
+              prepend-icon="$mdi-plus"
               variant="text"
               type="submit"
               form="additionalReportForm"

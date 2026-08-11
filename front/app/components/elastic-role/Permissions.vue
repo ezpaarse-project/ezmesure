@@ -3,13 +3,13 @@
     :title="$t('institutions.members.accessRights')"
     :subtitle="showRole ? role.name : undefined"
     :loading="loading && 'primary'"
-    prepend-icon="mdi-tag-arrow-right"
+    prepend-icon="$mdi-tag-arrow-right"
   >
     <template #text>
       <v-row>
         <v-col>
           <v-list-subheader class="d-flex align-center">
-            <v-icon icon="mdi-database" start />
+            <v-icon icon="$mdi-database" start />
             {{ $t('repositories.toolbarTitle', { count: repositoryPermissions.length }) }}
 
             <ElasticRolePermissionsAddRepositoryMenu
@@ -19,7 +19,7 @@
               <template #activator="{ props: menu }">
                 <v-btn
                   v-tooltip="$t('add')"
-                  icon="mdi-plus"
+                  icon="$mdi-plus"
                   color="green"
                   size="small"
                   density="comfortable"
@@ -65,7 +65,7 @@
       <v-row>
         <v-col>
           <v-list-subheader class="d-flex align-center">
-            <v-icon icon="mdi-database-eye" start />
+            <v-icon icon="$mdi-database-eye" start />
             {{ $t('repositoryAliases.toolbarTitle', { count: aliasPermissions.length }) }}
 
             <ElasticRolePermissionsAddAliasMenu
@@ -75,7 +75,7 @@
               <template #activator="{ props: menu }">
                 <v-btn
                   v-tooltip="$t('add')"
-                  icon="mdi-plus"
+                  icon="$mdi-plus"
                   color="green"
                   size="small"
                   density="comfortable"
@@ -99,7 +99,7 @@
               <template #title>
                 {{ permission.aliasPattern }}
 
-                <v-icon v-if="!!permission.alias?.filters" icon="mdi-filter" size="small" start />
+                <v-icon v-if="!!permission.alias?.filters" icon="$mdi-filter" size="small" start />
               </template>
 
               <template #subtitle>
@@ -130,7 +130,7 @@
       <v-row>
         <v-col>
           <v-list-subheader class="d-flex align-center">
-            <v-icon icon="mdi-tab" start />
+            <v-icon icon="$mdi-tab" start />
             {{ $t('spaces.toolbarTitle', { count: spacePermissions.length }) }}
 
             <ElasticRolePermissionsAddSpaceMenu
@@ -140,7 +140,7 @@
               <template #activator="{ props: menu }">
                 <v-btn
                   v-tooltip="$t('add')"
-                  icon="mdi-plus"
+                  icon="$mdi-plus"
                   color="green"
                   size="small"
                   density="comfortable"

@@ -2,7 +2,7 @@
   <v-card
     :title="isEditing ? $t('users.updateUser') : $t('users.newUser')"
     :subtitle="showUser ? modelValue?.fullName : undefined"
-    prepend-icon="mdi-account-plus"
+    prepend-icon="$mdi-account-plus"
   >
     <template #text>
       <v-row>
@@ -15,7 +15,7 @@
           >
             <v-card
               :title="$t('users.authentication')"
-              prepend-icon="mdi-lock"
+              prepend-icon="$mdi-lock"
               variant="outlined"
               class="mt-4"
             >
@@ -26,7 +26,7 @@
                       v-model="user.id"
                       :label="`${$t('users.user.id')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
-                      prepend-icon="mdi-identifier"
+                      prepend-icon="$mdi-identifier"
                       variant="underlined"
                       hide-details="auto"
                     />
@@ -49,7 +49,7 @@
 
             <v-card
               :title="$t('general')"
-              prepend-icon="mdi-format-list-bulleted"
+              prepend-icon="$mdi-format-list-bulleted"
               variant="outlined"
               class="mt-4"
             >
@@ -60,7 +60,7 @@
                       v-model="user.username"
                       :label="`${$t('users.user.username')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
-                      prepend-icon="mdi-form-textbox"
+                      prepend-icon="$mdi-form-textbox"
                       variant="underlined"
                       hide-details="auto"
                     />
@@ -71,7 +71,7 @@
                       v-model="user.email"
                       :label="`${$t('users.user.email')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
-                      prepend-icon="mdi-email"
+                      prepend-icon="$mdi-email"
                       variant="underlined"
                       hide-details="auto"
                     />
@@ -82,7 +82,7 @@
                       v-model="user.fullName"
                       :label="`${$t('users.user.fullName')} *`"
                       :rules="[v => !!v || $t('fieldIsRequired')]"
-                      prepend-icon="mdi-rename"
+                      prepend-icon="$mdi-rename"
                       variant="underlined"
                       hide-details
                     />
@@ -103,7 +103,7 @@
 
             <v-card
               :title="$t('administration')"
-              prepend-icon="mdi-security"
+              prepend-icon="$mdi-security"
               variant="outlined"
               class="mt-4"
             >
@@ -133,7 +133,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="saving"
         type="submit"

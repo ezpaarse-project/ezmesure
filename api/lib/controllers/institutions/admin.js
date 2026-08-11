@@ -18,7 +18,7 @@ async function sendValidateInstitutionMail(receivers, data) {
         try {
           await sendMail({
             to: receiver.email,
-            ...generateMail('validate-institution', data, { locale: receiver.language }),
+            ...await generateMail('validate-institution', data, { locale: receiver.language }),
           });
 
           appLogger.verbose(`[validate-institution] Mail sent to ${receiver.email}`);

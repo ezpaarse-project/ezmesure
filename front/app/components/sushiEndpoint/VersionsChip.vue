@@ -9,7 +9,7 @@
     :density="density"
     variant="flat"
     label
-    :class="[end ? 'ml-2' : 'mr-2']"
+    :class="[end ? 'ml-2' : 'mr-2', 'text-black']"
   />
 </template>
 

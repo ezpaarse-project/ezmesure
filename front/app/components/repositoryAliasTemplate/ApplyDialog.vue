@@ -17,7 +17,7 @@
       <v-card-text v-if="errorMessage">
         <v-alert
           :text="errorMessage"
-          icon="mdi-alert-circle"
+          icon="$mdi-alert-circle"
           type="error"
           density="compact"
           variant="tonal"

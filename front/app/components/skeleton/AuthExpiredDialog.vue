@@ -12,7 +12,7 @@
         />
         <v-btn
           :text="$t('authenticate.expired.confirm.actions.agree')"
-          prepend-icon="mdi-login"
+          prepend-icon="$mdi-login"
           size="small"
           color="primary"
           @click="agree()"

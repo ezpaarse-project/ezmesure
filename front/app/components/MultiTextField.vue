@@ -12,7 +12,7 @@
           v-for="(message, i) in errorMessages"
           :key="`err${i}`"
           :text="message"
-          prepend-icon="mdi-alert-circle"
+          prepend-icon="$mdi-alert-circle"
           density="comfortable"
           variant="elevated"
           class="value-chip my-1"
@@ -32,7 +32,7 @@
           class="value-chip my-1"
           @click:close="remValue(item.id)"
         >
-          <span class="text-overline text-grey mr-2">{{ i + 1 }}.</span>
+          <span class="text-label-medium text-grey mr-2">{{ i + 1 }}.</span>
 
           <v-text-field
             :model-value="item.value"
@@ -49,7 +49,7 @@
       <v-chip
         v-if="!readonly"
         :text="addLabel || $t('$ezreeport.addMultiValue')"
-        prepend-icon="mdi-plus"
+        prepend-icon="$mdi-plus"
         density="comfortable"
         variant="elevated"
         class="value-chip mt-1"

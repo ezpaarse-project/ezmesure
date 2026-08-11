@@ -9,7 +9,7 @@
     <v-empty-state
       v-else-if="itemLength.total <= 0"
       :title="$t('sushi.alerts.unsupportedButHarvested.empty')"
-      icon="mdi-check"
+      icon="$mdi-check"
       color="green"
     />
 
@@ -19,9 +19,9 @@
       v-bind="vDataTableOptions"
     >
       <template #[`item.severity`]="{ value }">
-        <v-icon v-if="value === 'info'" color="info" icon="mdi-information-outline" />
-        <v-icon v-else-if="value === 'warning'" color="warning" icon="mdi-alert-outline" />
-        <v-icon v-else color="error" icon="mdi-alert-outline" />
+        <v-icon v-if="value === 'info'" color="info" icon="$mdi-information-outline" />
+        <v-icon v-else-if="value === 'warning'" color="warning" icon="$mdi-alert-outline" />
+        <v-icon v-else color="error" icon="$mdi-alert-outline" />
       </template>
 
       <template #[`item.context.credentials.endpoint.vendor`]="{ item, value }">
@@ -56,7 +56,7 @@
             v-tooltip:top="$t('sushi.harvestState')"
             :disabled="!!lockActions"
             :loading="matrixLoading === `${item.context.reportId}:${item.context.status}:${item.context.credentialsId}`"
-            icon="mdi-table-headers-eye"
+            icon="$mdi-table-headers-eye"
             color="grey-darken-1"
             variant="text"
             density="comfortable"
@@ -65,7 +65,7 @@
           <v-btn
             v-tooltip:top="$t('delete')"
             :disabled="!!lockActions"
-            icon="mdi-delete"
+            icon="$mdi-delete"
             color="red"
             variant="text"
             density="comfortable"
@@ -102,7 +102,7 @@ const {
   refresh,
   itemLength,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/sushi-alerts',
     query: {
@@ -202,7 +202,7 @@ function deleteHarvestedPeriod(item) {
       endDate: item.context.endDate,
     }),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       lockActions.value = true;
 

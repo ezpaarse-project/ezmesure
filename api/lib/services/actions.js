@@ -1,0 +1,154 @@
+const elastic = require('./elastic');
+
+const { metrics: indexTemplate } = require('../utils/index-templates');
+
+const { appLogger } = require('./logger');
+const { followTask } = require('./elastic/utils');
+
+// eslint-disable-next-line no-underscore-dangle
+const indexTemplateVersion = indexTemplate.mappings._meta.version;
+
+const alias = '.ezmesure-metrics';
+const index = `${alias}.${indexTemplateVersion}`;
+async function migrateIndex() {
+  // Resolve indices behind alias
+  const { body: aliasesPerIndex } = await elastic.indices.getAlias({ index: `${alias}*` });
+  const oldIndices = Object.keys(aliasesPerIndex);
+  appLogger.verbose(`[metric] Found old indices: [${oldIndices}]`);
+
+  // Create index with new mapping
+  await elastic.indices.create({
+    index,
+    body: indexTemplate,
+  });
+  appLogger.info(`[metric] Created index: [${index}]`);
+
+  if (oldIndices.length <= 0) {
+    // Add alias to created index
+    await elastic.indices.putAlias({ index, name: alias });
+    appLogger.verbose(`[metric] Created alias [${alias}]`);
+
+    return;
+  }
+
+  // Reindex old indices into new one
+  const reindex = await elastic.reindex({
+    wait_for_completion: false,
+    body: {
+      source: { index: oldIndices },
+      dest: { index },
+    },
+  });
+  if (!reindex.body.task) {
+    throw new Error("Can't reindex data: No task id in response");
+  }
+
+  // Wait for reindex to complete
+  await new Promise((resolve, reject) => {
+    const task = followTask(reindex.body.task);
+    task.on('progress', ({ status }) => {
+      const done = (status?.created || 0) + (status?.updated || 0);
+      const progress = Math.floor((done / (status?.total || 1)) * 100);
+      appLogger.verbose(`[metric] Migrated ${progress}% of metrics`);
+    });
+
+    task.on('end', () => resolve());
+    task.on('error', (error) => reject(error));
+  });
+  appLogger.verbose('[metric] Migrated metrics');
+
+  // Check if an index exists in place of alias, and delete it
+  const aliasAsIndex = oldIndices.some((indexName) => indexName === alias);
+  if (aliasAsIndex) {
+    await elastic.indices.delete({ index: alias });
+    appLogger.info(`[metric] Deleted index: [${alias}]`);
+  }
+
+  // Add alias to created index
+  await elastic.indices.putAlias({ index, name: alias });
+  appLogger.verbose(`[metric] Created alias [${alias}]`);
+
+  // Delete old indices
+  if (!aliasAsIndex) {
+    await elastic.indices.delete({ index: oldIndices });
+    appLogger.info(`[metric] Deleted indices: [${oldIndices}]`);
+  }
+}
+
+const migrationState = { migrating: false, promise: Promise.resolve(undefined) };
+
+async function ensureIndex() {
+  const { body: exists } = await elastic.indices.exists({ index });
+  if (exists) {
+    return;
+  }
+
+  if (!migrationState.migrating) {
+    migrationState.migrating = true;
+    migrationState.promise = migrateIndex()
+      .finally(() => { migrationState.migrating = false; });
+  }
+
+  await migrationState.promise;
+}
+
+async function save(ctx) {
+  await ensureIndex();
+
+  const metric = {
+    datetime: ctx.startTime,
+    action: ctx.action,
+    index: ctx.index,
+    responseTime: ctx.responseTime,
+    metadata: ctx.metadata,
+    request: ctx.httpLog,
+    response: {
+      status: ctx.status,
+      body: typeof ctx.body === 'object' ? ctx.body : null,
+    },
+  };
+
+  switch (ctx.action) {
+    case 'indices/list':
+    case 'indices/search':
+    case 'export/counter5':
+    case 'file/list':
+    case 'sushi/create':
+    case 'sushi/update':
+    case 'sushi/delete-many':
+    case 'sushi/download-report':
+    case 'sushi/harvest':
+    case 'sushi/import':
+    case 'institutions/import':
+    case 'sushi/check-connection':
+      if (metric.response.body && !metric.response.body.error) {
+        metric.response.body = null;
+      }
+      break;
+    default:
+  }
+
+  const username = ctx.state && ctx.state.user && ctx.state.user.username;
+
+  if (username) {
+    const user = await elastic.security.findUser({ username });
+
+    metric.user = !user ? null : {
+      name: user.username,
+      roles: user.roles,
+      idp: user.metadata && user.metadata.idp,
+    };
+  }
+
+  const { body } = await elastic.index({
+    index,
+    body: metric,
+  });
+
+  return body;
+}
+
+module.exports = {
+  ensureIndex,
+  save,
+};

@@ -27,7 +27,7 @@
         <v-btn
           :text="$t('add')"
           :disabled="!alias"
-          prepend-icon="mdi-plus"
+          prepend-icon="$mdi-plus"
           type="submit"
           form="aliasForm"
           variant="elevated"

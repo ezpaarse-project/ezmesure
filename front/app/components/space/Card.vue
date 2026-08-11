@@ -7,7 +7,7 @@
     <template #subtitle>
       <v-chip
         :text="modelValue.id"
-        prepend-icon="mdi-identifier"
+        prepend-icon="$mdi-identifier"
         size="small"
         density="comfortable"
         class="mr-2"
@@ -46,7 +46,7 @@
       <v-btn
         :text="$t('open')"
         :href="`/kibana/s/${modelValue.id}`"
-        append-icon="mdi-open-in-app"
+        append-icon="$mdi-open-in-app"
         variant="text"
         size="small"
         class="mr-2"

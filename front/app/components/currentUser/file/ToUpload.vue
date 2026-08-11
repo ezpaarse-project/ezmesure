@@ -14,7 +14,7 @@
 
     <template v-if="modelValue.status !== 'running'" #append>
       <v-btn
-        icon="mdi-delete"
+        icon="$mdi-delete"
         density="comfortable"
         variant="text"
         color="red"
@@ -27,7 +27,7 @@
       >
         <template #activator="{ props: confirm }">
           <v-btn
-            icon="mdi-close"
+            icon="$mdi-close"
             density="comfortable"
             variant="text"
             v-bind="confirm"
@@ -44,7 +44,7 @@
               :model-value="modelValue.target?.repository"
               :label="$t('files.affectedRepository')"
               :items="repositories"
-              prepend-icon="mdi-database-arrow-up"
+              prepend-icon="$mdi-database-arrow-up"
               variant="underlined"
               density="comfortable"
               hide-details
@@ -57,7 +57,7 @@
               :model-value="modelValue.target?.index"
               :label="$t('files.affectedIndex')"
               :items="indices ?? []"
-              prepend-icon="mdi-harddisk"
+              prepend-icon="$mdi-harddisk"
               variant="underlined"
               density="comfortable"
               hide-details
@@ -96,15 +96,15 @@ const formRef = useTemplateRef('formRef');
 const statusIcon = computed(() => {
   switch (props.modelValue.status) {
     case 'failed':
-      return { icon: 'mdi-alert-circle-outline', color: 'error' };
+      return { icon: '$mdi-alert-circle-outline', color: 'error' };
     case 'cancelled':
-      return { icon: 'mdi-cancel', color: 'error' };
+      return { icon: '$mdi-cancel', color: 'error' };
     case 'running':
-      return { icon: 'mdi-progress-upload', color: 'info' };
+      return { icon: '$mdi-progress-upload', color: 'info' };
     case 'finished':
-      return { icon: 'mdi-check', color: 'success' };
+      return { icon: '$mdi-check', color: 'success' };
     default:
-      return { icon: 'mdi-dots-horizontal' };
+      return { icon: '$mdi-dots-horizontal' };
   }
 });
 
@@ -160,37 +160,27 @@ const repositories = computed(() => {
 
   const reposPerInstitution = Object.groupBy(repos, (r) => r.institutionId);
 
-  return Object.values(reposPerInstitution).map((r) => [
-    // There's no way to add "headers", "groups" or "children" into a
-    // VSelect (and other derivate), so headers are items with custom style
-    {
-      title: r[0].institution?.name || 'Unknown',
-      value: r[0].institution?.id,
-      props: {
-        disabled: true,
+  return Object.values(reposPerInstitution)
+    .flatMap((r) => [
+      {
+        type: 'subheader',
+        title: r[0].institution?.name || 'Unknown',
       },
-    },
-
-    ...r.map(({ pattern }) => ({
-      title: pattern,
-      value: pattern,
-      props: {
-        style: {
-          paddingLeft: '2rem',
-        },
-      },
-    })),
-  ]).flat();
+      ...r.map(({ pattern }) => ({
+        title: pattern,
+        value: pattern,
+      })),
+    ]);
 });
 
 function updateRepository(pattern) {
-  const target = { ...(props.modelValue.target ?? {}) };
+  const target = { ...props.modelValue.target };
   target.repository = pattern;
   emit('update:target', target);
 }
 
 function updateIndex(index) {
-  const target = { ...(props.modelValue.target ?? {}) };
+  const target = { ...props.modelValue.target };
   target.index = index;
   emit('update:target', target);
 }

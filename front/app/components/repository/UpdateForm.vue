@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('repositories.updateForm.title')"
-    prepend-icon="mdi-database-plus"
+    prepend-icon="$mdi-database-plus"
   >
     <template v-if="showRepository" #subtitle>
       {{ modelValue.pattern }}
@@ -20,7 +20,7 @@
           <v-col>
             <v-card
               :title="$t('repositories.updateForm.mapping.properties.title')"
-              prepend-icon="mdi-map-legend"
+              prepend-icon="$mdi-map-legend"
               variant="outlined"
             >
               <template #append>
@@ -34,7 +34,7 @@
                   <template #activator="{ props: menu }">
                     <v-btn
                       v-tooltip="showPropertyMenu ? $t('close') : $t('add')"
-                      :icon="showPropertyMenu ? 'mdi-close' : 'mdi-plus'"
+                      :icon="showPropertyMenu ? '$mdi-close' : '$mdi-plus'"
                       :color="showPropertyMenu ? undefined : 'green'"
                       variant="tonal"
                       density="comfortable"
@@ -63,7 +63,7 @@
 
                       <v-btn
                         :disabled="!propertyFormValid"
-                        icon="mdi-check"
+                        icon="$mdi-check"
                         color="primary"
                         density="comfortable"
                         variant="tonal"
@@ -105,7 +105,7 @@
                         />
 
                         <v-btn
-                          icon="mdi-delete"
+                          icon="$mdi-delete"
                           color="red"
                           density="comfortable"
                           variant="tonal"
@@ -158,7 +158,7 @@
                                         Unicode Technical Standard #35
                                       </a>
 
-                                      <v-icon icon="mdi-open-in-new" x-small />
+                                      <v-icon icon="$mdi-open-in-new" x-small />
                                     </template>
                                   </i18n-t>
                                 </div>
@@ -187,7 +187,7 @@
           <v-col>
             <v-card
               :title="$t('repositories.updateForm.settings.title')"
-              prepend-icon="mdi-cog"
+              prepend-icon="$mdi-cog"
               variant="outlined"
             >
               <template #text>
@@ -232,7 +232,7 @@
         :text="$t('save')"
         :disabled="!valid"
         :loading="saving"
-        prepend-icon="mdi-content-save"
+        prepend-icon="$mdi-content-save"
         type="submit"
         form="repoForm"
         variant="elevated"

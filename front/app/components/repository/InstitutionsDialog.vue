@@ -20,7 +20,7 @@
           <template #activator="{ props: menu }">
             <v-btn
               v-tooltip="$t('add')"
-              icon="mdi-plus"
+              icon="$mdi-plus"
               variant="text"
               color="success"
               density="comfortable"
@@ -56,7 +56,7 @@
               >
                 <template #activator="{ props }">
                   <v-btn
-                    icon="mdi-delete"
+                    icon="$mdi-delete"
                     variant="tonal"
                     size="small"
                     density="comfortable"

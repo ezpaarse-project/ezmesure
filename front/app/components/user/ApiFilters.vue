@@ -5,18 +5,18 @@
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-account-search" end />
+        <v-icon icon="$mdi-account-search" end />
       </template>
 
       <template #append>
         <v-btn
           v-tooltip="$t('reset')"
-          icon="mdi-filter-off"
+          icon="$mdi-filter-off"
           @click="clearFilters"
         />
 
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           @click="$emit('update:show', false)"
         />
       </template>
@@ -28,7 +28,7 @@
           <ApiFiltersButtonsGroup
             v-model="filters.isAdmin"
             :label="$t('users.user.isAdmin')"
-            prepend-icon="mdi-security"
+            prepend-icon="$mdi-security"
           />
         </v-col>
 
@@ -36,7 +36,7 @@
           <ApiFiltersButtonsGroup
             v-model="deletedFilter"
             :label="$t('users.user.deletedAt')"
-            prepend-icon="mdi-delete"
+            prepend-icon="$mdi-delete"
           />
         </v-col>
 
@@ -47,7 +47,7 @@
             :empty-symbol="emptySymbol"
             :items="permissionsItems"
             :label="$t('users.user.permissions')"
-            prepend-icon="mdi-key"
+            prepend-icon="$mdi-key"
             chips
             closable-chips
             multiple
@@ -64,7 +64,7 @@
             :loading="loadingRoles"
             item-title="label"
             item-value="id"
-            prepend-icon="mdi-tag"
+            prepend-icon="$mdi-tag"
             chips
             closable-chips
             multiple
