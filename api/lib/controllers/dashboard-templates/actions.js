@@ -64,6 +64,7 @@ exports.createOne = async (ctx) => {
   const kibanaExport = await kibana.exportObjects({
     spaceId: body.sourceSpaceId,
     includeReferencesDeep: true,
+    excludeExportDetails: true,
     objects: [
       {
         id: body.sourceDashboardId,
@@ -251,6 +252,7 @@ exports.refreshOne = async (ctx) => {
   const kibanaExport = await kibana.exportObjects({
     spaceId: dashboard.sourceSpaceId,
     includeReferencesDeep: true,
+    excludeExportDetails: true,
     objects: [
       {
         id: dashboard.sourceDashboardId,
