@@ -169,9 +169,12 @@ async function deleteSpace(spaceId) {
     throw new Error('Missing required parameter: spaceId');
   }
 
-  await $fetch(`/api/spaces/space/${spaceId}`, {
-    method: 'DELETE',
-  });
+  const request = `/api/spaces/space/${spaceId}`;
+  const response = await $fetch.raw(request, { method: 'DELETE', ignoreResponseError: true });
+
+  if (!response.ok && response.status !== 404) {
+    throw createFetchError({ request, options: { headers }, response });
+  }
 }
 
 /**
@@ -365,7 +368,7 @@ async function exportObjects(options) {
 /**
  * Import kibana saved objects
  *
- * @param {object[]} objects
+ * @param {object[]|string} objects - The kibana objects, as an array of objects or ND-JSON string
  * @param {Object} options
  * @param {string} [options.spaceId]
  * @param {boolean} [options.overwrite]
@@ -383,7 +386,9 @@ async function importObjects(objects, options) {
   } = options || {};
 
   const spacePrefix = spaceId ? `/s/${spaceId}` : '';
-  const ndjson = objects.map((o) => JSON.stringify(o)).join('\n');
+  const ndjson = Array.isArray(objects)
+    ? objects.map((o) => JSON.stringify(o)).join('\n')
+    : objects;
   const formData = new FormData();
 
   formData.append('file', new Blob([ndjson], { type: 'application/x-ndjson' }), 'export.ndjson');
