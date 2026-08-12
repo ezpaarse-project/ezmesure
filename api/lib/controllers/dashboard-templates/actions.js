@@ -54,6 +54,13 @@ exports.createOne = async (ctx) => {
     }
   }
 
+  const space = await kibana.getSpace(body.sourceSpaceId);
+
+  if (!space) {
+    ctx.throw(404, ctx.$t('errors.space.notFound', body.sourceSpaceId));
+    return;
+  }
+
   const kibanaExport = await kibana.exportObjects({
     spaceId: body.sourceSpaceId,
     includeReferencesDeep: true,
@@ -66,7 +73,7 @@ exports.createOne = async (ctx) => {
   });
 
   if (!kibanaExport) {
-    ctx.throw(409, ctx.$t('errors.dashboard.sourceDashboardNotFound'));
+    ctx.throw(404, ctx.$t('errors.dashboard.notFound', body.sourceDashboardId));
     return;
   }
 
@@ -234,6 +241,13 @@ exports.refreshOne = async (ctx) => {
     return;
   }
 
+  const space = await kibana.getSpace(dashboard.sourceDashboardId);
+
+  if (!space) {
+    ctx.throw(404, ctx.$t('errors.space.notFound', dashboard.sourceDashboardId));
+    return;
+  }
+
   const kibanaExport = await kibana.exportObjects({
     spaceId: dashboard.sourceSpaceId,
     includeReferencesDeep: true,
@@ -246,7 +260,7 @@ exports.refreshOne = async (ctx) => {
   });
 
   if (!kibanaExport) {
-    ctx.throw(409, ctx.$t('errors.dashboard.sourceDashboardNotFound'));
+    ctx.throw(404, ctx.$t('errors.dashboard.notFound', dashboard.sourceDashboardId));
     return;
   }
 
