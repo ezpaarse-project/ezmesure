@@ -135,7 +135,6 @@ errors:
     failedToExport: Failed to export dashboards [%s] from space [%s]
     failedToImport: Failed to import dashboards into space [%s]
     noSourceDashboard: No associated source dashboard
-    sourceDashboardNotFound: The source dashboard [%s] does not exist
 
   index:
     notFound: Index [%s] not found
