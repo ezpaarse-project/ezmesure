@@ -128,6 +128,32 @@ async function remove(params, tx = prisma) {
   return transactionResult;
 }
 
+/**
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Array<Dashboard> | null>}
+ */
+async function removeAll(tx) {
+  if (process.env.NODE_ENV !== 'dev') { return null; }
+
+  /** @param {TransactionClient} txx */
+  const transaction = async (txx) => {
+    const dashboards = await findMany({}, txx);
+
+    if (dashboards.length === 0) { return null; }
+
+    await Promise.all(
+      dashboards.map((dashboard) => remove({ where: { id: dashboard.id } }, txx)),
+    );
+
+    return dashboards;
+  };
+
+  if (tx) {
+    return transaction(tx);
+  }
+  return prisma.$transaction(transaction);
+}
+
 module.exports = {
   create,
   findMany,
@@ -138,4 +164,5 @@ module.exports = {
   upsert,
   count,
   remove,
+  removeAll,
 };

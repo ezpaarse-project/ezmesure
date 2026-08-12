@@ -183,6 +183,32 @@ async function remove(params, tx = prisma) {
   return transactionResult;
 }
 
+/**
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Array<DashboardCollection> | null>}
+ */
+async function removeAll(tx) {
+  if (process.env.NODE_ENV !== 'dev') { return null; }
+
+  /** @param {TransactionClient} txx */
+  const transaction = async (txx) => {
+    const collections = await findMany({}, txx);
+
+    if (collections.length === 0) { return null; }
+
+    await Promise.all(
+      collections.map((dashboard) => remove({ where: { id: dashboard.id } }, txx)),
+    );
+
+    return collections;
+  };
+
+  if (tx) {
+    return transaction(tx);
+  }
+  return prisma.$transaction(transaction);
+}
+
 module.exports = {
   create,
   findMany,
@@ -195,4 +221,5 @@ module.exports = {
   addToSpace,
   removeFromSpace,
   remove,
+  removeAll,
 };
