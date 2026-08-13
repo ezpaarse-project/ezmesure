@@ -1,11 +1,21 @@
 <template>
   <div class="d-inline">
     <v-icon
-      v-if="!modelValue.registryId"
-      v-tooltip:top="$t('endpoints.registryDescription')"
+      v-if="modelValue.compliant"
+      v-tooltip:top="$t('endpoints.compliantDescription')"
       :density="density"
       :size="size"
-      icon="mdi-link-variant-off"
+      icon="$mdi-check-decagram"
+      color="success"
+      :class="[end ? 'ml-2' : 'mr-2']"
+    />
+
+    <v-icon
+      v-if="!modelValue.registryId"
+      v-tooltip:top="$t('endpoints.registryIdNoDescription')"
+      :density="density"
+      :size="size"
+      icon="$mdi-link-variant-off"
       color="warning"
       :class="[end ? 'ml-2' : 'mr-2']"
     />
@@ -15,7 +25,7 @@
       v-tooltip:top="$t('endpoints.inactiveDescription')"
       :density="density"
       :size="size"
-      icon="mdi-api-off"
+      icon="$mdi-api-off"
       color="warning"
       :class="[end ? 'ml-2' : 'mr-2']"
     />

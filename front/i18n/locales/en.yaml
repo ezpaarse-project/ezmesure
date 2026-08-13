@@ -396,6 +396,10 @@ endpoints:
   searchRegistryDataHint: Search for a platform by name
   registryId: Platform ID in the COUNTER registry
   registryIdHint: You can directly paste the URL of the COUNTER registry
+  registryIdNoDescription: This endpoint is not in the COUNTER registry
+  compliant: COUNTER compliant
+  compliantDescription: This endpoint has been audited and harvests are mostly successful
+  compliantHint: Meaning that endpoint has been audited and harvests are successful
   registryUrl: Link to the COUNTER registry
   goToRegistry: COUNTER registry
 institutions:
