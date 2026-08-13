@@ -242,10 +242,10 @@ exports.refreshOne = async (ctx) => {
     return;
   }
 
-  const space = await kibana.getSpace(dashboard.sourceDashboardId);
+  const space = await kibana.getSpace(dashboard.sourceSpaceId);
 
   if (!space) {
-    ctx.throw(404, ctx.$t('errors.space.notFound', dashboard.sourceDashboardId));
+    ctx.throw(404, ctx.$t('errors.space.notFound', dashboard.sourceSpaceId));
     return;
   }
 
