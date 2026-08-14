@@ -7,6 +7,7 @@ import ezmesure from '../../../setup/ezmesure';
 
 import { resetDatabase } from '../../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../../lib/services/elastic/utils';
+import { signJWT } from '../../../../lib/utils/jwt';
 
 import institutionsPrisma from '../../../../lib/services/prisma/institutions';
 import membershipsPrisma from '../../../../lib/services/prisma/memberships';
@@ -15,7 +16,6 @@ import usersElastic from '../../../../lib/services/elastic/users';
 import UsersService from '../../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[institutions - memberships]: Test delete memberships features', () => {
   const allPermission = ['memberships:write', 'memberships:read'];
@@ -58,7 +58,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+    adminToken = await signJWT({ username: adminUsername });
 
     const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
@@ -131,8 +131,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
       await usersPrisma.create({ data: userManagerTest });
       await usersElastic.createUser(userManagerTest);
 
-      userManagerToken = await (new UsersService())
-        .generateToken(userManagerTest.username, userManagerPassword);
+      userManagerToken = await signJWT({ username: userManagerTest.username });
     });
     describe(`With permission [${allPermission}]`, () => {
       beforeEach(async () => {

@@ -10,9 +10,9 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
-import UsersService from '../../../lib/entities/users.service';
 import rolesPrisma from '../../../lib/services/prisma/roles';
 
 describe('[roles] Read features', () => {
@@ -66,7 +66,7 @@ describe('[roles] Read features', () => {
 
     beforeAll(async () => {
       await usersPrisma.create({ data: adminUser });
-      adminToken = await (new UsersService()).generateToken(adminUser.username);
+      adminToken = await signJWT({ username: adminUser.username });
     });
 
     it('#01 Should be able to list roles', async () => {
@@ -104,7 +104,7 @@ describe('[roles] Read features', () => {
 
     beforeAll(async () => {
       await usersPrisma.create({ data: testUser });
-      userToken = await (new UsersService()).generateToken(testUser.username);
+      userToken = await signJWT({ username: testUser.username });
     });
 
     it('#03 Should be able to list roles', async () => {
