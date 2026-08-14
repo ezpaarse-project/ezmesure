@@ -52,13 +52,17 @@ describe('[users]: Test activate users features', () => {
         // Test user service
         const userFromService = await usersPrisma.findByUsername('user.test');
 
-        expect(userFromService).toHaveProperty('username', userTest.username);
-        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
-        expect(userFromService).toHaveProperty('email', userTest.email);
-        expect(userFromService).toHaveProperty('isAdmin', false);
-        expect(userFromService?.createdAt).not.toBeNull();
-        expect(userFromService?.updatedAt).not.toBeNull();
-        expect(userFromService?.metadata).toBe(true);
+        expect(userFromService).toMatchObject({
+          id: expect.any(String),
+          username: userTest.username,
+          fullName: userTest.fullName,
+          email: userTest.email,
+          isAdmin: false,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+          lastActivity: expect.any(Date),
+          metadata: {},
+        });
       });
 
       afterAll(async () => {
