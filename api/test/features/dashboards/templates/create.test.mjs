@@ -12,8 +12,8 @@ import ezmesure from '../../../setup/ezmesure';
 
 import { resetDatabase } from '../../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../../lib/services/elastic/utils';
-import { createSpace, deleteSpace, importObjects } from '../../../../lib/services/kibana';
 import { signJWT } from '../../../../lib/utils/jwt';
+import { createSpace, deleteSpace, importObjects } from '../../../../lib/services/kibana';
 
 import usersPrisma from '../../../../lib/services/prisma/users';
 import dashboardsPrisma from '../../../../lib/services/prisma/dashboards';

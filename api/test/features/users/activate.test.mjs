@@ -1,15 +1,15 @@
 import {
-  describe, it, expect, beforeAll, afterAll,
+  describe, it, expect, beforeAll,
 } from 'vitest';
 
 import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 
 describe('[users]: Test activate users features', () => {
   const userTest = {
@@ -34,7 +34,7 @@ describe('[users]: Test activate users features', () => {
       beforeAll(async () => {
         await usersPrisma.create({ data: userTest });
         await usersElastic.createUser(userTest);
-        userToken = await UsersService.generateTokenForActivate(userTest.username);
+        userToken = await signJWT({ username: userTest.username });
       });
 
       it(`#01 Should activate user [${userTest.username}]`, async () => {

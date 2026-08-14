@@ -7,10 +7,10 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
 const authCookie = config.get('auth.cookie');
@@ -49,9 +49,8 @@ describe('[users]: Test impersonation features', () => {
     await usersPrisma.create({ data: regularUser });
     await usersElastic.createUser(regularUser);
 
-    const usersService = new UsersService();
-    adminToken = await (usersService).generateToken(adminUsername);
-    regularUserToken = await (usersService).generateToken(regularUser.username);
+    adminToken = await signJWT({ username: adminUsername });
+    regularUserToken = await signJWT({ username: regularUser.username });
   });
 
   describe('An admin', () => {
