@@ -101,7 +101,7 @@ const {
     q: debouncedSearch,
     source: '*',
     include: ['memberships.institution'],
-    'deletedAt:from': '',
+    'deletedAt[gte]': '',
   },
 });
 

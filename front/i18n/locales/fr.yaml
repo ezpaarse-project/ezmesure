@@ -401,6 +401,7 @@ endpoints:
   compliantDescription: Ce point d'accès a fait l'objet d'un audit et les moissons sont généralement couronnées de succès
   compliantHint: Cela signifie que le point d'accès a fait l'objet d'un audit et que les moissons sont couronnées de succès
   registryUrl: Lien vers le registre COUNTER
+  inRegistry: Présent dans le registre COUNTER
   goToRegistry: Registre COUNTER
   filters:
     title: Filtrer les points d'accès

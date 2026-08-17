@@ -86,8 +86,8 @@ const {
 } = useFetch(`/api/sushi-endpoints/${props.endpoint.id}/_matrix`, {
   params: {
     retryCode: 425,
-    'period:from': computed(() => period.value.beginDate),
-    'period:to': computed(() => period.value.endDate),
+    'period[gte]': computed(() => period.value.beginDate),
+    'period[lte]': computed(() => period.value.endDate),
   },
 
   // Try for 1 minute

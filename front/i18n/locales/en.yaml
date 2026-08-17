@@ -401,6 +401,7 @@ endpoints:
   compliantDescription: This endpoint has been audited and harvests are mostly successful
   compliantHint: Meaning that endpoint has been audited and harvests are successful
   registryUrl: Link to the COUNTER registry
+  inRegistry: Present in the COUNTER registry
   goToRegistry: COUNTER registry
 institutions:
   toolbarTitle: Institutions ({count})
