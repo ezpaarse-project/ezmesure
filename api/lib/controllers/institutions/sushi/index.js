@@ -63,8 +63,8 @@ router.route({
     },
     query: {
       retryCode: Joi.number().integer(),
-      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
-      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period[gte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period[lte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
     },
   },
 });

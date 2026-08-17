@@ -27,8 +27,8 @@ const queue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][institutions.${query.institutionId}][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
         institutionId,
       } = query;
 

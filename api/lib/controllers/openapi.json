@@ -2759,7 +2759,7 @@
             }
           },
           {
-            "name": "date:from",
+            "name": "date[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2767,7 +2767,7 @@
             }
           },
           {
-            "name": "date:to",
+            "name": "date[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2918,7 +2918,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2926,7 +2926,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2934,7 +2934,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2942,7 +2942,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3834,7 +3834,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3842,7 +3842,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3850,7 +3850,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3858,7 +3858,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3936,7 +3936,7 @@
             }
           },
           {
-            "name": "sushiReadySince:from",
+            "name": "sushiReadySince[gte]",
             "in": "query",
             "schema": {
               "nullable": true,
@@ -3945,7 +3945,7 @@
             }
           },
           {
-            "name": "sushiReadySince:to",
+            "name": "sushiReadySince[lte]",
             "in": "query",
             "schema": {
               "nullable": true,
@@ -4636,7 +4636,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:from",
+            "name": "period[gte]",
             "in": "query",
             "required": true
           },
@@ -4646,7 +4646,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:to",
+            "name": "period[lte]",
             "in": "query",
             "required": true
           },
@@ -7332,7 +7332,7 @@
           },
           { "$ref": "#/components/parameters/search" },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7340,7 +7340,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7348,7 +7348,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7356,7 +7356,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7793,7 +7793,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7801,7 +7801,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7809,7 +7809,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7817,7 +7817,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8156,7 +8156,7 @@
           },
           { "$ref": "#/components/parameters/search" },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8164,7 +8164,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8172,7 +8172,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8180,7 +8180,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8593,7 +8593,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8601,7 +8601,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8609,7 +8609,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -8617,7 +8617,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -9588,7 +9588,7 @@
             }
           },
           {
-            "name": "period:from",
+            "name": "period[gte]",
             "description": "Start date of the period",
             "in": "query",
             "schema": {
@@ -9598,7 +9598,7 @@
             }
           },
           {
-            "name": "period:to",
+            "name": "period[lte]",
             "description": "End date of the period",
             "in": "query",
             "schema": {
@@ -9630,7 +9630,7 @@
             "description": "filter harvests by endpoint ID"
           },
           {
-            "name": "harvestedAt:from",
+            "name": "harvestedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -9638,7 +9638,7 @@
             }
           },
           {
-            "name": "harvestedAt:to",
+            "name": "harvestedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -9686,42 +9686,42 @@
             }
           },
           {
-            "name": "insertedItems:from",
+            "name": "insertedItems[gte]",
             "in": "query",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "insertedItems:to",
+            "name": "insertedItems[lte]",
             "in": "query",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "updatedItems:from",
+            "name": "updatedItems[gte]",
             "in": "query",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "updatedItems:to",
+            "name": "updatedItems[lte]",
             "in": "query",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "failedItems:from",
+            "name": "failedItems[gte]",
             "in": "query",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "failedItems:to",
+            "name": "failedItems[lte]",
             "in": "query",
             "schema": {
               "type": "number"
@@ -9769,7 +9769,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:from",
+            "name": "period[gte]",
             "in": "query",
             "required": true
           },
@@ -9779,7 +9779,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:to",
+            "name": "period[lte]",
             "in": "query",
             "required": true
           },
@@ -9859,7 +9859,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:from",
+            "name": "period[gte]",
             "in": "query",
             "required": true
           },
@@ -9869,7 +9869,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:to",
+            "name": "period[lte]",
             "in": "query",
             "required": true
           },
@@ -9984,7 +9984,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -9992,7 +9992,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10000,7 +10000,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10008,7 +10008,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10016,7 +10016,7 @@
             }
           },
           {
-            "name": "startedAt:from",
+            "name": "startedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10024,7 +10024,7 @@
             }
           },
           {
-            "name": "startedAt:to",
+            "name": "startedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10064,14 +10064,14 @@
             }
           },
           {
-            "name": "timeout:from",
+            "name": "timeout[gte]",
             "in": "query",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "timeout:to",
+            "name": "timeout[lte]",
             "in": "query",
             "schema": {
               "type": "number"
@@ -10880,7 +10880,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10888,7 +10888,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10896,7 +10896,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -10904,7 +10904,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -11956,7 +11956,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -11964,7 +11964,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -11972,7 +11972,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -11980,7 +11980,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -12126,7 +12126,7 @@
             }
           },
           {
-            "name": "disabledUntil:from",
+            "name": "disabledUntil[gte]",
             "in": "query",
             "schema": {
               "nullable": true,
@@ -12135,7 +12135,7 @@
             }
           },
           {
-            "name": "disabledUntil:to",
+            "name": "disabledUntil[lte]",
             "in": "query",
             "schema": {
               "nullable": true,
@@ -12154,7 +12154,7 @@
             }
           },
           {
-            "name": "supportedReportsUpdatedAt:from",
+            "name": "supportedReportsUpdatedAt[gte]",
             "in": "query",
             "schema": {
               "nullable": true,
@@ -12163,7 +12163,7 @@
             }
           },
           {
-            "name": "supportedReportsUpdatedAt:to",
+            "name": "supportedReportsUpdatedAt[lte]",
             "in": "query",
             "schema": {
               "nullable": true,
@@ -12463,7 +12463,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:from",
+            "name": "period[gte]",
             "in": "query",
             "required": true
           },
@@ -12473,7 +12473,7 @@
               "format": "date",
               "pattern": "yyyy-MM"
             },
-            "name": "period:to",
+            "name": "period[lte]",
             "in": "query",
             "required": true
           },
@@ -12949,7 +12949,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -12957,7 +12957,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -12965,7 +12965,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -12973,7 +12973,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -12981,7 +12981,7 @@
             }
           },
           {
-            "name": "startedAt:from",
+            "name": "startedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -12989,7 +12989,7 @@
             }
           },
           {
-            "name": "startedAt:to",
+            "name": "startedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -13037,14 +13037,14 @@
             }
           },
           {
-            "name": "runningTime:from",
+            "name": "runningTime[gte]",
             "in": "query",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "runningTime:to",
+            "name": "runningTime[lte]",
             "in": "query",
             "schema": {
               "type": "number"
@@ -13339,7 +13339,7 @@
             }
           },
           {
-            "name": "date:from",
+            "name": "date[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -13347,7 +13347,7 @@
             }
           },
           {
-            "name": "date:to",
+            "name": "date[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -13595,7 +13595,7 @@
             }
           },
           {
-            "name": "updatedAt:from",
+            "name": "updatedAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -13603,7 +13603,7 @@
             }
           },
           {
-            "name": "updatedAt:to",
+            "name": "updatedAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -13611,7 +13611,7 @@
             }
           },
           {
-            "name": "createdAt:from",
+            "name": "createdAt[gte]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -13619,7 +13619,7 @@
             }
           },
           {
-            "name": "createdAt:to",
+            "name": "createdAt[lte]",
             "in": "query",
             "schema": {
               "type": "string",

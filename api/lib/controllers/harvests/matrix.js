@@ -28,8 +28,8 @@ const institutionsQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][institutions][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
@@ -113,8 +113,8 @@ const endpointsQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
