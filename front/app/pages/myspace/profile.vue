@@ -60,7 +60,7 @@
               <v-btn
                 v-if="apiKeyFormDialogRef"
                 :text="$t('add')"
-                prepend-icon="mdi-plus"
+                prepend-icon="$mdi-plus"
                 variant="tonal"
                 color="green"
                 class="mr-2"
@@ -70,7 +70,7 @@
               <v-btn
                 :text="$t('refresh')"
                 :loading="apiKeysStatus === 'pending'"
-                prepend-icon="mdi-reload"
+                prepend-icon="$mdi-reload"
                 variant="tonal"
                 color="primary"
                 class="mr-2"
@@ -108,7 +108,7 @@
                       <v-chip
                         :text="`${value.length}`"
                         :variant="!value.length ? 'outlined' : undefined"
-                        prepend-icon="mdi-database-outline"
+                        prepend-icon="$mdi-database-outline"
                         size="small"
                         v-bind="menu"
                       />
@@ -146,7 +146,7 @@
                       <v-chip
                         :text="`${value.length}`"
                         :variant="!value.length ? 'outlined' : undefined"
-                        prepend-icon="mdi-database-eye-outline"
+                        prepend-icon="$mdi-database-eye-outline"
                         size="small"
                         v-bind="menu"
                       />
@@ -202,7 +202,7 @@
                   <v-menu>
                     <template #activator="{ props: menu }">
                       <v-btn
-                        icon="mdi-cog"
+                        icon="$mdi-cog"
                         variant="plain"
                         density="compact"
                         v-bind="menu"
@@ -213,13 +213,13 @@
                       <v-list-item
                         v-if="apiKeyFormDialogRef"
                         :title="$t('modify')"
-                        prepend-icon="mdi-pencil"
+                        prepend-icon="$mdi-pencil"
                         @click="apiKeyFormDialogRef.open(item, { user })"
                       />
 
                       <v-list-item
                         :title="$t('revoke')"
-                        prepend-icon="mdi-delete"
+                        prepend-icon="$mdi-delete"
                         @click="deleteApiKeys([item])"
                       />
 
@@ -228,7 +228,7 @@
                       <v-list-item
                         v-if="clipboard"
                         :title="$t('copyId')"
-                        prepend-icon="mdi-identifier"
+                        prepend-icon="$mdi-identifier"
                         @click="copyKeyId(item)"
                       />
                     </v-list>
@@ -251,7 +251,7 @@
                 <template #actions>
                   <v-list-item
                     :title="$t('revoke')"
-                    prepend-icon="mdi-delete"
+                    prepend-icon="$mdi-delete"
                     @click="deleteApiKeys()"
                   />
 
@@ -259,7 +259,7 @@
 
                   <v-list-item
                     :title="$t('institutions.sushi.activeSwitch')"
-                    prepend-icon="mdi-toggle-switch"
+                    prepend-icon="$mdi-toggle-switch"
                     @click="toggleKeyActiveStates()"
                   />
                 </template>
@@ -311,7 +311,7 @@
                 <template v-if="clipboard" #append>
                   <v-btn
                     :text="$t('copy')"
-                    prepend-icon="mdi-clipboard-text"
+                    prepend-icon="$mdi-clipboard-text"
                     density="comfortable"
                     variant="text"
                     @click="copyTokenToClipboard()"
@@ -360,7 +360,7 @@ const {
   itemLength: apiKeysItemLength,
   vDataTableOptions: apiKeysVDataTableOptions,
   refresh: apiKeysRefresh,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/auth/api-keys',
     query: {

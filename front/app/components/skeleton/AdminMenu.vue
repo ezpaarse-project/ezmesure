@@ -68,7 +68,7 @@
       <v-list-item
         :title="$t('menu.admin.api-keys')"
         to="/admin/api-keys"
-        prepend-icon="mdi-lock-open"
+        prepend-icon="$mdi-lock-open"
       />
 
       <v-list-item

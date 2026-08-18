@@ -16,7 +16,7 @@
               <v-col>
                 <v-card
                   :title="$t('api-keys.subject')"
-                  prepend-icon="mdi-link-variant"
+                  prepend-icon="$mdi-link-variant"
                   variant="outlined"
                 >
                   <template #text>
@@ -52,7 +52,7 @@
               <v-col>
                 <v-card
                   :title="$t('general')"
-                  prepend-icon="mdi-format-list-bulleted"
+                  prepend-icon="$mdi-format-list-bulleted"
                   variant="outlined"
                 >
                   <template #text>
@@ -62,7 +62,7 @@
                           v-model="apiKey.name"
                           :label="$t('name')"
                           :rules="[v => !!v || $t('fieldIsRequired')]"
-                          prepend-icon="mdi-rename"
+                          prepend-icon="$mdi-rename"
                           variant="underlined"
                           hide-details="auto"
                           required
@@ -73,7 +73,7 @@
                         <v-textarea
                           v-model="apiKey.description"
                           :label="$t('description')"
-                          prepend-icon="mdi-image-text"
+                          prepend-icon="$mdi-image-text"
                           variant="underlined"
                           hide-details="auto"
                         />
@@ -86,7 +86,7 @@
                               :model-value="expiresAtFormatted"
                               :label="$t('api-keys.expiresAt')"
                               :hint="!expiresAt ? $t('never') : undefined"
-                              prepend-icon="mdi-clock-alert"
+                              prepend-icon="$mdi-clock-alert"
                               variant="underlined"
                               hide-details="auto"
                               persistent-hint
@@ -116,7 +116,7 @@
                   <v-col cols="12">
                     <v-card
                       :title="$t('institutions.members.institutionManagement')"
-                      prepend-icon="mdi-office-building"
+                      prepend-icon="$mdi-office-building"
                       variant="outlined"
                     >
                       <template #text>
@@ -137,7 +137,7 @@
                     <v-card
                       :title="$t('repositories.repositories')"
                       :loading="repoStatus && 'primary'"
-                      prepend-icon="mdi-database"
+                      prepend-icon="$mdi-database"
                       variant="outlined"
                     >
                       <template v-if="(repositories?.length ?? 0) > 0" #text>
@@ -166,7 +166,7 @@
                     <v-card
                       :title="$t('repositoryAliases.aliases')"
                       :loading="aliasesStatus && 'primary'"
-                      prepend-icon="mdi-database-eye"
+                      prepend-icon="$mdi-database-eye"
                       variant="outlined"
                     >
                       <template v-if="(repositoryAliases?.length ?? 0) > 0" #text>
@@ -207,7 +207,7 @@
 
                   <v-btn
                     v-if="clipboard"
-                    icon="mdi-content-copy"
+                    icon="$mdi-content-copy"
                     variant="text"
                     density="comfortable"
                     size="x-small"
@@ -258,7 +258,7 @@
       <v-btn
         v-if="windowId === 'value'"
         :text="$t('validate')"
-        prepend-icon="mdi-check"
+        prepend-icon="$mdi-check"
         variant="text"
         color="primary"
         @click="$emit('submit', apiKey)"

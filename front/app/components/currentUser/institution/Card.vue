@@ -86,7 +86,7 @@
           :text="$t('api-keys.keys')"
           :to="`/myspace/institutions/${institution.id}/api-keys`"
           :disabled="!allowedActions.apiKeys"
-          prepend-icon="mdi-lock-open"
+          prepend-icon="$mdi-lock-open"
           variant="text"
         />
       </div>

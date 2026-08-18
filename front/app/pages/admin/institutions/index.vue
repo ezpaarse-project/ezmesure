@@ -161,7 +161,7 @@
             <v-list-item
               :title="$t('api-keys.keys')"
               :to="`/admin/institutions/${item.id}/api-keys`"
-              prepend-icon="mdi-lock-open"
+              prepend-icon="$mdi-lock-open"
             />
             <v-list-item
               v-if="clipboard"

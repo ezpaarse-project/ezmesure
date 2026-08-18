@@ -21,10 +21,10 @@
     @click:clear="$emit('update:modelValue', undefined)"
   >
     <template #prepend>
-      <v-avatar icon="mdi-account" />
+      <v-avatar icon="$mdi-account" />
     </template>
 
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item
         :title="item.fullName"
         :subtitle="item.email"
@@ -32,7 +32,7 @@
         v-bind="listItem"
       >
         <template #prepend>
-          <v-avatar icon="mdi-account" />
+          <v-avatar icon="$mdi-account" />
         </template>
       </v-list-item>
     </template>

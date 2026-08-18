@@ -10,7 +10,7 @@
       <v-btn
         v-if="apiKeyFormDialogRef"
         :text="$t('add')"
-        prepend-icon="mdi-plus"
+        prepend-icon="$mdi-plus"
         variant="tonal"
         color="green"
         class="mr-2"
@@ -45,7 +45,7 @@
             <v-chip
               :text="`${value.length}`"
               :variant="!value.length ? 'outlined' : undefined"
-              prepend-icon="mdi-database-outline"
+              prepend-icon="$mdi-database-outline"
               size="small"
               v-bind="menu"
             />
@@ -83,7 +83,7 @@
             <v-chip
               :text="`${value.length}`"
               :variant="!value.length ? 'outlined' : undefined"
-              prepend-icon="mdi-database-eye-outline"
+              prepend-icon="$mdi-database-eye-outline"
               size="small"
               v-bind="menu"
             />
@@ -139,7 +139,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -150,13 +150,13 @@
             <v-list-item
               v-if="apiKeyFormDialogRef"
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="apiKeyFormDialogRef.open(item)"
             />
 
             <v-list-item
               :title="$t('revoke')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteApiKeys([item])"
             />
 
@@ -165,7 +165,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyKeyId(item)"
             />
           </v-list>
@@ -188,7 +188,7 @@
       <template #actions>
         <v-list-item
           :title="$t('revoke')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteApiKeys()"
         />
 
@@ -196,7 +196,7 @@
 
         <v-list-item
           :title="$t('institutions.sushi.activeSwitch')"
-          prepend-icon="mdi-toggle-switch"
+          prepend-icon="$mdi-toggle-switch"
           @click="toggleActiveStates()"
         />
       </template>
@@ -234,7 +234,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/api-keys',
     query: {

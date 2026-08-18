@@ -40,7 +40,7 @@
         <v-btn
           :text="$t('api-keys.keys')"
           :to="`/admin/institutions/${institution.id}/api-keys`"
-          prepend-icon="mdi-lock-open"
+          prepend-icon="$mdi-lock-open"
           variant="text"
         />
       </div>

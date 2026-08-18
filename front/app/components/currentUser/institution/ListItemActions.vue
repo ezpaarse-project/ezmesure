@@ -37,7 +37,7 @@
           :to="`/myspace/institutions/${institution.id}/api-keys`"
           :title="$t('api-keys.keys')"
           color="primary"
-          prepend-icon="mdi-lock-open"
+          prepend-icon="$mdi-lock-open"
         />
       </v-list>
 
