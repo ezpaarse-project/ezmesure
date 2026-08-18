@@ -359,5 +359,6 @@ emails:
         request-membership: Institution join request
         user-deleted: Account deletion confirmation
         user-deletion-requested: Account deletion request
+        new-institution: Institution created
         validate-institution: Institution validated
         welcome: Welcome to ezMESURE
