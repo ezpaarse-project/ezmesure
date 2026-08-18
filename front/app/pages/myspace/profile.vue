@@ -15,7 +15,7 @@
                 <template #activator="{ props: confirm }">
                   <v-btn
                     :text="$t('myspace.profile.actions.delete.title')"
-                    prepend-icon="mdi-delete"
+                    prepend-icon="$mdi-delete"
                     color="red"
                     variant="text"
                     v-bind="confirm"
@@ -42,8 +42,8 @@
                 :href="oidcProfileUri"
                 target="_blank"
                 rel="noopener noreferrer"
-                prepend-icon="mdi-key"
-                append-icon="mdi-open-in-new"
+                prepend-icon="$mdi-key"
+                append-icon="$mdi-open-in-new"
                 color="primary"
                 variant="tonal"
                 class="mr-2"
@@ -332,11 +332,6 @@ import { millisecondsInDay } from 'date-fns/constants';
 
 import { getErrorMessage } from '@/lib/errors';
 
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
-
 const { oidcProfileUri } = useRuntimeConfig().public;
 const { data: apiConfig } = await useApiConfig();
 const authStore = useAuthStore();
@@ -394,12 +389,12 @@ const deleteDuration = computed(() => {
 
 const fields = computed(
   () => [
-    { name: 'username', value: user.value?.username, icon: 'mdi-form-textbox' },
-    { name: 'name', value: user.value?.fullName, icon: 'mdi-account' },
-    { name: 'mail', value: user.value?.email, icon: 'mdi-email' },
-    { name: 'idp', value: user.value?.metadata?.idp, icon: 'mdi-web' },
-    { name: 'organization', value: user.value?.metadata?.org, icon: 'mdi-domain' },
-    { name: 'unit', value: user.value?.metadata?.unit, icon: 'mdi-account-group' },
+    { name: 'username', value: user.value?.username, icon: '$mdi-form-textbox' },
+    { name: 'name', value: user.value?.fullName, icon: '$mdi-account' },
+    { name: 'mail', value: user.value?.email, icon: '$mdi-email' },
+    { name: 'idp', value: user.value?.metadata?.idp, icon: '$mdi-web' },
+    { name: 'organization', value: user.value?.metadata?.org, icon: '$mdi-domain' },
+    { name: 'unit', value: user.value?.metadata?.unit, icon: '$mdi-account-group' },
   ].filter((f) => f.value),
 );
 

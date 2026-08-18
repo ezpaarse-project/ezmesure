@@ -35,7 +35,7 @@
         v-model="search"
         density="compact"
         :placeholder="$t('search')"
-        prepend-inner-icon="mdi-magnify"
+        prepend-inner-icon="$mdi-magnify"
         variant="solo"
         width="200"
         hide-details

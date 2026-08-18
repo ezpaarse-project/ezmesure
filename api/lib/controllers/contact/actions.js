@@ -19,7 +19,8 @@ exports.contact = async (ctx) => {
         await sendMail({
           from: body.email,
           to: admin.email,
-          ...generateMail('contact', { body, appName }, { locale: admin.language }),
+          replyTo: undefined,
+          ...await generateMail('contact', { body, appName }, { locale: admin.language }),
         });
 
         appLogger.verbose(`[contact] Mail sent to ${admin.email}`);

@@ -2,7 +2,7 @@ services:
   # We use dex as default authentication provider, you can choose another one that fits your needs,
   # as longs as it provides OIDC authentication
   auth:
-    image: 'dexidp/dex'
+    image: 'dexidp/dex:v2.45.1-alpine'
     extra_hosts:
       - "${SATOSA_DOMAIN}:host-gateway"
     environment:

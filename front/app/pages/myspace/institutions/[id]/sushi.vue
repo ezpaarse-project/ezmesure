@@ -25,7 +25,7 @@
         v-if="sushiFormRef"
         :text="$t('add')"
         :disabled="!canEdit"
-        prepend-icon="mdi-plus"
+        prepend-icon="$mdi-plus"
         variant="tonal"
         color="green"
         class="mr-2"
@@ -37,7 +37,7 @@
       <v-banner
         v-if="isLocked"
         color="info"
-        icon="mdi-lock"
+        icon="$mdi-lock"
         :lines="lockStatus?.reason ? 'two' : 'one'"
       >
         <template #text>
@@ -76,7 +76,7 @@
             <SushiMetric
               :model-value="sushiMetrics.statuses.success"
               :title="$t('sushi.operationalCredentials')"
-              icon="mdi-check"
+              icon="$mdi-check"
               color="success"
             />
           </v-col>
@@ -86,7 +86,7 @@
               :model-value="sushiMetrics.statuses.untested"
               :title="$t('sushi.untestedCredentials')"
               :action-text="$t('show')"
-              icon="mdi-bell-alert"
+              icon="$mdi-bell-alert"
               color="info"
               @click="query.connection = 'untested'; refresh()"
             />
@@ -97,7 +97,7 @@
               :model-value="sushiMetrics.statuses.unauthorized"
               :title="$t('sushi.invalidCredentials')"
               :action-text="$t('show')"
-              icon="mdi-key-alert-outline"
+              icon="$mdi-key-alert-outline"
               color="warning"
               @click="query.connection = 'unauthorized'; refresh()"
             />
@@ -108,7 +108,7 @@
               :model-value="sushiMetrics.statuses.failed"
               :title="$t('sushi.problematicEndpoints', sushiMetrics.statuses.failed)"
               :action-text="$t('show')"
-              icon="mdi-alert-circle"
+              icon="$mdi-alert-circle"
               color="error"
               @click="query.connection = 'failed'; refresh()"
             />
@@ -189,7 +189,7 @@
           <v-btn
             v-if="harvestMatrixRef"
             :text="$t('sushi.globalHarvestState.title')"
-            prepend-icon="mdi-table-headers-eye"
+            prepend-icon="$mdi-table-headers-eye"
             size="small"
             variant="outlined"
             @click="harvestMatrixRef.open()"
@@ -253,8 +253,6 @@ import ActiveTable from '@/components/sushi/credentials/ActiveTable.vue';
 import ArchivedTable from '@/components/sushi/credentials/ArchivedTable.vue';
 
 definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
   alias: ['/admin/institutions/:id/sushi'],
 });
 
@@ -320,13 +318,13 @@ const tabs = computed(() => [
     text: t('sushi.tabs.active.title'),
     description: t('sushi.tabs.active.description'),
     value: 'active',
-    icon: 'mdi-key-wireless',
+    icon: '$mdi-key-wireless',
   },
   {
     text: t('sushi.tabs.archived.title'),
     description: t('sushi.tabs.archived.description'),
     value: 'archived',
-    icon: 'mdi-archive',
+    icon: '$mdi-archive',
   },
 ]);
 /**
@@ -377,13 +375,13 @@ const sushiReadyLabels = computed(() => {
         text: t('institutions.sushi.readyPopup.completed', { date: sushiReadySince.value }),
       },
       status: {
-        icon: 'mdi-checkbox-marked-circle-outline',
+        icon: '$mdi-checkbox-marked-circle-outline',
         color: 'success',
         text: t('institutions.sushi.entryCompletedOn', { date: sushiReadySince.value }),
       },
       button: {
         color: 'secondary',
-        icon: 'mdi-text-box-edit-outline',
+        icon: '$mdi-text-box-edit-outline',
         text: t('institutions.sushi.resumeMyEntry'),
       },
     };
@@ -401,7 +399,7 @@ const sushiReadyLabels = computed(() => {
     },
     button: {
       color: 'primary',
-      icon: 'mdi-text-box-check-outline',
+      icon: '$mdi-text-box-check-outline',
       text: t('institutions.sushi.validateMyCredentials'),
     },
   };
@@ -419,7 +417,7 @@ const harvestableLabels = computed(() => {
       title: t('sushi.isHarvestable.title'),
       text: t('sushi.isHarvestable.text'),
       type: 'success',
-      icon: 'mdi-check',
+      icon: '$mdi-check',
     };
   }
 
@@ -427,7 +425,7 @@ const harvestableLabels = computed(() => {
     title: t('sushi.isNotHarvestable.title'),
     text: t('sushi.isNotHarvestable.text'),
     type: 'warning',
-    icon: 'mdi-alert',
+    icon: '$mdi-alert',
   };
 });
 

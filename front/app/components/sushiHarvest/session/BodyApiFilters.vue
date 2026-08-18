@@ -5,18 +5,18 @@
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-magnify" end />
+        <v-icon icon="$mdi-magnify" end />
       </template>
 
       <template #append>
         <v-btn
           v-tooltip="$t('reset')"
-          icon="mdi-filter-off"
+          icon="$mdi-filter-off"
           @click="clearFilters"
         />
 
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           @click="$emit('update:show', false)"
         />
       </template>
@@ -30,7 +30,7 @@
             :items="endpointsOptions"
             :loading="credentialStatus === 'pending' && 'primary'"
             :label="$t('endpoints.vendor')"
-            prepend-icon="mdi-api"
+            prepend-icon="$mdi-api"
             chips
             closable-chips
             multiple
@@ -43,7 +43,7 @@
             :items="institutionsOptions"
             :loading="credentialStatus === 'pending' && 'primary'"
             :label="$t('institutions.title')"
-            prepend-icon="mdi-domain"
+            prepend-icon="$mdi-domain"
             chips
             closable-chips
             multiple
@@ -55,7 +55,7 @@
             v-model="filters.counterVersion"
             :items="SUPPORTED_COUNTER_VERSIONS"
             :label="$t('endpoints.counterVersion')"
-            prepend-icon="mdi-numeric"
+            prepend-icon="$mdi-numeric"
             chips
             closable-chips
             multiple
@@ -67,7 +67,7 @@
             v-model="filters.reportType"
             :items="reportOptions"
             :label="$t('harvest.jobs.reportType')"
-            prepend-icon="mdi-format-list-bulleted-type"
+            prepend-icon="$mdi-format-list-bulleted-type"
             chips
             closable-chips
             multiple
@@ -79,7 +79,7 @@
             v-model="filters.status"
             :items="statusOptions"
             :label="$t('status')"
-            prepend-icon="mdi-list-status"
+            prepend-icon="$mdi-list-status"
             chips
             closable-chips
             multiple
@@ -92,7 +92,7 @@
             :empty-symbol="emptySymbol"
             :items="errorOptions"
             :label="$t('harvest.jobs.errorCode')"
-            prepend-icon="mdi-alert-circle"
+            prepend-icon="$mdi-alert-circle"
             chips
             closable-chips
             multiple

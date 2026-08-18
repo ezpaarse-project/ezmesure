@@ -2,7 +2,7 @@
   <v-list-item
     :title="modelValue.name"
     :subtitle="modelValue.acronym"
-    prepend-icon="mdi-account-circle"
+    prepend-icon="$mdi-account-circle"
     lines="two"
   >
     <template #prepend>
@@ -13,7 +13,7 @@
       <v-btn
         :disabled="isAlreadyAssigned"
         :loading="loading"
-        icon="mdi-office-building-plus"
+        icon="$mdi-office-building-plus"
         color="primary"
         variant="tonal"
         size="small"

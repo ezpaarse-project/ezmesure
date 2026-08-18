@@ -33,7 +33,7 @@
     <template v-if="looseEnabled" #append>
       <v-btn
         v-tooltip="loose ? $t('looseFilter') : $t('strictFilter')"
-        :icon="loose ? 'mdi-approximately-equal' : 'mdi-equal'"
+        :icon="loose ? '$mdi-approximately-equal' : '$mdi-equal'"
         density="comfortable"
         @click="emit('update:loose', !loose)"
       />

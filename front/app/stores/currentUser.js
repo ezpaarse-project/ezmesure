@@ -101,7 +101,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
   function getMembership(institutionId, opts) {
     const membership = memberships.value.find((m) => m.institution.id === institutionId);
     if (!membership && opts?.throwOnNoMembership) {
-      throw createError({ statusCode: 403, fatal: true });
+      throw createError({ status: 403, fatal: true });
     }
     return membership;
   }
@@ -120,7 +120,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
     const perms = new Set(membership?.permissions);
     const has = perms.has(permission);
     if (!has && opts?.throwOnNoRights) {
-      throw createError({ statusCode: 403, fatal: true });
+      throw createError({ status: 403, fatal: true });
     }
     return has;
   }

@@ -25,7 +25,7 @@
 
           <div
             v-if="currentInstance"
-            class="text-overline current-instance"
+            class="text-label-medium current-instance"
           >
             {{ currentInstance }}
           </div>

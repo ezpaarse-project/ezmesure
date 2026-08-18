@@ -13,7 +13,7 @@
           :to="`/myspace/institutions/${institution.id}/sushi`"
           :title="$t('institutions.sushi.credentials')"
           color="primary"
-          prepend-icon="mdi-key"
+          prepend-icon="$mdi-key"
         />
 
         <v-list-item
@@ -21,7 +21,7 @@
           :to="`/myspace/institutions/${institution.id}/members`"
           :title="$t('institutions.members.members')"
           color="primary"
-          prepend-icon="mdi-account-multiple"
+          prepend-icon="$mdi-account-multiple"
         />
 
         <v-list-item
@@ -29,7 +29,7 @@
           :to="`/myspace/institutions/${institution.id}/reports`"
           :title="$t('menu.report')"
           color="primary"
-          prepend-icon="mdi-file-chart-outline"
+          prepend-icon="$mdi-file-chart-outline"
         />
 
         <v-list-item
@@ -46,7 +46,7 @@
 
         <v-list lines="two" density="compact" class="pa-0">
           <v-list-subheader>
-            <v-icon icon="mdi-tab" start />
+            <v-icon icon="$mdi-tab" start />
             {{ $t('myspace.spaces') }}
           </v-list-subheader>
 
@@ -56,7 +56,7 @@
             v-tooltip="space.name"
             :title="space.name"
             :href="`/kibana/s/${space.id}`"
-            append-icon="mdi-open-in-app"
+            append-icon="$mdi-open-in-app"
             @click.prevent="openInTab(`/kibana/s/${space.id}`, space.id)"
           >
             <template #subtitle>
@@ -75,7 +75,7 @@
 
         <v-list lines="two" density="compact" class="pa-0">
           <v-list-subheader>
-            <v-icon icon="mdi-tab-plus" start />
+            <v-icon icon="$mdi-tab-plus" start />
             {{ $t('spaces.foreignSpaces') }}
           </v-list-subheader>
 
@@ -85,7 +85,7 @@
             v-tooltip="space.name"
             :title="space.name"
             :href="`/kibana/s/${space.id}`"
-            append-icon="mdi-open-in-app"
+            append-icon="$mdi-open-in-app"
             @click.prevent="openInTab(`/kibana/s/${space.id}`, space.id)"
           >
             <template #subtitle>
@@ -106,7 +106,7 @@
           :text="$t('institutions.leaveInstitutionConfirm', { institution: props.institution.name })"
           :agree-text="$t('institutions.leave')"
           :agree="() => leaveInstitution()"
-          agree-icon="mdi-logout"
+          agree-icon="$mdi-logout"
           location="end"
           max-width="400"
         >
@@ -115,7 +115,7 @@
               v-bind="confirm"
               :title="$t('institutions.leaveInstitution')"
               color="primary"
-              prepend-icon="mdi-logout"
+              prepend-icon="$mdi-logout"
             />
           </template>
         </ConfirmPopover>

@@ -16,7 +16,7 @@
           v-if="institutionProperties.length > 0"
           v-model="search"
           :placeholder="$t('search')"
-          append-inner-icon="mdi-magnify"
+          append-inner-icon="$mdi-magnify"
           variant="outlined"
           density="compact"
           width="200"
@@ -120,7 +120,7 @@ async function refreshForm() {
     });
   } catch (err) {
     errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
-    errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
+    errorIcon.value = err?.statusCode === 404 ? '$mdi-file-hidden' : '$mdi-alert-circle';
   }
 
   loading.value = false;

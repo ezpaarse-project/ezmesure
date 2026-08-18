@@ -17,7 +17,7 @@
       <template v-if="contacts.length > 0">
         <v-divider class="mb-3" />
 
-        <div class="text-subtitle-1">
+        <div class="text-body-large">
           {{ $t('partners.correspondents') }}
         </div>
 
@@ -73,11 +73,11 @@ const props = defineProps({
 });
 
 const socialChips = new Map([
-  ['website', { icon: 'mdi-web', color: '#616161' }],
-  ['twitterUrl', { icon: 'mdi-twitter', color: '#1da1f2' }],
-  ['linkedinUrl', { icon: 'mdi-linkedin', color: '#0077b5' }],
-  ['youtubeUrl', { icon: 'mdi-youtube', color: '#ff0000' }],
-  ['facebookUrl', { icon: 'mdi-facebook', color: '#1877f2' }],
+  ['website', { icon: '$mdi-web', color: '#616161' }],
+  ['twitterUrl', { icon: '$mdi-twitter', color: '#1da1f2' }],
+  ['linkedinUrl', { icon: '$mdi-linkedin', color: '#0077b5' }],
+  ['youtubeUrl', { icon: '$mdi-youtube', color: '#ff0000' }],
+  ['facebookUrl', { icon: '$mdi-facebook', color: '#1877f2' }],
 ]);
 
 const { t } = useI18n();

@@ -5,18 +5,18 @@
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-key" end />
+        <v-icon icon="$mdi-key" end />
       </template>
 
       <template #append>
         <v-btn
           v-tooltip="$t('reset')"
-          icon="mdi-filter-off"
+          icon="$mdi-filter-off"
           @click="clearFilters"
         />
 
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           @click="$emit('update:show', false)"
         />
       </template>
@@ -35,7 +35,7 @@
             chips
             closable-chips
             multiple
-            prepend-icon="mdi-api"
+            prepend-icon="$mdi-api"
             clearable
           />
         </v-col>
@@ -51,7 +51,7 @@
             chips
             closable-chips
             multiple
-            prepend-icon="mdi-tag"
+            prepend-icon="$mdi-tag"
           />
         </v-col>
 
@@ -60,7 +60,7 @@
             v-model="filters.connection"
             :label="$t('status')"
             :items="statuses"
-            prepend-icon="mdi-connection"
+            prepend-icon="$mdi-connection"
           />
         </v-col>
 
@@ -68,7 +68,7 @@
           <ApiFiltersButtonsGroup
             v-model="filters.active"
             :label="$t('endpoints.active')"
-            prepend-icon="mdi-toggle-switch"
+            prepend-icon="$mdi-toggle-switch"
           />
         </v-col>
 
@@ -76,7 +76,7 @@
           <ApiFiltersButtonsGroup
             v-model="filters.archived"
             :label="$t('archived')"
-            prepend-icon="mdi-archive"
+            prepend-icon="$mdi-archive"
           />
         </v-col>
       </v-row>

@@ -11,7 +11,7 @@
       <v-btn
         v-if="institutionFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -38,7 +38,7 @@
           :text="`${value.length}`"
           :to="`/admin/institutions/${item.id}/members`"
           :variant="!value.length ? 'outlined' : undefined"
-          prepend-icon="mdi-account-multiple"
+          prepend-icon="$mdi-account-multiple"
           size="small"
         />
       </template>
@@ -48,7 +48,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!institutionComponentsDialogRef"
-          prepend-icon="mdi-family-tree"
+          prepend-icon="$mdi-family-tree"
           size="small"
           @click="institutionComponentsDialogRef?.open(item)"
         />
@@ -59,7 +59,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!institutionRepositoriesDialogRef"
-          prepend-icon="mdi-database-outline"
+          prepend-icon="$mdi-database-outline"
           size="small"
           @click="institutionRepositoriesDialogRef?.open(item)"
         />
@@ -70,7 +70,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!institutionAliasesDialogRef"
-          prepend-icon="mdi-database-eye-outline"
+          prepend-icon="$mdi-database-eye-outline"
           size="small"
           @click="institutionAliasesDialogRef?.open(item)"
         />
@@ -81,7 +81,7 @@
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!institutionSpacesDialogRef"
-          prepend-icon="mdi-tab"
+          prepend-icon="$mdi-tab"
           size="small"
           @click="institutionSpacesDialogRef?.open(item)"
         />
@@ -121,7 +121,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -132,12 +132,12 @@
             <v-list-item
               v-if="institutionFormDialogRef"
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="showForm(item)"
             />
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteInstitutions([item])"
             />
 
@@ -146,17 +146,17 @@
             <v-list-item
               :title="$t('institutions.sushi.credentials')"
               :to="`/admin/institutions/${item.id}/sushi`"
-              prepend-icon="mdi-key"
+              prepend-icon="$mdi-key"
             />
             <v-list-item
               :title="$t('institutions.members.members')"
               :to="`/admin/institutions/${item.id}/members`"
-              prepend-icon="mdi-account-multiple"
+              prepend-icon="$mdi-account-multiple"
             />
             <v-list-item
               :title="$t('institutions.reports.reports')"
               :to="`/admin/institutions/${item.id}/reports`"
-              prepend-icon="mdi-file-chart-outline"
+              prepend-icon="$mdi-file-chart-outline"
             />
             <v-list-item
               :title="$t('api-keys.keys')"
@@ -166,7 +166,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyInstitutionId(item)"
             />
           </v-list>
@@ -181,13 +181,13 @@
       <template #actions>
         <v-list-item
           :title="$t('users.createMailUserList', 2)"
-          prepend-icon="mdi-email-multiple"
+          prepend-icon="$mdi-email-multiple"
           @click="copyMailList()"
         />
 
         <v-list-item
           :title="$t('institutions.validateSwitch')"
-          prepend-icon="mdi-check"
+          prepend-icon="$mdi-check"
           @click="toggleInstitutions()"
         />
 
@@ -195,7 +195,7 @@
 
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteInstitutions()"
         />
       </template>
@@ -234,8 +234,6 @@
 
 <script setup>
 definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
   alias: ['/admin/'],
 });
 
@@ -258,7 +256,7 @@ const {
   itemLength, // Total number of items
   query, // Query parameters
   vDataTableOptions, // Options to pass to v-data-table
-} = await useServerSidePagination({
+} = useServerSidePagination({
   // Fetch options to pass to $fetch
   fetch: {
     url: '/api/institutions',
@@ -406,7 +404,7 @@ function deleteInstitutions(items) {
       { named: { affected: t('institutions.deleteNbInstitutions.affected') } },
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

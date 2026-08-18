@@ -11,7 +11,7 @@ const UsersService = require('./lib/entities/users.service');
 const LocalizedError = require('./lib/models/LocalizedError');
 
 const i18n = require('./lib/services/i18n');
-const metrics = require('./lib/services/metrics');
+const actions = require('./lib/services/actions');
 const elastic = require('./lib/services/elastic');
 
 // Crons
@@ -78,7 +78,7 @@ app.use(async (ctx, next) => {
 
   if (ctx.action) {
     try {
-      await metrics.save(ctx);
+      await actions.save(ctx);
     } catch (e) {
       ctx.app.emit('error', e, ctx);
     }
@@ -143,8 +143,8 @@ app.on('error', (err, ctx = {}) => {
 app.use(mount('/', controller));
 
 function start() {
-  metrics.ensureIndex()
-    .catch((err) => appLogger.error(`Couldn't ensure index for metrics: ${err}`));
+  actions.ensureIndex()
+    .catch((err) => appLogger.error(`Couldn't ensure index for actions: ${err}`));
 
   notifications.startBroadcastCron();
   opendata.startRefreshCron();

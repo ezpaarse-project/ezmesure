@@ -54,7 +54,7 @@ async function sendValidateInstitutionMail(receivers, data) {
         try {
           await sendMail({
             to: receiver.email,
-            ...generateMail('validate-institution', data, { locale: receiver.language }),
+            ...await generateMail('validate-institution', data, { locale: receiver.language }),
           });
 
           appLogger.verbose(`[validate-institution] Mail sent to ${receiver.email}`);
@@ -78,7 +78,7 @@ async function sendCounterReadyChangeMail(data) {
         try {
           await sendMail({
             to: admin.email,
-            ...generateMail('sushi-ready-change', data, {
+            ...await generateMail('sushi-ready-change', data, {
               locale: admin.language,
               subjectKey: data.sushiReadySince ? 'subject.end' : 'subject.start',
             }),

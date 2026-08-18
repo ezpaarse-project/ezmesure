@@ -4,7 +4,7 @@
       <v-text-field
         v-model="searchRole"
         :placeholder="$t('search')"
-        prepend-inner-icon="mdi-magnify"
+        prepend-inner-icon="$mdi-magnify"
         variant="outlined"
         density="compact"
         hide-details
@@ -14,7 +14,7 @@
 
     <v-empty-state
       v-if="rolesError"
-      icon="mdi-alert-circle"
+      icon="$mdi-alert-circle"
       :title="rolesError"
     >
       <template #actions>
@@ -42,7 +42,7 @@
         :disabled="disabledItems.has(role.id)"
         :title="role.label"
         :subtitle="role.description"
-        :prepend-icon="role.icon ?? 'mdi-tag-outline'"
+        :prepend-icon="role.icon ?? '$mdi-tag-outline'"
       >
         <template #append="{ isSelected, select }">
           <v-list-item-action start>

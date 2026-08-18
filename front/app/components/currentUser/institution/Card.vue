@@ -48,7 +48,7 @@
     <div v-if="allowedActions.institution" class="px-4 mt-2">
       <v-btn
         :text="$t('institutions.modify')"
-        prepend-icon="mdi-pencil"
+        prepend-icon="$mdi-pencil"
         color="blue"
         variant="flat"
         block
@@ -62,7 +62,7 @@
           :text="$t('institutions.sushi.credentials')"
           :to="`/myspace/institutions/${institution.id}/sushi`"
           :disabled="!allowedActions.sushi"
-          prepend-icon="mdi-key"
+          prepend-icon="$mdi-key"
           variant="text"
         />
 
@@ -70,7 +70,7 @@
           :text="$t('institutions.members.members')"
           :to="`/myspace/institutions/${institution.id}/members`"
           :disabled="!allowedActions.members"
-          prepend-icon="mdi-account-multiple"
+          prepend-icon="$mdi-account-multiple"
           variant="text"
         />
 
@@ -78,7 +78,7 @@
           :text="$t('institutions.reports.reports')"
           :to="`/myspace/institutions/${institution.id}/reports`"
           :disabled="!allowedActions.reports"
-          prepend-icon="mdi-file-chart-outline"
+          prepend-icon="$mdi-file-chart-outline"
           variant="text"
         />
 
@@ -92,13 +92,13 @@
       </div>
 
       <v-tabs v-model="tab" grow>
-        <v-tab prepend-icon="mdi-tab">
+        <v-tab prepend-icon="$mdi-tab">
           {{ $t('myspace.spaces') }}
         </v-tab>
-        <v-tab prepend-icon="mdi-database">
+        <v-tab prepend-icon="$mdi-database">
           {{ $t('myspace.repos') }}
         </v-tab>
-        <v-tab prepend-icon="mdi-office-building">
+        <v-tab prepend-icon="$mdi-office-building">
           {{ $t('institutions.title') }}
         </v-tab>
       </v-tabs>
@@ -141,7 +141,7 @@
               v-for="customProp in customProps"
               :key="customProp.fieldId"
               :title="customProp.value"
-              prepend-icon="mdi-tag-outline"
+              prepend-icon="$mdi-tag-outline"
               lines="two"
             >
               <template #subtitle>
@@ -152,7 +152,7 @@
             <v-list-item
               v-if="links.length > 0"
               :subtitle="$t('institutions.institution.links')"
-              prepend-icon="mdi-link-variant"
+              prepend-icon="$mdi-link-variant"
               lines="two"
             >
               <template #title>
@@ -209,42 +209,42 @@ const logoSrc = computed(() => {
 });
 
 const fields = computed(() => [
-  { name: 'group', value: institution.value.parentInstitution?.name, icon: 'mdi-home-city' },
-  { name: 'homepage', value: institution.value.homepage, icon: 'mdi-web' },
-  { name: 'city', value: institution.value.city, icon: 'mdi-map-marker' },
-  { name: 'type', value: institution.value.type, icon: 'mdi-tag' },
-  { name: 'uai', value: institution.value.uai, icon: 'mdi-identifier' },
-  { name: 'role', value: institution.value.role, icon: 'mdi-shield' },
+  { name: 'group', value: institution.value.parentInstitution?.name, icon: '$mdi-home-city' },
+  { name: 'homepage', value: institution.value.homepage, icon: '$mdi-web' },
+  { name: 'city', value: institution.value.city, icon: '$mdi-map-marker' },
+  { name: 'type', value: institution.value.type, icon: '$mdi-tag' },
+  { name: 'uai', value: institution.value.uai, icon: '$mdi-identifier' },
+  { name: 'role', value: institution.value.role, icon: '$mdi-shield' },
 ].filter(({ value }) => !!value));
 
 const links = computed(() => [
   {
     title: t('social.website'),
-    icon: 'mdi-web',
+    icon: '$mdi-web',
     color: '#616161',
     url: institution.value.websiteUrl,
   },
   {
     title: t('social.twitter'),
-    icon: 'mdi-twitter',
+    icon: '$mdi-twitter',
     color: '#1da1f2',
     url: institution.value.social?.twitterUrl,
   },
   {
     title: t('social.linkedin'),
-    icon: 'mdi-linkedin',
+    icon: '$mdi-linkedin',
     color: '#0077b5',
     url: institution.value.social?.linkedinUrl,
   },
   {
     title: t('social.youtube'),
-    icon: 'mdi-youtube',
+    icon: '$mdi-youtube',
     color: '#ff0000',
     url: institution.value.social?.youtubeUrl,
   },
   {
     title: t('social.facebook'),
-    icon: 'mdi-facebook',
+    icon: '$mdi-facebook',
     color: '#1877f2',
     url: institution.value.social?.facebookUrl,
   },

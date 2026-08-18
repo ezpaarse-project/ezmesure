@@ -23,7 +23,7 @@
       <InstitutionAvatar :institution="modelValue" />
     </template>
 
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item
         :subtitle="item.city"
         lines="two"

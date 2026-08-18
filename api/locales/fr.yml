@@ -228,8 +228,8 @@ emails:
       p1: Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana {{ username }}
 
   newAccount:
-    subject: Un nouveau collaborateur s'est inscrit
-    title: Un nouveau collaborateur s'est inscrit
+    subject: Un nouveau collègue s'est inscrit
+    title: Un nouveau collègue s'est inscrit
     body:
       headline: "{{ name }} vient de créer son compte sur ezMESURE"
       p1: "Vous pouvez dès à présent l'intégrer à vos établissements depuis l'interface de gestion des membres :"
@@ -346,7 +346,7 @@ emails:
       types:
         assigned-role: Nouveau rôle assigné
         harvest-end: Fin de moissonnage
-        new-account: Inscription d'un collaborateur
+        new-account: Inscription d'un collègue
         request-membership: Demande d'intégration à un établissement
         user-deleted: Confirmation de suppression de compte
         user-deletion-requested: Demande de suppression de compte

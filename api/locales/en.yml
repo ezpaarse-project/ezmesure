@@ -234,8 +234,8 @@ emails:
       p1: You are now registered on ezMESURE with the Kibana user {{ username }}
 
   newAccount:
-    subject: A new collaborator has signed up
-    title: A new collaborator has signed up
+    subject: A new colleague has signed up
+    title: A new colleague has signed up
     body:
       headline: "{{ name }} has just signed up on ezMESURE"
       p1: "You can integrate them to your institutions from the members management interface:"

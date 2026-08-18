@@ -2,7 +2,7 @@
   <v-list-item :title="repository.pattern" lines="two">
     <template #append>
       <v-slide-x-reverse-transition>
-        <v-icon v-if="success" icon="mdi-check" color="success" start />
+        <v-icon v-if="success" icon="$mdi-check" color="success" start />
       </v-slide-x-reverse-transition>
 
       <PermissionSwitch

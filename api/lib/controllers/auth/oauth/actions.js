@@ -17,7 +17,7 @@ const logoutFromKibana = async (ctx) => {
   try {
     await logoutUser(ctx.cookies.get(AUTH_COOKIE.name));
   } catch (err) {
-    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user.username}: ${err}`);
+    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user?.username ?? 'unknown'}: ${err}`);
   }
 
   // Reset cookie on client side

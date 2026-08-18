@@ -3,7 +3,7 @@
     :loading="loading && 'primary'"
     :title="$t('institutions.members.permissionsOf', { name: modelValue.user.fullName })"
     :subtitle="subtitle"
-    prepend-icon="mdi-shield"
+    prepend-icon="$mdi-shield"
   >
     <template #text>
       <v-row>
@@ -23,7 +23,7 @@
             <v-col cols="12">
               <v-card
                 :title="$t('institutions.members.roles')"
-                prepend-icon="mdi-tag"
+                prepend-icon="$mdi-tag"
                 variant="outlined"
               >
                 <template #append>
@@ -36,7 +36,7 @@
                     <template #activator="{ props: menuProps }">
                       <v-btn
                         v-bind="menuProps"
-                        prepend-icon="mdi-plus"
+                        prepend-icon="$mdi-plus"
                         density="comfortable"
                         variant="text"
                         color="primary"
@@ -71,7 +71,7 @@
                   >
                     <template #prepend>
                       <v-icon
-                        :icon="role.icon ?? 'mdi-tag-outline'"
+                        :icon="role.icon ?? '$mdi-tag-outline'"
                         :color="role.color"
                       />
                     </template>
@@ -79,8 +79,8 @@
                     <template v-if="canEdit" #append>
                       <v-btn
                         v-if="user.isAdmin || (canEdit && !role.restricted)"
-                        :prepend-icon="$vuetify.display.smAndUp ? 'mdi-close' : undefined"
-                        :icon="$vuetify.display.xs ? 'mdi-close' : undefined"
+                        :prepend-icon="$vuetify.display.smAndUp ? '$mdi-close' : undefined"
+                        :icon="$vuetify.display.xs ? '$mdi-close' : undefined"
                         density="default"
                         variant="tonal"
                         :text="$t('delete')"
@@ -99,7 +99,7 @@
             <v-col cols="12">
               <v-card
                 :title="$t('institutions.members.institutionManagement')"
-                prepend-icon="mdi-office-building"
+                prepend-icon="$mdi-office-building"
                 variant="outlined"
               >
                 <template #text>
@@ -123,7 +123,7 @@
               <v-card
                 :title="$t('repositories.repositories')"
                 :loading="repoStatus === 'pending' && 'primary'"
-                prepend-icon="mdi-database"
+                prepend-icon="$mdi-database"
                 variant="outlined"
               >
                 <template v-if="(repositories?.length ?? 0) > 0" #text>
@@ -156,7 +156,7 @@
               <v-card
                 :title="$t('repositoryAliases.aliases')"
                 :loading="aliasesStatus === 'pending' && 'primary'"
-                prepend-icon="mdi-database-eye"
+                prepend-icon="$mdi-database-eye"
                 variant="outlined"
               >
                 <template v-if="(repositoryAliases?.length ?? 0) > 0" #text>
@@ -188,7 +188,7 @@
               <v-card
                 :title="$t('spaces.spaces')"
                 :loading="spaceStatus === 'pending' && 'primary'"
-                prepend-icon="mdi-tab"
+                prepend-icon="$mdi-tab"
                 variant="outlined"
               >
                 <template v-if="(spaces?.length ?? 0) > 0" #text>
@@ -219,7 +219,7 @@
             <v-col cols="12">
               <v-card
                 :title="$t('institutions.institution.general')"
-                prepend-icon="mdi-format-list-bulleted"
+                prepend-icon="$mdi-format-list-bulleted"
                 variant="outlined"
               >
                 <template #text>
@@ -240,7 +240,7 @@
                         :label="$t('institutions.sushi.comment')"
                         :loading="loading && 'primary'"
                         :readonly="!canEdit"
-                        prepend-icon="mdi-image-text"
+                        prepend-icon="$mdi-image-text"
                         variant="underlined"
                         hide-details="auto"
                       />

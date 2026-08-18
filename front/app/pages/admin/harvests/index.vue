@@ -11,7 +11,7 @@
       <v-btn
         v-if="harvestSessionFormDialogRef"
         v-tooltip="$t('harvest.sessions.form.title:add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -22,7 +22,7 @@
       <v-btn
         v-if="globalHarvestMatrixRef"
         v-tooltip="$t('sushi.globalHarvestState.title')"
-        icon="mdi-table-headers-eye"
+        icon="$mdi-table-headers-eye"
         variant="tonal"
         density="comfortable"
         color="primary"
@@ -87,11 +87,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
@@ -106,7 +101,7 @@ const {
   itemsPerPage,
   itemsPerPageOptions,
   vPaginationOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/harvests-sessions',
   },

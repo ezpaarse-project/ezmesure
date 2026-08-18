@@ -10,15 +10,33 @@ export default defineNuxtConfig({
       currentInstance: '',
       oidcProfileUri: '',
       counterRegistryUrl: 'https://registry.countermetrics.org',
+      homepage: {
+        features: {
+          dashboard: true,
+          repository: true,
+          ezpaarse: true,
+          counter: true,
+          reporting: true,
+        },
+        logos: {
+          SLSP: true,
+          CSAL: true,
+          EPFL: true,
+          UNIGE: true,
+          CNRS: true,
+          COUPERIN: true,
+          INIST: false,
+        },
+      },
     },
   },
 
-  modules: [
-    '@nuxtjs/i18n',
-    'vuetify-nuxt-module',
-    '@pinia/nuxt',
-    '@vueuse/nuxt',
-  ],
+  routeRules: {
+    '/admin/**': { appLayout: 'admin', appMiddleware: ['require-auth', 'require-terms', 'require-admin'] },
+    '/myspace/**': { appLayout: 'space', appMiddleware: ['require-auth', 'require-terms'] },
+  },
+
+  modules: ['@nuxtjs/i18n', 'vuetify-nuxt-module', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/fonts'],
 
   i18n: i18nOptions,
 
@@ -36,8 +54,7 @@ export default defineNuxtConfig({
     port: 8080,
   },
 
-  vite: {
-    // Prevent Vite from optimizing ezreeport in dev, allowing to replace it with a local version
-    optimizeDeps: process.env.NODE_ENV !== 'production' ? { exclude: ['@ezpaarse-project/ezreeport-vue'] } : undefined,
+  fonts: {
+    weights: ['100 900'],
   },
 });

@@ -170,7 +170,7 @@ module.exports = {
     },
   },
   notifications: {
-    sender: 'ezMESURE',
+    sender: 'ezMESURE <noreply.ezmesure@localhost.fr>',
     replyTo: '',
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,

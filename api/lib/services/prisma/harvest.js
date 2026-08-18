@@ -83,7 +83,7 @@ function upsert(params, tx = prisma) {
 /**
  * @param {HarvestGroupByArgs} params
  * @param {TransactionClient} [tx]
- * @returns
+ * @returns {Harvest[]}
  */
 function groupBy(params, tx = prisma) {
   // @ts-ignore

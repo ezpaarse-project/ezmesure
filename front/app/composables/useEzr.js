@@ -1,5 +1,5 @@
 import { prepareClient } from '@ezpaarse-project/ezreeport-vue';
-import '@ezpaarse-project/ezreeport-vue/styles';
+import '@ezpaarse-project/ezreeport-vue/style.css';
 
 import {
   useFetch,

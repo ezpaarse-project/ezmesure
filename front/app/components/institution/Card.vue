@@ -19,21 +19,21 @@
         <v-btn
           :text="$t('institutions.sushi.credentials')"
           :to="`/admin/institutions/${institution.id}/sushi`"
-          prepend-icon="mdi-key"
+          prepend-icon="$mdi-key"
           variant="text"
         />
 
         <v-btn
           :text="$t('institutions.members.members')"
           :to="`/admin/institutions/${institution.id}/members`"
-          prepend-icon="mdi-account-multiple"
+          prepend-icon="$mdi-account-multiple"
           variant="text"
         />
 
         <v-btn
           :text="$t('institutions.reports.reports')"
           :to="`/admin/institutions/${institution.id}/reports`"
-          prepend-icon="mdi-file-chart-outline"
+          prepend-icon="$mdi-file-chart-outline"
           variant="text"
         />
 
@@ -60,7 +60,7 @@
         <v-list-item
           v-if="links.length > 0"
           :subtitle="$t('institutions.institution.links')"
-          prepend-icon="mdi-link-variant"
+          prepend-icon="$mdi-link-variant"
           lines="two"
         >
           <template #title>
@@ -109,42 +109,42 @@ const logoSrc = computed(() => {
 });
 
 const fields = computed(() => [
-  { name: 'group', value: props.institution.parentInstitution?.name, icon: 'mdi-home-city' },
-  { name: 'homepage', value: props.institution.homepage, icon: 'mdi-web' },
-  { name: 'city', value: props.institution.city, icon: 'mdi-map-marker' },
-  { name: 'type', value: props.institution.type, icon: 'mdi-tag' },
-  { name: 'uai', value: props.institution.uai, icon: 'mdi-identifier' },
-  { name: 'role', value: props.institution.role, icon: 'mdi-shield' },
+  { name: 'group', value: props.institution.parentInstitution?.name, icon: '$mdi-home-city' },
+  { name: 'homepage', value: props.institution.homepage, icon: '$mdi-web' },
+  { name: 'city', value: props.institution.city, icon: '$mdi-map-marker' },
+  { name: 'type', value: props.institution.type, icon: '$mdi-tag' },
+  { name: 'uai', value: props.institution.uai, icon: '$mdi-identifier' },
+  { name: 'role', value: props.institution.role, icon: '$mdi-shield' },
 ].filter(({ value }) => !!value));
 
 const links = computed(() => [
   {
     title: t('social.website'),
-    icon: 'mdi-web',
+    icon: '$mdi-web',
     color: '#616161',
     url: props.institution.websiteUrl,
   },
   {
     title: t('social.twitter'),
-    icon: 'mdi-twitter',
+    icon: '$mdi-twitter',
     color: '#1da1f2',
     url: props.institution.social?.twitterUrl,
   },
   {
     title: t('social.linkedin'),
-    icon: 'mdi-linkedin',
+    icon: '$mdi-linkedin',
     color: '#0077b5',
     url: props.institution.social?.linkedinUrl,
   },
   {
     title: t('social.youtube'),
-    icon: 'mdi-youtube',
+    icon: '$mdi-youtube',
     color: '#ff0000',
     url: props.institution.social?.youtubeUrl,
   },
   {
     title: t('social.facebook'),
-    icon: 'mdi-facebook',
+    icon: '$mdi-facebook',
     color: '#1877f2',
     url: props.institution.social?.facebookUrl,
   },

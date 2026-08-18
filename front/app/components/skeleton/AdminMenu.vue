@@ -4,20 +4,20 @@
       <v-list-item
         :title="$t('menu.admin.institutions')"
         to="/admin/institutions"
-        prepend-icon="mdi-domain"
+        prepend-icon="$mdi-domain"
       />
 
       <v-list-item
         :title="$t('menu.admin.repositories')"
         to="/admin/repositories"
-        prepend-icon="mdi-database"
+        prepend-icon="$mdi-database"
       />
 
       <v-list-group value="aliases">
         <template #activator="{ props }">
           <v-list-item
             :title="$t('menu.admin.repositoryAliases.title')"
-            prepend-icon="mdi-database-eye"
+            prepend-icon="$mdi-database-eye"
             v-bind="props"
           />
         </template>
@@ -25,44 +25,44 @@
         <v-list-item
           :title="$t('menu.admin.repositoryAliases.entries.aliases')"
           to="/admin/repository-aliases"
-          prepend-icon="mdi-database-eye"
+          prepend-icon="$mdi-database-eye"
         />
 
         <v-list-item
           :title="$t('menu.admin.repositoryAliases.entries.templates')"
           to="/admin/repository-aliases/templates"
-          prepend-icon="mdi-view-grid"
+          prepend-icon="$mdi-view-grid"
         />
 
         <v-list-item
           :title="$t('menu.admin.repositoryAliases.entries.orphans')"
           to="/admin/repository-aliases/orphans"
-          prepend-icon="mdi-bell-outline"
+          prepend-icon="$mdi-bell-outline"
         />
       </v-list-group>
 
       <v-list-item
         :title="$t('menu.admin.spaces')"
         to="/admin/spaces"
-        prepend-icon="mdi-tab"
+        prepend-icon="$mdi-tab"
       />
 
       <v-list-item
         :title="$t('menu.admin.users')"
         to="/admin/users"
-        prepend-icon="mdi-account-multiple"
+        prepend-icon="$mdi-account-multiple"
       />
 
       <v-list-item
         :title="$t('menu.admin.roles')"
         to="/admin/roles"
-        prepend-icon="mdi-account-group"
+        prepend-icon="$mdi-account-group"
       />
 
       <v-list-item
         :title="$t('menu.admin.shares')"
         to="/admin/elastic-roles"
-        prepend-icon="mdi-account-tag"
+        prepend-icon="$mdi-account-tag"
       />
 
       <v-list-item
@@ -74,20 +74,20 @@
       <v-list-item
         :title="$t('menu.admin.sushiEndpoints')"
         to="/admin/endpoints"
-        prepend-icon="mdi-api"
+        prepend-icon="$mdi-api"
       />
 
       <v-list-item
         :title="$t('menu.admin.customFields')"
         to="/admin/custom-fields"
-        prepend-icon="mdi-tag-outline"
+        prepend-icon="$mdi-tag-outline"
       />
 
       <v-list-group value="harvests">
         <template #activator="{ props }">
           <v-list-item
             :title="$t('menu.admin.harvest.title')"
-            prepend-icon="mdi-tractor"
+            prepend-icon="$mdi-tractor"
             v-bind="props"
           />
         </template>
@@ -95,21 +95,21 @@
         <v-list-item
           :title="$t('menu.admin.harvest.entries.institutions')"
           to="/admin/harvests/institutions"
-          prepend-icon="mdi-domain"
+          prepend-icon="$mdi-domain"
           exact
         />
 
         <v-list-item
           :title="$t('menu.admin.harvest.entries.sessions')"
           to="/admin/harvests"
-          prepend-icon="mdi-file-tree"
+          prepend-icon="$mdi-file-tree"
           exact
         />
 
         <v-list-item
           :title="$t('menu.admin.harvest.entries.alerts')"
           to="/admin/harvests/alerts"
-          prepend-icon="mdi-bell-outline"
+          prepend-icon="$mdi-bell-outline"
         />
       </v-list-group>
 
@@ -117,7 +117,7 @@
         <template #activator="{ props }">
           <v-list-item
             :title="$t('menu.admin.report')"
-            prepend-icon="mdi-file-chart-outline"
+            prepend-icon="$mdi-file-chart-outline"
             v-bind="props"
           />
         </template>
@@ -125,45 +125,45 @@
         <v-list-item
           :title="$t('report.admin.templateTab')"
           to="/admin/report/templates"
-          prepend-icon="mdi-view-grid"
+          prepend-icon="$mdi-view-grid"
         />
 
         <v-list-item
           :title="$t('report.admin.presetTab')"
           to="/admin/report/presets"
-          prepend-icon="mdi-file"
+          prepend-icon="$mdi-file"
         />
 
         <v-list-item
           :title="$t('report.admin.taskTab')"
           to="/admin/report/tasks"
-          prepend-icon="mdi-email"
+          prepend-icon="$mdi-email"
         />
 
         <v-list-item
           :title="$t('report.admin.adminTab')"
           to="/admin/report"
-          prepend-icon="mdi-tools"
+          prepend-icon="$mdi-tools"
         />
 
         <v-list-item
           :title="$t('report.admin.activityTab')"
           to="/admin/report/activity"
-          prepend-icon="mdi-history"
+          prepend-icon="$mdi-history"
         />
       </v-list-group>
 
       <v-list-item
         :title="$t('menu.admin.sync')"
         to="/admin/sync"
-        prepend-icon="mdi-sync"
+        prepend-icon="$mdi-sync"
       />
 
       <v-list-item
         v-tooltip="$t('menu.admin.actions.tooltip')"
         :title="$t('menu.admin.actions.title')"
         to="/admin/actions"
-        prepend-icon="mdi-history"
+        prepend-icon="$mdi-history"
       >
         <template #append>
           <v-badge content="BETA" color="primary" inline />
@@ -173,13 +173,13 @@
       <v-list-item
         :title="$t('menu.admin.activity')"
         to="/admin/activity"
-        prepend-icon="mdi-history"
+        prepend-icon="$mdi-history"
       />
 
       <v-list-item
         :title="$t('admin.logs.title')"
         to="/admin/logs"
-        prepend-icon="mdi-text"
+        prepend-icon="$mdi-text"
       />
     </v-list>
   </v-navigation-drawer>

@@ -2,13 +2,13 @@
   <v-card
     :title="$t('spaces.spaces')"
     :subtitle="showInstitution ? institution.name : undefined"
-    prepend-icon="mdi-tab"
+    prepend-icon="$mdi-tab"
   >
     <template v-if="!userSpaced" #append>
       <v-btn
         v-if="spaceFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="text"
         density="comfortable"
         color="green"
@@ -25,7 +25,7 @@
         <v-row v-if="sortedSpaces.length > 0" dense>
           <v-col v-if="sortedForeignSpaces.length > 0" cols="12" class="pt-0">
             <v-list-subheader>
-              <v-icon icon="mdi-tab" start />
+              <v-icon icon="$mdi-tab" start />
               {{ $t('spaces.ownedSpaces') }}
             </v-list-subheader>
           </v-col>
@@ -40,7 +40,7 @@
                 <v-btn
                   v-if="spaceFormDialogRef"
                   v-tooltip="$t('modify')"
-                  icon="mdi-pencil"
+                  icon="$mdi-pencil"
                   variant="text"
                   size="small"
                   density="comfortable"
@@ -58,7 +58,7 @@
                   <template #activator="{ props: confirm }">
                     <v-btn
                       v-tooltip="$t('delete')"
-                      icon="mdi-delete"
+                      icon="$mdi-delete"
                       variant="text"
                       size="small"
                       density="comfortable"
@@ -77,7 +77,7 @@
         <v-row v-if="sortedForeignSpaces.length > 0" dense>
           <v-col cols="12">
             <v-list-subheader>
-              <v-icon icon="mdi-tab-plus" start />
+              <v-icon icon="$mdi-tab-plus" start />
               {{ $t('spaces.foreignSpaces') }}
             </v-list-subheader>
           </v-col>
@@ -92,7 +92,7 @@
                 <v-chip
                   v-tooltip:left="$t('shares.grantedBy')"
                   :text="elasticRole.name"
-                  append-icon="mdi-account-tag"
+                  append-icon="$mdi-account-tag"
                   color="secondary"
                   variant="outlined"
                   size="small"

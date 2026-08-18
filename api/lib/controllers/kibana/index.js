@@ -17,7 +17,7 @@ const { requireActiveAuth, requireUser, requireAdmin } = require('../../services
 const kibanaProxy = createProxyMiddleware({
   target: url || `http://${host}:${port}`,
   changeOrigin: true,
-  pathRewrite: { '^/kibana': '/' },
+  pathRewrite: { '^/kibana/': '/' },
   logger: appLogger,
   on: {
     proxyReq: (proxyReq) => {

@@ -138,7 +138,7 @@ module.exports = class HarvestsService extends BasePrismaService {
 
   /**
    * @param {HarvestGroupByArgs} params
-   * @returns
+   * @returns {Harvest[]}
    */
   groupBy(params) {
     return harvestPrisma.groupBy(params, this.prisma);

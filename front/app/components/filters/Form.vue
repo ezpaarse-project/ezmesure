@@ -10,7 +10,7 @@
     <template #append>
       <v-btn
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="text"
         density="comfortable"
         color="green"
@@ -39,7 +39,7 @@
       <v-menu v-model="isFormOpen" :close-on-content-click="false" target="parent">
         <v-card
           :title="editingFilter ? $t('repositoryAliases.filtersForm.editFilter') : $t('repositoryAliases.filtersForm.newFilter')"
-          prepend-icon="mdi-filter-plus"
+          prepend-icon="$mdi-filter-plus"
           variant="outlined"
         >
           <template v-if="!disableAdvanced" #append>
@@ -47,7 +47,7 @@
               v-tooltip="$t('repositoryAliases.filtersForm.advanced')"
               :color="isRawMode ? 'orange' : 'grey'"
               variant="text"
-              icon="mdi-tools"
+              icon="$mdi-tools"
               density="comfortable"
               @click="isRawMode = !isRawMode"
             />
@@ -61,7 +61,7 @@
                     <v-textarea
                       v-model="rawFilterJSON"
                       :label="$t('repositoryAliases.filtersForm.raw')"
-                      prepend-icon="mdi-cursor-text"
+                      prepend-icon="$mdi-cursor-text"
                       variant="outlined"
                       required
                     />
@@ -78,7 +78,7 @@
                       :items="[]"
                       :rules="[(v) => !!v || $t('fieldIsRequired')]"
                       :return-object="false"
-                      prepend-icon="mdi-form-textbox"
+                      prepend-icon="$mdi-form-textbox"
                       variant="underlined"
                       required
                     />
@@ -90,7 +90,7 @@
                     <MultiTextField
                       v-model="values"
                       :label="$t('repositoryAliases.filtersForm.value')"
-                      prepend-icon="mdi-cursor-text"
+                      prepend-icon="$mdi-cursor-text"
                       variant="underlined"
                     />
                   </v-col>
@@ -117,7 +117,7 @@
                     :model-value="filterType"
                     :label="$t('$ezreeport.editor.filters.type')"
                     variant="plain"
-                    prepend-icon="mdi-format-list-bulleted"
+                    prepend-icon="$mdi-format-list-bulleted"
                     disabled
                   />
                 </v-col>
@@ -129,7 +129,7 @@
                     v-model="name"
                     :label="$t('name')"
                     :rules="[(v) => !!v || $t('fieldIsRequired')]"
-                    prepend-icon="mdi-rename"
+                    prepend-icon="$mdi-rename"
                     variant="underlined"
                     required
                     @update:model-value="hasNameChanged = true"
@@ -151,7 +151,7 @@
             <v-btn
               :text="$t('create')"
               :disabled="!isValid"
-              prepend-icon="mdi-content-save"
+              prepend-icon="$mdi-content-save"
               variant="elevated"
               color="primary"
               @click="submitFilter()"
@@ -179,7 +179,7 @@ const props = defineProps({
   },
   prependIcon: {
     type: String,
-    default: () => 'mdi-filter',
+    default: () => '$mdi-filter',
   },
   disableAdvanced: {
     type: Boolean,

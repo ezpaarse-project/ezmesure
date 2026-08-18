@@ -42,8 +42,11 @@ async function updateVisibleMenu() {
 }
 </script>
 
-<style lang="scss">
-a {
-  color: rgb(var(--v-theme-primary));
-}
+<style>
+  @layer vuetify-core.reset {
+    ul, ol, figure, details, summary { padding: 0; margin: 0; }
+    h1, h2, h3, h4, h5, h6, p { margin: 0; }
+
+    a { color: rgb(var(--v-theme-primary)); }
+  }
 </style>

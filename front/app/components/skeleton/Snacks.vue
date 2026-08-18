@@ -6,17 +6,17 @@
     :timeout="currentMessages?.timeout"
     transition="slide-y-reverse-transition"
   >
-    <div v-if="currentMessages?.title" class="text-h6 pb-2">
+    <div v-if="currentMessages?.title" class="text-title-large pb-2">
       {{ currentMessages.title }}
     </div>
 
-    <div class="text-body-2">
+    <div class="text-body-medium">
       {{ currentMessages?.text }}
     </div>
 
     <template #actions>
       <v-btn
-        icon="mdi-window-close"
+        icon="$mdi-window-close"
         variant="text"
         right
         @click="visible = false"

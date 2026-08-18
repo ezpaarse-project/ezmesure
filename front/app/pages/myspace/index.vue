@@ -10,7 +10,7 @@
             class="d-flex justify-center text-primary font-weight-light font-italic"
             style="position: absolute; left: 0.25rem; top: 5.5rem;"
           >
-            <v-icon icon="mdi-arrow-top-left-thin" size="large" />
+            <v-icon icon="$mdi-arrow-top-left-thin" size="large" />
 
             <span style="transform: translateY(1rem);">
               {{ $t('institutions.searchForInstitution') }}
@@ -19,7 +19,7 @@
 
           <!-- Text to explain what to do -->
           <v-empty-state
-            icon="mdi-domain-off"
+            icon="$mdi-domain-off"
             :title="$t('myspace.noMemberships')"
           >
             <template #text>
@@ -64,10 +64,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
 
 const currentUser = useCurrentUserStore();
 const { hasMemberships, memberships } = storeToRefs(currentUser);

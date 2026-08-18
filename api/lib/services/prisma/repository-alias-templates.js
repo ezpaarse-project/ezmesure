@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma, Prisma } = require('./index');
+const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
@@ -10,6 +10,7 @@ const { client: prisma, Prisma } = require('./index');
  * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateUpdateArgs} RepositoryAliasTemplateUpdateArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateUpsertArgs} RepositoryAliasTemplateUpsertArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateFindUniqueArgs} RepositoryAliasTemplateFindUniqueArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateFindFirstArgs} RepositoryAliasTemplateFindFirstArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateFindManyArgs} RepositoryAliasTemplateFindManyArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateCreateArgs} RepositoryAliasTemplateCreateArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.RepositoryAliasTemplateDeleteArgs} RepositoryAliasTemplateDeleteArgs
@@ -44,6 +45,15 @@ function findMany(params, tx = prisma) {
  */
 function findUnique(params, tx = prisma) {
   return tx.repositoryAliasTemplate.findUnique(params);
+}
+
+/**
+ * @param {RepositoryAliasTemplateFindFirstArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<RepositoryAliasTemplate | null>}
+ */
+function findFirst(params, tx = prisma) {
+  return tx.repositoryAliasTemplate.findFirst(params);
 }
 
 /**
@@ -124,4 +134,5 @@ module.exports = {
   upsert,
   remove,
   count,
+  findFirst,
 };

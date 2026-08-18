@@ -45,8 +45,8 @@
     :model-value="Array.from(enabledFeatures)"
     :items="availableFeatures"
     density="compact"
-    expand-icon="mdi-chevron-right"
-    collapse-icon="mdi-chevron-down"
+    expand-icon="$mdi-chevron-right"
+    collapse-icon="$mdi-chevron-down"
     item-value="id"
     item-title="name"
     select-strategy="classic"
@@ -54,7 +54,7 @@
     @update:model-value="onSelectionChange($event)"
   >
     <template #append="{ item }">
-      <span v-if="item?.children" class="text-caption text-grey">
+      <span v-if="item?.children" class="text-body-small text-grey">
         {{ nbActiveChildren.get(item.id) }} / {{ item.children.length }}
       </span>
     </template>
