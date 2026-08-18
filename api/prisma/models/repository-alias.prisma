@@ -1,25 +1,27 @@
 /// A repository alias template (used to generate repository aliases)
 model RepositoryAliasTemplate {
   /// ID
-  id         String            @id
+  id                String                            @id
   /// Creation date
-  createdAt  DateTime          @default(now())
+  createdAt         DateTime                          @default(now())
   /// Latest update date
-  updatedAt  DateTime          @updatedAt
+  updatedAt         DateTime                          @updatedAt
   /// The alias pattern (ex: x-alias-istex-{id}-ezpaarse)
-  pattern    String
+  pattern           String
   /// The repository's pattern targeted by alias
-  target     String
+  target            String
   /// Whether the template is active or not
-  active     Boolean           @default(true)
+  active            Boolean                           @default(true)
   /// The repository
-  repository Repository        @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  repository        Repository                        @relation(fields: [target], references: [pattern], onDelete: Cascade)
   /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
-  filters    Json[]
+  filters           Json[]
   /// Conditions for creating a new alias (format: [{ "field": "foo", "value": "bar" }])
-  conditions Json[]
+  conditions        Json[]
   /// The aliases that were generated with this template
-  aliases    RepositoryAlias[]
+  aliases           RepositoryAlias[]
+  /// Permissions granted by api keys for this alias
+  apiKeyPermissions ApiKeyRepositoryAliasPermission[]
 }
 
 /// A repository alias (alias for a section of elasticsearch)
@@ -46,6 +48,8 @@ model RepositoryAlias {
   permissions            RepositoryAliasPermission[]
   /// Permissions granted by role for this alias
   elasticRolePermissions ElasticRoleRepositoryAliasPermission[]
+  /// Permissions granted by api keys for this alias
+  apiKeyPermissions      ApiKeyRepositoryAliasPermission[]
 }
 
 /// A alias permission (access rights of a member for a specific alias)

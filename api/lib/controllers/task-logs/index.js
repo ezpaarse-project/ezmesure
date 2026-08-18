@@ -3,14 +3,14 @@ const router = require('koa-joi-router')();
 const { standardQueryParams, getAll } = require('./actions');
 
 const {
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireTermsOfUse,
   requireAdmin,
 } = require('../../services/auth');
 
 router.use(
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireTermsOfUse,
   requireAdmin,

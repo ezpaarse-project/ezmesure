@@ -35,6 +35,17 @@ export const useCurrentUserStore = defineStore('current-user', () => {
   });
 
   /**
+   * Permissions of current user on repository aliases
+   */
+  const aliasPermissions = computed(() => {
+    const entries = memberships.value.flatMap((m) => {
+      const perms = m.repositoryAliasPermissions ?? [];
+      return perms.map((p) => [p.aliasPattern, p]);
+    });
+    return Array.from(new Map(entries).values());
+  });
+
+  /**
    * Permissions of current user on foreign spaces
    */
   const foreignSpacesPermissions = computed(() => {
@@ -55,6 +66,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
           'institution.customProps.field', // Used to show details in institution page
           'spacePermissions.space', // Used to show spaces in menu & institution page
           'repositoryPermissions.repository', // Used to show repositories in institution page
+          'repositoryAliasPermissions.alias.repository', // Used to create API keys on aliases
           'institution.elasticRoles.spacePermissions.space', // Used to show spaces in menu & institution page
           'institution.elasticRoles.repositoryPermissions.repository', // Used to show repositories in institution page
           'roles.role', // Used to show roles in institution page
@@ -120,6 +132,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
     spacesPermissions,
     foreignSpacesPermissions,
     reposPermissions,
+    aliasPermissions,
     fetchMemberships,
     getMembership,
     hasPermission,

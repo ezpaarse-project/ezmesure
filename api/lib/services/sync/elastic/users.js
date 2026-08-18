@@ -26,6 +26,7 @@ const syncUser = async (user) => {
     email: user.email,
     fullName: user.fullName,
     roles,
+    metadata: {},
   });
 };
 

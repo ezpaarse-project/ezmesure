@@ -50,6 +50,7 @@ menu:
       title: Actions
       tooltip: Nouvelle version de l'activité, les actions seront mises en place progressivement
     activity: Activité
+    api-keys: Clés d'API
 home:
   head:
     title: Bienvenue sur ezMESURE
@@ -234,7 +235,8 @@ files:
     not: pas
     bestPracticeLink: règles de bonnes pratiques
 token:
-  title: Token d'autentification
+  title: Token d'autentification [Déprécié]
+  deprecated: Cette méthode d'authentification est dépréciée et sera retirée dans une future mise à jour d'ezMESURE. Merci d'utiliser les clés d'API.
   whatDoesToken:
     text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}'
     header: 'Authorization: Bearer [insérez le token ici]'
@@ -580,6 +582,7 @@ institutions:
       reporting: ezREEPORT
       repositories: Entrepôts
       spaces: Espaces Kibana
+      api-keys: Clés d'API
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
@@ -1031,6 +1034,7 @@ clipboard:
   textCopied: Texte copié dans le presse-papier
 users:
   toolbarTitle: Utilisateurs ({count})
+  title: Utilisateur
   manageUsers: >
     Gérer les utilisateurs
     |Gérer {count} utilisateurs
@@ -1456,6 +1460,33 @@ customFields:
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
   restrictToAdmins: Restreindre aux administrateurs
+api-keys:
+  title: Clés d'API ({count})
+  keys: Clés d'API
+  newKey: Nouvelle clé d'API
+  editKey: Édition d'une clé d'API
+  expiresAt: Expire
+  permissions: Permissions
+  subject: Objet de la clé
+  subjectDesc: En tant qu'administrateur, vous devez définir si la clé d'API est liée à un établissement OU à un utilisateur.
+  unableToUpdate: Impossible de mettre à jour la clé d'API
+  whatDoesKey:
+    text: "Une clé d'API est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}"
+    header: 'X-API-Key: [insérez la clé ici]'
+  manageN: >
+    Gérer les clés d'API|
+    Gérer {count} clés d'API
+  deleteN: >
+    Vous allez révoquer l'accès d'une clé d'API. Elle ne pourra plus être utilisée pour accéder à ezMESURE.
+    |Vous allez révoquer l'accès de {count} clés d'API. Elle ne pourrons plus être utilisées pour accéder à ezMESURE.
+  created:
+    title: Votre clé d'API est prête !
+    text:
+      instructions: Vous pouvez l'utiliser en utilisant le header HTTP {header} lors des requêtes à l'API d'ezMESURE.
+      save: Pensez à la sauvegarder dans un endroit sécurisé (par exemple un gestionnaire de mots de passes comme {pass}) car {warn}
+      warning: votre clé d'API ne sera affichée qu'une seule fois !
+  institution:
+    user: Créateur
 statuses:
   created: Créé
   updated: Mis à jour
@@ -1576,3 +1607,4 @@ back: Retour
 select: Sélectionner
 all: Tous
 pleaseWait: Veuillez patienter...
+never: Jamais

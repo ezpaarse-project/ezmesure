@@ -66,6 +66,12 @@
       />
 
       <v-list-item
+        :title="$t('menu.admin.api-keys')"
+        to="/admin/api-keys"
+        prepend-icon="$mdi-lock-open"
+      />
+
+      <v-list-item
         :title="$t('menu.admin.sushiEndpoints')"
         to="/admin/endpoints"
         prepend-icon="$mdi-api"

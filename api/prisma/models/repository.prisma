@@ -24,6 +24,8 @@ model Repository {
   aliasTemplates         RepositoryAliasTemplate[]
   /// Harvest jobs using this repository
   harvestJobs            HarvestJob[]
+  /// Permissions granted by api keys for this repository
+  apiKeyPermissions      ApiKeyRepositoryPermission[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)

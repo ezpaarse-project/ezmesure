@@ -8,6 +8,7 @@
       <PermissionSwitch
         v-model="value"
         :readonly="readonly"
+        :max="max"
         mandatory
         icons
       />
@@ -32,6 +33,10 @@ const props = defineProps({
   readonly: {
     type: Boolean,
     default: false,
+  },
+  max: {
+    type: String,
+    default: undefined,
   },
 });
 

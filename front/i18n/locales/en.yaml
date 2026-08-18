@@ -50,6 +50,7 @@ menu:
       title: Actions
       tooltip: New version of the activity, actions will being rolled out progressively
     activity: Activity
+    api-keys: API keys
 home:
   head:
     title: Welcome to ezMESURE
@@ -234,7 +235,8 @@ files:
     not: not
     bestPracticeLink: best practice rules
 token:
-  title: Authentication token
+  title: Authentication token [Deprecated]
+  deprecated: This authentication method is deprecated and will be removed in a future version of ezMESURE. Please use API keys.
   whatDoesToken:
     text: "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
     header: "Authorization: Bearer [insert the token here]"
@@ -532,7 +534,9 @@ institutions:
     noMembers: No members
     title: Members ({count})
     createMailList: Copy emails
-    manageN: Manage members|Manage {count} members
+    manageN: >
+      Manage members
+      |Manage {count} members
     deleteN: You are about to revoke {count} member's access.|You are about to revoke {count} members' access.
     technical: Technical
     documentary: Documentary
@@ -578,6 +582,7 @@ institutions:
       reporting: ezREEPORT
       repositories: Repositories
       spaces: Kibana spaces
+      api-keys: API keys
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
@@ -1021,6 +1026,7 @@ clipboard:
   textCopied: Text copied in the clipboard
 users:
   toolbarTitle: Users ({count})
+  title: User
   manageUsers: >
     Manage users
     |Manage {count} users
@@ -1444,6 +1450,33 @@ customFields:
   descriptionFr: French description
   descriptionEn: English description
   manageCustomField: Manage custom field|Manage {count} custom fields
+api-keys:
+  title: API keys ({count})
+  keys: API keys
+  newKey: New API key
+  editKey: Edit API key
+  expiresAt: Expires
+  permissions: Permissions
+  subject: Subject of the key
+  subjectDesc: As an adminstrator, you must define if the API key is associated to an institution OR a user.
+  unableToUpdate: Unable to update API key
+  whatDoesKey:
+    text: "An API key is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
+    header: 'X-API-Key: [insert key here]'
+  manageN: >
+    Manage API key
+    |Manage {count} API keys
+  deleteN: >
+    You are about to revoke access for an API key. It will no longer be usable to access ezMESURE.
+    |You are about to revoke access for {count} API keys. They will no longer be usable to access ezMESURE.
+  created:
+    title: Your API key is ready !
+    text:
+      instructions: You can use it by providing the HTTP header {header} while requesting ezMESURE's API.
+      save: Remember to save it in a safe location (a password manager like {pass} for example) because  {warn}
+      warning: your API key will be shown only once !
+  institution:
+    user: Creator
 statuses:
   created: Created
   updated: Updated
@@ -1564,3 +1597,4 @@ back: Back
 select: Select
 all: All
 pleaseWait: Please wait...
+never: Never

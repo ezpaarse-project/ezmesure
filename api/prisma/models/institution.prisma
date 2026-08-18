@@ -58,6 +58,8 @@ model Institution {
   repositoryAliases   RepositoryAlias[]
   /// Custom properties
   customProps         InstitutionProperty[]
+  /// API Keys related to institution
+  apiKeys             ApiKey[]
 }
 
 /// A membership (a user belonging to an institution)

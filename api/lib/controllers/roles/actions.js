@@ -1,6 +1,6 @@
 const RolesService = require('../../entities/roles.service');
 
-/** @typedef {import('@prisma/client').Prisma.RoleCreateInput} RoleCreateInput */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.RoleCreateInput} RoleCreateInput */
 
 const { schema, includableFields, adminImportSchema } = require('../../entities/roles.dto');
 const { prepareStandardQueryParams } = require('../../services/std-query');

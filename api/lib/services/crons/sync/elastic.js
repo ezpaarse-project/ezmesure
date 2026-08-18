@@ -8,11 +8,13 @@ const { syncSchedule } = config.get('elasticsearch');
 const { syncRepositories } = require('../../sync/elastic/repositories');
 const { syncRepositoryAliases } = require('../../sync/elastic/alias');
 const { syncUsers } = require('../../sync/elastic/users');
+const { syncApiKeys } = require('../../sync/elastic/api-keys');
 
 const sync = async () => {
   await syncRepositories();
   await syncRepositoryAliases();
   await syncUsers();
+  await syncApiKeys();
 };
 
 /**

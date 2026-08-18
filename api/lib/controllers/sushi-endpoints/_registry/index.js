@@ -2,7 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
 const {
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireTermsOfUse,
   requireAdmin,
@@ -14,7 +14,7 @@ const {
 } = require('./actions');
 
 router.use(
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireTermsOfUse,
   requireAdmin,

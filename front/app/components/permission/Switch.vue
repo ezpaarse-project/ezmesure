@@ -12,6 +12,7 @@
         :key="level.value"
         v-tooltip:top="level.text"
         :readonly="readonly"
+        :disabled="level.disabled"
         size="small"
         variant="outlined"
       >
@@ -24,6 +25,7 @@
         v-for="level in levelOptions"
         :key="level.value"
         :readonly="readonly"
+        :disabled="level.disabled"
         size="small"
         variant="outlined"
       >
@@ -36,11 +38,7 @@
 </template>
 
 <script setup>
-const LEVEL_ICONS = {
-  none: '$mdi-eye-off',
-  read: '$mdi-book',
-  write: '$mdi-book-edit',
-};
+import { permissionLevelEnum } from '@/lib/permissions/utils';
 
 const props = defineProps({
   modelValue: {
@@ -54,6 +52,10 @@ const props = defineProps({
   readonly: {
     type: Boolean,
     default: false,
+  },
+  max: {
+    type: String,
+    default: undefined,
   },
   icons: {
     type: Boolean,
@@ -71,10 +73,13 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 
+const maxValue = computed(() => (props.max ? permissionLevelEnum[props.max] : undefined));
+
 const levelOptions = computed(() => props.levels.map((level) => ({
   text: t(`permissions.${level}`),
-  icon: LEVEL_ICONS[level],
+  icon: permLevelColors.get(level)?.icon,
   value: level,
+  disabled: props.max ? permissionLevelEnum[level] > maxValue.value : false,
 })));
 
 const currentLevel = computed({

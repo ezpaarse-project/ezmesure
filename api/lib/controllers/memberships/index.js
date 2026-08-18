@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 
 const {
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireAdmin,
 } = require('../../services/auth');
@@ -13,7 +13,7 @@ const {
   getMany,
 } = require('./actions');
 
-router.use(requireActiveJwt, requireUser, requireAdmin);
+router.use(requireActiveAuth, requireUser, requireAdmin);
 
 router.route({
   method: 'POST',

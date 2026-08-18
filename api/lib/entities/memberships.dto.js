@@ -23,6 +23,10 @@ const FEATURES = {
     read: 'reporting:read',
     write: 'reporting:write',
   },
+  apiKeys: {
+    read: 'api-keys:read',
+    write: 'api-keys:write',
+  },
 };
 
 const PERMISSIONS = Object.values(FEATURES).flatMap((feature) => Object.values(feature));
@@ -38,16 +42,15 @@ const schema = {
   institutionId: Joi.string().trim(),
   institution: Joi.object(),
 
-  permissions: Joi.array().items(Joi.string().valid(
-    ...Object.values(FEATURES).flatMap((featurePerms) => Object.values(featurePerms)),
-  )),
+  permissions: Joi.array().items(Joi.string().valid(...PERMISSIONS)),
 
   locked: Joi.boolean(),
   comment: Joi.string().allow(''),
 
   roles: Joi.array().items(Joi.object()),
-  spacePermissions: Joi.array().items(Joi.object()),
   repositoryPermissions: Joi.array().items(Joi.object()),
+  repositoryAliasPermissions: Joi.array().items(Joi.object()),
+  spacePermissions: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -59,8 +62,9 @@ const immutableFields = [
   'institutionId',
   'institution',
   'roles',
-  'spacePermissions',
   'repositoryPermissions',
+  'repositoryAliasPermissions',
+  'spacePermissions',
 ];
 
 /**
