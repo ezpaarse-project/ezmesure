@@ -161,6 +161,8 @@ myspace:
         user: Notifications related to a user
         app: Notifications from application
       types:
+        institution:created:
+          admin: A new institution has been created
         institution:validated:
           user: One of your institutions has been validated
           admin: One institution has been validated
