@@ -238,6 +238,14 @@ emails:
       browser: "Navigateur :"
       message: "Message :"
 
+  newInstitution:
+    subject: Un nouvel établissement a été déclaré
+    title: Un nouvel établissement a été déclaré
+    body:
+      headline: Bonjour,
+      p1: Sur demande de {{ user }}, l'établissement {{ name }} à été créé dans ezMESURE.
+      p2: En tant qu'administrateur, vous pouvez à présent <a target="_blank" href="{{ manageInstitutionLink }}">vérifier et compléter les informations</a> de l'établissement avant de le valider.
+
   validateInstitution:
     subject: Votre établissement a été validé
     title: Votre établissement a été validé
@@ -344,5 +352,6 @@ emails:
         request-membership: Demande d'intégration à un établissement
         user-deleted: Confirmation de suppression de compte
         user-deletion-requested: Demande de suppression de compte
+        new-institution: Nouvel établissement
         validate-institution: Établissement validé
         welcome: Bienvenue sur ezMESURE
