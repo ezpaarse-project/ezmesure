@@ -12,6 +12,9 @@ RUN npm run build
 FROM node:24.4.1-alpine3.22
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
 
+RUN \
+    apk add --no-cache python2 build-base
+
 WORKDIR /usr/src/app
 COPY --chown=node:node --from=builder /app/.output .
 
