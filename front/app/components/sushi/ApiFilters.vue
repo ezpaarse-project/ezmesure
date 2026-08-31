@@ -42,8 +42,8 @@
 
         <v-col v-if="institution" cols="12">
           <ApiFiltersSelect
-            v-model="filters.packages"
-            v-model:loose="filters['packages:loose']"
+            v-model="packages"
+            v-model:mode="packagesMode"
             :items="availablePackages"
             :label="$t('institutions.sushi.packages')"
             :loading="loadingPackages && 'primary'"
@@ -108,7 +108,10 @@ const {
   emptySymbol,
   filters,
   resetFilters,
+  defineArrayFilter,
 } = useFilters(() => props.modelValue, emit);
+
+const { state: packages, modifier: packagesMode } = defineArrayFilter('packages');
 
 const loadingEndpoints = shallowRef(false);
 const loadingPackages = shallowRef(false);
@@ -155,7 +158,7 @@ const availablePackages = computedAsync(
     onCancel(() => abortController.abort());
 
     try {
-      const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+      const data = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
         signal: abortController.signal,
         query: {
           size: 0,
@@ -164,9 +167,9 @@ const availablePackages = computedAsync(
       });
 
       // Merge all packages in one array them make unique
-      const packages = new Set(items.flatMap((item) => item.packages ?? []));
+      const items = new Set(data.flatMap((item) => item.packages ?? []));
 
-      return Array.from(packages)
+      return Array.from(items)
         .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
     } catch (err) {
       snacks.error(t('anErrorOccurred'), err);

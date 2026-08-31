@@ -20,11 +20,12 @@ const stringOrArrayValidation = Joi.alternatives().try(
  * Prepare Joi validation and filter for a string
  *
  * @param {string} key The name of the field
+ * @param {'' | 'not'} operator The operator to use
  * @param {RegExp} [regex] The regex for the validation
  *
  * @returns {ValidationAndFilter} The validation and filter
  */
-const stringJoiAndFilter = (key, regex = undefined) => {
+const stringJoiAndFilter = (key, operator, regex = undefined) => {
   let strValidation = Joi.string().trim();
   if (regex) {
     strValidation = strValidation.regex(regex);
@@ -37,10 +38,11 @@ const stringJoiAndFilter = (key, regex = undefined) => {
     ),
     filter: (value) => {
       const values = stringToArray(value ?? '');
-      if (values.length > 0) {
-        return { [key]: { in: values } };
+      const filter = values.length > 0 ? { [key]: { in: values } } : { OR: [{ [key]: null }, { [key]: '' }] };
+      if (operator === 'not') {
+        return { NOT: filter };
       }
-      return { OR: [{ [key]: null }, { [key]: '' }] };
+      return filter;
     },
   };
 };
@@ -85,9 +87,9 @@ const booleanJoiAndFilter = (key, isNullable) => {
  * Prepare Prisma filter for a array
  *
  * @param {string | string[] | undefined} value Value of the query parameter
- * @param {boolean} [hasSome] uses hasSome instead of hasEvery
+ * @param {'every' | 'some'} operator The operator
  */
-const arrayFilter = (value, hasSome) => {
+const arrayFilter = (value, operator) => {
   if (value == null) {
     return undefined;
   }
@@ -96,7 +98,7 @@ const arrayFilter = (value, hasSome) => {
   if (values.length <= 0) {
     return { isEmpty: true };
   }
-  if (hasSome) {
+  if (operator === 'some') {
     return { hasSome: values };
   }
   return { hasEvery: values };
@@ -108,11 +110,12 @@ const arrayFilter = (value, hasSome) => {
  * Arrays of objects and arrays of arrays are not supported
  *
  * @param {string} key The name of the field
+ * @param {'every' | 'some'} operator The operator
  * @param {string[]} [subtypes] Subtypes of the array
  *
  * @returns {ValidationAndFilter} The validation and filter
  */
-const arrayJoiAndFilter = (key, subtypes) => {
+const arrayJoiAndFilter = (key, operator, subtypes) => {
   if (subtypes?.includes('object') || subtypes?.includes('array')) {
     return {
       validation: undefined,
@@ -122,7 +125,7 @@ const arrayJoiAndFilter = (key, subtypes) => {
 
   return {
     validation: stringOrArrayValidation,
-    filter: (value, query) => ({ [key]: arrayFilter(value, !!query[`${key}:loose`]) }),
+    filter: (value) => ({ [key]: arrayFilter(value, operator) }),
   };
 };
 
@@ -178,7 +181,7 @@ const numberFilter = (value, operator, isNullable) => {
   if (isNullable && typeof value !== 'number') {
     return null;
   }
-  return { [operator]: value };
+  return operator === 'eq' ? value : { [operator]: value };
 };
 
 /**

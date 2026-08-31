@@ -27,8 +27,8 @@ exports.standardQueryParams = standardQueryParams;
 
 exports.getHarvests = async (ctx) => {
   const {
-    'period:from': from,
-    'period:to': to,
+    'period[gte]': from,
+    'period[lte]': to,
     endpointId,
     institutionId,
     tags,
@@ -107,8 +107,8 @@ const institutionsMatrixQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][institutions][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
@@ -192,8 +192,8 @@ const endpointsMatrixQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();

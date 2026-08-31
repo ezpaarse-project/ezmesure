@@ -396,7 +396,12 @@ endpoints:
   searchRegistryDataHint: Chercher une plateforme par nom
   registryId: ID de la plateforme dans le registre COUNTER
   registryIdHint: Vous pouvez directement coller l'URL du registre COUNTER
+  registryIdNoDescription: Ce point d'accès n'est pas présent dans le registre COUNTER
+  compliant: Conforme COUNTER
+  compliantDescription: Ce point d'accès a fait l'objet d'un audit et les moissons sont généralement couronnées de succès
+  compliantHint: Cela signifie que le point d'accès a fait l'objet d'un audit et que les moissons sont couronnées de succès
   registryUrl: Lien vers le registre COUNTER
+  inRegistry: Présent dans le registre COUNTER
   goToRegistry: Registre COUNTER
   filters:
     title: Filtrer les points d'accès
