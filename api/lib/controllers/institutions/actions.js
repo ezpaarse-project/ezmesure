@@ -47,6 +47,30 @@ exports.standardQueryParams = standardQueryParams;
 
 const { PERMISSIONS } = require('../../entities/memberships.dto');
 
+async function sendNewInstitutionMail(data) {
+  try {
+    const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.institutionCreated);
+
+    return await Promise.allSettled(
+      admins.map(async (receiver) => {
+        try {
+          await sendMail({
+            to: receiver.email,
+            ...await generateMail('new-institution', data, { locale: receiver.language }),
+          });
+
+          appLogger.verbose(`[new-institution] Mail sent to ${receiver.email}`);
+        } catch (err) {
+          appLogger.error(`[new-institution] Failed to send mail to ${receiver.email}: ${err}`);
+          throw err;
+        }
+      }),
+    );
+  } catch (err) {
+    appLogger.error(`[validate-institution] Failed to send sushi-ready-change mail: ${err}`);
+  }
+}
+
 async function sendValidateInstitutionMail(receivers, data) {
   try {
     return await Promise.allSettled(
@@ -195,6 +219,14 @@ exports.createInstitution = async (ctx) => {
     data: { ...institutionData, memberships, customProps },
   });
   appLogger.verbose(`Institution [${institution.id}] is created`);
+
+  if (!isAdmin) {
+    await sendNewInstitutionMail({
+      user: username,
+      name: institution.name,
+      manageInstitutionLink: (new URL(`/admin/institutions/${institution.id}`, publicUrl)).href,
+    });
+  }
 
   ctx.metadata.institutionId = institution.id;
   ctx.status = 201;

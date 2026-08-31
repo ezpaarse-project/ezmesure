@@ -244,6 +244,15 @@ emails:
       browser: "Browser:"
       message: "Message:"
 
+
+  newInstitution:
+    subject: A new institution has been created
+    title: A new institution has been created
+    body:
+      headline: Hello,
+      p1: At the request of {{ user }}, the institution {{ name }} was created in ezMESURE.
+      p2: As an administrator, you can now <a target="_blank" href="{{ manageInstitutionLink }}">review and complete the institution's information</a> before approving it.
+
   validateInstitution:
     subject: Your institution has been validated
     title: Your institution has been validated
@@ -350,5 +359,6 @@ emails:
         request-membership: Institution join request
         user-deleted: Account deletion confirmation
         user-deletion-requested: Account deletion request
+        new-institution: Institution created
         validate-institution: Institution validated
         welcome: Welcome to ezMESURE
