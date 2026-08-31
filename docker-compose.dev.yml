@@ -2,7 +2,7 @@ include:
   - docker-compose.common.yml
 services:
   api:
-    image: node:24.4.1-alpine3.22
+    image: node:24.20.0-alpine3.24
     ports:
       - 3000:3000
       - 9229:9229 # Debug port
@@ -69,7 +69,7 @@ services:
     command: npm run dev
 
   front:
-    image: node:24.4.1-alpine3.22
+    image: node:24.20.0-alpine3.24
     ports:
       - 8080:8080
     volumes:
