@@ -20,11 +20,10 @@ exports.getAll = async (ctx) => {
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
-  console.log(prismaQuery.where);
-  prismaQuery.where = prismaQuery.where;
+  prismaQuery.where = prismaQuery.where || {};
 
   // Remove date filters as handled later
-  prismaQuery.where.AND = prismaQuery.where.AND.filter((filter) => !filter.date);
+  prismaQuery.where.AND = prismaQuery.where.AND?.filter((filter) => !filter.date);
 
   if (from || to) {
     prismaQuery.where.date = {
