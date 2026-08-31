@@ -13,7 +13,6 @@ const { prepareStandardQueryParams } = require('../../services/std-query');
 const { arrayFilter } = require('../../services/std-query/filters');
 const { stringToArray } = require('../../services/utils');
 const { logoutUser, AUTH_COOKIE } = require('../../services/kibana');
-const { Prisma } = require('../../.prisma/client.mts');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,

@@ -20,7 +20,6 @@ export default function useFilters(data, emit) {
   // Symbol used to not confuse '' and undefined with actual empty value
   const emptySymbol = Symbol('empty filter');
 
-  // eslint-disable-next-line no-underscore-dangle
   const filters = ref(toValue(data));
 
   // Apply updates to internal data
