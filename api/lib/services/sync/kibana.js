@@ -149,6 +149,11 @@ const syncDashboards = async (spaceToSync) => {
 
   const kibanaExport = await kibana.exportObjects({ type: 'dashboard', spaceId: space.id });
 
+  if (!kibanaExport) {
+    appLogger.verbose(`[kibana] Unable to get objects of ${spaceToSync.id}`);
+    return;
+  }
+
   const currentDashboards = kibanaExport.split('\n').map((line) => JSON.parse(line)).filter(
     (obj) => obj?.id?.startsWith?.(savedObjectsNamespace),
   );
