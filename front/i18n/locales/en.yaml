@@ -914,6 +914,7 @@ sushi:
       institutionIsNotReady: Your entry is not complete
       institutionHasNoCredentials: No COUNTER credentials has been declared
       institutionHasFaultyCredentials: Some of your credentials have not been tested or are invalid
+      institutionIsHarvested: Institution is already harvested for the period
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
