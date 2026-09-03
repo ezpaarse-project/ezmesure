@@ -2,7 +2,7 @@ include:
   - docker-compose.common.yml
 services:
   api:
-    image: node:24.4.1-alpine3.22
+    image: node:24.20.0-alpine3.24
     ports:
       - 3000:3000
       - 9229:9229 # Debug port
@@ -36,6 +36,7 @@ services:
       - EZMESURE_ADMIN_PASSWORD
       - EZMESURE_ADMIN_EMAIL
       - EZMESURE_AUTH_SECRET
+      - EZMESURE_AUTH_PERSIST_ENCRYPT=1
       - EZMESURE_OIDC_CLIENT_ID
       - EZMESURE_OIDC_CLIENT_SECRET
       - EZMESURE_OIDC_CONFIG_URI
@@ -48,13 +49,20 @@ services:
       - EZMESURE_OIDC_USERINFO_URI
       - EZMESURE_OIDC_SCOPES
       - EZMESURE_SMTP_HOST=maildev
-      - EZMESURE_SMTP_PORT=25
+      - EZMESURE_SMTP_PORT=1025
       - EZMESURE_SMTP_SECURE=false
       - EZMESURE_SMTP_IGNORE_TLS=true
       - EZMESURE_SMTP_REJECT_UNAUTHORIZED
       - EZMESURE_NOTIFICATIONS_SENDER
       - EZMESURE_NOTIFICATIONS_CRON
       - EZMESURE_NOTIFICATIONS_REPLY_TO
+      - EZMESURE_CACHE_DURATION_LOGIN_STATE
+      - EZMESURE_CACHE_DURATION_HARVEST_MATRIX
+      - EZMESURE_CACHE_DURATION_HARVEST_SESSION_JOBS
+      - EZMESURE_CACHE_DURATION_HARVEST_SESSION_STATUS
+      - EZMESURE_CACHE_DURATION_INSTITUTION_HARVESTABLE
+      - EZMESURE_CACHE_DURATION_INSTITUTION_REPORTING
+      - EZMESURE_CACHE_DURATION_COUNTER_REGISTRY
       - EZMESURE_SEND_EMPTY_ACTIVITY
       - EZMESURE_ENCRYPTION_SECRET
       - EZMESURE_LOG_LEVEL
@@ -68,7 +76,7 @@ services:
     command: npm run dev
 
   front:
-    image: node:24.4.1-alpine3.22
+    image: node:24.20.0-alpine3.24
     ports:
       - 8080:8080
     volumes:
@@ -96,6 +104,6 @@ services:
     restart: "no"
 
   maildev:
-    image: djfarrelly/maildev
+    image: maildev/maildev
     ports:
-      - 1080:80
+      - 1080:1080

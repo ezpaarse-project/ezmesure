@@ -221,8 +221,8 @@ const {
 } = useFetch('/api/harvests/_institutions-matrix', {
   params: {
     retryCode: 425,
-    'period:from': computed(() => period.value.beginDate),
-    'period:to': computed(() => period.value.endDate),
+    'period[gte]': computed(() => period.value.beginDate),
+    'period[lte]': computed(() => period.value.endDate),
   },
 
   // Try for 1 minute
@@ -266,8 +266,8 @@ const {
 } = useFetch('/api/harvests/_endpoints-matrix', {
   params: {
     retryCode: 425,
-    'period:from': computed(() => period.value.beginDate),
-    'period:to': computed(() => period.value.endDate),
+    'period[gte]': computed(() => period.value.beginDate),
+    'period[lte]': computed(() => period.value.endDate),
   },
 
   // Try for 1 minute

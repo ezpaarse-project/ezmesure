@@ -2,7 +2,7 @@ const config = require('config');
 const { add } = require('date-fns');
 
 const { getPermissionsFromPreset, mergePresets } = require('../../utils/roles');
-const { EVENT_TYPES } = require('../../utils/notifications/constants');
+const { EVENT_TYPES, NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
 const { signJWT } = require('../../utils/jwt');
 
 const UsersService = require('../../entities/users.service');
@@ -145,10 +145,12 @@ exports.changeExcludeNotifications = async (ctx) => {
   const { body } = ctx.request;
   const { username } = ctx.state.user;
 
+  const keys = new Set(NOTIFICATION_KEYS);
+
   const service = new UsersService();
   const user = await service.update({
     where: { username },
-    data: { excludeNotifications: body },
+    data: { excludeNotifications: body.filter((key) => keys.has(key)) },
   });
 
   ctx.status = 200;

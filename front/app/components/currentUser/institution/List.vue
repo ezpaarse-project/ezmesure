@@ -37,7 +37,7 @@
 
     <InstitutionFormDialog
       ref="institutionFormDialogRef"
-      @update:model-value="currentUser.fetchMemberships()"
+      @submit="currentUser.fetchMemberships()"
     />
   </v-list>
 </template>

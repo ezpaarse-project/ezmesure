@@ -1,17 +1,30 @@
+const { createHash } = require('node:crypto');
+
 const config = require('config');
 
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
+const { prepareStandardQueryParams } = require('../../services/std-query');
+const ImagesService = require('../../services/images');
+
+const RolesService = require('../../entities/roles.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
-const ImagesService = require('../../services/images');
 const MembershipsService = require('../../entities/memberships.service');
-const RolesService = require('../../entities/roles.service');
+const { PERMISSIONS } = require('../../entities/memberships.dto');
+const {
+  schema: institutionSchema,
+  adminCreateSchema,
+  adminUpdateSchema,
+  createSchema,
+  updateSchema,
+  adminImportSchema,
+  includableFields,
+} = require('../../entities/institutions.dto');
 
+const { createCache } = require('../../utils/cache-manager');
 const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES, EVENT_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
-
-const publicUrl = config.get('publicUrl');
 
 /* eslint-disable max-len */
 /**
@@ -26,17 +39,7 @@ const publicUrl = config.get('publicUrl');
 */
 /* eslint-enable max-len */
 
-const {
-  schema: institutionSchema,
-  adminCreateSchema,
-  adminUpdateSchema,
-  createSchema,
-  updateSchema,
-  adminImportSchema,
-  includableFields,
-} = require('../../entities/institutions.dto');
-
-const { prepareStandardQueryParams } = require('../../services/std-query');
+const publicUrl = config.get('publicUrl');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema: institutionSchema,
@@ -45,7 +48,29 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-const { PERMISSIONS } = require('../../entities/memberships.dto');
+async function sendNewInstitutionMail(data) {
+  try {
+    const admins = await getNotificationRecipients(ADMIN_NOTIFICATION_TYPES.institutionCreated);
+
+    return await Promise.allSettled(
+      admins.map(async (receiver) => {
+        try {
+          await sendMail({
+            to: receiver.email,
+            ...await generateMail('new-institution', data, { locale: receiver.language }),
+          });
+
+          appLogger.verbose(`[new-institution] Mail sent to ${receiver.email}`);
+        } catch (err) {
+          appLogger.error(`[new-institution] Failed to send mail to ${receiver.email}: ${err}`);
+          throw err;
+        }
+      }),
+    );
+  } catch (err) {
+    appLogger.error(`[validate-institution] Failed to send sushi-ready-change mail: ${err}`);
+  }
+}
 
 async function sendValidateInstitutionMail(receivers, data) {
   try {
@@ -195,6 +220,14 @@ exports.createInstitution = async (ctx) => {
     data: { ...institutionData, memberships, customProps },
   });
   appLogger.verbose(`Institution [${institution.id}] is created`);
+
+  if (!isAdmin) {
+    await sendNewInstitutionMail({
+      user: username,
+      name: institution.name,
+      manageInstitutionLink: (new URL(`/admin/institutions/${institution.id}`, publicUrl)).href,
+    });
+  }
 
   ctx.metadata.institutionId = institution.id;
   ctx.status = 201;
@@ -590,9 +623,19 @@ exports.deleteInstitution = async (ctx) => {
   ctx.body = data;
 };
 
-exports.harvestableInstitutions = async (ctx) => {
-  const institutionsService = new InstitutionsService();
+const harvestableCache = createCache(config.get('cache.duration.institutionHarvestable'));
 
+exports.harvestableInstitutions = async (ctx) => {
+  // Compute id of query to cache
+  const id = createHash('md5').update(JSON.stringify(ctx.query)).digest('hex');
+  const cached = await harvestableCache.get(id);
+  if (cached) {
+    ctx.status = 200;
+    ctx.body = cached;
+    return;
+  }
+
+  const institutionsService = new InstitutionsService();
   const institutions = await institutionsService.findMany({
     where: {
       sushiCredentials: {
@@ -628,6 +671,8 @@ exports.harvestableInstitutions = async (ctx) => {
       harvestable: await institutionsService.isHarvestable(institution.id, ctx.query),
     });
   }
+
+  await harvestableCache.set(id, response);
 
   ctx.status = 200;
   ctx.body = response;

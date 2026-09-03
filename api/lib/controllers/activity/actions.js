@@ -10,8 +10,8 @@ exports.search = async (ctx) => {
     page = 1,
     sort = 'datetime',
     order = 'desc',
-    'datetime:from': datetimeFrom,
-    'datetime:to': datetimeTo,
+    'datetime[gte]': datetimeFrom,
+    'datetime[lte]': datetimeTo,
     action,
     username,
   } = ctx.query;

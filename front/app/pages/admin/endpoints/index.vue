@@ -27,23 +27,20 @@
     <v-data-table-server
       v-model="selectedEndpoints"
       :headers="headers"
+      :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
       show-select
       show-expand
       return-object
       v-bind="vDataTableOptions"
     >
-      <template #[`item.tags`]="{ value }">
-        <v-chip
-          v-for="(tag, index) in value"
-          :key="index"
-          variant="outlined"
-          color="primary"
-          size="small"
-          label
-          class="ml-1"
-        >
-          {{ tag }}
-        </v-chip>
+      <template #[`item.vendor`]="{ item }">
+        <div>
+          {{ item.vendor }}
+
+          <SushiEndpointStatusChip :model-value="item" size="small" class="ml-2" />
+        </div>
+
+        <SushiEndpointTagsChip :model-value="item" size="small" />
       </template>
 
       <template #[`item.disabledUntil`]="{ item }">
@@ -210,12 +207,6 @@ const headers = computed(() => [
   {
     title: t('endpoints.vendor'),
     value: 'vendor',
-    sortable: true,
-  },
-  {
-    title: t('endpoints.tags'),
-    value: 'tags',
-    align: 'center',
     sortable: true,
   },
   {

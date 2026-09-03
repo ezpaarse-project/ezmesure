@@ -11,9 +11,14 @@
       v-model:search="search"
       v-model:filters="filters"
       :refresh="refresh"
-      :title="endpoint.vendor"
       icons
     >
+      <template #title>
+        {{ endpoint.vendor }}
+
+        <SushiEndpointStatusChip :model-value="endpoint" size="small" class="ml-2" />
+      </template>
+
       <template #filters-panel="props">
         <SushiApiFilters v-bind="props" />
       </template>

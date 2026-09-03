@@ -2,6 +2,7 @@ const path = require('path');
 const { format } = require('winston');
 
 const oneMinute = 60;
+const oneHour = 60 * oneMinute;
 
 module.exports = {
   port: 3000,
@@ -170,7 +171,7 @@ module.exports = {
     },
   },
   notifications: {
-    sender: 'ezMESURE',
+    sender: 'ezMESURE <noreply.ezmesure@localhost.fr>',
     replyTo: '',
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,
@@ -185,6 +186,17 @@ module.exports = {
   },
   cypher: {
     secret: 'some-secret',
+  },
+  cache: {
+    duration: {
+      loginState: oneHour * 1000,
+      harvestMatrix: 10 * oneMinute * 1000,
+      harvestSessionJobs: 5 * oneMinute * 1000,
+      harvestSessionStatus: 60 * oneMinute * 1000,
+      institutionHarvestable: 5 * oneMinute * 1000,
+      institutionReporting: 24 * oneHour * 1000,
+      counterRegistry: 24 * oneHour * 1000,
+    },
   },
   defaultLocale: 'en',
   appName: 'ezMESURE',

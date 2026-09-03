@@ -8,6 +8,7 @@ const {
   jwtVerify,
   jwtDecrypt,
 } = require('jose');
+const { readFileSync, writeFileSync } = require('node:fs');
 
 const publicUrl = config.get('publicUrl');
 const { secret } = config.get('auth');
@@ -30,8 +31,18 @@ const { secret } = config.get('auth');
   */
 
 const encodedSecret = new TextEncoder().encode(secret);
+
 // A256CBC-HS512 requires a 64bytes secret
-const encryptKey = randomBytes(64);
+let encryptKey = randomBytes(64);
+// Restoring previous encryptKey in non production environments
+if (process.env.EZMESURE_AUTH_PERSIST_ENCRYPT) {
+  const encryptFile = 'auth-key.dev';
+  try {
+    encryptKey = readFileSync(encryptFile);
+  } catch {
+    writeFileSync(encryptFile, encryptKey);
+  }
+}
 
 /**
  * @template {SignJWT | EncryptJWT} JWT
