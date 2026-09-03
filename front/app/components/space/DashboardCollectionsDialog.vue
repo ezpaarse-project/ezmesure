@@ -175,11 +175,8 @@ const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) 
 const errorIcon = computed(() => (error?.value?.statusCode === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
 
 const initialLoading = shallowRef(true);
-const unwatchLoading = watch(loading, () => {
-  if (loading.value === false) {
-    initialLoading.value = false;
-    unwatchLoading();
-  }
+whenever(() => loading.value === false, () => {
+  initialLoading.value = false;
 });
 
 const loadingCollections = ref(new Set());
