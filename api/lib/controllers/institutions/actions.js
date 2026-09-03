@@ -623,8 +623,7 @@ exports.deleteInstitution = async (ctx) => {
   ctx.body = data;
 };
 
-const HARVESTABLE_CACHE_DURATION = 1 * 60 * 1000;
-const harvestableCache = createCache(HARVESTABLE_CACHE_DURATION);
+const harvestableCache = createCache(config.get('cache.duration.institutionHarvestable'));
 
 exports.harvestableInstitutions = async (ctx) => {
   // Compute id of query to cache

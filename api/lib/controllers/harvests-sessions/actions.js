@@ -1,3 +1,5 @@
+const config = require('config');
+
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 const { appLogger } = require('../../services/logger');
@@ -64,8 +66,7 @@ exports.getOne = async (ctx) => {
   ctx.body = session;
 };
 
-const STATUS_CACHE_DURATION = 5 * 60 * 1000;
-const statusCache = createCache(STATUS_CACHE_DURATION);
+const statusCache = createCache(config.get('cache.duration.harvestSessionStatus'));
 
 exports.getManyStatus = async (ctx) => {
   ctx.type = 'json';

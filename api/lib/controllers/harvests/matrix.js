@@ -1,5 +1,7 @@
 const { createHash } = require('node:crypto');
 
+const config = require('config');
+
 const InMemoryQueue = require('../../utils/memory-queue');
 const { createCache } = require('../../utils/cache-manager');
 
@@ -9,8 +11,7 @@ const HarvestsService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
 
-const CACHE_DURATION = 5 * 60 * 1000;
-const cache = createCache(CACHE_DURATION);
+const cache = createCache(config.get('cache.duration.harvestMatrix'));
 
 const institutionsQueue = new InMemoryQueue(
   /**

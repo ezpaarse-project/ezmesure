@@ -1,5 +1,7 @@
 const { createHash } = require('node:crypto');
 
+const config = require('config');
+
 const InMemoryQueue = require('../../utils/memory-queue');
 const { createCache } = require('../../utils/cache-manager');
 
@@ -88,8 +90,7 @@ exports.deleteHarvestsByQuery = async (ctx) => {
   ctx.body = { deleted };
 };
 
-const MATRIX_CACHE_DURATION = 5 * 60 * 1000;
-const matrixCache = createCache(MATRIX_CACHE_DURATION);
+const matrixCache = createCache(config.get('cache.duration.harvestMatrix'));
 
 const institutionsMatrixQueue = new InMemoryQueue(
   /**
