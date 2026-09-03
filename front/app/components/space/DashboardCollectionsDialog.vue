@@ -151,13 +151,8 @@ const {
   status,
   error,
   refresh,
-} = await useAsyncData(computed(() => `space-collections-${props.spaceId}`), async (_nuxtApp, { signal }) => {
-  if (!props.spaceId) {
-    return undefined;
-  }
-
-  return $fetch(`/api/kibana-spaces/${props.spaceId}`, { signal, query: { include: ['dashboardCollections.collection', 'institution.repositories'] } });
-}, {
+} = await useFetch(computed(() => `/api/kibana-spaces/${props.spaceId}`), {
+  query: { include: ['dashboardCollections.collection', 'institution.repositories'] },
   lazy: true,
   dedupe: 'defer',
 });

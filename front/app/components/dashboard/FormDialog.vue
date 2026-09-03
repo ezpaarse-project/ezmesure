@@ -63,19 +63,16 @@ const props = defineProps({
 });
 
 const show = defineModel({ type: Boolean, default: false });
+const fetchEnabled = computed(() => !!props.dashboardId);
 
 const {
   data: dashboardData,
   status,
   error,
   refresh,
-} = await useAsyncData(computed(() => `dashboard-${props.dashboardId}`), async (_nuxtApp, { signal }) => {
-  if (!props.dashboardId) {
-    return undefined;
-  }
-
-  return $fetch(`/api/dashboard-templates/${props.dashboardId}`, { signal });
-}, {
+  clear,
+} = await useFetch(computed(() => `/api/dashboard-templates/${props.dashboardId}`), {
+  enabled: fetchEnabled,
   lazy: true,
   dedupe: 'defer',
 });
@@ -83,6 +80,14 @@ const {
 const loading = computed(() => status.value === 'pending');
 const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) : undefined));
 const errorIcon = computed(() => (error?.value?.statusCode === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
+
+watch(fetchEnabled, (isEnabled) => {
+  if (isEnabled) {
+    refresh();
+  } else {
+    clear();
+  }
+});
 
 watch(show, (isOpen) => {
   if (isOpen) { refresh(); }
