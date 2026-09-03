@@ -10,6 +10,7 @@ const HarvestSessionService = require('../../entities/harvest-session.service');
 const { Prisma } = require('../../services/prisma');
 
 const { schema, includableFields } = require('../../entities/harvest-session.dto');
+const { createCache } = require('../../utils/cache-manager');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -63,13 +64,40 @@ exports.getOne = async (ctx) => {
   ctx.body = session;
 };
 
+const STATUS_CACHE_DURATION = 5 * 60 * 1000;
+const statusCache = createCache(STATUS_CACHE_DURATION);
+
 exports.getManyStatus = async (ctx) => {
   ctx.type = 'json';
   const { harvestIds } = ctx.request.query;
 
+  const cachedStatus = new Set(['finished', 'stopped']);
+
   const sessionStatusesEntries = await HarvestSessionService.$transaction(
     (harvestSessionService) => Promise.all(
-      harvestIds.map(async (id) => [id, await harvestSessionService.getStatus({ id })]),
+      harvestIds.map(async (id) => {
+        const session = await harvestSessionService.findUnique({
+          where: { id },
+          select: { status: true },
+        });
+        if (!session) {
+          return [id, null];
+        }
+
+        // Don't cache sessions that status can quickly change
+        const shouldCache = cachedStatus.has(session.status);
+        const cached = shouldCache ? await statusCache.get(id) : null;
+        if (cached) {
+          return [id, cached];
+        }
+
+        const status = await harvestSessionService.getStatus({ id });
+        if (shouldCache) {
+          await statusCache.set(id, status);
+        }
+
+        return [id, status];
+      }),
     ),
   );
 
