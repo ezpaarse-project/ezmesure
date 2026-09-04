@@ -165,6 +165,8 @@ myspace:
         user: Notifications related to a user
         app: Notifications from application
       types:
+        institution:created:
+          admin: A new institution has been created
         institution:validated:
           user: One of your institutions has been validated
           admin: One institution has been validated
@@ -400,7 +402,12 @@ endpoints:
   searchRegistryDataHint: Search for a platform by name
   registryId: Platform ID in the COUNTER registry
   registryIdHint: You can directly paste the URL of the COUNTER registry
+  registryIdNoDescription: This endpoint is not in the COUNTER registry
+  compliant: COUNTER compliant
+  compliantDescription: This endpoint has been audited and harvests are mostly successful
+  compliantHint: Meaning that endpoint has been audited and harvests are successful
   registryUrl: Link to the COUNTER registry
+  inRegistry: Present in the COUNTER registry
   goToRegistry: COUNTER registry
 institutions:
   toolbarTitle: Institutions ({count})
@@ -911,6 +918,7 @@ sushi:
       institutionIsNotReady: Your entry is not complete
       institutionHasNoCredentials: No COUNTER credentials has been declared
       institutionHasFaultyCredentials: Some of your credentials have not been tested or are invalid
+      institutionIsHarvested: Institution is already harvested for the period
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials

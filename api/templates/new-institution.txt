@@ -1,0 +1,8 @@
+{{ t('emails.newInstitution.body.headline') }}
+
+{{ t('emails.newInstitution.body.p1', { user: user, name: name }) }}
+
+{{ t('emails.newInstitution.body.p2') | striptags }}
+
+{{ t('emails.global.regards') }}
+{{ t('emails.global.theTeam') }}

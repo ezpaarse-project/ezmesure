@@ -132,10 +132,6 @@
 import DashboardFormDialog from '~/components/dashboard/FormDialog.vue';
 import { getErrorMessage } from '@/lib/errors';
 
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();

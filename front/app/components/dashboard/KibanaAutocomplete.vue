@@ -34,7 +34,7 @@ const props = defineProps({
 
 const selectedDashboard = defineModel({ type: [String, Object] });
 
-const search = ref('');
+const search = shallowRef('');
 const debouncedSearch = useDebounce(search, 250);
 
 const spacePrefix = computed(() => (props.spaceId ? `s/${props.spaceId}/` : ''));

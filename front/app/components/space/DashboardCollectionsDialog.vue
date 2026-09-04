@@ -151,13 +151,8 @@ const {
   status,
   error,
   refresh,
-} = await useAsyncData(computed(() => `space-collections-${props.spaceId}`), async (_nuxtApp, { signal }) => {
-  if (!props.spaceId) {
-    return undefined;
-  }
-
-  return $fetch(`/api/kibana-spaces/${props.spaceId}`, { signal, query: { include: ['dashboardCollections.collection', 'institution.repositories'] } });
-}, {
+} = await useFetch(computed(() => `/api/kibana-spaces/${props.spaceId}`), {
+  query: { include: ['dashboardCollections.collection', 'institution.repositories'] },
   lazy: true,
   dedupe: 'defer',
 });
@@ -180,10 +175,14 @@ const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) 
 const errorIcon = computed(() => (error?.value?.statusCode === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
 
 const initialLoading = shallowRef(true);
-const unwatchLoading = watch(loading, () => {
-  if (loading.value === false) {
-    initialLoading.value = false;
-    unwatchLoading();
+whenever(() => loading.value === false, () => {
+  initialLoading.value = false;
+});
+
+watch(show, (isOpen) => {
+  if (isOpen) {
+    initialLoading.value = true;
+    refresh();
   }
 });
 

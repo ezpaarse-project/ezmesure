@@ -1,5 +1,7 @@
 const { createHash } = require('node:crypto');
 
+const config = require('config');
+
 const InMemoryQueue = require('../../utils/memory-queue');
 const { createCache } = require('../../utils/cache-manager');
 
@@ -27,8 +29,8 @@ exports.standardQueryParams = standardQueryParams;
 
 exports.getHarvests = async (ctx) => {
   const {
-    'period:from': from,
-    'period:to': to,
+    'period[gte]': from,
+    'period[lte]': to,
     endpointId,
     institutionId,
     tags,
@@ -88,8 +90,7 @@ exports.deleteHarvestsByQuery = async (ctx) => {
   ctx.body = { deleted };
 };
 
-const MATRIX_CACHE_DURATION = 5 * 60 * 1000;
-const matrixCache = createCache(MATRIX_CACHE_DURATION);
+const matrixCache = createCache(config.get('cache.duration.harvestMatrix'));
 
 const institutionsMatrixQueue = new InMemoryQueue(
   /**
@@ -107,8 +108,8 @@ const institutionsMatrixQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][institutions][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
@@ -192,8 +193,8 @@ const endpointsMatrixQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();

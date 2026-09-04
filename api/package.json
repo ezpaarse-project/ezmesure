@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "db:migrate": "prisma migrate deploy",
-    "db:diff": "prisma migrate diff --from-schema-datasource prisma --to-schema-datamodel prisma"
+    "db:diff": "prisma migrate diff --from-config-datasource prisma --to-schema prisma"
   },
   "repository": {
     "type": "git",

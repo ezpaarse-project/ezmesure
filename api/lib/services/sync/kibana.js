@@ -149,6 +149,11 @@ const syncDashboards = async (spaceToSync) => {
 
   const kibanaExport = await kibana.exportObjects({ type: 'dashboard', spaceId: space.id });
 
+  if (!kibanaExport) {
+    appLogger.verbose(`[kibana] Unable to get objects of ${spaceToSync.id}`);
+    return;
+  }
+
   const currentDashboards = kibanaExport.split('\n').map((line) => JSON.parse(line)).filter(
     (obj) => obj?.id?.startsWith?.(savedObjectsNamespace),
   );
@@ -177,7 +182,7 @@ const syncDashboards = async (spaceToSync) => {
       return true;
     }
 
-    if (isAfter(objectUpdatedAt, importedAt)) {
+    if (objectUpdatedAt - importedAt > 0) {
       // The saved object has been updated since the last import, so consider it dirty
       return true;
     }

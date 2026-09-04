@@ -43,10 +43,17 @@ async function updateVisibleMenu() {
 </script>
 
 <style>
+  /* Bring back reset layer from Vuetify 3 */
   @layer vuetify-core.reset {
     ul, ol, figure, details, summary { padding: 0; margin: 0; }
     h1, h2, h3, h4, h5, h6, p { margin: 0; }
 
+    /* Default to primary color for links */
     a { color: rgb(var(--v-theme-primary)); }
+  }
+
+  /* Bring back text-transform for buttons (but for toolbars only) */
+  .v-toolbar .v-btn {
+    text-transform: uppercase;
   }
 </style>

@@ -63,19 +63,16 @@ const props = defineProps({
 });
 
 const show = defineModel({ type: Boolean, default: false });
+const fetchEnabled = computed(() => !!props.collectionId);
 
 const {
   data: collectionData,
   status,
   error,
   refresh,
-} = await useAsyncData(computed(() => `collection-${props.collectionId}`), async (_nuxtApp, { signal }) => {
-  if (!props.collectionId) {
-    return undefined;
-  }
-
-  return $fetch(`/api/dashboard-collections/${props.collectionId}`, { signal });
-}, {
+  clear,
+} = await useFetch(computed(() => `/api/dashboard-collections/${props.collectionId}`), {
+  enabled: fetchEnabled,
   lazy: true,
   dedupe: 'defer',
 });
@@ -83,6 +80,14 @@ const {
 const loading = computed(() => status.value === 'pending');
 const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) : undefined));
 const errorIcon = computed(() => (error?.value?.statusCode === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
+
+watch(fetchEnabled, (isEnabled) => {
+  if (isEnabled) {
+    refresh();
+  } else {
+    clear();
+  }
+});
 
 watch(show, (isOpen) => {
   if (isOpen) { refresh(); }

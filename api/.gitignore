@@ -4,3 +4,6 @@ uploads
 node_modules
 # Built files
 .prisma
+
+# Private
+auth-key.dev
