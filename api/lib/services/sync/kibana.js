@@ -182,12 +182,12 @@ const syncDashboards = async (spaceToSync) => {
       return true;
     }
 
-    if (objectUpdatedAt - importedAt > 0) {
+    if (objectUpdatedAt.getTime() > importedAt.getTime()) {
       // The saved object has been updated since the last import, so consider it dirty
       return true;
     }
 
-    return isAfter(dashboard.updatedAt, importedAt);
+    return dashboard.updatedAt.getTime() > importedAt.getTime();
   };
 
   /**
