@@ -169,9 +169,12 @@ async function deleteSpace(spaceId) {
     throw new Error('Missing required parameter: spaceId');
   }
 
-  await $fetch(`/api/spaces/space/${spaceId}`, {
-    method: 'DELETE',
-  });
+  const request = `/api/spaces/space/${spaceId}`;
+  const response = await $fetch.raw(request, { method: 'DELETE', ignoreResponseError: true });
+
+  if (!response.ok && response.status !== 404) {
+    throw createFetchError({ request, options: { headers }, response });
+  }
 }
 
 /**
@@ -318,6 +321,138 @@ async function findObjects(options) {
       page: page || 1,
       per_page: perPage || 50,
     },
+  });
+}
+
+/**
+ * Export kibana saved objects
+ *
+ * @param {object} options
+ * @param {string|string[]} [options.type]
+ * @param {string} [options.spaceId]
+ * @param {boolean} [options.excludeExportDetails]
+ * @param {boolean} [options.includeReferencesDeep]
+ * @param {string} [options.search]
+ * @param {({ id: string, type: string })[]} [options.hasReference]
+ * @param {({ id: string, type: string })[]} [options.objects]
+ *
+ * @returns {Promise<string>} The raw exported objects as an ndjson string
+ */
+async function exportObjects(options) {
+  const {
+    type,
+    spaceId,
+    excludeExportDetails,
+    includeReferencesDeep,
+    search,
+    hasReference,
+    objects,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+
+  return $fetch(`${spacePrefix}/api/saved_objects/_export`, {
+    method: 'POST',
+    responseType: 'text',
+    body: {
+      type,
+      excludeExportDetails,
+      includeReferencesDeep,
+      search,
+      hasReference,
+      objects,
+    },
+  });
+}
+
+/**
+ * Import kibana saved objects
+ *
+ * @param {object[]|string} objects - The kibana objects, as an array of objects or ND-JSON string
+ * @param {Object} options
+ * @param {string} [options.spaceId]
+ * @param {boolean} [options.overwrite]
+ * @param {boolean} [options.createNewCopies]
+ * @param {boolean} [options.compatibilityMode]
+ *
+ * @returns {Promise<string>} The saved object
+ */
+async function importObjects(objects, options) {
+  const {
+    spaceId,
+    overwrite,
+    createNewCopies,
+    compatibilityMode,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  const ndjson = Array.isArray(objects)
+    ? objects.map((o) => JSON.stringify(o)).join('\n')
+    : objects;
+  const formData = new FormData();
+
+  formData.append('file', new Blob([ndjson], { type: 'application/x-ndjson' }), 'export.ndjson');
+
+  return $fetch(`${spacePrefix}/api/saved_objects/_import`, {
+    method: 'POST',
+    body: formData,
+    query: {
+      overwrite,
+      createNewCopies,
+      compatibilityMode,
+    },
+  });
+}
+
+/**
+ * Bulk delete a list of kibana saved objects
+ *
+ * @param {{ id: string, type: string }[]} objects - The objects to delete
+ * @param {object} options
+ * @param {boolean} [options.force]
+ * @param {string} [options.spaceId]
+ *
+ * @deprecated - Deprecated but does not have any alternative for now
+ * @see https://www.elastic.co/docs/api/doc/kibana/v9/operation/operation-bulkdeletesavedobjects
+ *
+ * @returns {Promise<string>} The saved object
+ */
+async function deleteSavedObjects(objects, options) {
+  const {
+    force,
+    spaceId,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+
+  return $fetch(`${spacePrefix}/api/saved_objects/_bulk_delete`, {
+    method: 'POST',
+    body: objects,
+    query: { force },
+  });
+}
+
+/**
+ * Delete a kibana saved object
+ *
+ * @param {{ id: string, type: string }} object - The object to delete
+ * @param {object} options
+ * @param {boolean} [options.force]
+ * @param {string} [options.spaceId]
+ *
+ * @returns {Promise<object>} The saved object
+ */
+async function deleteSavedObject(object, options) {
+  const {
+    force,
+    spaceId,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+
+  return $fetch(`${spacePrefix}/api/saved_objects/${object.type}/${object.id}`, {
+    method: 'DELETE',
+    query: { force },
   });
 }
 
@@ -563,6 +698,10 @@ module.exports = {
   getIndexPatterns,
   findObjects,
   getObject,
+  exportObjects,
+  importObjects,
+  deleteSavedObjects,
+  deleteSavedObject,
   exportDashboard,
   importDashboard,
   loginUser,

@@ -1,11 +1,13 @@
 const { ofetch } = require('ofetch');
+const config = require('config');
+
 const { createCache } = require('../utils/cache-manager');
 
 const registry = ofetch.create({
   baseURL: 'https://registry.countermetrics.org/api/v1',
 });
 
-const cache = createCache(24 * 3600 * 1000);
+const cache = createCache(config.get('cache.duration.counterRegistry'));
 
 /**
  * Get all platforms from counter registry, and cache them for 1 day

@@ -1,11 +1,12 @@
+const config = require('config');
+
 const ActionsService = require('../../entities/actions.service');
 const HarvestSessionService = require('../../entities/harvest-session.service');
 
 const { harvestQueue } = require('../../services/jobs');
 const { createCache } = require('../../utils/cache-manager');
 
-const CACHE_DURATION = 5 * 60 * 1000;
-const cache = createCache(CACHE_DURATION);
+const cache = createCache(config.get('cache.duration.harvestSessionJobs'));
 
 async function startSession(session, options = {}) {
   const service = new HarvestSessionService();

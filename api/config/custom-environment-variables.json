@@ -202,6 +202,38 @@
       }
     }
   },
+  "cache": {
+    "duration": {
+      "loginState": {
+        "__name": "EZMESURE_CACHE_DURATION_LOGIN_STATE",
+        "__format": "number"
+      },
+      "harvestMatrix": {
+        "__name": "EZMESURE_CACHE_DURATION_HARVEST_MATRIX",
+        "__format": "number"
+      },
+      "harvestSessionJobs": {
+        "__name": "EZMESURE_CACHE_DURATION_HARVEST_SESSION_JOBS",
+        "__format": "number"
+      },
+      "harvestSessionStatus": {
+        "__name": "EZMESURE_CACHE_DURATION_HARVEST_SESSION_STATUS",
+        "__format": "number"
+      },
+      "institutionHarvestable": {
+        "__name": "EZMESURE_CACHE_DURATION_INSTITUTION_HARVESTABLE",
+        "__format": "number"
+      },
+      "institutionReporting": {
+        "__name": "EZMESURE_CACHE_DURATION_INSTITUTION_REPORTING",
+        "__format": "number"
+      },
+      "counterRegistry": {
+        "__name": "EZMESURE_CACHE_DURATION_COUNTER_REGISTRY",
+        "__format": "number"
+      }
+    }
+  },
   "defaultLocale": "EZMESURE_DEFAULT_LOCALE",
   "appName": "EZMESURE_APP_NAME",
   "publicUrl": "EZMESURE_PUBLIC_URL"

@@ -1,19 +1,20 @@
-import { describe, it, expect, beforeAll, afterAll, afterAll } from 'vitest';
+import {
+  describe, it, expect, beforeAll, afterAll,
+} from 'vitest';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import spacesPrisma from '../../../lib/services/prisma/spaces';
 import institutionsPrisma from '../../../lib/services/prisma/institutions';
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[space]: Test create spaces features', () => {
   const userTest = {
@@ -43,7 +44,7 @@ describe('[space]: Test create spaces features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+    adminToken = await signJWT({ username: adminUsername });
     const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
     spaceConfig.institutionId = institutionId;
@@ -51,7 +52,6 @@ describe('[space]: Test create spaces features', () => {
 
   describe('As admin', () => {
     describe(`Create new space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
-      let spaceId;
       it('#01 Should create space', async () => {
         const httpAppResponse = await ezmesure.raw('/kibana-spaces/', {
           method: 'POST',
@@ -92,7 +92,7 @@ describe('[space]: Test create spaces features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
+      userToken = await signJWT({ username: userTest.username });
     });
     describe(`Create new space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       it('#02 Should not create space', async () => {

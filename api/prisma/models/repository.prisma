@@ -24,6 +24,8 @@ model Repository {
   aliasTemplates         RepositoryAliasTemplate[]
   /// Harvest jobs using this repository
   harvestJobs            HarvestJob[]
+  /// Space dashboard collections that are using the repository
+  spaceDashboardCollections       SpaceDashboardCollection[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)

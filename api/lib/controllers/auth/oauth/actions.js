@@ -11,7 +11,7 @@ const { createCache } = require('../../../utils/cache-manager');
 
 const { cookie } = config.get('auth');
 
-const loginStateCache = createCache(3600 * 1000);
+const loginStateCache = createCache(config.get('cache.duration.loginState'));
 
 const logoutFromKibana = async (ctx) => {
   try {

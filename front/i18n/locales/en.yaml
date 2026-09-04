@@ -38,6 +38,10 @@ menu:
     shares: Shares
     sushiEndpoints: COUNTER endpoints
     customFields: Custom fields
+    dashboards:
+      title: Dashboards
+      templates: Templates
+      collections: Collections
     harvest:
       title: Harvest
       entries:
@@ -914,6 +918,7 @@ sushi:
       institutionIsNotReady: Your entry is not complete
       institutionHasNoCredentials: No COUNTER credentials has been declared
       institutionHasFaultyCredentials: Some of your credentials have not been tested or are invalid
+      institutionIsHarvested: Institution is already harvested for the period
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
@@ -1235,8 +1240,8 @@ spaces:
     Manage spaces
     |Manage {count} spaces
   deleteNbSpaces: >
-    Vous allez supprimer 1 espace.
-    |Vous allez supprimer {count} espaces.
+    You are about to delete 1 space.
+    |You are about to delete {count} spaces.
   xSpaces: >
     1 space
     |{count} spaces
@@ -1254,6 +1259,12 @@ spaces:
   deleteSpace: You are about to delete "{spaceName}", which will delete the dashboards included in this space. This action cannot be undone.
   filters:
     title: Filter spaces
+  collections: Collections
+  collectionsDialog:
+    empty:
+      title: No collections
+      text: No dashboard collection has been assigned to this space yet
+      action: Add a collection
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
@@ -1465,6 +1476,52 @@ admin:
     title: Application logs
     connecting: Connecting...
     connectionError: Connection error
+dashboardCollections:
+  toolbarTitle: Dashboard collections ({count})
+  pageDesc: Here you can create the dashboard collections that you want to be able to add into the spaces.
+  updateCollection: Update the collection
+  newCollection: New collection
+  repositorySelection: Repository selection
+  noRepositories: No repository available
+  manageCollections: >
+    Manage the collection
+    |Manage {count} collections
+  search:
+    empty: There is no collection matching your search
+  actions:
+    delete:
+      title: Delete 1 collection ?|Delete {count} collections ?
+      text: The associated templates will also be deleted.
+dashboards:
+  toolbarTitle: Dashboard templates ({count})
+  pageDesc: On this page, you can save dashboards from Kibana. Then, associate them with a collection in order to integrate them into spaces.
+  updateDashboard: Update dashboard
+  newDashboard: New dashboard
+  sourceSpace: Source space
+  sourceSpaceHint: ID of the space from which the dashboard originates
+  sourceDashboardId: Dashboard ID
+  collection: Collection
+  templates: Templates
+  noCollection: No collection
+  kibanaVersion: Kibana version
+  tags: Tags
+  manageDashboards: Manage 1 dashboard|Manage {count} dashboards
+  addCollection: Add a collection
+  cannotAddToCollection: Failed to add the dashboard to the collection
+  cannotRemoveFromCollection: Failed to remove the dashboard from the collection
+  actions:
+    update:
+      title: Update 1 dashboard ?|Update {count} dashboards ?
+      text: >
+        The current version will be replaced by the one found in Kibana.
+        |The current versions will be replaced by the one found in Kibana.
+      confirm: Update
+    delete:
+      title: Delete 1 dashboard ?|Delete {count} dashboards ?
+      text: >
+        The current saved template will be deleted. The Kibana dashboard from which it was created will not be affected.
+        |The current saved templates will be deleted. The Kibana dashboards from which they were created will not be affected.
+      confirm: Delete
 anErrorOccurred: An error occurred
 url: URL
 type: Type
