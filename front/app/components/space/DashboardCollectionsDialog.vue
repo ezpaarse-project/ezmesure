@@ -179,7 +179,7 @@ whenever(() => loading.value === false, () => {
   initialLoading.value = false;
 });
 
-whenever(() => show.value, () => {
+whenever(show, () => {
   initialLoading.value = true;
   refresh();
 });
