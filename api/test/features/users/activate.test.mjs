@@ -1,5 +1,5 @@
 import {
-  describe, it, expect, beforeAll,
+  describe, it, expect, beforeAll, afterAll,
 } from 'vitest';
 
 import ezmesure from '../../setup/ezmesure';
