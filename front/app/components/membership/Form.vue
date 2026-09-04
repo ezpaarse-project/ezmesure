@@ -13,7 +13,7 @@
               <v-alert
                 :text="$t('institutions.members.notEditable')"
                 type="info"
-                dense
+                density="comfortable"
                 outlined
               />
             </v-col>

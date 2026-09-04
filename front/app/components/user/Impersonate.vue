@@ -2,21 +2,8 @@
   <v-card
     :title="$t('authenticate.impersonate.title')"
     :subtitle="showUser ? user.fullName : undefined"
-    :loading="loadingTestUsers && 'primary'"
     prepend-icon="$mdi-account"
   >
-    <template #append>
-      <v-scale-transition>
-        <v-btn
-          v-if="windowId === 'kibana'"
-          v-tooltip:left="$t('refresh')"
-          icon="$mdi-reload"
-          variant="text"
-          @click="refresh()"
-        />
-      </v-scale-transition>
-    </template>
-
     <template #text>
       <p>{{ $t('authenticate.impersonate.text.intro') }}</p>
 

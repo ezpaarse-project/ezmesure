@@ -22,7 +22,7 @@
       </div>
 
       <template v-else>
-        <v-row v-if="sortedSpaces.length > 0" dense>
+        <v-row v-if="sortedSpaces.length > 0" density="comfortable">
           <v-col v-if="sortedForeignSpaces.length > 0" cols="12" class="pt-0">
             <v-list-subheader>
               <v-icon icon="$mdi-tab" start />
@@ -68,13 +68,23 @@
                   </template>
                 </ConfirmPopover>
               </template>
+
+              <template #actions>
+                <v-btn
+                  append-icon="$mdi-view-dashboard"
+                  text="Collections"
+                  variant="text"
+                  size="small"
+                  @click="openCollections(space.id)"
+                />
+              </template>
             </SpaceCard>
           </v-col>
         </v-row>
 
         <v-divider v-if="sortedForeignSpaces.length > 0 && sortedSpaces.length > 0" class="mt-4 mb-2" />
 
-        <v-row v-if="sortedForeignSpaces.length > 0" dense>
+        <v-row v-if="sortedForeignSpaces.length > 0" density="comfortable">
           <v-col cols="12">
             <v-list-subheader>
               <v-icon icon="$mdi-tab-plus" start />
@@ -120,6 +130,8 @@
 </template>
 
 <script setup>
+import SpacesDashboardCollectionsDialog from '~/components/space/DashboardCollectionsDialog.vue';
+
 const props = defineProps({
   institution: {
     type: Object,
@@ -142,6 +154,7 @@ const emit = defineEmits({
 const { t } = useI18n();
 const { user } = storeToRefs(useAuthStore());
 const snacks = useSnacksStore();
+const { openDialog } = useDialogStore();
 
 /** @type {Ref<object[]>} */
 const spaces = ref(props.institution.spaces || []);
@@ -186,5 +199,12 @@ async function removeSpace(item) {
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   }
+}
+
+function openCollections(spaceId) {
+  openDialog({
+    component: SpacesDashboardCollectionsDialog,
+    data: { spaceId },
+  });
 }
 </script>

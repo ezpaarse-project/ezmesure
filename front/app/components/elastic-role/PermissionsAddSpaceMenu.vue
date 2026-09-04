@@ -9,7 +9,7 @@
         <v-form id="spaceForm" @submit.prevent="submit()">
           <v-row>
             <v-col>
-              <SpaceAutoComplete v-model="space" />
+              <SpaceAutoComplete v-model="space" hide-details />
             </v-col>
           </v-row>
         </v-form>

@@ -649,6 +649,14 @@
             "items": {
               "$ref": "#/components/schemas/SpacePermission"
             }
+          },
+          "dashboardCollections": {
+            "description": "The dashboard collections that should be loaded into the space",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/SpaceDashboardCollection"
+            }
           }
         }
       },
@@ -686,6 +694,181 @@
             "description": "Whether the permission can be modified by admins only",
             "type": "boolean",
             "default": false
+          }
+        }
+      },
+      "DashboardTemplate": {
+        "description": "A Kibana dashboard template",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "sourceDashboardId": {
+            "description": "The ID of the source dashboard",
+            "type": "string"
+          },
+          "sourceSpaceId": {
+            "description": "The space where the source dashboard comes from",
+            "type": "string"
+          },
+          "data": {
+            "description": "The dashboard definition (exported from Kibana)",
+            "type": "string",
+            "readOnly": true
+          },
+          "tags": {
+            "description": "The Kibana version from which the dashboard was exported (extracted from the Kibana export)",
+            "type": "string",
+            "readOnly": true
+          },
+          "kibanaVersion": {
+            "description": "The dashboard name (extracted from the Kibana export)",
+            "type": "string",
+            "readOnly": true
+          },
+          "name": {
+            "description": "The dashboard description (extracted from the Kibana export)",
+            "type": "string",
+            "readOnly": true
+          },
+          "description": {
+            "description": "The dashboard description (extracted from the Kibana export)",
+            "type": "string",
+            "readOnly": true
+          },
+          "collectionId": {
+            "description": "ID of the collection the dashboard belongs to",
+            "type": "string"
+          },
+          "collection": {
+            "description": "The collection the dashboard belongs to",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DashboardCollection"
+              },
+              {
+                "readOnly": true
+              }
+            ]
+          }
+        }
+      },
+      "DashboardCollection": {
+        "description": "A collection of Kibana dashboards that can be loaded into spaces",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "name": {
+            "description": "The collection name",
+            "type": "string"
+          },
+          "description": {
+            "description": "The collection description",
+            "type": "string"
+          },
+          "dashboards": {
+            "description": "The dashboards included in the collection",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/DashboardCollection"
+            }
+          },
+          "spaces": {
+            "description": "The spaces that subscribed to the collection",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/SpaceDashboardCollection"
+            }
+          }
+        }
+      },
+      "SpaceDashboardCollection": {
+        "description": "Represent the subscription of a space to a collection",
+        "type": "object",
+        "properties": {
+          "disabledDashboards": {
+            "description": "ID of the dashboards that should not be loaded into the space",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "importedAt": {
+            "description": "Date when the collection was last imported into the space",
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "readOnly": true
+          },
+          "importErrors": {
+            "description": "Errors that occured during the last import",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type": "object"
+            }
+          },
+          "collectionId": {
+            "description": "ID of the collection to be loaded into the space",
+            "type": "string"
+          },
+          "spaceId": {
+            "description": "ID of the space where the collection should be loaded",
+            "type": "string"
+          },
+          "repositoryPattern": {
+            "description": "Pattern of the repository that should be used in the dashboards",
+            "type": "string"
+          },
+          "collection": {
+            "description": "The collection to load into the space",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DashboardCollection"
+              },
+              {
+                "readOnly": true
+              }
+            ]
+          },
+          "space": {
+            "description": "The space where the collection should be loaded",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Space"
+              },
+              {
+                "readOnly": true
+              }
+            ]
+          },
+          "repository": {
+            "description": "The repository that should be used in the dashboards",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Repository"
+              },
+              {
+                "readOnly": true
+              }
+            ]
           }
         }
       },
@@ -3159,6 +3342,786 @@
           }
         ],
         "tags": ["Administration", "CustomFields"]
+      }
+    },
+    "/dashboard-collections": {
+      "get": {
+        "operationId": "get-dashboard-collections",
+        "summary": "List dashboard collections",
+        "description": "List dashboard collections",
+        "tags": ["Administration", "Kibana"],
+        "parameters": [
+          { "$ref": "#/components/parameters/size" },
+          { "$ref": "#/components/parameters/page" },
+          { "$ref": "#/components/parameters/sort" },
+          { "$ref": "#/components/parameters/order" },
+          { "$ref": "#/components/parameters/distinct" },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Relations that should be included in the response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "dashboards",
+                  "spaces",
+                  "_count.dashboards",
+                  "_count.spaces"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardCollection"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post-dashboard-collections",
+        "summary": "Create a dashboard collection",
+        "description": "Create a dashboard collection",
+        "tags": ["Administration", "Kibana"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardCollection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardCollection"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboard-collections/_import": {
+      "post": {
+        "operationId": "post-dashboard-collections-import",
+        "tags": ["Administration", "Kibana"],
+        "summary": "Import dashboard collections",
+        "description": "Import a list of dashboard collections",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DashboardCollection"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": ["error", "conflict", "created"]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/DashboardCollection"
+                          }
+                        },
+                        "required": ["status", "data"]
+                      }
+                    }
+                  },
+                  "required": ["errors", "conflicts", "created", "items"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/dashboard-collections/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "name": "id",
+          "description": "ID of the dashboard collection"
+        }
+      ],
+      "get": {
+        "operationId": "get-dashboard-collections-id",
+        "summary": "Get a dashboard collection",
+        "description": "Get a dashboard collection",
+        "tags": ["Administration", "Kibana"],
+        "parameters": [
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Relations that should be included in the response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "dashboards",
+                  "spaces",
+                  "_count.dashboards",
+                  "_count.spaces"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardCollection"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "put-dashboard-collections-id",
+        "summary": "Update a dashboard collection",
+        "description": "Update a dashboard collection",
+        "tags": ["Administration", "Kibana"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardCollection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardCollection"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "delete-dashboard-collections-id",
+        "summary": "Delete a dashboard collection",
+        "description": "Delete a dashboard collection",
+        "tags": ["Administration", "Kibana"],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboard-collections/{id}/spaces/{spaceId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "name": "id",
+          "description": "ID of the dashboard collection"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "name": "spaceId",
+          "description": "ID of a space"
+        }
+      ],
+      "put": {
+        "operationId": "put-dashboard-collections-id-spaces/spaceid",
+        "summary": "Add a dashboard collection to a space",
+        "description": "Add a dashboard collection to a space",
+        "tags": ["Administration", "Kibana"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["repositoryPattern"],
+                "properties": {
+                  "repositoryPattern": {
+                    "description": "Pattern of the repository that should be used for the dashboards",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "delete-dashboard-collections-id-spaces-spaceid",
+        "summary": "Delete a dashboard collection from a space",
+        "description": "Delete a dashboard collection from a space",
+        "tags": ["Administration", "Kibana"],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboard-templates": {
+      "get": {
+        "operationId": "get-dashboard-templates",
+        "summary": "List dashboard templates",
+        "description": "List dashboard templates",
+        "tags": ["Administration", "Kibana"],
+        "parameters": [
+          { "$ref": "#/components/parameters/size" },
+          { "$ref": "#/components/parameters/page" },
+          { "$ref": "#/components/parameters/sort" },
+          { "$ref": "#/components/parameters/order" },
+          { "$ref": "#/components/parameters/distinct" },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Relations that should be included in the response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "collection"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post-dashboard-templates",
+        "summary": "Create a dashboard template",
+        "description": "Create a dashboard template",
+        "tags": ["Administration", "Kibana"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboard-templates/_import": {
+      "post": {
+        "operationId": "post-dashboard-templates-import",
+        "tags": ["Administration", "Kibana"],
+        "summary": "Import dashboard templates",
+        "description": "Import a list of dashboard templates",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DashboardTemplate"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": ["error", "conflict", "created"]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/DashboardTemplate"
+                          }
+                        },
+                        "required": ["status", "data"]
+                      }
+                    }
+                  },
+                  "required": ["errors", "conflicts", "created", "items"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/dashboard-templates/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "name": "id",
+          "description": "ID of the dashboard template"
+        }
+      ],
+      "get": {
+        "operationId": "get-dashboard-templates-id",
+        "summary": "Get a dashboard template",
+        "description": "Get a dashboard template",
+        "tags": ["Administration", "Kibana"],
+        "parameters": [
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Relations that should be included in the response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "collection"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardTemplate"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch-dashboard-templates-id",
+        "summary": "Update a dashboard template",
+        "description": "Update a dashboard template",
+        "tags": ["Administration", "Kibana"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "delete-dashboard-templates-id",
+        "summary": "Delete a dashboard template",
+        "description": "Delete a dashboard template",
+        "tags": ["Administration", "Kibana"],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboard-templates/{id}/_refresh": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "name": "id",
+          "description": "ID of the dashboard template"
+        }
+      ],
+      "post": {
+        "operationId": "post-dashboard-templates-id-refresh",
+        "summary": "Refresh a dashboard template",
+        "description": "Refresh a dashboard template by fetching the last version of its source dashboard from Kibana",
+        "tags": ["Administration", "Kibana"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/dashboards": {

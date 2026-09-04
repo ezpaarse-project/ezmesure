@@ -1,5 +1,5 @@
 import {
-  describe, it, expect, beforeAll, afterAll,
+  describe, it, expect, beforeAll,
 } from 'vitest';
 import config from 'config';
 
@@ -7,10 +7,10 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 import customFieldsPrisma from '../../../lib/services/prisma/custom-fields';
 
 const adminUsername = config.get('admin.username');
@@ -44,7 +44,7 @@ describe('[custom-fields]: Test read features', () => {
     let adminToken;
 
     beforeAll(async () => {
-      adminToken = await (new UsersService()).generateToken(adminUsername);
+      adminToken = await signJWT({ username: adminUsername });
     });
 
     describe('Get custom field', () => {
@@ -76,7 +76,7 @@ describe('[custom-fields]: Test read features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await (new UsersService()).generateToken(userTest.username);
+      userToken = await signJWT({ username: userTest.username });
     });
 
     describe('Get custom field', () => {
