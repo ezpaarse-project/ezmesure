@@ -179,11 +179,9 @@ whenever(() => loading.value === false, () => {
   initialLoading.value = false;
 });
 
-watch(show, (isOpen) => {
-  if (isOpen) {
-    initialLoading.value = true;
-    refresh();
-  }
+whenever(() => show.value, () => {
+  initialLoading.value = true;
+  refresh();
 });
 
 const loadingCollections = ref(new Set());
