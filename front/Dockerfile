@@ -9,7 +9,7 @@ RUN npm run build
 
 # ---
 
-FROM node:24.4.1-alpine3.22
+FROM node:24.20.0-alpine3.24
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
 
 WORKDIR /usr/src/app
