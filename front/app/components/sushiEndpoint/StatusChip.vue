@@ -16,7 +16,7 @@
       :density="density"
       :size="size"
       icon="$mdi-link-variant-off"
-      color="warning"
+      color="grey"
       :class="[end ? 'ml-2' : 'mr-2']"
     />
 
