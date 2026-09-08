@@ -90,7 +90,8 @@ exports.deleteHarvestsByQuery = async (ctx) => {
   ctx.body = { deleted };
 };
 
-const matrixCache = createCache(config.get('cache.duration.harvestMatrix'));
+const matrixCacheDuration = config.get('cache.duration.harvestMatrix');
+const matrixCache = createCache(matrixCacheDuration);
 
 const institutionsMatrixQueue = new InMemoryQueue(
   /**
@@ -157,9 +158,9 @@ const institutionsMatrixQueue = new InMemoryQueue(
       });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${matrixCacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + matrixCacheDuration);
       data.unharvested = unharvested;
       data.matrix = {
         ...matrix,
@@ -221,9 +222,9 @@ const endpointsMatrixQueue = new InMemoryQueue(
       const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${matrixCacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + matrixCacheDuration);
       data.matrix = {
         ...matrix,
         headers: {

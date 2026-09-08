@@ -11,7 +11,8 @@ const HarvestsService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
 
-const cache = createCache(config.get('cache.duration.harvestMatrix'));
+const cacheDuration = config.get('cache.duration.harvestMatrix');
+const cache = createCache(cacheDuration);
 
 const institutionsQueue = new InMemoryQueue(
   /**
@@ -78,9 +79,9 @@ const institutionsQueue = new InMemoryQueue(
       });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${cacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + cacheDuration);
       data.unharvested = unharvested;
       data.matrix = {
         ...matrix,
@@ -142,9 +143,9 @@ const endpointsQueue = new InMemoryQueue(
       const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${cacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + cacheDuration);
       data.matrix = {
         ...matrix,
         headers: {
