@@ -3,6 +3,7 @@ const { Joi } = require('koa-joi-router');
 const {
   withModifiers,
   ignoreFields,
+  requireFields,
 } = require('./schema.utils');
 
 /**
@@ -70,11 +71,8 @@ const adminUpsertSchema = withModifiers(
  * Schema to be applied when an administrator imports multiple repositories
  */
 const adminImportSchema = withModifiers(
-  adminCreateSchema,
-  {
-    id: () => schema.id,
-    collection: () => schema.collection,
-  },
+  schema,
+  requireFields(['id']),
 );
 
 module.exports = {
