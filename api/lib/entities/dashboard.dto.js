@@ -18,7 +18,7 @@ const schema = {
   sourceDashboardId: Joi.string().trim().min(1),
   sourceSpaceId: Joi.string().trim().min(1),
 
-  data: Joi.object(),
+  data: Joi.array().items(Joi.object()),
   tags: Joi.array().items(Joi.object()),
 
   kibanaVersion: Joi.string().trim(),
