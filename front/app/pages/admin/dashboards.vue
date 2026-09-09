@@ -87,6 +87,7 @@
             <v-list-item
               :title="$t('update')"
               prepend-icon="$mdi-sync"
+              :disabled="!item.sourceDashboardId"
               @click="updateDashboards([item])"
             />
             <v-list-item
