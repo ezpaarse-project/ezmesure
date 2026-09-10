@@ -1,7 +1,14 @@
 location /api/ {
-  rewrite     ^/api(/.*)$ $1 break;
-
-  proxy_pass  http://api_server;
-
   client_max_body_size 0;
+
+  proxy_pass  http://api_server/;
+}
+
+location /api/logs/ {
+  client_max_body_size 0;
+  proxy_read_timeout 40m;
+  proxy_send_timeout 40m;
+  client_body_timeout 40m;
+
+  proxy_pass  http://api_server/logs/;
 }
