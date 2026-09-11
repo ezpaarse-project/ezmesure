@@ -1495,11 +1495,10 @@ dashboardCollections:
 dashboards:
   toolbarTitle: Dashboard templates ({count})
   pageDesc: On this page, you can save dashboards from Kibana. Then, associate them with a collection in order to integrate them into spaces.
-  updateDashboard: Update dashboard
-  newDashboard: New dashboard
-  sourceSpace: Source space
-  sourceSpaceHint: ID of the space from which the dashboard originates
-  sourceDashboardId: Dashboard ID
+  updateTemplate: Update template
+  newTemplate: New template
+  sourceSpace: Space
+  sourceDashboard: Dashboard
   collection: Collection
   templates: Templates
   noCollection: No collection
@@ -1509,6 +1508,10 @@ dashboards:
   addCollection: Add a collection
   cannotAddToCollection: Failed to add the dashboard to the collection
   cannotRemoveFromCollection: Failed to remove the dashboard from the collection
+  form:
+    headline:
+      add: Search for a Kibana dashboard that you want to save as a template.
+      modify: Update the Kibana dashboard that you want to use as a template.
   actions:
     update:
       title: Update 1 dashboard ?|Update {count} dashboards ?
