@@ -26,7 +26,7 @@
           :rules="[v => !!v || $t('fieldIsRequired')]"
           :return-object="false"
           :space-id="dashboard.sourceSpaceId"
-          prepend-icon="$mdi-form-textbox"
+          prepend-icon="$mdi-view-dashboard"
           variant="underlined"
         />
       </v-form>
