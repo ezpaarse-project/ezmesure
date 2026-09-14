@@ -1,4 +1,4 @@
-location /report/api {
+location /report/api/ {
   include /etc/nginx/conf.d/utils/ws-proxy.conf;
 
   proxy_pass  http://ezreeport_server/;
