@@ -1,5 +1,5 @@
 const config = require('config');
-const { parseISO, isAfter, isValid: isValidDate } = require('date-fns');
+const { parseISO, isValid: isValidDate } = require('date-fns');
 
 const prisma = require('../prisma');
 const { appLogger } = require('../logger');
