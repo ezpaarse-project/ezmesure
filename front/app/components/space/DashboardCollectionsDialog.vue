@@ -42,7 +42,7 @@
           :title="$t('dashboards.addCollection')"
           :dashboard-id="spaceId"
           :loading-items="loadingCollections"
-          :repository-patterns="repositoryPatterns"
+          :repositories="repositories"
           @add-collection="addCollection($event)"
           @update:model-value="refresh()"
         >
@@ -157,9 +157,7 @@ const {
   dedupe: 'defer',
 });
 
-const repositoryPatterns = computed(() => (
-  spaceData.value.institution?.repositories?.map((repository) => repository.pattern)
-));
+const repositories = computed(() => spaceData.value.institution?.repositories);
 
 const collections = computed(
   () => spaceData.value?.dashboardCollections?.map((c) => c.collection) ?? [],
