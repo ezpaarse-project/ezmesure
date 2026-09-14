@@ -157,7 +157,10 @@ const {
   dedupe: 'defer',
 });
 
-const repositories = computed(() => spaceData.value.institution?.repositories);
+const repositories = computed(() => {
+  const allRepositories = spaceData.value.institution?.repositories ?? [];
+  return allRepositories.filter((repository) => repository?.type === spaceData.value?.type);
+});
 
 const collections = computed(
   () => spaceData.value?.dashboardCollections?.map((c) => c.collection) ?? [],
