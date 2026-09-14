@@ -142,11 +142,6 @@ const syncDashboards = async (spaceToSync) => {
     return;
   }
 
-  if (space.dashboardCollections.length === 0) {
-    appLogger.verbose(`[kibana] No collection to sync with space [${space.id}]`);
-    return;
-  }
-
   const kibanaExport = await kibana.exportObjects({ type: 'dashboard', spaceId: space.id });
 
   if (!kibanaExport) {
@@ -333,9 +328,13 @@ const syncDashboards = async (spaceToSync) => {
     });
   };
 
-  await Promise.allSettled(
-    space.dashboardCollections.map(syncSpaceCollection),
-  );
+  if (space.dashboardCollections.length === 0) {
+    appLogger.verbose(`[kibana] No collection to sync with space [${space.id}]`);
+  } else {
+    await Promise.allSettled(
+      space.dashboardCollections.map(syncSpaceCollection),
+    );
+  }
 
   try {
     await removeExtraneousDashboards();
