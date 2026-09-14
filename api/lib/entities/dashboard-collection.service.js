@@ -23,9 +23,9 @@ module.exports = class RepositoriesService extends BasePrismaService {
    * @returns {Promise<DashboardCollection>}
    */
   async create(params) {
-    const repositoryAlias = await dashboardCollectionsPrisma.create(params, this.prisma);
-    this.triggerHooks('dashboard_collection:create', repositoryAlias);
-    return repositoryAlias;
+    const collection = await dashboardCollectionsPrisma.create(params, this.prisma);
+    this.triggerHooks('dashboard_collection:create', collection);
+    return collection;
   }
 
   /**
@@ -65,9 +65,9 @@ module.exports = class RepositoriesService extends BasePrismaService {
    * @returns {Promise<DashboardCollection>}
    */
   async update(params) {
-    const repositoryAlias = await dashboardCollectionsPrisma.update(params, this.prisma);
-    this.triggerHooks('dashboard_collection:update', repositoryAlias);
-    return repositoryAlias;
+    const collection = await dashboardCollectionsPrisma.update(params, this.prisma);
+    this.triggerHooks('dashboard_collection:update', collection);
+    return collection;
   }
 
   /**
@@ -107,9 +107,9 @@ module.exports = class RepositoriesService extends BasePrismaService {
    * @returns {Promise<DashboardCollection>}
    */
   async upsert(params) {
-    const repositoryAlias = await dashboardCollectionsPrisma.upsert(params, this.prisma);
-    this.triggerHooks('dashboard_collection:upsert', repositoryAlias);
-    return repositoryAlias;
+    const collection = await dashboardCollectionsPrisma.upsert(params, this.prisma);
+    this.triggerHooks('dashboard_collection:upsert', collection);
+    return collection;
   }
 
   /**
