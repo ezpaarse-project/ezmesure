@@ -77,7 +77,7 @@ function setJWTPayload(token, options) {
 function getJWTVerifyOptions(options) {
   return {
     audience: options.requireAudience !== false ? publicUrl : undefined,
-    clockTolerance: options.requireExpiration === false ? Number.POSITIVE_INFINITY : undefined,
+    clockTolerance: options.requireExpiration === false ? 1 : undefined,
     issuer: options.requireIssuer !== false ? publicUrl : undefined,
   };
 }
