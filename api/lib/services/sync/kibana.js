@@ -119,11 +119,11 @@ const syncIndexPatterns = async (space) => {
 
 /**
  * Sync dashboards for a given space
- * @param {Space} spaceToSync - The space we want to sync
+ * @param {Space|Space['id']} spaceToSync - The space we want to sync
  */
 const syncDashboards = async (spaceToSync) => {
   const space = await (new SpacesService()).findUnique({
-    where: { id: spaceToSync.id },
+    where: { id: typeof spaceToSync === 'string' ? spaceToSync : spaceToSync.id },
     include: {
       dashboardCollections: {
         include: {
@@ -561,6 +561,7 @@ module.exports = {
   getSpaceLogo,
 
   syncIndexPatterns,
+  syncDashboards,
 
   syncSpace,
   syncSpaces,
