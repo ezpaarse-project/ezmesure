@@ -1,5 +1,5 @@
 const config = require('config');
-const { parseISO, isAfter, isValid: isValidDate } = require('date-fns');
+const { parseISO, isValid: isValidDate } = require('date-fns');
 
 const prisma = require('../prisma');
 const { appLogger } = require('../logger');
@@ -119,11 +119,11 @@ const syncIndexPatterns = async (space) => {
 
 /**
  * Sync dashboards for a given space
- * @param {Space} spaceToSync - The space we want to sync
+ * @param {Space|Space['id']} spaceToSync - The space we want to sync
  */
 const syncDashboards = async (spaceToSync) => {
   const space = await (new SpacesService()).findUnique({
-    where: { id: spaceToSync.id },
+    where: { id: typeof spaceToSync === 'string' ? spaceToSync : spaceToSync.id },
     include: {
       dashboardCollections: {
         include: {
@@ -139,11 +139,6 @@ const syncDashboards = async (spaceToSync) => {
 
   if (!space) {
     appLogger.verbose(`[kibana] Space ${spaceToSync.id} does not exist anymore, ignoring dashboard sync`);
-    return;
-  }
-
-  if (space.dashboardCollections.length === 0) {
-    appLogger.verbose(`[kibana] No collection to sync with space [${space.id}]`);
     return;
   }
 
@@ -333,9 +328,13 @@ const syncDashboards = async (spaceToSync) => {
     });
   };
 
-  await Promise.allSettled(
-    space.dashboardCollections.map(syncSpaceCollection),
-  );
+  if (space.dashboardCollections.length === 0) {
+    appLogger.verbose(`[kibana] No collection to sync with space [${space.id}]`);
+  } else {
+    await Promise.allSettled(
+      space.dashboardCollections.map(syncSpaceCollection),
+    );
+  }
 
   try {
     await removeExtraneousDashboards();
@@ -561,6 +560,7 @@ module.exports = {
   getSpaceLogo,
 
   syncIndexPatterns,
+  syncDashboards,
 
   syncSpace,
   syncSpaces,

@@ -47,7 +47,7 @@
         <v-chip
           :text="`${value ?? 0}`"
           :variant="!value ? 'outlined' : undefined"
-          prepend-icon="$mdi-folder-outline"
+          prepend-icon="$mdi-tab"
           size="small"
         />
       </template>

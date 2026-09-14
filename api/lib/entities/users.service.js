@@ -44,7 +44,8 @@ module.exports = class UsersService extends BasePrismaService {
       email,
       fullName,
       isAdmin: true,
-      metadata: { acceptedTerms: true },
+      acceptedTerms: true,
+      metadata: {},
     };
 
     const admin = await usersPrisma.upsert(

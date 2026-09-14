@@ -1507,11 +1507,10 @@ dashboardCollections:
 dashboards:
   toolbarTitle: Modèles de tableaux de bord ({count})
   pageDesc: Dans cette page, vous pouvez sauvegarder des tableaux de bord issus de Kibana. Associez les ensuite à une collection pour les intégrer dans les espaces.
-  updateDashboard: Modifier le tableau de bord
-  newDashboard: Nouveau tableau de bord
-  sourceSpace: Espace source
-  sourceSpaceHint: Identifiant de l'espace d'où provient le tableau de bord
-  sourceDashboardId: Identifiant du tableau de bord
+  updateTemplate: Modifier le modèle
+  newTemplate: Nouveau modèle
+  sourceSpace: Espace
+  sourceDashboard: Tableau de bord
   collection: Collection
   templates: Modèles
   noCollection: Pas de collection
@@ -1521,6 +1520,10 @@ dashboards:
   addCollection: Ajouter une collection
   cannotAddToCollection: Impossible d'ajouter le tableau de bord dans la collection
   cannotRemoveFromCollection: Impossible de supprimer le tableau de bord de la collection
+  form:
+    headline:
+      add: Cherchez un tableau de bord Kibana que vous souhaitez enregistrer comme modèle.
+      modify: Modifiez le tableau de bord Kibana que vous souhaitez utiliser comme modèle.
   actions:
     update:
       title: Mettre à jour 1 tableau de bord ?|Mettre à jour {count} tableaux de bord ?

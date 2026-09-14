@@ -80,13 +80,17 @@
                   </v-list-subheader>
 
                   <v-list-item
-                    v-for="(pattern, index) in props.repositoryPatterns"
-                    :key="index"
-                    :value="pattern"
-                    :title="pattern"
+                    v-for="repository in props.repositories"
+                    :key="repository.pattern"
+                    :value="repository.pattern"
+                    :title="repository.pattern"
                     prepend-icon="$mdi-database"
-                    @click="addCollection(collection, pattern)"
-                  />
+                    @click="addCollection(collection, repository)"
+                  >
+                    <template #subtitle>
+                      <RepositoryTypeChip :model-value="repository" />
+                    </template>
+                  </v-list-item>
                 </v-list>
               </v-menu>
             </template>
@@ -107,7 +111,7 @@ const props = defineProps({
     type: String,
     default: undefined,
   },
-  repositoryPatterns: {
+  repositories: {
     type: Array,
     default: () => [],
   },
@@ -131,7 +135,7 @@ const debouncedSearch = refDebounced(search, 250);
 const selectedCollections = computed(() => new Set(affectedCollections.value.map((i) => i.id)));
 
 const hasRepositories = computed(
-  () => Array.isArray(props.repositoryPatterns) && props.repositoryPatterns.length > 0,
+  () => Array.isArray(props.repositories) && props.repositories.length > 0,
 );
 
 const {

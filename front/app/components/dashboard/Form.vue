@@ -1,9 +1,16 @@
 <template>
   <v-card
-    :title="isEditing ? $t('dashboards.updateDashboard') : $t('dashboards.newDashboard')"
+    :title="isEditing ? $t('dashboards.updateTemplate') : $t('dashboards.newTemplate')"
     prepend-icon="$mdi-view-dashboard-edit"
   >
     <template #text>
+      <p v-if="isEditing">
+        {{ $t('dashboards.form.headline.modify') }}
+      </p>
+      <p v-else>
+        {{ $t('dashboards.form.headline.add') }}
+      </p>
+
       <v-form
         id="dashboardForm"
         v-model="valid"
@@ -22,11 +29,11 @@
         <DashboardKibanaAutocomplete
           v-model="dashboard.sourceDashboardId"
           :disabled="!dashboard.sourceSpaceId"
-          :label="$t('dashboards.sourceDashboardId')"
+          :label="$t('dashboards.sourceDashboard')"
           :rules="[v => !!v || $t('fieldIsRequired')]"
           :return-object="false"
           :space-id="dashboard.sourceSpaceId"
-          prepend-icon="$mdi-form-textbox"
+          prepend-icon="$mdi-view-dashboard"
           variant="underlined"
         />
       </v-form>

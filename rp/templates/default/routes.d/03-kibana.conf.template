@@ -1,7 +1,5 @@
 location /kibana/ {
-  rewrite     ^/kibana(/.*)$ $1 break;
-
-  proxy_pass  http://kibana_server;
+  proxy_pass  http://kibana_server/;
 }
 
 location ~* ^/kibana/(s/[a-z0-9_-]+/)?login/?$ {

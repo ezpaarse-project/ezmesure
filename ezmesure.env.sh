@@ -16,6 +16,8 @@ export EZMESURE_APPLICATION_NAME="ezMESURE"
 
 export SATOSA_ENABLED="true"
 
+export EZMESURE_SMTP_PORT=1025
+
 # kibana env settings
 export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
 export EZMESURE_SMTP_HOST="127.0.0.1"

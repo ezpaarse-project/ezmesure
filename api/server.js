@@ -65,7 +65,11 @@ app.use(async (ctx, next) => {
   };
 
   ctx.startTime = Date.now();
-  await next();
+  try {
+    await next();
+  } catch (error) {
+    ctx.app.emit('error', error, ctx);
+  }
   ctx.responseTime = Date.now() - ctx.startTime;
 
   httpLogger.log('info', {
