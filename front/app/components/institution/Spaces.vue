@@ -72,7 +72,7 @@
               <template #actions>
                 <v-btn
                   append-icon="$mdi-view-dashboard"
-                  text="Collections"
+                  :text="$t('dashboards.title')"
                   variant="text"
                   size="small"
                   @click="openCollections(space.id)"
