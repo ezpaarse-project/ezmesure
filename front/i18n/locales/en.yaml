@@ -1493,6 +1493,7 @@ dashboardCollections:
       title: Delete 1 collection ?|Delete {count} collections ?
       text: The associated templates will also be deleted.
 dashboards:
+  title: Dashboards
   toolbarTitle: Dashboard templates ({count})
   pageDesc: On this page, you can save dashboards from Kibana. Then, associate them with a collection in order to integrate them into spaces.
   updateTemplate: Update template
