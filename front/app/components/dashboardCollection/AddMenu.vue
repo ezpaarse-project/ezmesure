@@ -85,7 +85,7 @@
                     :value="repository.pattern"
                     :title="repository.pattern"
                     prepend-icon="$mdi-database"
-                    @click="addCollection(collection, repository)"
+                    @click="addCollection(collection, repository.pattern)"
                   >
                     <template #subtitle>
                       <RepositoryTypeChip :model-value="repository" />
