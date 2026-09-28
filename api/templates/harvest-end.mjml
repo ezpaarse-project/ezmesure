@@ -70,9 +70,9 @@
 
     <mj-text>
       {% if REPLY_TO %}
-      {{ t('emails.harvestEnd.body.p4.withoutAddress') }}
-      {% else %}
       {{ t('emails.harvestEnd.body.p4.withAddress', { replyTo: (REPLY_TO | e) }) | safe }}
+      {% else %}
+      {{ t('emails.harvestEnd.body.p4.withoutAddress') }}
       {% endif %}
     </mj-text>
 
