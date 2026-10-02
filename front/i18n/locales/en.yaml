@@ -1476,6 +1476,13 @@ admin:
     title: Application logs
     connecting: Connecting...
     connectionError: Connection error
+    actions:
+      level:
+        title: Modify logging level
+        buttonText: Logging level
+        level: Level
+        duration: Duration
+        durationHint: Once the period expires, the default level will be restored
 dashboardCollections:
   toolbarTitle: Dashboard collections ({count})
   pageDesc: Here you can create the dashboard collections that you want to be able to add into the spaces.
