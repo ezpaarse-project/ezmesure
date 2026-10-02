@@ -1488,6 +1488,13 @@ admin:
     title: Journaux applicatifs
     connecting: Connexion...
     connectionError: Erreur de connexion
+    actions:
+      level:
+        title: Modifier le niveau de log
+        buttonText: Niveau de log
+        level: Niveau
+        duration: Durée
+        durationHint: Une fois la durée écoulée, le niveau par défaut sera rétabli
 dashboardCollections:
   toolbarTitle: Collections de tableaux de bord ({count})
   pageDesc: Créez ici les collections de tableaux de bord que vous souhaitez pouvoir intégrer dans les espaces.
