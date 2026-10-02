@@ -3050,6 +3050,111 @@
         }
       }
     },
+    "/config/logging": {
+      "get": {
+        "summary": "Get current logging config",
+        "operationId": "get-config-logging",
+        "description": "Get current logging config",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Administration", "Config"],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "description": "Current logging level",
+                      "type": "string"
+                    },
+                    "levels": {
+                      "description": "List of available logging levels, sorted by severity",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/config/logging/level": {
+      "put": {
+        "summary": "Update logging level",
+        "operationId": "put-config-logging-level",
+        "description": "Update logging level",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["Administration", "Config"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "description": "The new logging level. Must be part of the available levels",
+                    "type": "string"
+                  },
+                  "duration": {
+                    "description": "Duration in seconds before the logging level comes back to default",
+                    "type": "number",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "description": "Current logging level",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
     "/custom-fields": {
       "get": {
         "summary": "Get custom fields",
