@@ -127,8 +127,8 @@ const {
     },
   },
   sortMapping: {
-    dashboards: 'dashboards._count',
-    spaces: 'spaces._count',
+    '_count.dashboards': 'dashboards._count',
+    '_count.spaces': 'spaces._count',
   },
   data: {
     sortBy: [
