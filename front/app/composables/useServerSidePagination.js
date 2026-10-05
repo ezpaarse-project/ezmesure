@@ -5,6 +5,7 @@ import {
   useI18n,
   useSnacksStore,
   useLocalStorage,
+  toValue,
 } from '#imports';
 
 /**
@@ -92,7 +93,7 @@ export default function useServerSidePagination(params = {}) {
           sort,
         };
 
-        const res = await $fetch.raw(url, fetchOpts);
+        const res = await $fetch.raw(toValue(url), fetchOpts);
 
         // Update item length
         itemLength.value.current = Number.parseInt(res.headers.get('x-total-count'), 10) || 0;
