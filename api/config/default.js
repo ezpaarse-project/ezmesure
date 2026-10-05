@@ -51,6 +51,7 @@ module.exports = {
     apiKey: '00000000-0000-0000-0000-000000000000',
   },
   logs: {
+    level: 'info',
     sse: {
       maxPoolSize: 20,
       heartbeatInterval: 10000,
