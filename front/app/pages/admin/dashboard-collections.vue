@@ -34,12 +34,13 @@
       return-object
       v-bind="vDataTableOptions"
     >
-      <template #[`item._count.dashboards`]="{ value }">
+      <template #[`item._count.dashboards`]="{ item, value }">
         <v-chip
           :text="`${value ?? 0}`"
           :variant="!value ? 'outlined' : undefined"
           prepend-icon="$mdi-view-dashboard"
           size="small"
+          @click="openDashboardsList(item.id)"
         />
       </template>
 
@@ -105,6 +106,7 @@
 
 <script setup>
 import DashboardCollectionFormDialog from '~/components/dashboardCollection/FormDialog.vue';
+import DashboardCollectionDashboardsDialog from '~/components/dashboardCollection/DashboardsDialog.vue';
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
@@ -191,6 +193,18 @@ function openCollectionForm(collectionId) {
     data: { collectionId },
     listeners: {
       submit: () => {
+        debouncedRefresh();
+      },
+    },
+  });
+}
+
+function openDashboardsList(collectionId) {
+  openDialog({
+    component: DashboardCollectionDashboardsDialog,
+    data: { collectionId },
+    listeners: {
+      afterLeave: () => {
         debouncedRefresh();
       },
     },
