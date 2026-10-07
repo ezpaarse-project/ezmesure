@@ -1,4 +1,4 @@
-issuer: {{ getenv "OIDC_ISSUER_URI" }}
+issuer: {{ getenv "EZMESURE_OIDC_ISSUER_URI" }}
 
 storage:
   type: sqlite3
@@ -21,9 +21,9 @@ logger:
 enablePasswordDB: true
 
 staticPasswords:
-  - email: {{ getenv "EZMESURE_ADMIN_EMAIL" "ezmesure-admin@example.com" }}
+  - email: {{ getenv "EZMESURE_ADMIN_EMAIL" }}
     hash: {{ getenv "EZMESURE_ADMIN_PASSWORD_HASH" }}
-    username: {{ getenv "EZMESURE_ADMIN_USERNAME" "ezmesure-admin" }}
+    username: {{ getenv "EZMESURE_ADMIN_USERNAME" }}
     userID: "CiQwOGE4Njg0Yi1kYjg4LTRiNzMtOTBhOS0zY2QxNjYxZjU0NjYSBWxvY2Fs"
 
 oauth2:
@@ -35,11 +35,11 @@ oauth2:
     - "refresh_token"
 
 staticClients:
-- id: {{ getenv "OIDC_CLIENT_ID" }}
-  secret: {{ getenv "OIDC_CLIENT_SECRET" }}
-  name: {{ getenv "OIDC_CLIENT_NAME"}}
+- id: {{ getenv "EZMESURE_OIDC_CLIENT_ID" }}
+  secret: {{ getenv "EZMESURE_OIDC_CLIENT_SECRET" }}
+  name: {{ getenv "EZMESURE_APP_NAME"}}
   redirectURIs:
-    - '{{ getenv "EZMESURE_PUBLIC_URL" }}/api/auth/oauth/login/callback'
+    - 'https://{{ getenv "EZMESURE_DOMAIN" }}/api/auth/oauth/login/callback'
 
 connectors:
 - type: mockCallback

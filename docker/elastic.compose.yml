@@ -1,0 +1,59 @@
+services:
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    restart: never
+    ports:
+      - 9200:9200
+      - 9300:9300
+    env_file:
+      - path: .env
+        required: true
+      - path: .env.local
+        required: false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data/elastic:/usr/share/elasticsearch/data
+    environment:
+      ELASTIC_PASSWORD: ${EZMESURE_ELASTICSEARCH_PASSWORD}
+      network.host: 0.0.0.0
+      discovery.type: single-node
+      bootstrap.memory_lock: 'true'
+      xpack.monitoring.enabled: 'true'
+      xpack.security.enabled: 'true'
+      xpack.security.authc.api_key.enabled: 'true'
+    healthcheck:
+      test: [CMD-SHELL, "curl --noproxy '*' --silent --fail http://elastic:${EZMESURE_ELASTICSEARCH_PASSWORD}@localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.14.1
+    restart: never
+    ports:
+      - 5601:5601
+    env_file:
+      - path: .env
+        required: true
+      - path: .env.local
+        required: false
+    environment:
+      ELASTICSEARCH_USERNAME: ${EZMESURE_ELASTICSEARCH_USERNAME}
+      ELASTICSEARCH_PASSWORD: ${EZMESURE_ELASTICSEARCH_PASSWORD}
+      SERVER_BASEPATH: /kibana
+      SERVER_PUBLICBASEURL: https://${EZMESURE_DOMAIN}/kibana
+      SERVER_DEFAULTROUTE: /app/dashboards
+      SERVER_HOST: 0.0.0.0
+      ELASTICSEARCH_HOSTS: http://elastic:9200
+      XPACK_MONITORING_ENABLED: 'true'
+    healthcheck:
+      test: [CMD-SHELL, "curl --noproxy '*' --fail http://localhost:5601 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      elastic:
+        condition: service_healthy

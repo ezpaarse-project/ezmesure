@@ -1,0 +1,10 @@
+# Override file for /compose.build.yml
+
+services:
+  api:
+    build:
+      context: ./api
+
+  rp:
+    build:
+      context: ./front

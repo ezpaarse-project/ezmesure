@@ -1,0 +1,41 @@
+# Override file for /compose.dev-satosa.yml
+
+services:
+  rp:
+    environment:
+      SATOSA_HOST: satosa:8080
+
+  dex:
+    extra_hosts:
+      - satosa.${EZMESURE_DOMAIN}:host-gateway
+    environment:
+      SATOSA_ENABLED: 1
+      SATOSA_PUBLIC_URL: https://${SATOSA_DOMAIN}
+
+  # We use SATOSA to proxy auth to Renater, you can skip that if your institutional provider already
+  # provides OIDC authentication
+  satosa:
+    build:
+      context: ./docker/satosa
+    restart: never
+    volumes:
+      - ./docker/satosa/certs:/etc/satosa/certs/
+      - ./docker/satosa/templates:/etc/satosa-templates/
+    env_file:
+      - path: .env
+        required: true
+      - path: .env.local
+        required: false
+    environment:
+      SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}
+      SATOSA_ENCRYPTION_KEY: super-secret
+      SATOSA_ENCRYPTION_SALT: randomSALTvalue
+
+      SAML_ORG_DISPLAY_NAME: CNRS - DSI
+      SAML_ORG_URL: https://www.cnrs.fr/fr/dsi
+
+      SAML_DISPLAY_NAME: ${EZMESURE_APPLICATION_NAME}
+      SAML_DS_URL: https://discovery.renater.fr/test
+      SAML_SERVERADMIN: support-sisr@inist.fr
+      SAML_ENTITY_ID: ${EZMESURE_PUBLIC_URL}/sp
+      SAML_METADATA_URL: https://pub.federation.renater.fr/metadata/test/idps.xml

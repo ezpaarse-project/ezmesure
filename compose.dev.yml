@@ -1,0 +1,7 @@
+include:
+  # Base layers
+  - compose.yml
+  - docker/elastic.compose.yml
+  - docker/dex.compose.yml
+  # Override layer
+  - docker/compose.dev.yml

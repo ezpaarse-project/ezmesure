@@ -1,0 +1,68 @@
+# Override file for /compose.dev.yml
+
+services:
+  rabbitmq:
+    volumes:
+      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./docker/rabbitmq/definitions.d:/etc/rabbitmq/definitions.d
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+
+  api:
+    image: node:24.20.0-alpine3.24
+    restart: never
+    working_dir: /usr/src/app
+    ports:
+      - 9229:9229 # Debug port
+    extra_hosts:
+      - ${EZMESURE_DOMAIN}:host-gateway
+    volumes:
+      - ./api:/usr/src/app
+      - ./docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
+    command: npm run dev
+    environment:
+      NODE_EXTRA_CA_CERTS: /etc/ssl/ezmesure.pem
+      EZMESURE_ADMIN_PASSWORD: changeme # Forced to match dex definition
+      EZMESURE_AUTH_PERSIST_ENCRYPT: "1"
+      EZMESURE_OIDC_DISCOVERY_URI: https://${EZMESURE_DOMAIN}/auth/.well-known/openid-configuration
+      SMTP_HOST: maildev
+      SMTP_PORT: "1025"
+      SMTP_SECURE: "false"
+      SMTP_IGNORE_TLS: "true"
+    depends_on:
+      elastic:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+      dex:
+        condition: service_started
+
+  front:
+    image: node:24.20.0-alpine3.24
+    command: npm run dev
+    restart: never
+    working_dir: /usr/src/app
+    tmpfs: /tmp
+    env_file:
+      - path: .env
+        required: true
+      - path: .env.local
+        required: false
+    volumes:
+      - ./front:/usr/src/app
+    depends_on:
+      api:
+        condition: service_healthy
+
+  rp:
+    image: nginx:1.29.1-alpine-slim
+    restart: never
+    volumes:
+      - ./docker/nginx:/etc/nginx/templates
+      - ./docker/certs:/etc/nginx/ssl
+    environment:
+      AUTH_HOST: dex:5556
+      FRONT_HOST: front:8080

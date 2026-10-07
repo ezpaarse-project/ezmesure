@@ -1,0 +1,5 @@
+include:
+  # Base layers
+  - compose.dev.yml
+  # Override layer
+  - docker/compose.dev-satosa.yml
