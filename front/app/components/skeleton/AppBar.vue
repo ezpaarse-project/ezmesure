@@ -24,10 +24,10 @@
           ezMESURE
 
           <div
-            v-if="currentInstance"
+            v-if="apiConfig?.instanceName"
             class="text-label-medium current-instance"
           >
-            {{ currentInstance }}
+            {{ apiConfig.instanceName }}
           </div>
         </div>
 
@@ -40,9 +40,7 @@
 <script setup>
 import logo from '@@/static/images/logo.png';
 
-const { public: config } = useRuntimeConfig();
-
-const currentInstance = computed(() => config.currentInstance);
+const { data: apiConfig } = await useApiConfig();
 </script>
 
 <style scoped lang="scss">

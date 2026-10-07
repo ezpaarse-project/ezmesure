@@ -1,0 +1,13 @@
+location /kibana/ {
+  proxy_pass  http://kibana_server/;
+}
+
+location ~* ^/kibana/(s/[a-z0-9_-]+/)?login/?$ {
+  rewrite     ^.*$ /_kbb break;
+
+  proxy_pass  http://api_server;
+}
+
+location ~* ^/kibana/s/[a-z0-9_-]+/security/account/?$ {
+  rewrite     ^.*$ /myspace/profile redirect;
+}
