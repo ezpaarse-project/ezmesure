@@ -129,6 +129,7 @@ module.exports = {
     },
   },
   counter: {
+    registryUrl: 'https://registry.countermetrics.org',
     defaultHarvestedReports: [
       'dr',
       'dr_d1',
@@ -196,7 +197,12 @@ module.exports = {
       counterRegistry: 24 * oneHour * 1000,
     },
   },
+  homepage: {
+    features: ['dashboard', 'repository', 'ezpaarse', 'counter', 'reporting'],
+    logos: ['slsp', 'csal', 'epfl', 'unige', 'cnrs', 'couperin', 'inist'],
+  },
   defaultLocale: 'en',
   appName: 'ezMESURE',
+  instanceName: '',
   publicUrl: 'https://ezmesure.couperin.org',
 };

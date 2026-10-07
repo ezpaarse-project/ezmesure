@@ -69,6 +69,7 @@
     }
   },
   "auth": {
+    "profilePage": "EZMESURE_OIDC_PROFILE_PAGE",
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE",
     "oidc": {
@@ -126,6 +127,7 @@
     }
   },
   "counter": {
+    "registryUrl": "EZMESURE_COUNTER_REGISTRY_URL",
     "defaultHarvestedReports": {
       "__name": "EZMESURE_DEFAULT_HARVESTED_REPORTS",
       "__format": "json"
@@ -224,7 +226,18 @@
       }
     }
   },
+  "homepage": {
+    "features": {
+      "__name": "EZMESURE_HOMEPAGE_FEATURES",
+      "__format": "json"
+    },
+    "logos": {
+      "__name": "EZMESURE_HOMEPAGE_LOGOS",
+      "__format": "json"
+    }
+  },
   "defaultLocale": "EZMESURE_DEFAULT_LOCALE",
   "appName": "EZMESURE_APP_NAME",
+  "instanceName": "EZMESURE_CURRENT_INSTANCE",
   "publicUrl": "EZMESURE_PUBLIC_URL"
 }
