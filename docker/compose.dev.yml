@@ -25,6 +25,10 @@ services:
     command: npm run dev
     environment:
       NODE_EXTRA_CA_CERTS: /etc/ssl/ezmesure.pem
+      ELASTICSEARCH_HOST: elastic
+      ELASTICSEARCH_PORT: 9200
+      KIBANA_HOST: kibana
+      KIBANA_PORT: 5601
       EZMESURE_ADMIN_PASSWORD: changeme # Forced to match dex definition
       EZMESURE_AUTH_PERSIST_ENCRYPT: "1"
       EZMESURE_OIDC_DISCOVERY_URI: https://${EZMESURE_DOMAIN}/auth/.well-known/openid-configuration
@@ -66,3 +70,11 @@ services:
     environment:
       AUTH_HOST: dex:5556
       FRONT_HOST: front:8080
+      KIBANA_HOST: kibana:5601
+
+  ezreeport:
+    image: ghcr.io/ezpaarse-project/ezreeport-aio:rc
+    restart: never
+    environment:
+      ELASTICSEARCH_HOST: elastic
+      ELASTICSEARCH_PORT: 9200

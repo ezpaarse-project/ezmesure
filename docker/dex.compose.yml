@@ -3,6 +3,7 @@ services:
   # as longs as it provides OIDC authentication
   dex:
     image: 'dexidp/dex:v2.45.1-alpine'
+    restart: never
     env_file:
       - path: .env
         required: true

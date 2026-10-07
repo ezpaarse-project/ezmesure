@@ -1,9 +1,5 @@
-node_modules
-data
-npm-debug.log
-storage
+data/
 ezmesure.local.env.sh
-certificates/
 
 docker/rabbitmq/definitions.d/00-users.json
 docker/satosa/certs/*
@@ -14,4 +10,3 @@ docker/certs/*
 compose.override.yml
 
 .env.local
-.env.override
