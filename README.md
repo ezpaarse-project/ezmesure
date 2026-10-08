@@ -11,8 +11,8 @@ https://ezmesure.couperin.org
 - [🛠️ Prerequisites](#-prerequisites)
 - [📦 Install](#-install)
 - [⚙️ Configure](#-configure)
-  - [HTTPS](#-https)
-  - [OpenID Connect](#-openid-connect)
+  - [🌐 HTTPS](#-https)
+  - [👥 OpenID Connect](#-openid-connect)
 - [🚀 Start application](#-start-application)
 - [🧪 Development](#-development)
 - [👷 Build](#-build)
@@ -136,15 +136,13 @@ EZREEPORT_ADMIN_KEY="<api key to save somewhere>"
 
 You can find all the available variables in the [`.env`](https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/.env) file.
 
-### HTTPS
+### 🌐 HTTPS
 
 **ezMESURE needs to be served over HTTPS** either with your own reverse proxy (Caddy, Traefik, etc.) or by the reverse proxy included with ezMESURE.
 
-<!-- TODO: websockets -->
+ezMESURE and ezREEPORT uses websockets to ensure some features, please ensure websocket support is included in your reverse proxy.
 
 #### Using the included reverse proxy
-
-<!-- TODO: openssl -->
 
 You'll need SSL certificate, you can generate them with [`mkcert`](https://github.com/FiloSottile/mkcert) or `openssl`.
 
@@ -266,13 +264,13 @@ server {
 
 <summary>Caddy</summary>
 
-```nginx
-
+```
+<!-- TODO: add example -->
 ```
 
 </details>
 
-### OpenID Connect
+### 👥 OpenID Connect
 
 > [!IMPORTANT]
 > When configuring your OpenID provider, be sure to register the following redirect URI with the provider: `https://${EZMESURE_DOMAIN}/api/auth/oauth/login/callback`
@@ -313,6 +311,17 @@ EZMESURE_ADMIN_EMAIL=admin@ezmesure.localhost
 
 ## 🚀 Start application
 
+```bash
+# Start application
+docker compose up -d
+
+# Access to logs
+docker compose logs [api|rp]
+
+# Stop application
+docker compose down
+```
+
 > [!WARNING]  
 > If using `podman compose`:
 >
@@ -325,17 +334,6 @@ EZMESURE_ADMIN_EMAIL=admin@ezmesure.localhost
 > NGINX_RESOLVER=10.89.0.1
 > ```
 
-```bash
-# Start application
-docker compose up -d
-
-# Access to logs
-docker compose logs [api|rp]
-
-# Stop application
-docker compose down
-```
-
 ## 🧪 Development
 
 You should clone the repository using `git` :
@@ -344,9 +342,20 @@ You should clone the repository using `git` :
 git clone https://github.com/ezpaarse-project/ezmesure.git
 ```
 
+It contains configuration files for running and developing ezMESURE. There's a dedicated `compose.dev.yml` (extending default `compose.yml`) to ease development.
+
 ### 🛠️ Prerequisites
 
 Unlike production setup, the development setup are including an OIDC provider ([Dex](https://dexidp.io/)) and a single-node ElasticSearch cluster preconfigured to be used by ezMESURE, so the prerequisites are a bit different
+
+> [!CAUTION]
+> ElasticSearch has some [system requirements](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-system-configuration) that you should check.
+>
+> To avoid memory exceptions, you may have to increase maps count. Edit `/etc/sysctl.conf` and add the following line :
+>
+> ```ini
+> vm.max_map_count=262144
+> ```
 
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
 - A dedicated DNS entry
@@ -361,7 +370,14 @@ Unlike production setup, the development setup are including an OIDC provider ([
   - You can use tools like `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert)
   - `localias` already includes a reverse proxy so you can skip the certificate and the private key CA is still needed)
 
-### 🚀 Start application
+### 🚀 Start developing
+
+```bash
+# Start application in dev mode
+docker compose -f compose.dev.yml up -d
+```
+
+Development setup already includes watch mode (for api) and hot module reloading (for front). So you can edit the code and watch changes go live.
 
 > [!WARNING]
 > If using `podman compose`:
@@ -375,12 +391,37 @@ Unlike production setup, the development setup are including an OIDC provider ([
 > NGINX_RESOLVER=10.89.0.1
 > ```
 
+### 🔒 SATOSA (optional)
+
+If you want to test SATOSA to test signin from the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all), you'll have additional configuration to do
+
+- Add a dedicated DNS entry
+- Put the certificate (`sp.crt`) and private key (`sp.key`) and the certificate used to sign the metadata file (`metadata.crt`) into `./docker/satosa/certs/`
+
+> [!NOTE]
+> If you're enabling SATOSA and SSL with the internal reverse proxy, SSL certificates should cover both hostnames
+
+> [!TIP]
+> You might have to change your `EZMESURE_DOMAIN` to match SP declaration
+
+And run the dedicated compose file to have a running instance of SATOSA with ezMESURE, RP and Dex pre-configured :
+
 ```bash
-docker compose -f compose.dev.yaml up -d
+# Start application in dev mode with SATOSA
+docker compose -f compose.dev-satosa.yml up -d
 ```
 
-Development setup already includes watch mode (for api) and hot module reloading (for front). So you can edit the code and watch changes go live.
+## 👷 Build
 
-<!--### 🔒 SATOSA
+There's a `compose.build.yml` (extending `compose.yml`) dedicated to building and pushing images
 
-## 👷 Build-->
+```bash
+# Build local images
+docker compose -f compose.build.yml build
+
+# Start application with local images (useful to test one last time)
+docker compose -f compose.build.yml up -d
+
+# Push local images to registry
+docker compose -f compose.build.yml push
+```
