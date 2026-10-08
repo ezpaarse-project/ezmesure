@@ -8,28 +8,39 @@ https://ezmesure.couperin.org
 
 ## Table of contents
 
-- [🛠️ Prerequisites](#-prerequisites)
-- [📦 Install](#-install)
-- [⚙️ Configure](#-configure)
-  - [🌐 HTTPS](#-https)
-  - [👥 OpenID Connect](#-openid-connect)
-- [🚀 Start application](#-start-application)
+<!--- [✨ Features](#-features)-->
+
+- [⚡ Quickstart](#-quickstart)
+  - [🛠️ Prerequisites](#-prerequisites)
+  - [📦 Install](#-install)
+  - [⚙️ Configure](#-configure)
+    - [🌐 HTTPS](#-https)
+    - [👥 OpenID Connect](#-openid-connect)
+  - [🚀 Start application](#-start-application)
+  - [🔃 Update application](#-update-application)
 - [🧪 Development](#-development)
+  - [🔒 SATOSA (optional)](#-satosa-optional)
 - [👷 Build](#-build)
 
 ---
 
-## 🛠️ Prerequisites
+<!--## ✨ Features-->
+
+## ⚡ Quickstart
+
+In order to self-host your own ezMESURE instance, you'll need to fulfill some requirements, install the application and configure it.
+
+### 🛠️ Prerequisites
 
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
 - OIDC provider (like [Keycloak](https://www.keycloak.org/), [Authelia](https://www.authelia.com/) and so on)
 - Production-ready [ElasticSearch](https://www.elastic.co/elasticsearch) cluster with [Kibana](https://www.elastic.co/kibana)
   - ezMESURE will manage a big part of the cluster and so it is recommended to have it's own cluster
-  - ezMESURE is not yet compatible with versions after 7, it is however planned to support ElasticSearch/Kibana 9
+  - ezMESURE only support version 7 for now, it is however planned to support ElasticSearch/Kibana 9
 - A dedicated DNS entry
 - SSL certificates for the domain serving ezMESURE (if not using your own reverse proxy, see [HTTPS](#-https) for more details)
 
-## 📦 Install
+### 📦 Install
 
 A `compose` example is available with some default env variables, but feel free to customise it to match your needs.
 
@@ -44,7 +55,7 @@ curl -o .env https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/he
 >
 > Here's a few links to help :
 >
-> - [Install Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docker.html)
+> - [Install ElasticSearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docker.html)
 > - [Install Kibana with Docker](https://www.elastic.co/guide/en/kibana/7.17/docker.html)
 
 > [!TIP]
@@ -52,7 +63,7 @@ curl -o .env https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/he
 >
 > You can use the compose file `docker/dex.compose.yml` to have non production ready [Dex](https://dexidp.io/) as a OIDC provider. It is used for development purposes but you can base your own from it.
 
-## ⚙️ Configure
+### ⚙️ Configure
 
 ezMESURE needs several environment variables to be properly started. You can directly edit variables present in the `.env` file or create a `.env.local` file and add your changes.
 
@@ -136,13 +147,13 @@ EZREEPORT_ADMIN_KEY="<api key to save somewhere>"
 
 You can find all the available variables in the [`.env`](https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/.env) file.
 
-### 🌐 HTTPS
+#### 🌐 HTTPS
 
 **ezMESURE needs to be served over HTTPS** either with your own reverse proxy (Caddy, Traefik, etc.) or by the reverse proxy included with ezMESURE.
 
 ezMESURE and ezREEPORT uses websockets to ensure some features, please ensure websocket support is included in your reverse proxy.
 
-#### Using the included reverse proxy
+##### Using the included reverse proxy
 
 You'll need SSL certificate, you can generate them with [`mkcert`](https://github.com/FiloSottile/mkcert) or `openssl`.
 
@@ -166,7 +177,7 @@ services:
 NGINX_PROTOCOL=https
 ```
 
-#### Using an external reverse proxy
+##### Using an external reverse proxy
 
 Here's a few configuration examples for popular reverse proxies :
 
@@ -270,7 +281,7 @@ server {
 
 </details>
 
-### 👥 OpenID Connect
+#### 👥 OpenID Connect
 
 > [!IMPORTANT]
 > When configuring your OpenID provider, be sure to register the following redirect URI with the provider: `https://${EZMESURE_DOMAIN}/api/auth/oauth/login/callback`
@@ -309,7 +320,9 @@ EZMESURE_ADMIN_FULLNAME=ezmesure-admin
 EZMESURE_ADMIN_EMAIL=admin@ezmesure.localhost
 ```
 
-## 🚀 Start application
+### 🚀 Start application
+
+Once configured, you can start ezMESURE using the following commands :
 
 ```bash
 # Start application
@@ -334,6 +347,24 @@ docker compose down
 > NGINX_RESOLVER=10.89.0.1
 > ```
 
+### 🔃 Update application
+
+To update ezMESURE (we're pushing 2 releases every month on average), you can run the following command :
+
+> [!TIP]
+> The following commands assume you use the `latest` (and `stable` for ezREEPORT) tags.
+>
+> However, you can pin version numbers in `compose.yml` (or use a `compose.override.yml`) and manually update them before running commands.
+
+```bash
+# Pull images
+docker compose pull
+# Stop application
+docker compose down
+# Restart application
+docker compose up -d
+```
+
 ## 🧪 Development
 
 You should clone the repository using `git` :
@@ -344,9 +375,7 @@ git clone https://github.com/ezpaarse-project/ezmesure.git
 
 It contains configuration files for running and developing ezMESURE. There's a dedicated `compose.dev.yml` (extending default `compose.yml`) to ease development.
 
-### 🛠️ Prerequisites
-
-Unlike production setup, the development setup are including an OIDC provider ([Dex](https://dexidp.io/)) and a single-node ElasticSearch cluster preconfigured to be used by ezMESURE, so the prerequisites are a bit different
+Unlike production setup, the development setup are including an OIDC provider ([Dex](https://dexidp.io/)) and a single-node ElasticSearch cluster preconfigured to be used by ezMESURE, so the prerequisites are a bit different :
 
 > [!CAUTION]
 > ElasticSearch has some [system requirements](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-system-configuration) that you should check.
@@ -370,7 +399,7 @@ Unlike production setup, the development setup are including an OIDC provider ([
   - You can use tools like `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert)
   - `localias` already includes a reverse proxy so you can skip the certificate and the private key CA is still needed)
 
-### 🚀 Start developing
+Once prerequisites are fulfilled, you can start dev server by running :
 
 ```bash
 # Start application in dev mode
