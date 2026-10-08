@@ -8,8 +8,7 @@ https://ezmesure.couperin.org
 
 ## Table of contents
 
-<!--- [✨ Features](#-features)-->
-
+- [✨ Features](#-features)
 - [⚡ Quickstart](#-quickstart)
   - [🛠️ Prerequisites](#-prerequisites)
   - [📦 Install](#-install)
@@ -25,7 +24,12 @@ https://ezmesure.couperin.org
 
 ---
 
-<!--## ✨ Features-->
+## ✨ Features
+
+- **Centralized repository**: ezMESURE is a repository centralizing the usage data of electronic documentation of higher education and research institutions.
+- **Data produced by ezPAARSE**: The data is produced by the various local institutional [ezPAARSE](https://github.com/ezpaarse-project/ezpaarse) entities before being aggregated in ezMESURE.
+- **COUNTER harvesting**: ezMESURE includes all the tools to harvest COUNTER-compliant reports directly from publisher platforms before aggregating them into [ElasticSearch](https://www.elastic.co/elasticsearch) indices, allowing users to consult data through [Kibana](https://www.elastic.co/kibana) dashboards.
+- **Regular PDF reports**: Integrated with [ezREEPORT](https://github.com/ezpaarse-project/ezreeport), ezMESURE can send condensed reports in PDF format on a recurring basis.
 
 ## ⚡ Quickstart
 
@@ -146,7 +150,7 @@ EZMESURE_AUTH_SECRET="<auth secret to persist>"
 EZREEPORT_ADMIN_KEY="<api key to save somewhere>"
 ```
 
-You can find all the available variables in the [`.env`](https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/.env) file.
+You can find all the available variables in the [`.env`](./.env) file.
 
 #### 🌐 HTTPS
 
@@ -279,7 +283,7 @@ server {
 In this example:
 
 - ezMESURE is served under `ezmesure.localhost`, you must change to match your DNS configuration
-- ezMESURE reverse proxy is assumed to be in the same docker network, you should change the `proxy_pass` directive to match your configuration
+- ezMESURE reverse proxy is assumed to be in the same docker network, you should change the `reverse_proxy` directive to match your configuration
 
 ```caddyfile
 ezmesure.localhost {
