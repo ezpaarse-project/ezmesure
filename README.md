@@ -1,247 +1,386 @@
 # ezMESURE
 
 Platform aggregating electronic resources usage statistics for the French researcher organizations.
+
 https://ezmesure.couperin.org
 
-## Prerequisites
-* [docker](https://www.docker.com/)
-* [docker-compose](https://docs.docker.com/compose/)
+---
 
-## Installation
+## Table of contents
+
+- [🛠️ Prerequisites](#-prerequisites)
+- [📦 Install](#-install)
+- [⚙️ Configure](#-configure)
+  - [HTTPS](#-https)
+  - [OpenID Connect](#-openid-connect)
+- [🚀 Start application](#-start-application)
+- [🧪 Development](#-development)
+- [👷 Build](#-build)
+
+---
+
+## 🛠️ Prerequisites
+
+- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
+- OIDC provider (like [Keycloak](https://www.keycloak.org/), [Authelia](https://www.authelia.com/) and so on)
+- Production-ready [ElasticSearch](https://www.elastic.co/elasticsearch) cluster with [Kibana](https://www.elastic.co/kibana)
+  - ezMESURE will manage a big part of the cluster and so it is recommended to have it's own cluster
+  - ezMESURE is not yet compatible with versions after 7, it is however planned to support ElasticSearch/Kibana 9
+- A dedicated DNS entry
+- SSL certificates for the domain serving ezMESURE (if not using your own reverse proxy, see [HTTPS](#-https) for more details)
+
+## 📦 Install
+
+A `compose` example is available with some default env variables, but feel free to customise it to match your needs.
+
+```bash
+# Download only needed files
+curl -o compose.yml https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/compose.yml
+curl -o .env https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/.env
+```
+
+> [!IMPORTANT]
+> The `compose.yml` doesn't include an OIDC provider and doesn't include a ElasticSearch cluster with Kibana. You have to provide your own and configure ezMESURE to use it (see [⚙️ Configure](#-configure)).
+>
+> Here's a few links to help :
+>
+> - [Install Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docker.html)
+> - [Install Kibana with Docker](https://www.elastic.co/guide/en/kibana/7.17/docker.html)
+
+> [!TIP]
+> You can use the compose file `docker/elastic.compose.yml` to have a single-node ElasticSearch cluster (non production ready). It is used for development purposes but you can base your own from it.
+>
+> You can use the compose file `docker/dex.compose.yml` to have non production ready [Dex](https://dexidp.io/) as a OIDC provider. It is used for development purposes but you can base your own from it.
+
+## ⚙️ Configure
+
+ezMESURE needs several environment variables to be properly started. You can directly edit variables present in the `.env` file or create a `.env.local` file and add your changes.
+
+Here's the minimal variables needed to be set to have a production instance :
+
+```.env
+# .env.local
+
+# How to connect to the ElasticSearch cluster
+# Option 1: Set every part of URL
+ELASTICSEARCH_SCHEME=http
+ELASTICSEARCH_HOST=elastic.localhost
+ELASTICSEARCH_PORT=9200
+# Option 2: Set the full URL
+ELASTICSEARCH_URL=http://elastic.localhost:9200
+# Credentials used to administrate the ElasticSearch cluster
+EZMESURE_ELASTICSEARCH_USERNAME=elastic
+EZMESURE_ELASTICSEARCH_PASSWORD=changeme
+# Credentials used to generate reports
+# Set this to a user having "run_as" and "monitor" privileges on the ElasticSearch Cluster
+# Option 1: Set username/password
+EZREEPORT_ELASTICSEARCH_USERNAME=elastic
+EZREEPORT_ELASTICSEARCH_PASSWORD=changeme
+# Option 2: Set API Key generated from cluster
+EZREEPORT_ELASTICSEARCH_API_KEY=
+
+# Connection options of Kibana (on the same ElasticSearch cluster)
+# Option 1: Set every part of URL
+KIBANA_HOST=kibana.localhost
+KIBANA_PORT=5601
+# Option 2: Set the full URL
+KIBANA_URL=http://kibana.localhost:5601
+# Credentials used to administrate Kibana
+# Note that the API will change the password for this user to the one provided
+EZMESURE_KIBANA_USERNAME=kibana_system
+EZMESURE_KIBANA_PASSWORD=changeme
+
+# Password to protect redis instance
+REDIS_PASSWORD=changeme
+
+# Connection options of mail server
+SMTP_HOST=smtp.localhost
+SMTP_PORT=25
+# Should use TLS immediately -> Set to "true" if using port 465, "false" (auto) otherwise
+SMTP_SECURE=false
+# Should ignore TLS support -> Set to "false" to use TLS (if available)
+SMTP_IGNORE_TLS=false
+# Should reject invalid TLS certificates
+SMTP_REJECT_UNAUTHORIZED=false
+
+# Connection options of Postgres
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+# Credentials used to connect to Postgres
+# Set this to a user having rights on "ezmesure" and "ezreeport"
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=changeme
+
+# Mail address to use when ezMESURE send mails
+EZMESURE_NOTIFICATIONS_SENDER="ezMESURE <noreply@ezmesure.localhost>"
+# Mail address to use when ezREEPORT send reports
+EZREEPORT_EMAIL_SENDER="ezREEPORT <noreply@ezreeport.localhost>"
+# Mail address to add as a "reply-to" header
+EZMESURE_NOTIFICATIONS_REPLY_TO=
+# Mail addresses to send reports error and failed reports
+EZREEPORT_EMAIL_SUPPORT_TEAM=
+
+# The public domain of your ezMESURE instance
+EZMESURE_DOMAIN=ezmesure.localhost
+
+# Default locale of the app
+EZMESURE_DEFAULT_LOCALE=fr
+
+# Secret to sign JWT used to interact with the API
+# Needs to be 32bytes
+EZMESURE_AUTH_SECRET="<auth secret to persist>"
+
+# Key to interact with ezREEPORT admin API, ezMESURE uses it to sync data
+EZREEPORT_ADMIN_KEY="<api key to save somewhere>"
+```
+
+You can find all the available variables in the [`.env`](https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/.env) file.
+
+### HTTPS
+
+**ezMESURE needs to be served over HTTPS** either with your own reverse proxy (Caddy, Traefik, etc.) or by the reverse proxy included with ezMESURE.
+
+<!-- TODO: websockets -->
+
+#### Using the included reverse proxy
+
+<!-- TODO: openssl -->
+
+You'll need SSL certificate, you can generate them with [`mkcert`](https://github.com/FiloSottile/mkcert) or `openssl`.
+
+1. Update the `compose.yml` file (you can use a `compose.override.yml`) to add a volume providing SSL certificate:
+
+```yaml
+# compose.override.yml
+
+services:
+  rp:
+    volumes:
+      - ./path/to/certificate/file.crt:/etc/nginx/ssl/cert.pem
+      - ./path/to/certificate/private-key.pem:/etc/nginx/ssl/key.pem
+```
+
+2. Update the `.env` file (you can use a `.env.local`) to add needed environment variables:
+
+```.env
+# .env.local
+
+NGINX_PROTOCOL=https
+```
+
+#### Using an external reverse proxy
+
+Here's a few configuration examples for popular reverse proxies :
+
+<details>
+
+<summary>Traefik</summary>
+
+In this example:
+
+- ezMESURE is served under `ezmesure.localhost`, you must change to match your DNS configuration.
+
+```yaml
+# compose.override.yml
+services:
+  rp:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ezmesure.rule=Host('ezmesure.localhost')
+      - traefik.http.routers.ezmesure.entrypoint=websecure
+      - traefik.http.routers.ezmesure.tls=true
+      # Use let's encrypt to generate certificates, you can use any certresolver
+      - traefik.http.routers.ezmesure.tls.certresolver=letsencrypt
+      - traefik.http.routers.ezmesure.tls.domains[0].main=ezmesure.localhost
+      - traefik.http.services.ezmesure.loadbalancer.server.port=80
+```
+
+</details>
+
+<details>
+
+<summary>NGINX</summary>
+
+In this example:
+
+- ezMESURE is served under `ezmesure.localhost`, you must change to match your DNS configuration
+- SSL certificate is in `/etc/nginx/ssl/cert.pem` and private key in `/etc/nginx/ssl/key.pem`, you should change to match your configuration
+- ezMESURE reverse proxy is assumed to be in the same docker network, you should change the `proxy_pass` directive to match your configuration
+
+```nginx
+server {
+  server_name ezmesure.localhost;
+
+  listen 80;
+  listen [::]:80;
+
+  location / {
+    return 301 https://ezmesure.localhost$request_uri;
+  }
+}
+
+server {
+  server_name ezmesure.localhost;
+
+  listen 443 ssl;
+  listen [::]:443 ssl;
+
+  ## Certificates
+  ssl_certificate /etc/nginx/ssl/cert.pem;
+  ssl_certificate_key /etc/nginx/ssl/key.pem;
+
+  proxy_set_header  X-Forwarded-Host   $host;
+  proxy_set_header  X-Forwarded-Server $host;
+  proxy_set_header  X-Forwarded-For    $proxy_add_x_forwarded_for;
+  proxy_hide_header X-Powered-By;
+
+  location / {
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+
+    proxy_pass  http://rp:80/;
+  }
+
+  ## Diffie-Hellman
+  ssl_ecdh_curve secp384r1;
+
+  ## Protocol
+  ssl_protocols TLSv1.2;
+
+  ## Cipher suite
+  ssl_ciphers EECDH+AESGCM:EECDH+CHACHA20:EECDH+AES;
+  ssl_prefer_server_ciphers on;
+
+  ## HTTP Strict Transport Security
+  add_header Strict-Transport-Security "max-age=15552000; preload";
+}
+
+```
+
+</details>
+
+<details>
+
+<summary>Caddy</summary>
+
+```nginx
+
+```
+
+</details>
+
+### OpenID Connect
+
+> [!IMPORTANT]
+> When configuring your OpenID provider, be sure to register the following redirect URI with the provider: `https://${EZMESURE_DOMAIN}/api/auth/oauth/login/callback`
+
+ezMESURE delegates user authentication to an OIDC server, edit the `.env` file (you can use a `.env.local`) to add needed environment variables:
+
+```.env
+#.env.local
+
+# client_id given by the provider
+EZMESURE_OIDC_CLIENT_ID="<client_id from provider>"
+# client_sercret given by the provider
+EZMESURE_OIDC_CLIENT_SECRET="<client_secret from provider>"
+
+# If your OpenID provider supports discovery:
+EZMESURE_OIDC_DISCOVERY_URI=https://auth.localhost/.well-known/openid-configuration
+
+# If your OpenID provider DOES NOT supports discovery:
+EZMESURE_OIDC_ISSUER_URI=https://auth.localhost
+EZMESURE_OIDC_AUTH_URI=https://auth.localhost/auth
+EZMESURE_OIDC_TOKEN_URI=https://auth.localhost/token
+EZMESURE_OIDC_INTROSPECTION_URI=https://auth.localhost/token/introspect
+EZMESURE_OIDC_REVOCATION_URI=https://auth.localhost/token/revoke
+EZMESURE_OIDC_USERINFO_URI=https://auth.localhost/userinfo
+
+# scopes to request to the provider, this is the default value
+EZMESURE_OIDC_SCOPES=["openid","profile","email","offline_access"]
+
+# Link to the "My Profile" page, makes it available for users (optional)
+EZMESURE_OIDC_PROFILE_PAGE=
+
+# Data for the default user (app admin)
+# Should match someone in your IDP to allow login
+EZMESURE_ADMIN_USERNAME=admin
+EZMESURE_ADMIN_FULLNAME=ezmesure-admin
+EZMESURE_ADMIN_EMAIL=admin@ezmesure.localhost
+```
+
+## 🚀 Start application
+
+> [!WARNING]  
+> If using `podman compose`:
+>
+> - You might encounter migration issues as it does not supports (yet) the `pre-up` directives.
+>   - You can use `podman compose run --rm "..."` to execute the scripts
+> - You'll need to add the following environment variable to the `.env` file (or create a `.env.local` file) :
+>
+> ```.env
+> # .env.local
+> NGINX_RESOLVER=10.89.0.1
+> ```
+
+```bash
+# Start application
+docker compose up -d
+
+# Access to logs
+docker compose logs [api|rp]
+
+# Stop application
+docker compose down
+```
+
+## 🧪 Development
+
+You should clone the repository using `git` :
 
 ```bash
 git clone https://github.com/ezpaarse-project/ezmesure.git
 ```
 
-## Configuration
+### 🛠️ Prerequisites
 
-### 0. Prerequisites
+Unlike production setup, the development setup are including an OIDC provider ([Dex](https://dexidp.io/)) and a single-node ElasticSearch cluster preconfigured to be used by ezMESURE, so the prerequisites are a bit different
 
-- ezMESURE needs **two** dedicated DNS entry: one for application, and one for for [`satosa`](https://github.com/IdentityPython/SATOSA/)
-  - For dev purposes, you can edit `/etc/hosts` to something like `ezmesure.localhost`. You can also use tools like [`localias`](https://github.com/peterldowns/localias)
+- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
+- A dedicated DNS entry
+  - Example environment uses `ezmesure.localhost`, you can change it by setting `EZMESURE_DOMAIN` in a `.env.local` file
+  - You can edit `/etc/hosts`
+  - You can also use tools like [`localias`](https://github.com/peterldowns/localias)
+- SSL certificates for the domain serving ezMESURE
+  - Internal reverse proxy expect the following locations:
+    - Certificate: `./docker/certs/cert.pem`
+    - Private key: `./docker/certs/key.pem`
+    - Authority: `./docker/certs/ca.pem`
+  - You can use tools like `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert)
+  - `localias` already includes a reverse proxy so you can skip the certificate and the private key CA is still needed)
 
-### 1. Setup environment
+### 🚀 Start application
 
-Create an environment file named `ezmesure.local.env.sh` and export the following environment variables. You can then source `ezmesure.env.sh` , which contains a set of predefined variables and is overridden by `ezmesure.local.env.sh`.
-
-**NB**: a helper script is available at `tools/init_env.sh`.
-
-| name | description |
-|------|-------------|
-| EZMESURE_DOMAIN | the ezmesure domain |
-| SATOSA_DOMAIN | the satosa domain |
-| SATOSA_ENCRYPTION_KEY | the satosa encryption key |
-| NGINX_PROTOCOL | The protocol used by the reverse proxy to serve ezMESURE |
-| EZMESURE_SMTP_HOST | host of the SMTP server |
-| ELASTIC_REQUIRED_STATUS | status of elastic cluster needed from ezmesure to connect |
-| EZMESURE_NOTIFICATIONS_RECIPIENTS | recipients of the recent activity email |
-| EZMESURE_NOTIFICATIONS_SUPPORT_RECIPIENTS | recipients of the recent activity email |
-
-### 2. Install SSL certificates
-
-ezMESURE needs to be served over HTTPS, by default the reverse proxy included with ezMESURE handles that, but needs proper SSL certificates in the following locations :
-
-- `./rp/certs/cert.pem` - The certificate
-- `./rp/certs/key.pem` - The private key
-
-**NB:** if you are using Satosa, the certificates must also cover its dedicated hostname
-
-You can skip this step by using a dedicated reverse proxy (cf. step 0).
-
-You can generate certificates with tools like [`mkcert`](https://github.com/FiloSottile/mkcert).
-
-### 3. Configure satosa
-
-Put the certificate (`server.crt`) and private key (`server.key`) used to declare the service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all), as well as the certificate used to sign the metadata file, in :
-
-- `./satosa/certs/sp.crt` - The certificate
-- `./satosa/certs/sp.key` - The private key
-- `./satosa/certs/metadata.crt` - The metadata signing certificate
-
-**NB**: the private key is critical and should not be shared.
-
-Additionally, set the environment variables `SAML_METADATA_URL` and `SAML_DS_URL` with the URL of the service provider and discovery service. Those variables are not necessary if you disable satosa authentication (see below).
-
-#### Disabling satosa
-
-If you don't need the satosa authentication, set the `SATOSA_ENABLED` environment variable to an empty string. If you already started ezMESURE, restart the `auth` service :
+> [!WARNING]
+> If using `podman compose`:
+>
+> - You might encounter migration issues as it does not supports (yet) the `pre-up` directives.
+>   - You can use `podman compose run --rm "..."` to execute the scripts
+> - You'll need to add the following environment variable to the `.env` file (or create a `.env.local` file) :
+>
+> ```.env
+> # .env.local
+> NGINX_RESOLVER=10.89.0.1
+> ```
 
 ```bash
-docker compose up -d --force-recreate auth
-docker compose restart rp
+docker compose -f compose.dev.yaml up -d
 ```
 
-### 4. Setup Elastic certificates
+Development setup already includes watch mode (for api) and hot module reloading (for front). So you can edit the code and watch changes go live.
 
-For each node in the cluster, add certificates in `elasticsearch/config/certificates/`. Kibana should also have certificates in `kibana/config/certificates`. If you don't have them yet, you can generate them by following these steps :
+<!--### 🔒 SATOSA
 
-  - Open the `certs` directory.
-  - Create an [instances.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/certutil.html#certutil-silent) file. A helper script is available at `tools/init_es_instances.sh`.
-  - Run `docker compose -f create-certs.yml run --rm create_certs`.
-  - A `bundle.zip` file should be created, just unzip it in the certificates directory (**NB**: you may need to `chown` it) :
-    - `unzip bundle.zip -d ../elasticsearch/config/certificates/`
-    - `unzip bundle.zip -d ../kibana/config/certificates/`
-
-
-### 5. Adjust system configuration for Elasticsearch
-
-Elasticsearch has some [system requirements](https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html) that you should check.
-
-To avoid memory exceptions, you may have to increase maps count. Edit `/etc/sysctl.conf` and add the following line :
-
-```ini
-# configuration needed for elastic search
-vm.max_map_count=262144
-```
-
-Then apply the changes :
-
-```bash
-sysctl -p
-```
-
-## Start / Stop / Status
-
-Before you start ezMESURE, make sure all necessary environment variables are set.
-
-```bash
-# Start ezMESURE as daemon
-docker compose up -d
-
-# Stop ezMESURE
-docker compose stop
-
-# Get the status of ezMESURE services
-docker compose ps
-```
-
-## Usage
-
-### Log in
-
-Navigate to https://localhost/myspace and log in with your identity provider.
-
-### Get your authentication token
-
-An authentication token is required in order to use the API. Once logged, grab your token from the authentication tab.
-
-To use your token, add the following header to your requests: `Authorization: Bearer <token>` (replace `<token>` with your actual token)
-
-### Upload a file
-
-To upload an EC result file in elastic-search, you need to `POST` it on the `/api/logs/{index_name}` route. For example :
-
-```bash
-curl -v -X POST https://localhost/api/logs/test-index -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv" -H "Authorization: Bearer <token>"
-```
-
-You can then issue a `GET` request on the `/api/logs` route to list your indices :
-
-```bash
-curl -X GET https://localhost/api/logs -H "Authorization: Bearer <token>"
-```
-
-### Visualize your data
-
-Now you can access the Kibana instance on https://localhost/kibana/ and start building dashboards.
-
-## API
-
-The ezMESURE API is documented here : https://localhost/api-reference
-
-## Dev mode
-
-### Prerequisites
-
-* [docker](https://www.docker.com/)
-* [docker compose](https://docs.docker.com/compose/)
-* [npm](https://docs.npmjs.com/about-npm)
-* [node 24](https://nodejs.org/en/)
-
-### 1. Install local dependencies
-
-You should install local dependencies with npm in `api` and `front` directory;
-
-```bash
-docker compose run --rm api npm ci
-
-docker compose run --rm front npm ci
-```
-
-### 2. Source environnement variable
-
-You should source ``ezmesure.env.sh`` for the following and before each start.
-
-```bash
-source ezmesure.env.sh
-```
-
-### 3. Install SSL certificates
-
-cf. Configuration - step 2
-
-### 4. Setup https for kibana and elastic
-
-ezmesure request to elastic in https, to do that, you need to create certificate.
-
-Before that, you need to create ``instances.yml`` file, you need to use a script that will help you to create that in ``init_es_instance.sh``. This script will pre-fill the necessary fields.
-
-```bash
-ezmesure/tools/init_es_instances.sh
-
-Adding new instance
-  Name: <Name>
-  IP: <IP>
-  Hostname: <Hostname>
-Instance added to ./tools/../certs/instances.yml
-Add another instance (Y/n) ? n
-```
-
-Once the file is created, you need to add elastic in dns and you can generate the certificates.
-
-```bash
-ezmesure/certs docker compose -f create-certs.yml run --rm create_certs
-```
-
-Once the certificates are generated, they must be unzipped and placed in the right folders.
-
-```bash
-ezmesure/certs sudo unzip bundle.zip -d ../elasticsearch/config/certificates/
-ezmesure/certs sudo unzip bundle.zip -d ../kibana/config/certificates/
-```
-
-### 5. Setup local DNS
-
-cf. Configuration - step 0
-
-### 6. Prepare start
-
-Before launching ezmesure, you have to create the elastic container and launch the database migration, for that you have to use these commands :
-
-```bash
-docker compose -f docker-compose.dev.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
-
-docker compose -f docker-compose.migrate.yml up api report
-```
-
-### 7. Start in dev mode
-
-```bash
-docker compose -f docker-compose.dev.yml up -d
-```
-
-### 8. Database update
-
-If you have updated the database schema, you need to migrate your database :
-
-```bash
-docker compose -f docker-compose.dev.yml run --rm api npx prisma db push
-```
-
-### 9. Test
-
-To start test, make sure you have a ezmesure started in dev mode
-
-```bash
-docker compose exec api npm run test
-```
+## 👷 Build-->

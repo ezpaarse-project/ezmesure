@@ -18,10 +18,8 @@ services:
         required: true
       - path: .env.local
         required: false
-    env:
-
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     pre_start:
       - command: ["/bin/sh", "-c", "psql -U ${POSTGRES_USER} -c createdb ${EZMESURE_POSTGRES_DB}"]
         entrypoint: ""
@@ -62,8 +60,8 @@ services:
     image: ghcr.io/ezpaarse-project/ezmesure-api:latest
     restart: unless-stopped
     volumes:
-      - ./data/api/storage:/usr/src/app/storage
-      - ./data/api/uploads:/usr/src/app/uploads
+      - ezmesure-data:/usr/src/app/storage
+      - ezmesure-uploads:/usr/src/app/uploads
     ports:
       - 3000:${EZMESURE_PORT}
     env_file:
@@ -124,8 +122,8 @@ services:
     image: ghcr.io/ezpaarse-project/ezreeport-aio:stable
     restart: unless-stopped
     volumes:
-      - ./data/ezreeport/reports:/data/ezreeport/reports
-      - ./data/ezreeport/db:/data/ezreeport/db
+      - ezreeport-data:/data/ezreeport/reports
+      - ezreeport-db:/data/ezreeport/db
     env_file:
       - path: .env
         required: true
@@ -159,3 +157,15 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+
+volumes:
+  postgres-data:
+    driver: local
+  ezmesure-data:
+    driver: local
+  ezmesure-uploads:
+    driver: local
+  ezreeport-data:
+    driver: local
+  ezreeport-db:
+    driver: local

@@ -15,7 +15,7 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ./data/elastic:/usr/share/elasticsearch/data
+      - elastic-data:/usr/share/elasticsearch/data
     environment:
       ELASTIC_PASSWORD: ${EZMESURE_ELASTICSEARCH_PASSWORD}
       network.host: 0.0.0.0
@@ -57,3 +57,7 @@ services:
     depends_on:
       elastic:
         condition: service_healthy
+
+volumes:
+  elastic-data:
+    driver: local
