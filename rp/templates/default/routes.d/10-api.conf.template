@@ -4,6 +4,10 @@ location /api/ {
   proxy_pass  http://api_server/;
 }
 
+location = /api/logs {
+  proxy_pass  http://api_server/logs;
+}
+
 location /api/logs/ {
   client_max_body_size 0;
   proxy_read_timeout 40m;
