@@ -18,6 +18,7 @@ https://ezmesure.couperin.org
     - [👥 OpenID Connect](#-openid-connect)
   - [🚀 Start application](#-start-application)
   - [🔃 Update application](#-update-application)
+- [🏗️ Architecture](#-architecture)
 - [🧪 Development](#-development)
   - [🔒 SATOSA (optional)](#-satosa-optional)
 - [👷 Build](#-build)
@@ -372,6 +373,26 @@ docker compose down
 # Restart application
 docker compose up -d
 ```
+
+## 🏗️ Architecture
+
+![architecture schema](./docs/architecture.png)
+
+The application is made of 2 essentials components :
+
+- **Backend**: a NodeJS HTTP API and a NodeJS sub-process (used to harvest COUNTER APIs)
+- **Frontend**: a NGINX serving the static Vue frontend and proxying requests to API, Kibana and ezREEPORT
+
+ezMESURE uses :
+
+- [PostgreSQL](https://www.postgresql.org/) to store management data (institutions, users, etc.)
+- [ElasticSearch](https://www.elastic.co/elasticsearch) to store usage data (with indices) and managing user access to data
+- [Kibana](https://www.elastic.co/kibana) to display usage data, the application will create spaces and manage user access to spaces
+- [ezREEPORT](https://github.com/ezpaarse-project/ezreeport) to send PDF reports by mail
+  - It will use [RabbitMQ](https://www.rabbitmq.com/) for internal communication
+  - It will use [PostgreSQL](https://www.postgresql.org/) to store report data
+- [Redis](https://redis.io/) to queue COUNTER harvest jobs
+- An OIDC Provider to manage user authentication
 
 ## 🧪 Development
 
