@@ -275,8 +275,16 @@ server {
 
 <summary>Caddy</summary>
 
-```
-<!-- TODO: add example -->
+In this example:
+
+- ezMESURE is served under `ezmesure.localhost`, you must change to match your DNS configuration
+- ezMESURE reverse proxy is assumed to be in the same docker network, you should change the `proxy_pass` directive to match your configuration
+
+```caddyfile
+ezmesure.localhost {
+  # By default, Caddy generates certificates with Let's Encrypt and redirects HTTP to HTTPS
+  reverse_proxy http://rp:80
+}
 ```
 
 </details>
