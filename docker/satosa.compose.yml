@@ -10,7 +10,7 @@ services:
       - ./docker/satosa/templates:/etc/satosa-templates/
     env_file: .env
     environment:
-      SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}
+      SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}
       SATOSA_ENCRYPTION_KEY: super-secret
       SATOSA_ENCRYPTION_SALT: randomSALTvalue
 
@@ -20,5 +20,5 @@ services:
       SAML_DISPLAY_NAME: ${EZMESURE_APP_NAME}
       SAML_DS_URL: https://discovery.renater.fr/test
       SAML_SERVERADMIN: support-sisr@inist.fr
-      SAML_ENTITY_ID: https://${EZMESURE_DOMAIN}/sp
+      SAML_ENTITY_ID: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/sp
       SAML_METADATA_URL: https://pub.federation.renater.fr/metadata/test/idps.xml

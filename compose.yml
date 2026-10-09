@@ -58,7 +58,7 @@ services:
       EZMESURE_REPORT_HOST: ezreeport
       EZMESURE_REPORT_PORT: ${EZREEPORT_PORT}
       EZMESURE_REPORT_ADMIN_KEY: ${EZREEPORT_ADMIN_KEY}
-      EZMESURE_PUBLIC_URL: https://${EZMESURE_DOMAIN}/
+      EZMESURE_PUBLIC_URL: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/
       EZMESURE_POSTGRES_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZMESURE_POSTGRES_DB}
     healthcheck:
       test: [CMD-SHELL, "wget -Y off --no-verbose --tries=1 --spider http://localhost:${EZMESURE_PORT}/ || exit 1"]
@@ -113,7 +113,7 @@ services:
       EZREEPORT_MAILS_CONCURRENCE: 1
       EZREEPORT_FILES_CONCURRENCE: 1
       EZREEPORT_API_URL: https://${EZMESURE_DOMAIN}/report/api
-      EZREEPORT_API_HOME: https://${EZMESURE_DOMAIN}
+      EZREEPORT_API_HOME: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/
       EZREEPORT_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}
     healthcheck:
       test: [CMD-SHELL, "wget -Y off --no-verbose --tries=1 --spider http://localhost:8080/health/probes/liveness || exit 1"]
