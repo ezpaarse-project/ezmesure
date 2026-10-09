@@ -752,57 +752,74 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     /**
      * Create jobs in bulk
      *
-     * @param {object[]} jobs Jobs to create
+     * @param {any[]} jobs Jobs to create
      *
      * @returns {Promise<import('../.prisma/client.mts').HarvestJob[]>} Created jobs
      */
-    const createJobs = async (jobs) => HarvestJobsService.$transaction(
-      async (service) => Promise.all(
-        jobs.map(async (data) => {
-          if (options.dryRun) {
-            return {
-              ...data,
-              credentialsId: data.credentials.id,
-              sessionId: data.session.id,
-            };
-          }
+    const createJobs = async (jobs) => {
+      const service = new HarvestJobsService();
 
-          const job = await service.findFirst({
-            where: {
-              ...data,
-              status: { not: 'finished' },
-            },
-          });
-          // if job exists, move it into waiting
-          if (job) {
-            return service.update({
-              where: { id: job.id },
-              data: {
-                status: 'waiting',
-                beginDate: data.beginDate,
-                endDate: data.endDate,
+      try {
+        const created = await Promise.all(
+          jobs.map(async (data) => {
+            if (options.dryRun) {
+              return {
+                ...data,
+                credentialsId: data.credentials.id,
+                sessionId: data.session.id,
+              };
+            }
+
+            const job = await service.findFirst({
+              where: {
+                ...data,
+                status: { not: 'finished' },
               },
             });
-          }
-          // if not, create new job
-          return service.create({
-            data: {
-              ...data,
-              repositoryPattern: undefined,
-              repository: {
-                connect: data.repository,
+            // if job exists, move it into waiting
+            if (job) {
+              return service.update({
+                where: { id: job.id },
+                data: {
+                  status: 'waiting',
+                  beginDate: data.beginDate,
+                  endDate: data.endDate,
+                },
+              });
+            }
+            // if not, create new job
+            return service.create({
+              data: {
+                ...data,
+                repositoryPattern: undefined,
+                repository: {
+                  connect: data.repository,
+                },
+                credentials: {
+                  connect: data.credentials,
+                },
+                session: {
+                  connect: data.session,
+                },
               },
-              credentials: {
-                connect: data.credentials,
-              },
-              session: {
-                connect: data.session,
-              },
-            },
-          });
-        }),
-      ),
-    );
+            });
+          }),
+        );
+
+        return created;
+      } catch (error) {
+        appLogger.error(`[harvest-start][${session.id}] Unable to create jobs: ${error.message}`);
+
+        try {
+          await service.deleteMany({ where: { sessionId: session.id } });
+        } catch (suberror) {
+          appLogger.error(`[harvest-start][${session.id}] Unable to delete created jobs: ${suberror.message}`);
+          throw new Error(`Unable to create jobs and delete created jobs: ${error.message} - ${suberror.message}. Please delete session and try again.`);
+        }
+
+        throw new Error(`Unable to create jobs: ${error.message}`);
+      }
+    };
 
     if (options.dryRun) {
       appLogger.verbose(`[harvest-start][${session.id}] Running in dry mode, no real updates are done`);
