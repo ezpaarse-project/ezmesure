@@ -168,7 +168,7 @@ You'll need SSL certificate, you can generate them with [`mkcert`](https://githu
 # compose.override.yml
 
 services:
-  rp:
+  front:
     volumes:
       - ./path/to/certificate/file.crt:/etc/nginx/ssl/cert.pem
       - ./path/to/certificate/private-key.pem:/etc/nginx/ssl/key.pem
@@ -197,7 +197,7 @@ In this example:
 ```yaml
 # compose.override.yml
 services:
-  rp:
+  front:
     labels:
       - traefik.enable=true
       - traefik.http.routers.ezmesure.rule=Host('ezmesure.localhost')
@@ -255,7 +255,7 @@ server {
     proxy_set_header Host $host;
     proxy_cache_bypass $http_upgrade;
 
-    proxy_pass  http://rp:80/;
+    proxy_pass  http://front:80/;
   }
 
   ## Diffie-Hellman
@@ -288,7 +288,7 @@ In this example:
 ```caddyfile
 ezmesure.localhost {
   # By default, Caddy generates certificates with Let's Encrypt and redirects HTTP to HTTPS
-  reverse_proxy http://rp:80
+  reverse_proxy http://front:80
 }
 ```
 
@@ -342,7 +342,7 @@ Once configured, you can start ezMESURE using the following commands :
 docker compose up -d
 
 # Access to logs
-docker compose logs [api|rp]
+docker compose logs [api|front]
 
 # Stop application
 docker compose down
@@ -351,7 +351,7 @@ docker compose down
 > [!WARNING]  
 > If using `podman compose`:
 >
-> - You might encounter migration issues as it does not supports (yet) the `pre-up` directives.
+> - You might encounter migration issues as it does not supports (yet) the `pre_start` and `post_start` directives.
 >   - You can use `podman compose run --rm "..."` to execute the scripts
 > - You'll need to add the following environment variable to the `.env` file (or create a `.env.local` file) :
 >
@@ -400,10 +400,14 @@ ezMESURE uses :
 
 ## 🧪 Development
 
-You should clone the repository using `git` :
+You should clone the repository using `git` and install dependencies of both services :
 
 ```bash
+# Clone project
 git clone https://github.com/ezpaarse-project/ezmesure.git
+# Install dependencies
+npm --prefix api ci
+npm --prefix front ci
 ```
 
 It contains configuration files for running and developing ezMESURE. There's a dedicated `compose.dev.yml` (extending default `compose.yml`) to ease development.
@@ -430,7 +434,7 @@ Unlike production setup, the development setup are including an OIDC provider ([
     - Private key: `./docker/certs/key.pem`
     - Authority: `./docker/certs/ca.pem`
   - You can use tools like `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert)
-  - `localias` already includes a reverse proxy so you can skip the certificate and the private key CA is still needed)
+  - `localias` already includes a reverse proxy so you can skip the certificate and the private key (CA is still needed)
 
 Once prerequisites are fulfilled, you can start dev server by running :
 
@@ -444,8 +448,8 @@ Development setup already includes watch mode (for api) and hot module reloading
 > [!WARNING]
 > If using `podman compose`:
 >
-> - You might encounter migration issues as it does not supports (yet) the `pre-up` directives.
->   - You can use `podman compose run --rm "..."` to execute the scripts
+> - You might encounter migration issues as it does not supports (yet) the `pre_start` and `post_start` directives.
+>   - You can use `podman compose -f compose.dev.yml run --rm "..."` to execute the scripts
 > - You'll need to add the following environment variable to the `.env` file (or create a `.env.local` file) :
 >
 > ```.env

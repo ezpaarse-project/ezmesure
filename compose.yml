@@ -14,9 +14,9 @@ services:
     image: postgres:17.6-alpine3.22
     restart: unless-stopped
     env_file:
-      - path: $(PWD)/.env
+      - path: .env
         required: true
-      - path: $(PWD)/.env.local
+      - path: .env.local
         required: false
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -25,7 +25,7 @@ services:
       - command: ["/bin/sh", "-c", "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"]
       - command: ["/bin/sh", "-c", "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"]
     healthcheck:
-      test: [CMD-SHELL, "pg_isready -U ${POSTGRES_USER}"]
+      test: [CMD-SHELL, "pg_isready -U ${POSTGRES_USER} -d ${EZMESURE_POSTGRES_DB} && pg_isready -U ${POSTGRES_USER} -d ${EZREEPORT_POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,9 +35,9 @@ services:
     restart: unless-stopped
     command: --requirepass '${REDIS_PASSWORD}'
     env_file:
-      - path: $(PWD)/.env
+      - path: .env
         required: true
-      - path: $(PWD)/.env.local
+      - path: .env.local
         required: false
     healthcheck:
       test: [CMD-SHELL, "redis-cli -a '${REDIS_PASSWORD}' ping | grep PONG"]
@@ -64,9 +64,9 @@ services:
     ports:
       - 3000:${EZMESURE_PORT}
     env_file:
-      - path: $(PWD)/.env
+      - path: .env
         required: true
-      - path: $(PWD)/.env.local
+      - path: .env.local
         required: false
     environment:
       EZMESURE_REPORT_HOST: ezreeport
@@ -90,16 +90,16 @@ services:
       - command: ["/bin/sh", "-c", "npm install --no-save prisma && npm run db:migrate"]
         entrypoint: ""
 
-  rp:
+  front:
     image: ghcr.io/ezpaarse-project/ezmesure-front:latest
     restart: unless-stopped
     ports:
       - 8443:443
       - 8880:80
     env_file:
-      - path: $(PWD)/.env
+      - path: .env
         required: true
-      - path: $(PWD)/.env.local
+      - path: .env.local
         required: false
     environment:
       API_HOST: api:${EZMESURE_PORT}
@@ -121,9 +121,9 @@ services:
       - ezreeport-data:/data/ezreeport/reports
       - ezreeport-db:/data/ezreeport/db
     env_file:
-      - path: $(PWD)/.env
+      - path: .env
         required: true
-      - path: $(PWD)/.env.local
+      - path: .env.local
         required: false
     environment:
       EZREEPORT_API_HTTP_PORT: ${EZREEPORT_PORT}

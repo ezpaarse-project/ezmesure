@@ -7,6 +7,6 @@ docker/satosa/certs/*
 docker/certs/*
 !docker/certs/.gitkeep
 
-compose.override.yml
+compose*.override.yml
 
 .env.local
