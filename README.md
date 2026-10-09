@@ -474,7 +474,7 @@ And run the dedicated compose file to have a running instance of SATOSA with ezM
 
 ```bash
 # Start application in dev mode with SATOSA
-docker compose -f compose.dev-satosa.yml up -d
+docker compose -f compose.dev.yml -f compose.dev-satosa.yml up -d
 ```
 
 ## 👷 Build

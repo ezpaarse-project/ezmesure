@@ -1,55 +1,15 @@
-# Add ES and SATOSA pre-configured for dev
+# This compose file is expected to be used alongside compose.dev.yml
+
+# Add SATOSA pre-configured for dev
 include:
-  - path: docker/elastic.compose.yml
-    project_directory: .
-  - path: docker/dex.compose.yml
-    project_directory: .
   - path: docker/satosa.compose.yml
     project_directory: .
 
 services:
-  postgres:
-    extends:
-      file: compose.dev.yml
-      service: postgres
-
-  redis:
-    extends:
-      file: compose.dev.yml
-      service: redis
-
-  rabbitmq:
-    extends:
-      file: compose.dev.yml
-      service: rabbitmq
-
-  api:
-    extends:
-      file: compose.dev.yml
-      service: api
-
   rp:
-    extends:
-      file: compose.dev.yml
-      service: rp
     environment:
       SATOSA_DOMAIN: satosa.${EZMESURE_DOMAIN}
       SATOSA_HOST: satosa:8080
-
-  ezreeport:
-    extends:
-      file: compose.dev.yml
-      service: ezreeport
-
-  front:
-    extends:
-      file: compose.dev.yml
-      service: front
-
-  maildev:
-    extends:
-      file: compose.dev.yml
-      service: maildev
 
   dex:
     extra_hosts:
@@ -57,16 +17,3 @@ services:
     environment:
       SATOSA_ENABLED: 1
       SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}
-
-# Volumes are needed when extending
-volumes:
-  postgres-data:
-    driver: local
-  ezmesure-data:
-    driver: local
-  ezmesure-uploads:
-    driver: local
-  ezreeport-data:
-    driver: local
-  ezreeport-db:
-    driver: local
