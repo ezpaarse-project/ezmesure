@@ -367,8 +367,10 @@ docker compose down
 > [!WARNING]  
 > If using `podman compose`:
 >
-> - You might encounter migration issues as it does not supports (yet) the `pre_start` and `post_start` directives.
->   - You can use `podman compose run --rm "..."` to execute the scripts
+> - You might encounter database issues as it does not supports (yet) the `pre_start` and `post_start` directives, you should run the following commands :
+>   - `podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"`
+>   - `podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"`
+>   - `podman compose run --rm api "npm install --no-save prisma && npm run db:migrate"`
 > - You'll need to add the following environment variable to the `.env` file :
 >
 > ```.env
@@ -416,7 +418,21 @@ ezMESURE uses :
 
 ## 🧪 Development
 
-You should clone the repository using `git` and install dependencies of both services :
+Unlike production setup, the development setup are including an OIDC provider ([Dex](https://dexidp.io/)) and a single-node ElasticSearch cluster preconfigured to be used by ezMESURE, so the prerequisites are a bit different :
+
+> [!CAUTION]
+> ElasticSearch has some [system requirements](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-system-configuration) that you should check.
+>
+> To avoid memory exceptions, you may have to increase maps count. Edit `/etc/sysctl.conf` and add the following line :
+>
+> ```ini
+> vm.max_map_count=262144
+> ```
+
+- Node 24
+- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
+
+You should clone the repository using `git`, it contains configuration files for running and developing ezMESURE with a dedicated `compose.dev.yml` (extending default `compose.yml`) to ease development. You'll also need default environment and to install dependencies :
 
 ```bash
 # Clone project
@@ -429,33 +445,37 @@ npm --prefix front ci
 cp .env.example .env
 ```
 
-It contains configuration files for running and developing ezMESURE. There's a dedicated `compose.dev.yml` (extending default `compose.yml`) to ease development.
-
-Unlike production setup, the development setup are including an OIDC provider ([Dex](https://dexidp.io/)) and a single-node ElasticSearch cluster preconfigured to be used by ezMESURE, so the prerequisites are a bit different :
-
-> [!CAUTION]
-> ElasticSearch has some [system requirements](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-system-configuration) that you should check.
+> [!TIP]
+> To serve the application You can use tools like [`localias`](https://github.com/peterldowns/localias), that includes `/etc/hosts`, a reverse proxy and SSL management.
 >
-> To avoid memory exceptions, you may have to increase maps count. Edit `/etc/sysctl.conf` and add the following line :
+> If so you can set the following environment variable to the `.env` file :
 >
-> ```ini
-> vm.max_map_count=262144
+> ```.env
+> # .env
+> NGINX_PROTOCOL="http"
+> EZMESURE_PUBLIC_PORT=""
 > ```
+>
+> Remember to add the Certificate Authority of `localias` to `./docker/certs/ca.pem`
 
-- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
-- A dedicated DNS entry
-  - Example environment uses `ezmesure.localhost`, you can change it by setting `EZMESURE_DOMAIN` in the `.env` file
-  - You can edit `/etc/hosts`
-  - You can also use tools like [`localias`](https://github.com/peterldowns/localias)
-    - If using `localias` (or other tools providing a reverse proxy) you'll need to `EZMESURE_PUBLIC_PORT` to `""`
-- SSL certificates for the domain serving ezMESURE
-  - Set `NGINX_PROTOCOL=https` in the `.env` file
-  - Internal reverse proxy expect the following locations:
-    - Certificate: `./docker/certs/cert.pem`
-    - Private key: `./docker/certs/key.pem`
-    - Authority: `./docker/certs/ca.pem`
-  - You can use tools like `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert)
-  - `localias` already includes a reverse proxy so you can skip the port in `EZMESURE_DOMAIN` the certificate and the private key (CA is still needed)
+### 1. Setup DNS entry
+
+Example environment uses `ezmesure.localhost`, you can change it by setting `EZMESURE_DOMAIN` in the `.env` file.
+
+- Edit `/etc/hosts` and add the following line : `127.0.0.1    ezmesure.localhost`
+- Set the following environment variable to the `.env` file :
+
+```.env
+# .env
+NGINX_PROTOCOL="https"
+EZMESURE_PUBLIC_PORT=":8443"
+```
+
+- Generate SSL certificates for the domain serving ezMESURE (using `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert))
+- Place the SSL certificate for the internal reverse proxy at the following locations:
+  - Certificate: `./docker/certs/cert.pem`
+  - Private key: `./docker/certs/key.pem`
+  - Authority: `./docker/certs/ca.pem`
 
 Once prerequisites are fulfilled, you can start dev server by running :
 
@@ -469,9 +489,11 @@ Development setup already includes watch mode (for api) and hot module reloading
 > [!WARNING]
 > If using `podman compose`:
 >
-> - You might encounter migration issues as it does not supports (yet) the `pre_start` and `post_start` directives.
->   - You can use `podman compose -f compose.dev.yml run --rm "..."` to execute the scripts
-> - You'll need to add the following environment variable to the `.env` file :
+> - You might encounter database issues as it does not supports (yet) the `pre_start` and `post_start` directives, you should run the following commands :
+>   - `podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"`
+>   - `podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"`
+>   - `podman compose run --rm api "npx prisma generate && npx prisma db push"`
+> - You'll need to set the following environment variable to the `.env` file :
 >
 > ```.env
 > # .env
