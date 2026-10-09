@@ -3,8 +3,8 @@
 services:
   api:
     build:
-      context: ./api
+      context: ${PWD}/api
 
   rp:
     build:
-      context: ./front
+      context: ${PWD}/front

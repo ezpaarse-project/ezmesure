@@ -20,8 +20,8 @@ services:
     extra_hosts:
       - ${EZMESURE_DOMAIN}:host-gateway
     volumes:
-      - ./api:/usr/src/app
-      - ./docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
+      - ${PWD}/api:/usr/src/app
+      - ${PWD}/docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
     command: npm run dev
     environment:
       NODE_EXTRA_CA_CERTS: /etc/ssl/ezmesure.pem
@@ -51,9 +51,9 @@ services:
     working_dir: /usr/src/app
     tmpfs: /tmp
     env_file:
-      - path: .env
+      - path: ${PWD}/.env
         required: true
-      - path: .env.local
+      - path: ${PWD}/.env.local
         required: false
     volumes:
       - ./front:/usr/src/app
@@ -65,8 +65,8 @@ services:
     image: nginx:1.29.1-alpine-slim
     restart: "no"
     volumes:
-      - ./docker/nginx:/etc/nginx/templates
-      - ./docker/certs:/etc/nginx/ssl
+      - ${PWD}/docker/nginx:/etc/nginx/templates
+      - ${PWD}/docker/certs:/etc/nginx/ssl
     environment:
       AUTH_HOST: dex:5556
       FRONT_HOST: front:8080

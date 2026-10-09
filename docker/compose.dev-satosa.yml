@@ -16,11 +16,11 @@ services:
   # provides OIDC authentication
   satosa:
     build:
-      context: ./docker/satosa
+      context: ${PWD}/docker/satosa
     restart: "no"
     volumes:
-      - ./docker/satosa/certs:/etc/satosa/certs/
-      - ./docker/satosa/templates:/etc/satosa-templates/
+      - ${PWD}/docker/satosa/certs:/etc/satosa/certs/
+      - ${PWD}/docker/satosa/templates:/etc/satosa-templates/
     env_file:
       - path: .env
         required: true

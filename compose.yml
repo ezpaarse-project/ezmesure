@@ -14,9 +14,9 @@ services:
     image: postgres:17.6-alpine3.22
     restart: unless-stopped
     env_file:
-      - path: .env
+      - path: $(PWD)/.env
         required: true
-      - path: .env.local
+      - path: $(PWD)/.env.local
         required: false
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -35,9 +35,9 @@ services:
     restart: unless-stopped
     command: --requirepass '${REDIS_PASSWORD}'
     env_file:
-      - path: .env
+      - path: $(PWD)/.env
         required: true
-      - path: .env.local
+      - path: $(PWD)/.env.local
         required: false
     healthcheck:
       test: [CMD-SHELL, "redis-cli -a '${REDIS_PASSWORD}' ping | grep PONG"]
@@ -64,9 +64,9 @@ services:
     ports:
       - 3000:${EZMESURE_PORT}
     env_file:
-      - path: .env
+      - path: $(PWD)/.env
         required: true
-      - path: .env.local
+      - path: $(PWD)/.env.local
         required: false
     environment:
       EZMESURE_REPORT_HOST: ezreeport
@@ -87,7 +87,7 @@ services:
       ezreeport:
         condition: service_healthy
     pre_start:
-      - command: ["/bin/sh", "-c", "npm install prisma && npm run db:migrate"]
+      - command: ["/bin/sh", "-c", "npm install --no-save prisma && npm run db:migrate"]
         entrypoint: ""
 
   rp:
@@ -97,9 +97,9 @@ services:
       - 8443:443
       - 8880:80
     env_file:
-      - path: .env
+      - path: $(PWD)/.env
         required: true
-      - path: .env.local
+      - path: $(PWD)/.env.local
         required: false
     environment:
       API_HOST: api:${EZMESURE_PORT}
@@ -121,9 +121,9 @@ services:
       - ezreeport-data:/data/ezreeport/reports
       - ezreeport-db:/data/ezreeport/db
     env_file:
-      - path: .env
+      - path: $(PWD)/.env
         required: true
-      - path: .env.local
+      - path: $(PWD)/.env.local
         required: false
     environment:
       EZREEPORT_API_HTTP_PORT: ${EZREEPORT_PORT}

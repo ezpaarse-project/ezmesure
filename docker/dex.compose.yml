@@ -5,14 +5,14 @@ services:
     image: 'dexidp/dex:v2.45.1-alpine'
     restart: "no"
     env_file:
-      - path: .env
+      - path: ${PWD}/.env
         required: true
-      - path: .env.local
+      - path: ${PWD}/.env.local
         required: false
     environment:
       EZMESURE_OIDC_ISSUER_URI: https://${EZMESURE_DOMAIN}/auth
       # echo changeme | htpasswd -BinC 10 admin | cut -d: -f2
       EZMESURE_ADMIN_PASSWORD_HASH: "$2y$10$/Ctv48gjpa9DbcRB3djGQOujxIoUCfxrfFlwYKtW4k6D6.SgC6OP."
     volumes:
-      - ./docker/dex/dex.yaml:/etc/dex/config.docker.yaml
-      - ./docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
+      - ${PWD}/docker/dex/dex.yaml:/etc/dex/config.docker.yaml
+      - ${PWD}/docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
