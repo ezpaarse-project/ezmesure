@@ -199,7 +199,7 @@ module.exports = {
   },
   homepage: {
     features: ['dashboard', 'repository', 'ezpaarse', 'counter', 'reporting'],
-    logos: ['slsp', 'csal', 'epfl', 'unige', 'cnrs', 'couperin', 'inist'],
+    logos: ['slsp', 'csal', 'epfl', 'unige', 'cnrs', 'couperin'],
   },
   defaultLocale: 'en',
   appName: 'ezMESURE',
