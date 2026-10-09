@@ -12,7 +12,7 @@ services:
 
   dex:
     extra_hosts:
-      - satosa.${EZMESURE_DOMAIN}=host-gateway
+      - satosa.${EZMESURE_DOMAIN}:host-gateway
     environment:
       SATOSA_ENABLED: 1
       SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}

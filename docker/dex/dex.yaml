@@ -39,7 +39,7 @@ staticClients:
   secret: {{ getenv "EZMESURE_OIDC_CLIENT_SECRET" }}
   name: {{ getenv "EZMESURE_APP_NAME"}}
   redirectURIs:
-    - 'https://{{ getenv "EZMESURE_DOMAIN" }}/api/auth/oauth/login/callback'
+    - 'https://{{ getenv "EZMESURE_DOMAIN" }}{{ getenv "EZMESURE_PUBLIC_PORT" }}/api/auth/oauth/login/callback'
 
 connectors:
 - type: mockCallback

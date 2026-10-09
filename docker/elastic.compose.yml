@@ -14,6 +14,7 @@ services:
       - elastic-data:/usr/share/elasticsearch/data
     environment:
       ELASTIC_PASSWORD: ${EZMESURE_ELASTICSEARCH_PASSWORD}
+      ES_JAVA_OPTS: -Xms4g -Xmx4g
       network.host: 0.0.0.0
       discovery.type: single-node
       bootstrap.memory_lock: 'true'

@@ -37,7 +37,7 @@ services:
     ports:
       - 9229:9229 # Debug port
     extra_hosts:
-      - ${EZMESURE_DOMAIN}=host-gateway
+      - ${EZMESURE_DOMAIN}:host-gateway
     volumes:
       - ./api:/usr/src/app
       - ./docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
