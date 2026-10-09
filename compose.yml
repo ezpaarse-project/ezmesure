@@ -1,0 +1,141 @@
+services:
+  # ezMESURE expects to have a Elastic cluster with Kibana,
+  # for simplifications reasons it is skipped in this compose file.
+  # It is recommended to run a production cluster:
+  # - https://www.elastic.co/guide/en/elasticsearch/reference/7.17/install-elasticsearch.html
+  # - https://www.elastic.co/guide/en/kibana/7.17/install.html
+  # However you can check `docker/elastic.compose.yml` to have a single node instance.
+
+  # ezMESURE expects to have a OIDC provider to sign in users,
+  # for simplifications reasons it is skipped in this compose file.
+  # You can check `docker/dex.compose.yml` to have an example with Dex.
+
+  postgres:
+    image: postgres:17.6-alpine3.22
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    post_start:
+      - command: ["/bin/sh", "-c", "until pg_isready -U $POSTGRES_USER; do sleep 1; done"]
+      - command: ["/bin/sh", "-c", "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"]
+      - command: ["/bin/sh", "-c", "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U ${POSTGRES_USER} -d ${EZMESURE_POSTGRES_DB} && pg_isready -U ${POSTGRES_USER} -d ${EZREEPORT_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8.2.2-alpine3.22
+    restart: unless-stopped
+    command: --requirepass '${REDIS_PASSWORD}'
+    env_file: .env
+    healthcheck:
+      test: [CMD-SHELL, "redis-cli -a '${REDIS_PASSWORD}' ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4.1.4-alpine
+    restart: unless-stopped
+    user: rabbitmq
+    healthcheck:
+      test: [CMD-SHELL, "rabbitmq-diagnostics -q ping"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  api:
+    image: ghcr.io/ezpaarse-project/ezmesure-api:latest
+    restart: unless-stopped
+    volumes:
+      - ezmesure-data:/usr/src/app/storage
+      - ezmesure-uploads:/usr/src/app/uploads
+    env_file: .env
+    environment:
+      EZMESURE_REPORT_HOST: ezreeport
+      EZMESURE_REPORT_PORT: ${EZREEPORT_PORT}
+      EZMESURE_REPORT_ADMIN_KEY: ${EZREEPORT_ADMIN_KEY}
+      EZMESURE_PUBLIC_URL: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/
+      EZMESURE_POSTGRES_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZMESURE_POSTGRES_DB}
+    healthcheck:
+      test: [CMD-SHELL, "wget -Y off --no-verbose --tries=1 --spider http://localhost:${EZMESURE_PORT}/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ezreeport:
+        condition: service_healthy
+    pre_start:
+      - command: ["/bin/sh", "-c", "npm install --no-save prisma && npm run db:migrate"]
+        entrypoint: ""
+
+  front:
+    image: ghcr.io/ezpaarse-project/ezmesure-front:latest
+    restart: unless-stopped
+    ports:
+      - 8880:80
+    env_file: .env
+    environment:
+      API_HOST: api:${EZMESURE_PORT}
+      KIBANA_HOST: ${KIBANA_HOST}:${KIBANA_PORT}
+      REPORT_HOST: ezreeport:8080
+    healthcheck:
+      test: [CMD-SHELL, "wget -Y off --no-verbose --tries=1 --spider http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      api:
+        condition: service_healthy
+
+  ezreeport:
+    image: ghcr.io/ezpaarse-project/ezreeport-aio:stable
+    restart: unless-stopped
+    volumes:
+      - ezreeport-data:/data/ezreeport/reports
+      - ezreeport-db:/data/ezreeport/db
+    env_file: .env
+    environment:
+      EZREEPORT_API_HTTP_PORT: ${EZREEPORT_PORT}
+      EZREEPORT_WORKER_HTTP_PORT: 8180
+      EZREEPORT_SCHEDULER_HTTP_PORT: 8280
+      EZREEPORT_MAIL_HTTP_PORT: 8380
+      EZREEPORT_FILES_HTTP_PORT: 8480
+      EZREEPORT_APIS_CONCURRENCE: 1
+      EZREEPORT_WORKERS_CONCURRENCE: 1
+      EZREEPORT_MAILS_CONCURRENCE: 1
+      EZREEPORT_FILES_CONCURRENCE: 1
+      EZREEPORT_API_URL: https://${EZMESURE_DOMAIN}/report/api
+      EZREEPORT_API_HOME: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/
+      EZREEPORT_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}
+    healthcheck:
+      test: [CMD-SHELL, "wget -Y off --no-verbose --tries=1 --spider http://localhost:8080/health/probes/liveness || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    pre_start:
+      - image: ghcr.io/ezpaarse-project/ezreeport-migrate:rc
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+    driver: local
+  ezmesure-data:
+    driver: local
+  ezmesure-uploads:
+    driver: local
+  ezreeport-data:
+    driver: local
+  ezreeport-db:
+    driver: local

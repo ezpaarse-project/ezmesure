@@ -1,0 +1,27 @@
+root /www/data;
+
+add_header X-Frame-Options SAMEORIGIN;
+add_header X-Content-Type-Options nosniff;
+add_header X-XSS-Protection "1; mode=block";
+add_header Referrer-Policy "no-referrer-when-downgrade";
+gzip_vary on;
+
+location /images {
+  try_files $uri $uri/;
+  expires modified 1y;
+  add_header Cache-Control "public";
+  access_log off;
+}
+
+location /logos {
+  try_files $uri $uri/;
+  expires modified 1y;
+  add_header Cache-Control "public";
+  access_log off;
+}
+
+location / {
+  try_files $uri $uri/ /www/data/index.html;
+  expires -1;
+  add_header Cache-Control "no-store, no-cache, must-revalidate";
+}

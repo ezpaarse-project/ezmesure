@@ -45,7 +45,7 @@ module.exports = {
     },
   },
   ezreeport: {
-    host: 'reporting',
+    host: 'ezreeport',
     port: 8080,
     syncSchedule: '0 0 0 * * *',
     apiKey: '00000000-0000-0000-0000-000000000000',
@@ -83,6 +83,7 @@ module.exports = {
     },
   },
   auth: {
+    profileUri: '',
     secret: 'some-secret',
     cookie: 'eztoken',
     oidc: {
@@ -128,6 +129,7 @@ module.exports = {
     },
   },
   counter: {
+    registryUrl: 'https://registry.countermetrics.org',
     defaultHarvestedReports: [
       'dr',
       'dr_d1',
@@ -177,10 +179,6 @@ module.exports = {
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,
   },
-  depositors: {
-    index: 'depositors',
-    cron: '0 0 0 * * *',
-  },
   opendata: {
     index: 'opendata',
     cron: '0 0 0 * * *',
@@ -199,7 +197,12 @@ module.exports = {
       counterRegistry: 24 * oneHour * 1000,
     },
   },
+  homepage: {
+    features: ['dashboard', 'repository', 'ezpaarse', 'counter', 'reporting'],
+    logos: ['slsp', 'csal', 'epfl', 'unige', 'cnrs', 'couperin'],
+  },
   defaultLocale: 'en',
   appName: 'ezMESURE',
+  instanceName: '',
   publicUrl: 'https://ezmesure.couperin.org',
 };

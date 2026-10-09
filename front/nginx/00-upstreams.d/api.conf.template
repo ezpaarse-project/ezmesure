@@ -1,0 +1,4 @@
+upstream api_server {
+  zone upstream_dynamic 64k;
+  server ${API_HOST} max_fails=0  resolve;
+}

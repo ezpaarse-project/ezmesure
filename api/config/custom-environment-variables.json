@@ -1,28 +1,27 @@
 {
   "port": "EZMESURE_PORT",
   "elasticsearch": {
-    "scheme": "EZMESURE_ELASTIC_SCHEME",
-    "port": "EZMESURE_ELASTIC_PORT",
-    "host": "EZMESURE_ELASTIC_HOST",
-    "url": "EZMESURE_ELASTIC_URL",
-    "user": "EZMESURE_ELASTIC_USER",
-    "password": "ELASTICSEARCH_PASSWORD",
-    "apiVersion": "EZMESURE_ELASTIC_VERSION",
+    "scheme": "ELASTICSEARCH_SCHEME",
+    "port": "ELASTICSEARCH_PORT",
+    "host": "ELASTICSEARCH_HOST",
+    "url": "ELASTICSEARCH_URL",
+    "user": "EZMESURE_ELASTICSEARCH_USERNAME",
+    "password": "EZMESURE_ELASTICSEARCH_PASSWORD",
     "syncSchedule": "EZMESURE_ELASTIC_SYNC_SCHEDULE"
   },
   "kibana": {
-    "username": "KIBANA_USERNAME",
-    "password": "KIBANA_PASSWORD",
-    "port": "EZMESURE_KIBANA_PORT",
-    "host": "EZMESURE_KIBANA_HOST",
-    "url": "EZMESURE_KIBANA_URL",
+    "username": "EZMESURE_KIBANA_USERNAME",
+    "password": "EZMESURE_KIBANA_PASSWORD",
+    "port": "KIBANA_PORT",
+    "host": "KIBANA_HOST",
+    "url": "KIBANA_URL",
     "dateFormat": "EZMESURE_KIBANA_DATE_FORMAT",
     "syncSchedule": "EZMESURE_KIBANA_SYNC_SCHEDULE"
   },
   "redis": {
-    "host": "EZMESURE_REDIS_HOST",
-    "port": "EZMESURE_REDIS_PORT",
-    "password": "EZMESURE_REDIS_PASSWORD"
+    "host": "REDIS_HOST",
+    "port": "REDIS_PORT",
+    "password": "REDIS_PASSWORD"
   },
   "ezreeport": {
     "host": "EZMESURE_REPORT_HOST",
@@ -31,19 +30,19 @@
     "apiKey": "EZMESURE_REPORT_ADMIN_KEY"
   },
   "smtp": {
-    "host": "EZMESURE_SMTP_HOST",
-    "port": "EZMESURE_SMTP_PORT",
+    "host": "SMTP_HOST",
+    "port": "SMTP_PORT",
     "secure": {
-      "__name": "EZMESURE_SMTP_SECURE",
+      "__name": "SMTP_SECURE",
       "__format": "boolean"
     },
     "ignoreTLS": {
-      "__name": "EZMESURE_SMTP_IGNORE_TLS",
+      "__name": "SMTP_IGNORE_TLS",
       "__format": "boolean"
     },
     "tls": {
       "rejectUnauthorized": {
-        "__name": "EZMESURE_SMTP_REJECT_UNAUTHORIZED",
+        "__name": "SMTP_REJECT_UNAUTHORIZED",
         "__format": "boolean"
       }
     }
@@ -70,6 +69,7 @@
     }
   },
   "auth": {
+    "profilePage": "EZMESURE_OIDC_PROFILE_PAGE",
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE",
     "oidc": {
@@ -127,6 +127,7 @@
     }
   },
   "counter": {
+    "registryUrl": "EZMESURE_COUNTER_REGISTRY_URL",
     "defaultHarvestedReports": {
       "__name": "EZMESURE_DEFAULT_HARVESTED_REPORTS",
       "__format": "json"
@@ -137,7 +138,7 @@
     },
     "deleteSushi": {
       "schedule": "EZMESURE_DELETE_SUSHI_COUNTER_SCHEDULE",
-      "maxDayAge": "EZMESURE_DELETE_SUSHI_COUNTER_FOLLOW_INTERVAL"
+      "followInterval": "EZMESURE_DELETE_SUSHI_COUNTER_FOLLOW_INTERVAL"
     },
     "alerts": {
       "harvestedButUnsupported": {
@@ -162,18 +163,9 @@
     }
   },
   "testUsers": {
-    "lifespan": {
-      "max": "EZMESURE_TEST_USERS_MAX_LIFESPAN",
-      "default": "EZMESURE_TEST_USERS_DEFAULT_LIFESPAN"
-    },
     "clean": {
       "schedule": "EZMESURE_TEST_USERS_CLEAN_SCHEDULE"
     }
-  },
-  "depositors": {
-    "index": "EZMESURE_DEPOSITORS_INDEX",
-    "spreadsheetId": "EZMESURE_DEPOSITORS_SPREADSHEET",
-    "cron": "EZMESURE_DEPOSITORS_CRON"
   },
   "cypher": {
     "secret": "EZMESURE_ENCRYPTION_SECRET"
@@ -234,7 +226,18 @@
       }
     }
   },
+  "homepage": {
+    "features": {
+      "__name": "EZMESURE_HOMEPAGE_FEATURES",
+      "__format": "json"
+    },
+    "logos": {
+      "__name": "EZMESURE_HOMEPAGE_LOGOS",
+      "__format": "json"
+    }
+  },
   "defaultLocale": "EZMESURE_DEFAULT_LOCALE",
   "appName": "EZMESURE_APP_NAME",
+  "instanceName": "EZMESURE_CURRENT_INSTANCE",
   "publicUrl": "EZMESURE_PUBLIC_URL"
 }

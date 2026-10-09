@@ -1,0 +1,27 @@
+services:
+  api:
+    extends:
+      file: compose.yml
+      service: api
+    build:
+      context: ${PWD}/api
+
+  front:
+    extends:
+      file: compose.yml
+      service: front
+    build:
+      context: ${PWD}/front
+
+# Volumes are needed when extending
+volumes:
+  postgres-data:
+    driver: local
+  ezmesure-data:
+    driver: local
+  ezmesure-uploads:
+    driver: local
+  ezreeport-data:
+    driver: local
+  ezreeport-db:
+    driver: local

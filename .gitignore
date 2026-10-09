@@ -1,14 +1,12 @@
-node_modules
-data
-npm-debug.log
-storage
+data/
 ezmesure.local.env.sh
-certificates/
 
-rabbitmq/definitions.d/00-users.json
+docker/rabbitmq/definitions.d/00-users.json
+docker/satosa/certs/*
+!docker/satosa/certs/.gitkeep
+docker/certs/*
+!docker/certs/.gitkeep
 
-satosa/certs/*
-!satosa/certs/.gitkeep
+compose*.override.yml
 
-rp/certs/*
-!rp/certs/.gitkeep
+.env

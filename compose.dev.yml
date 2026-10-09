@@ -1,0 +1,127 @@
+# Add ES and Dex pre-configured for dev
+include:
+  - path: docker/elastic.compose.yml
+    project_directory: .
+  - path: docker/dex.compose.yml
+    project_directory: .
+
+services:
+  postgres:
+    extends:
+      file: compose.yml
+      service: postgres
+    restart: "no"
+
+  redis:
+    extends:
+      file: compose.yml
+      service: redis
+    restart: "no"
+
+  rabbitmq:
+    extends:
+      file: compose.yml
+      service: rabbitmq
+    restart: "no"
+    volumes:
+      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./docker/rabbitmq/definitions.d:/etc/rabbitmq/definitions.d
+
+  api:
+    extends:
+      file: compose.yml
+      service: api
+    image: node:24.20.0-alpine3.24
+    restart: "no"
+    working_dir: /usr/src/app
+    ports:
+      - 9229:9229 # Debug port
+    extra_hosts:
+      - ${EZMESURE_DOMAIN}:host-gateway
+    volumes:
+      - ./api:/usr/src/app
+      - ./docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro
+    command: npm run dev
+    environment:
+      NODE_EXTRA_CA_CERTS: /etc/ssl/ezmesure.pem
+      ELASTICSEARCH_HOST: elastic
+      ELASTICSEARCH_PORT: 9200
+      KIBANA_HOST: kibana
+      KIBANA_PORT: 5601
+      EZMESURE_ADMIN_PASSWORD: changeme # Forced to match dex definition
+      EZMESURE_AUTH_PERSIST_ENCRYPT: "1"
+      EZMESURE_OIDC_DISCOVERY_URI: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/auth/.well-known/openid-configuration
+      SMTP_HOST: maildev
+      SMTP_PORT: "1025"
+      SMTP_SECURE: "false"
+      SMTP_IGNORE_TLS: "true"
+    depends_on:
+      elastic:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+      dex:
+        condition: service_started
+    pre_start:
+      - command: ["/bin/sh", "-c", "npx prisma generate"]
+        entrypoint: ""
+
+  rp:
+    extends:
+      file: compose.yml
+      service: front
+    image: nginx:1.29.1-alpine-slim
+    restart: "no"
+    ports:
+      - 8443:443
+    volumes:
+      - ./docker/nginx:/etc/nginx/templates
+      - ./docker/certs:/etc/nginx/ssl
+    environment:
+      SATOSA_DOMAIN: satosa.${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}
+
+      AUTH_HOST: dex:5556
+      FRONT_HOST: front:8080
+      KIBANA_HOST: kibana:5601
+
+  ezreeport:
+    extends:
+      file: compose.yml
+      service: ezreeport
+    image: ghcr.io/ezpaarse-project/ezreeport-aio:rc
+    restart: "no"
+    environment:
+      ELASTICSEARCH_HOST: elastic
+      ELASTICSEARCH_PORT: 9200
+
+  front:
+    image: node:24.20.0-alpine3.24
+    command: npm run dev
+    restart: "no"
+    working_dir: /usr/src/app
+    tmpfs: /tmp
+    env_file: .env
+    volumes:
+      - ./front:/usr/src/app
+    depends_on:
+      api:
+        condition: service_healthy
+
+  maildev:
+    image: maildev/maildev
+    restart: "no"
+    ports:
+      - 1080:1080
+
+# Volumes are needed when extending
+volumes:
+  postgres-data:
+    driver: local
+  ezmesure-data:
+    driver: local
+  ezmesure-uploads:
+    driver: local
+  ezreeport-data:
+    driver: local
+  ezreeport-db:
+    driver: local

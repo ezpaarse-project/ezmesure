@@ -51,7 +51,7 @@
 
     <v-container class="text-center home-background home-background--accent pa-md-12 pa-6">
       <v-row
-        v-for="(group, i) in PARTNERS"
+        v-for="(group, i) in partnersItems"
         :key="i"
         class="justify-center"
       >
@@ -361,7 +361,7 @@ import prettySize from 'pretty-bytes';
 const { t, locale } = useI18n();
 const router = useRouter();
 const goTo = useVGoTo();
-const { public: { homepage } } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 
 const snacks = useSnacksStore();
 
@@ -372,54 +372,6 @@ if (router.currentRoute.value.query.error) {
 }
 
 const YEAR = new Date().getFullYear();
-
-const PARTNERS = [
-  [
-    {
-      name: 'EPFL',
-      src: '/logos/partners/logo-epfl.svg',
-      href: 'https://www.epfl.ch/',
-      hide: !homepage.logos.EPFL,
-    },
-    {
-      name: 'SLSP',
-      src: '/logos/partners/logo-slsp.svg',
-      href: 'https://slsp.ch/',
-      hide: !homepage.logos.SLSP,
-    },
-    {
-      name: 'CSAL',
-      href: 'https://consortium.ch/',
-      hide: !homepage.logos.CSAL,
-    },
-    {
-      name: 'UNIGE',
-      src: '/logos/partners/logo-unige.svg',
-      href: 'https://www.unige.ch/',
-      hide: !homepage.logos.UNIGE,
-    },
-  ].filter((item) => !item.hide),
-  [
-    {
-      name: 'CNRS',
-      src: '/logos/partners/logo-cnrs.svg',
-      href: 'https://www.cnrs.fr/',
-      hide: !homepage.logos.CNRS,
-    },
-    {
-      name: 'couperin',
-      src: '/logos/partners/logo-couperin.svg',
-      href: 'https://www.couperin.org/',
-      hide: !homepage.logos.COUPERIN,
-    },
-    {
-      name: 'INIST-CNRS',
-      src: '/logos/by-inist.svg',
-      href: 'https://www.inist.fr/',
-      hide: !homepage.logos.INIST,
-    },
-  ].filter((item) => !item.hide),
-].filter((items) => items.length > 0);
 
 const { data: metrics, status: metricsStatus } = await useFetch('/api/metrics', {
   lazy: true,
@@ -448,9 +400,61 @@ const { data: metrics, status: metricsStatus } = await useFetch('/api/metrics', 
   }),
 });
 
+const enabledLogos = computed(() => new Set(apiConfig.value?.homepage.logos));
+
+const enabledFeatures = computed(() => new Set(apiConfig.value?.homepage.features));
+
 const formatter = computed(() => new Intl.NumberFormat(locale.value));
 
 const metricsDate = computed(() => dateFormat(metrics.value?.createdAt, locale.value, 'PPP'));
+
+const partnersItems = computed(() => [
+  [
+    {
+      name: 'EPFL',
+      src: '/logos/partners/logo-epfl.svg',
+      href: 'https://www.epfl.ch/',
+      hide: !enabledLogos.value.has('epfl'),
+    },
+    {
+      name: 'SLSP',
+      src: '/logos/partners/logo-slsp.svg',
+      href: 'https://slsp.ch/',
+      hide: !enabledLogos.value.has('slsp'),
+    },
+    {
+      name: 'CSAL',
+      href: 'https://consortium.ch/',
+      hide: !enabledLogos.value.has('csal'),
+    },
+    {
+      name: 'UNIGE',
+      src: '/logos/partners/logo-unige.svg',
+      href: 'https://www.unige.ch/',
+      hide: !enabledLogos.value.has('unige'),
+    },
+  ].filter((item) => !item.hide),
+  [
+    {
+      name: 'CNRS',
+      src: '/logos/partners/logo-cnrs.svg',
+      href: 'https://www.cnrs.fr/',
+      hide: !enabledLogos.value.has('cnrs'),
+    },
+    {
+      name: 'couperin',
+      src: '/logos/partners/logo-couperin.svg',
+      href: 'https://www.couperin.org/',
+      hide: !enabledLogos.value.has('couperin'),
+    },
+    {
+      name: 'INIST-CNRS',
+      src: '/logos/by-inist.svg',
+      href: 'https://www.inist.fr/',
+      hide: !enabledLogos.value.has('inist'),
+    },
+  ].filter((item) => !item.hide),
+].filter((items) => items.length > 0));
 
 const metricsItems = computed(() => [
   {
@@ -509,33 +513,33 @@ const features = computed(() => [
     icon: '$mdi-view-dashboard',
     title: t('home.features.items.dashboard.title'),
     text: t('home.features.items.dashboard.text'),
-    hide: !homepage.features.dashboard,
+    hide: !enabledFeatures.value.has('dashboard'),
   },
   {
     icon: '$mdi-database',
     title: t('home.features.items.repository.title'),
     text: t('home.features.items.repository.text'),
-    hide: !homepage.features.repository,
+    hide: !enabledFeatures.value.has('repository'),
     to: '#metrics',
   },
   {
     icon: '$mdi-file-document',
     title: t('home.features.items.ezpaarse.title'),
     text: t('home.features.items.ezpaarse.text'),
-    hide: !homepage.features.ezpaarse,
+    hide: !enabledFeatures.value.has('ezpaarse'),
   },
   {
     icon: '$mdi-api',
     title: t('home.features.items.counter.title'),
     text: t('home.features.items.counter.text'),
-    hide: !homepage.features.counter,
+    hide: !enabledFeatures.value.has('counter'),
     to: '#counter',
   },
   {
     icon: '$mdi-file-chart-outline',
     title: t('home.features.items.reporting.title'),
     text: t('home.features.items.reporting.text'),
-    hide: !homepage.features.reporting,
+    hide: !enabledFeatures.value.has('reporting'),
     to: '#reporting',
   },
 ].filter((item) => !item.hide));

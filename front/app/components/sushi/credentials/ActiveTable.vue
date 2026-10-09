@@ -274,7 +274,7 @@ const maxHarvestYear = new Date().getFullYear();
 
 const { user } = storeToRefs(useAuthStore());
 const { t, locale } = useI18n();
-const { public: { counterRegistryUrl } } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
 const { addToCheck } = useSushiCheckQueueStore();
@@ -384,7 +384,7 @@ const debouncedRefresh = useDebounceFn(async () => {
 /**
  * Generate COUNTER registry URL
  */
-const generateRegistryURL = (item) => new URL(`/platform/${item.endpoint.registryId}`, counterRegistryUrl);
+const generateRegistryURL = (item) => new URL(`/platform/${item.endpoint.registryId}`, apiConfig.value.counter.registryUrl);
 
 function onSushiUpdate(item) {
   const index = sushis.value.findIndex((sushi) => sushi.id === item.id);
