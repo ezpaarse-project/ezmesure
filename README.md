@@ -52,7 +52,7 @@ A `compose` example is available with some default env variables, but feel free 
 ```bash
 # Download only needed files
 curl -o compose.yml https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/compose.yml
-curl -o .env https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/.env
+curl -o .env https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/heads/master/.env.example
 ```
 
 > [!IMPORTANT]
@@ -70,12 +70,12 @@ curl -o .env https://raw.githubusercontent.com/ezpaarse-project/ezmesure/refs/he
 
 ### ⚙️ Configure
 
-ezMESURE needs several environment variables to be properly started. You can directly edit variables present in the `.env` file or create a `.env.local` file and add your changes.
+ezMESURE needs several environment variables to be properly started. You can directly edit variables present in the `.env` file.
 
 Here's the minimal variables needed to be set to have a production instance :
 
 ```.env
-# .env.local
+# .env
 
 # How to connect to the ElasticSearch cluster
 # Option 1: Set every part of URL
@@ -138,6 +138,8 @@ EZREEPORT_EMAIL_SUPPORT_TEAM=
 
 # The public domain of your ezMESURE instance
 EZMESURE_DOMAIN=ezmesure.localhost
+# The public port needed to access your ezMESURE instance (you can skip it if using 80 on HTTP and 443 on HTTPS)
+EZMESURE_PUBLIC_PORT=8880
 
 # Default locale of the app
 EZMESURE_DEFAULT_LOCALE=fr
@@ -169,20 +171,34 @@ You'll need SSL certificate, you can generate them with [`mkcert`](https://githu
 
 services:
   front:
+    ports:
+      - 8443:443
     volumes:
       - ./path/to/certificate/file.crt:/etc/nginx/ssl/cert.pem
       - ./path/to/certificate/private-key.pem:/etc/nginx/ssl/key.pem
 ```
 
-2. Update the `.env` file (you can use a `.env.local`) to add needed environment variables:
+2. Update the `.env` file to change needed environment variables:
 
 ```.env
-# .env.local
+# .env
 
 NGINX_PROTOCOL=https
+EZMESURE_PUBLIC_PORT=":8443"
 ```
 
 ##### Using an external reverse proxy
+
+1. Update the `.env` file to change needed environment variables:
+
+```.env
+# .env
+
+NGINX_PROTOCOL=http
+EZMESURE_PUBLIC_PORT="" # Or match your RP public port
+```
+
+2. Configure your reverse proxy
 
 Here's a few configuration examples for popular reverse proxies :
 
@@ -297,12 +313,12 @@ ezmesure.localhost {
 #### 👥 OpenID Connect
 
 > [!IMPORTANT]
-> When configuring your OpenID provider, be sure to register the following redirect URI with the provider: `https://${EZMESURE_DOMAIN}/api/auth/oauth/login/callback`
+> When configuring your OpenID provider, be sure to register the following redirect URI with the provider: `https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/api/auth/oauth/login/callback`
 
-ezMESURE delegates user authentication to an OIDC server, edit the `.env` file (you can use a `.env.local`) to add needed environment variables:
+ezMESURE delegates user authentication to an OIDC server, edit the `.env` file to updated needed environment variables:
 
 ```.env
-#.env.local
+#.env
 
 # client_id given by the provider
 EZMESURE_OIDC_CLIENT_ID="<client_id from provider>"
@@ -353,10 +369,10 @@ docker compose down
 >
 > - You might encounter migration issues as it does not supports (yet) the `pre_start` and `post_start` directives.
 >   - You can use `podman compose run --rm "..."` to execute the scripts
-> - You'll need to add the following environment variable to the `.env` file (or create a `.env.local` file) :
+> - You'll need to add the following environment variable to the `.env` file :
 >
 > ```.env
-> # .env.local
+> # .env
 > NGINX_RESOLVER=10.89.0.1
 > ```
 
@@ -405,9 +421,12 @@ You should clone the repository using `git` and install dependencies of both ser
 ```bash
 # Clone project
 git clone https://github.com/ezpaarse-project/ezmesure.git
+cd ezmesure
 # Install dependencies
 npm --prefix api ci
 npm --prefix front ci
+# Setup environment
+cp .env.example .env
 ```
 
 It contains configuration files for running and developing ezMESURE. There's a dedicated `compose.dev.yml` (extending default `compose.yml`) to ease development.
@@ -425,16 +444,18 @@ Unlike production setup, the development setup are including an OIDC provider ([
 
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
 - A dedicated DNS entry
-  - Example environment uses `ezmesure.localhost`, you can change it by setting `EZMESURE_DOMAIN` in a `.env.local` file
+  - Example environment uses `ezmesure.localhost`, you can change it by setting `EZMESURE_DOMAIN` in the `.env` file
   - You can edit `/etc/hosts`
   - You can also use tools like [`localias`](https://github.com/peterldowns/localias)
+    - If using `localias` (or other tools providing a reverse proxy) you'll need to `EZMESURE_PUBLIC_PORT` to `""`
 - SSL certificates for the domain serving ezMESURE
+  - Set `NGINX_PROTOCOL=https` in the `.env` file
   - Internal reverse proxy expect the following locations:
     - Certificate: `./docker/certs/cert.pem`
     - Private key: `./docker/certs/key.pem`
     - Authority: `./docker/certs/ca.pem`
   - You can use tools like `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert)
-  - `localias` already includes a reverse proxy so you can skip the certificate and the private key (CA is still needed)
+  - `localias` already includes a reverse proxy so you can skip the port in `EZMESURE_DOMAIN` the certificate and the private key (CA is still needed)
 
 Once prerequisites are fulfilled, you can start dev server by running :
 
@@ -450,10 +471,10 @@ Development setup already includes watch mode (for api) and hot module reloading
 >
 > - You might encounter migration issues as it does not supports (yet) the `pre_start` and `post_start` directives.
 >   - You can use `podman compose -f compose.dev.yml run --rm "..."` to execute the scripts
-> - You'll need to add the following environment variable to the `.env` file (or create a `.env.local` file) :
+> - You'll need to add the following environment variable to the `.env` file :
 >
 > ```.env
-> # .env.local
+> # .env
 > NGINX_RESOLVER=10.89.0.1
 > ```
 
@@ -468,7 +489,7 @@ If you want to test SATOSA to test signin from the [fédération d'identités Ed
 > If you're enabling SATOSA and SSL with the internal reverse proxy, SSL certificates should cover both hostnames
 
 > [!TIP]
-> You might have to change your `EZMESURE_DOMAIN` to match SP declaration
+> You might have to change your `EZMESURE_DOMAIN` and `EZMESURE_PUBLIC_PORT` to match SP declaration
 
 And run the dedicated compose file to have a running instance of SATOSA with ezMESURE, RP and Dex pre-configured :
 

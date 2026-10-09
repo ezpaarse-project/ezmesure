@@ -13,11 +13,7 @@ services:
   postgres:
     image: postgres:17.6-alpine3.22
     restart: unless-stopped
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     volumes:
       - postgres-data:/var/lib/postgresql/data
     post_start:
@@ -34,11 +30,7 @@ services:
     image: redis:8.2.2-alpine3.22
     restart: unless-stopped
     command: --requirepass '${REDIS_PASSWORD}'
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     healthcheck:
       test: [CMD-SHELL, "redis-cli -a '${REDIS_PASSWORD}' ping | grep PONG"]
       interval: 1s
@@ -61,13 +53,7 @@ services:
     volumes:
       - ezmesure-data:/usr/src/app/storage
       - ezmesure-uploads:/usr/src/app/uploads
-    ports:
-      - 3000:${EZMESURE_PORT}
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     environment:
       EZMESURE_REPORT_HOST: ezreeport
       EZMESURE_REPORT_PORT: ${EZREEPORT_PORT}
@@ -94,13 +80,8 @@ services:
     image: ghcr.io/ezpaarse-project/ezmesure-front:latest
     restart: unless-stopped
     ports:
-      - 8443:443
       - 8880:80
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     environment:
       API_HOST: api:${EZMESURE_PORT}
       KIBANA_HOST: ${KIBANA_HOST}:${KIBANA_PORT}
@@ -120,11 +101,7 @@ services:
     volumes:
       - ezreeport-data:/data/ezreeport/reports
       - ezreeport-db:/data/ezreeport/db
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     environment:
       EZREEPORT_API_HTTP_PORT: ${EZREEPORT_PORT}
       EZREEPORT_WORKER_HTTP_PORT: 8180
@@ -137,7 +114,7 @@ services:
       EZREEPORT_FILES_CONCURRENCE: 1
       EZREEPORT_API_URL: https://${EZMESURE_DOMAIN}/report/api
       EZREEPORT_API_HOME: https://${EZMESURE_DOMAIN}
-      EREEPORT_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}"
+      EZREEPORT_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}
     healthcheck:
       test: [CMD-SHELL, "wget -Y off --no-verbose --tries=1 --spider http://localhost:8080/health/probes/liveness || exit 1"]
       interval: 10s

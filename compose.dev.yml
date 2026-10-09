@@ -50,7 +50,7 @@ services:
       KIBANA_PORT: 5601
       EZMESURE_ADMIN_PASSWORD: changeme # Forced to match dex definition
       EZMESURE_AUTH_PERSIST_ENCRYPT: "1"
-      EZMESURE_OIDC_DISCOVERY_URI: https://${EZMESURE_DOMAIN}/auth/.well-known/openid-configuration
+      EZMESURE_OIDC_DISCOVERY_URI: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/auth/.well-known/openid-configuration
       SMTP_HOST: maildev
       SMTP_PORT: "1025"
       SMTP_SECURE: "false"
@@ -72,10 +72,14 @@ services:
       service: front
     image: nginx:1.29.1-alpine-slim
     restart: "no"
+    ports:
+      - 8443:443
     volumes:
       - ./docker/nginx:/etc/nginx/templates
       - ./docker/certs:/etc/nginx/ssl
     environment:
+      SATOSA_DOMAIN: satosa.${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}
+
       AUTH_HOST: dex:5556
       FRONT_HOST: front:8080
       KIBANA_HOST: kibana:5601
@@ -96,11 +100,7 @@ services:
     restart: "no"
     working_dir: /usr/src/app
     tmpfs: /tmp
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     volumes:
       - ./front:/usr/src/app
     depends_on:
