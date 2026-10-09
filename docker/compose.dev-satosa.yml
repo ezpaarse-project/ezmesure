@@ -17,7 +17,7 @@ services:
   satosa:
     build:
       context: ./docker/satosa
-    restart: never
+    restart: "no"
     volumes:
       - ./docker/satosa/certs:/etc/satosa/certs/
       - ./docker/satosa/templates:/etc/satosa-templates/

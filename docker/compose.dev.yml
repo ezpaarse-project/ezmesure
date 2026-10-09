@@ -13,7 +13,7 @@ services:
 
   api:
     image: node:24.20.0-alpine3.24
-    restart: never
+    restart: "no"
     working_dir: /usr/src/app
     ports:
       - 9229:9229 # Debug port
@@ -47,7 +47,7 @@ services:
   front:
     image: node:24.20.0-alpine3.24
     command: npm run dev
-    restart: never
+    restart: "no"
     working_dir: /usr/src/app
     tmpfs: /tmp
     env_file:
@@ -63,7 +63,7 @@ services:
 
   rp:
     image: nginx:1.29.1-alpine-slim
-    restart: never
+    restart: "no"
     volumes:
       - ./docker/nginx:/etc/nginx/templates
       - ./docker/certs:/etc/nginx/ssl
@@ -74,7 +74,7 @@ services:
 
   ezreeport:
     image: ghcr.io/ezpaarse-project/ezreeport-aio:rc
-    restart: never
+    restart: "no"
     environment:
       ELASTICSEARCH_HOST: elastic
       ELASTICSEARCH_PORT: 9200
