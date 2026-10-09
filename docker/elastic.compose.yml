@@ -5,11 +5,7 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
-    env_file:
-      - path: ${PWD}/.env
-        required: true
-      - path: ${PWD}/.env.local
-        required: false
+    env_file: .env
     ulimits:
       memlock:
         soft: -1
@@ -35,11 +31,7 @@ services:
     restart: "no"
     ports:
       - 5601:5601
-    env_file:
-      - path: ${PWD}/.env
-        required: true
-      - path: ${PWD}/.env.local
-        required: false
+    env_file: .env
     environment:
       ELASTICSEARCH_USERNAME: ${EZMESURE_ELASTICSEARCH_USERNAME}
       ELASTICSEARCH_PASSWORD: ${EZMESURE_ELASTICSEARCH_PASSWORD}

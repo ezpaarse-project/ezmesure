@@ -8,11 +8,7 @@ services:
     volumes:
       - ./docker/satosa/certs:/etc/satosa/certs/
       - ./docker/satosa/templates:/etc/satosa-templates/
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     environment:
       SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}
       SATOSA_ENCRYPTION_KEY: super-secret

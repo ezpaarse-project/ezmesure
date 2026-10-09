@@ -4,11 +4,7 @@ services:
   dex:
     image: 'dexidp/dex:v2.45.1-alpine'
     restart: "no"
-    env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: false
+    env_file: .env
     environment:
       EZMESURE_OIDC_ISSUER_URI: https://${EZMESURE_DOMAIN}/auth
       # echo changeme | htpasswd -BinC 10 admin | cut -d: -f2
