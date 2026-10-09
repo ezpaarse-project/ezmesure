@@ -1,5 +1,5 @@
 include:
   # Base layers
-  - compose.dev.yml
+  - compose.yml
   # Override layer
   - docker/compose.build.yml
