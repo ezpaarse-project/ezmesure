@@ -6,7 +6,7 @@ services:
     restart: "no"
     env_file: .env
     environment:
-      EZMESURE_OIDC_ISSUER_URI: https://${EZMESURE_DOMAIN}/auth
+      EZMESURE_OIDC_ISSUER_URI: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/auth
       # echo changeme | htpasswd -BinC 10 admin | cut -d: -f2
       EZMESURE_ADMIN_PASSWORD_HASH: "$2y$10$/Ctv48gjpa9DbcRB3djGQOujxIoUCfxrfFlwYKtW4k6D6.SgC6OP."
     volumes:
