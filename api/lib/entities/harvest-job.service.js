@@ -8,6 +8,7 @@ const BasePrismaService = require('./base-prisma.service');
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobDeleteManyArgs} HarvestJobDeleteManyArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
@@ -137,6 +138,16 @@ module.exports = class HarvestJobsService extends BasePrismaService {
     this.triggerHooks('harvest-job:delete', job);
 
     return job;
+  }
+
+  /**
+   * @param {HarvestJobDeleteManyArgs} params
+   * @returns {Promise<number>}
+   */
+  async deleteMany(params) {
+    const { count } = await harvestJobPrisma.removeMany(params, this.prisma);
+
+    return count;
   }
 
   /**
