@@ -163,7 +163,7 @@
 
 <script setup>
 const { t, locale } = useI18n();
-const { public: { counterRegistryUrl } } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
@@ -258,7 +258,7 @@ const debouncedRefresh = useDebounceFn(refresh, 250);
 /**
  * Generate COUNTER registry URL
  */
-const generateRegistryURL = (item) => URL.parse(`/platform/${item.registryId}`, counterRegistryUrl);
+const generateRegistryURL = (item) => URL.parse(`/platform/${item.registryId}`, apiConfig.value.counter.generateRegistryURL);
 
 /**
  * Toggle active states for selected endpoints
