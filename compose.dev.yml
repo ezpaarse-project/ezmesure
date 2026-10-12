@@ -96,6 +96,10 @@ services:
       EZREEPORT_RABBITMQ_USERNAME: ezreeport
       EZREEPORT_RABBITMQ_PASSWORD: changeme
       EZREEPORT_RABBITMQ_VHOST: /ezreeport
+      SMTP_HOST: maildev
+      SMTP_PORT: "1025"
+      SMTP_SECURE: "false"
+      SMTP_IGNORE_TLS: "true"
 
   front:
     image: node:24.20.0-alpine3.24
