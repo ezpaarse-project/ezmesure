@@ -1,19 +1,10 @@
 server {
   server_name ${EZMESURE_DOMAIN};
 
-  listen 80;
-  listen [::]:80;
-
-  location / {
-    return 301 https://${EZMESURE_DOMAIN}$request_uri;
-  }
-}
-
-server {
-  server_name ${EZMESURE_DOMAIN};
-
   listen 443 ssl;
   listen [::]:443 ssl;
+
+  absolute_redirect off;
 
   ## Certificates
   ssl_certificate /etc/nginx/ssl/cert.pem;

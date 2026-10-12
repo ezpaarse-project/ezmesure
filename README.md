@@ -273,19 +273,6 @@ server {
 
     proxy_pass  http://front:80/;
   }
-
-  ## Diffie-Hellman
-  ssl_ecdh_curve secp384r1;
-
-  ## Protocol
-  ssl_protocols TLSv1.2;
-
-  ## Cipher suite
-  ssl_ciphers EECDH+AESGCM:EECDH+CHACHA20:EECDH+AES;
-  ssl_prefer_server_ciphers on;
-
-  ## HTTP Strict Transport Security
-  add_header Strict-Transport-Security "max-age=15552000; preload";
 }
 
 ```
