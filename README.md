@@ -394,6 +394,18 @@ docker compose down
 docker compose up -d
 ```
 
+> [!WARNING]
+> If using `podman compose`:
+>
+> - You might encounter database issues as it does not supports (yet) the `pre_start` and `post_start` directives, you should run the following commands:
+>
+> ```bash
+> # This will run the migrations on the ezMESURE database
+> podman compose run --rm api "npx prisma migrate deploy"
+> # This will run the migrations on the ezREEPORT database
+> podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
+> ```
+
 ## 🏗️ Architecture
 
 ![architecture schema](./docs/architecture.png)
