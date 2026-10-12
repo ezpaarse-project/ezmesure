@@ -24,6 +24,7 @@ RUN NODE_ENV=production npm ci --omit=dev
 
 FROM base
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
+LABEL org.opencontainers.image.source="https://github.com/ezpaarse-project/ezmesure"
 
 WORKDIR /usr/src/app
 

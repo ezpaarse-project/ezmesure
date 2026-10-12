@@ -11,6 +11,7 @@ RUN npm run generate
 
 FROM nginx:1.29.1-alpine-slim
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
+LABEL org.opencontainers.image.source="https://github.com/ezpaarse-project/ezmesure"
 
 COPY --from=builder /app/.output/public/ /www/data/
 
