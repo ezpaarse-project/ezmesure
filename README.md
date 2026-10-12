@@ -458,11 +458,15 @@ NGINX_PROTOCOL="https"
 EZMESURE_PUBLIC_PORT=":8443"
 ```
 
-- Generate SSL certificates for the domain serving ezMESURE (using `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert))
-- Place the SSL certificate for the internal reverse proxy at the following locations:
-  - Certificate: `./docker/certs/cert.pem`
-  - Private key: `./docker/certs/key.pem`
-  - Authority: `./docker/certs/ca.pem`
+### 2. Add SLL certificates
+
+Generate SSL certificates for the domain serving ezMESURE (using `openssl` or [`mkcert`](https://github.com/FiloSottile/mkcert)) then place the certificate for the internal reverse proxy at the following locations:
+
+- Certificate: `./docker/certs/cert.pem`
+- Private key: `./docker/certs/key.pem`
+- Authority: `./docker/certs/ca.pem`
+
+### 3. Run dev stack
 
 Once prerequisites are fulfilled, you can start dev server by running :
 

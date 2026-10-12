@@ -1,7 +1,6 @@
 data/
 ezmesure.local.env.sh
 
-docker/rabbitmq/definitions.d/00-users.json
 docker/satosa/certs/*
 !docker/satosa/certs/.gitkeep
 docker/certs/*
