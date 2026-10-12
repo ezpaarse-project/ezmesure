@@ -370,6 +370,8 @@ docker compose down
 > podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$EZMESURE_POSTGRES_DB')\\gexec\" | psql -U ${POSTGRES_USER}"
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
 > podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
+> # This will run the migrations on the ezMESURE database
+> podman compose run --rm api "npx prisma migrate deploy"
 > # This will run the migrations on the ezREEPORT database
 > podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
 > ```
@@ -505,6 +507,8 @@ Development setup already includes watch mode (for api) and hot module reloading
 > podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$EZMESURE_POSTGRES_DB')\\gexec\" | psql -U ${POSTGRES_USER}"
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
 > podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
+> # This will run the migrations on the ezMESURE database
+> podman compose run --rm api "npx prisma migrate deploy"
 > # This will run the migrations on the ezREEPORT database
 > podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
 > ```
