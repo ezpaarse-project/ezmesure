@@ -51,6 +51,7 @@ services:
       EZMESURE_ADMIN_PASSWORD: changeme # Forced to match dex definition
       EZMESURE_AUTH_PERSIST_ENCRYPT: "1"
       EZMESURE_OIDC_DISCOVERY_URI: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/auth/.well-known/openid-configuration
+      ELASTICSEARCH_REQUIRED_STATUS: yellow
       SMTP_HOST: maildev
       SMTP_PORT: "1025"
       SMTP_SECURE: "false"
@@ -96,6 +97,7 @@ services:
       EZREEPORT_RABBITMQ_USERNAME: ezreeport
       EZREEPORT_RABBITMQ_PASSWORD: changeme
       EZREEPORT_RABBITMQ_VHOST: /ezreeport
+      ELASTICSEARCH_REQUIRED_STATUS: yellow
       SMTP_HOST: maildev
       SMTP_PORT: "1025"
       SMTP_SECURE: "false"
