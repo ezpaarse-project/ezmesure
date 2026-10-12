@@ -48,7 +48,7 @@ services:
       retries: 3
 
   api:
-    image: ghcr.io/ezpaarse-project/ezmesure-api:latest
+    image: codeberg.org/readmetrics/ezmesure/api:latest
     restart: unless-stopped
     volumes:
       - ezmesure-data:/usr/src/app/storage
@@ -77,7 +77,7 @@ services:
         entrypoint: ""
 
   front:
-    image: ghcr.io/ezpaarse-project/ezmesure-front:latest
+    image: codeberg.org/readmetrics/ezmesure/front:latest
     restart: unless-stopped
     ports:
       - 8880:80
