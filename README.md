@@ -367,11 +367,11 @@ docker compose down
 > # Replace the env variables with their values from `.env`
 >
 > # This will create the `$EZMESURE_POSTGRES_DB` database if doesn't exists
-> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$EZMESURE_POSTGRES_DB')\\gexec\" | psql -U ${POSTGRES_USER}"
+> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
 > podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
 > # This will run the migrations on the ezMESURE database
-> podman compose run --rm api "npx prisma migrate deploy"
+> podman compose run --rm --entrypoint="" api npx prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
 > podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
 > ```
@@ -401,7 +401,7 @@ docker compose up -d
 >
 > ```bash
 > # This will run the migrations on the ezMESURE database
-> podman compose run --rm api "npx prisma migrate deploy"
+> podman compose run --rm --entrypoint="" api npx prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
 > podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
 > ```
@@ -516,11 +516,11 @@ Development setup already includes watch mode (for api) and hot module reloading
 > # Replace the env variables with their values from `.env`
 >
 > # This will create the `$EZMESURE_POSTGRES_DB` database if doesn't exists
-> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$EZMESURE_POSTGRES_DB')\\gexec\" | psql -U ${POSTGRES_USER}"
+> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
 > podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
 > # This will run the migrations on the ezMESURE database
-> podman compose run --rm api "npx prisma migrate deploy"
+> podman compose -f compose.dev.yml run --rm --entrypoint="" api npx prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
 > podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
 > ```
