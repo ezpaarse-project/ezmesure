@@ -39,7 +39,9 @@ const immutableFields = [
  */
 const includableFields = [
   'dashboards',
+  'dashboards.dashboard',
   'spaces',
+  'spaces.space',
 ];
 
 /**
