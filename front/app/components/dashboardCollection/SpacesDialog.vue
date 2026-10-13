@@ -214,6 +214,7 @@ whenever(() => loading.value === false, () => {
 
 whenever(show, () => {
   initialLoading.value = true;
+  itemLength.value = { total: 0, current: 0 };
   refresh();
 });
 
