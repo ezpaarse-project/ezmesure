@@ -23,8 +23,8 @@
         <v-text-field
           v-model="search"
           :label="$t('search')"
-          :error="!!error"
-          :error-messages="error"
+          :error="!!errorMessage"
+          :error-messages="errorMessage"
           prepend-inner-icon="$mdi-magnify"
           density="compact"
           variant="outlined"
@@ -89,6 +89,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const props = defineProps({
   title: {
     type: String,
@@ -126,6 +128,8 @@ const {
     q: debouncedSearch,
   },
 });
+
+const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) : undefined));
 
 function addDashboardTemplate(dashboard) {
   emit('add-dashboard', dashboard);
