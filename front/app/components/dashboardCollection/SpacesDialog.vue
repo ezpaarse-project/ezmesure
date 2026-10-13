@@ -93,6 +93,7 @@
         :search="search"
         :items="spacesData.spaces"
         :loading="loading"
+        :no-data-text="t('spaces.search.empty')"
         :sort-by="[{ key: 'name', order: 'asc' }]"
         density="comfortable"
         v-bind="vDataTableOptions"
@@ -189,7 +190,7 @@ const {
 const debouncedRefresh = useDebounceFn(refresh, 250);
 
 const spaces = computed(() => spacesData.value ?? []);
-const hasSpaces = computed(() => spaces.value.length > 0);
+const hasSpaces = computed(() => itemLength.value.total > 0);
 
 const title = computed(() => {
   if (props.title) { return props.title; }
