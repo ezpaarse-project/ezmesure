@@ -174,7 +174,7 @@ const {
   vDataTableOptions,
 } = useServerSidePagination({
   fetch: {
-    url: `/api/dashboard-collections/${props.collectionId}/spaces`,
+    url: () => `/api/dashboard-collections/${props.collectionId}/spaces`,
     query: {
       include: ['space', 'repository'],
     },
