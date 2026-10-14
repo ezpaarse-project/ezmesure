@@ -61,7 +61,6 @@
                   v-tooltip:top="tag.attributes.description"
                   :text="tag.attributes.name"
                   :color="tag.attributes.color"
-                  class=""
                   variant="flat"
                   size="x-small"
                   label
