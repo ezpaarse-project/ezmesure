@@ -151,14 +151,35 @@ module.exports = class HarvestJobsService extends BasePrismaService {
   }
 
   /**
+   * Shorthand to add a log to an HarvestJob
+   *
+   * @param {string} jobId - The job to update
+   * @param {string} level - Log level
+   * @param {string} message - Log message
+   *
+   * @returns {Promise<HarvestJob>} The updated job
+   */
+  log(jobId, level, message) {
+    return this.update({
+      where: { id: jobId },
+      data: {
+        logs: {
+          push: { level, message, date: new Date() },
+        },
+      },
+    });
+  }
+
+  /**
    * @param {HarvestJob} job
    * @param {object} options
    * @param {string} [options.status=finished] - The status of the task
    * @param {string} [options.errorCode] - An error code
+   * @param {{ level: string, message: string }} [options.log] - Log to create
    * @returns {Promise<HarvestJob>}
    */
   finish(job, options = {}) {
-    const { status = 'finished', errorCode } = options;
+    const { status = 'finished', errorCode, log } = options;
     const { startedAt, createdAt } = job;
 
     let runningTime;
@@ -176,6 +197,7 @@ module.exports = class HarvestJobsService extends BasePrismaService {
         status,
         runningTime,
         errorCode,
+        logs: log ? { push: { ...log, date: new Date() } } : undefined,
       },
     });
   }

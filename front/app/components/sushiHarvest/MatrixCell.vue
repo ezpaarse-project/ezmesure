@@ -143,7 +143,7 @@ async function openTaskHistoryFromHarvest() {
   try {
     task.value = await $fetch(`/api/tasks/${props.modelValue.harvestedById}`, {
       params: {
-        include: ['steps', 'logs', 'session'],
+        include: ['session'],
       },
     });
 
