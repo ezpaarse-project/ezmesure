@@ -364,9 +364,9 @@ docker compose down
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
 > podman compose exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
 > # This will run the migrations on the ezMESURE database
-> podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
+> podman compose run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
-> EZREEPORT_DATABASE_URL=$(podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="sh -c" ezreeport "echo \${EZREEPORT_DATABASE_URL}") podman run --rm --network "$(basename $PWD)_default" -e EZREEPORT_DATABASE_URL ghcr.io/ezpaarse-project/ezreeport-migrate:stable
+> EZREEPORT_DATABASE_URL=$(podman compose run --rm --no-deps --entrypoint="sh -c" ezreeport "echo \${EZREEPORT_DATABASE_URL}") podman run --rm --network "$(basename $PWD)_default" -e EZREEPORT_DATABASE_URL ghcr.io/ezpaarse-project/ezreeport-migrate:stable
 > # Stop postgres
 > podman compose down
 > ```
@@ -398,9 +398,9 @@ docker compose up -d
 > # Start postgres
 > podman compose up -d postgres
 > # This will run the migrations on the ezMESURE database
-> podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
+> podman compose run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
-> EZREEPORT_DATABASE_URL=$(podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="sh -c" ezreeport "echo \${EZREEPORT_DATABASE_URL}") podman run --rm --network "$(basename $PWD)_default" -e EZREEPORT_DATABASE_URL ghcr.io/ezpaarse-project/ezreeport-migrate:stable
+> EZREEPORT_DATABASE_URL=$(podman compose run --rm --no-deps --entrypoint="sh -c" ezreeport "echo \${EZREEPORT_DATABASE_URL}") podman run --rm --network "$(basename $PWD)_default" -e EZREEPORT_DATABASE_URL ghcr.io/ezpaarse-project/ezreeport-migrate:stable
 > # Stop postgres
 > podman compose down
 > ```
@@ -506,11 +506,11 @@ Development setup already includes watch mode (for api) and hot module reloading
 >
 > ```bash
 > # Start postgres
-> podman compose up -d postgres
+> podman compose -f compose.dev.yml up -d postgres
 > # This will create the `$EZMESURE_POSTGRES_DB` database if doesn't exists
-> podman compose exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
+> podman compose -f compose.dev.yml exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
-> podman compose exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
+> podman compose -f compose.dev.yml exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
 > # This will run the migrations on the ezMESURE database
 > podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
