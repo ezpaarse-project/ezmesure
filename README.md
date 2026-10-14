@@ -354,26 +354,21 @@ docker compose down
 > [!WARNING]
 > If using `podman compose`:
 >
-> - You'll need to set the following environment variable to the `.env` file :
->
-> ```.env
-> # .env
-> NGINX_RESOLVER=10.89.0.1
-> ```
->
 > - You might encounter database issues as it does not supports (yet) the `pre_start` and `post_start` directives, you should run the following commands:
 >
 > ```bash
-> # Replace the env variables with their values from `.env`
->
+> # Start postgres
+> podman compose up -d postgres
 > # This will create the `$EZMESURE_POSTGRES_DB` database if doesn't exists
-> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
+> podman compose exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
-> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
+> podman compose exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
 > # This will run the migrations on the ezMESURE database
-> podman compose run --rm --entrypoint="" api npx prisma migrate deploy
+> podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
-> podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
+> EZREEPORT_DATABASE_URL=$(podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="sh -c" ezreeport "echo \${EZREEPORT_DATABASE_URL}") podman run --rm --network "$(basename $PWD)_default" -e EZREEPORT_DATABASE_URL ghcr.io/ezpaarse-project/ezreeport-migrate:stable
+> # Stop postgres
+> podman compose down
 > ```
 
 ### 🔃 Update application
@@ -400,10 +395,14 @@ docker compose up -d
 > - You might encounter database issues as it does not supports (yet) the `pre_start` and `post_start` directives, you should run the following commands:
 >
 > ```bash
+> # Start postgres
+> podman compose up -d postgres
 > # This will run the migrations on the ezMESURE database
-> podman compose run --rm --entrypoint="" api npx prisma migrate deploy
+> podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
-> podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
+> EZREEPORT_DATABASE_URL=$(podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="sh -c" ezreeport "echo \${EZREEPORT_DATABASE_URL}") podman run --rm --network "$(basename $PWD)_default" -e EZREEPORT_DATABASE_URL ghcr.io/ezpaarse-project/ezreeport-migrate:stable
+> # Stop postgres
+> podman compose down
 > ```
 
 ## 🏗️ Architecture
@@ -503,26 +502,21 @@ Development setup already includes watch mode (for api) and hot module reloading
 > [!WARNING]
 > If using `podman compose`:
 >
-> - You'll need to set the following environment variable to the `.env` file :
->
-> ```.env
-> # .env
-> NGINX_RESOLVER=10.89.0.1
-> ```
->
 > - You might encounter database issues as it does not supports (yet) the `pre_start` and `post_start` directives, you should run the following commands:
 >
 > ```bash
-> # Replace the env variables with their values from `.env`
->
+> # Start postgres
+> podman compose up -d postgres
 > # This will create the `$EZMESURE_POSTGRES_DB` database if doesn't exists
-> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
+> podman compose exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZMESURE_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZMESURE_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
 > # This will create the `$EZREEPORT_POSTGRES_DB` database if doesn't exists
-> podman compose run --rm postgres "echo \"SELECT 'CREATE DATABASE ${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U ${POSTGRES_USER}"
+> podman compose exec postgres sh -c "echo \"SELECT 'CREATE DATABASE \${EZREEPORT_POSTGRES_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '\${EZREEPORT_POSTGRES_DB}')\\gexec\" | psql -U \${POSTGRES_USER}"
 > # This will run the migrations on the ezMESURE database
-> podman compose -f compose.dev.yml run --rm --entrypoint="" api npx prisma migrate deploy
+> podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma migrate deploy
 > # This will run the migrations on the ezREEPORT database
-> podman compose up -d postgres && podman run --rm --network ezmesure_default -e EZREEPORT_DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${EZREEPORT_POSTGRES_DB}" ghcr.io/ezpaarse-project/ezreeport-migrate:rc && podman compose down
+> EZREEPORT_DATABASE_URL=$(podman compose -f compose.dev.yml run --rm --no-deps --entrypoint="sh -c" ezreeport "echo \${EZREEPORT_DATABASE_URL}") podman run --rm --network "$(basename $PWD)_default" -e EZREEPORT_DATABASE_URL ghcr.io/ezpaarse-project/ezreeport-migrate:rc
+> # Stop postgres
+> podman compose down
 > ```
 
 ### 🔒 SATOSA (optional)
