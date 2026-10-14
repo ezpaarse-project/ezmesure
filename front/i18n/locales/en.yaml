@@ -1334,6 +1334,13 @@ harvest:
         title: Harvest settings
         sendEndMail: A mail will be sent on harvest end
         timeout: Completion time of tasks
+        description_template:
+          date: Session of the {date} to harvest
+          endpoints: all endpoints
+          join: for
+          institutions: all institutions
+          more: and 1 other|and {n} others
+          period: '{period} on'
     unableToRetrive: Unable to retrieve harvests
     start: Start the session
     stop: Stop the session
