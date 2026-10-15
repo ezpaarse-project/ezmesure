@@ -92,8 +92,8 @@
         :headers="headers"
         :items="spacesData.spaces"
         :loading="loading"
-        :no-data-text="t('spaces.search.empty')"
         :sort-by="[{ key: 'name', order: 'asc' }]"
+        no-data-text="spaces.search.empty"
         density="comfortable"
         v-bind="vDataTableOptions"
       >
