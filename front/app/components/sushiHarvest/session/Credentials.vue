@@ -14,53 +14,57 @@
       <template #text>
         <v-row class="mt-2" gap="0">
           <v-col cols="6" class="pt-0 institution-list">
-            <v-list density="compact" lines="two" max-height="300" class="pt-0">
+            <v-list density="compact" lines="two" class="pt-0">
               <v-list-subheader sticky>
                 <v-icon icon="$mdi-domain" />
                 {{ $t('institutions.toolbarTitle', { count: institutions.length }) }}
               </v-list-subheader>
 
-              <v-list-item
-                v-for="item in institutions"
-                :key="item.id"
-                :title="item.name"
-                :subtitle="item.acronym"
-                :to="`/admin/institutions/${item.id}/sushi`"
-                append-icon="$mdi-open-in-new"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <template #prepend>
-                  <InstitutionAvatar :institution="item" />
+              <v-virtual-scroll :items="institutions" max-height="300">
+                <template #default="{ item }">
+                  <v-list-item
+                    :title="item.name"
+                    :subtitle="item.acronym"
+                    :to="`/admin/institutions/${item.id}/sushi`"
+                    append-icon="$mdi-open-in-new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <template #prepend>
+                      <InstitutionAvatar :institution="item" />
+                    </template>
+                  </v-list-item>
                 </template>
-              </v-list-item>
+              </v-virtual-scroll>
             </v-list>
           </v-col>
 
           <v-col cols="6" class="pt-0 endpoint-list">
-            <v-list density="compact" lines="two" max-height="300" class="pt-0">
+            <v-list density="compact" lines="two" class="pt-0">
               <v-list-subheader sticky>
                 <v-icon icon="$mdi-api" />
                 {{ $t('endpoints.toolbarTitle', { count: endpoints.length }) }}
               </v-list-subheader>
 
-              <v-list-item
-                v-for="item in endpoints"
-                :key="item.id"
-                :title="item.vendor"
-                :to="`/admin/endpoints/${item.id}`"
-                append-icon="$mdi-open-in-new"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <template #subtitle>
-                  <SushiEndpointVersionsChip
-                    :model-value="item"
-                    size="small"
-                    density="compact"
-                  />
+              <v-virtual-scroll :items="endpoints" max-height="300">
+                <template #default="{ item }">
+                  <v-list-item
+                    :title="item.vendor"
+                    :to="`/admin/endpoints/${item.id}`"
+                    append-icon="$mdi-open-in-new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <template #subtitle>
+                      <SushiEndpointVersionsChip
+                        :model-value="item"
+                        size="small"
+                        density="compact"
+                      />
+                    </template>
+                  </v-list-item>
                 </template>
-              </v-list-item>
+              </v-virtual-scroll>
             </v-list>
           </v-col>
         </v-row>
