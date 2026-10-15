@@ -1349,7 +1349,7 @@ harvest:
         timeout: Délai de complétion des tâches
         description:
           template: Session du {date} pour moissonner {period} sur {endpoints} pour {institutions}
-          allEndpoints: tout les points d'accès
+          allEndpoints: tous les points d'accès
           allInstitutions: tous les établissements
           more: et 1 autre|et {n} autres
     unableToRetrive: Impossible de récupérer les moissonnages
