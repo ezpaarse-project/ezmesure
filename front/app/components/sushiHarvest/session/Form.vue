@@ -12,7 +12,7 @@
           :loading="initialLoading"
           variant="elevated"
           color="secondary"
-          @click="initialLoading = true; Promise.all([onInstitutionSearch(), endpointsRefresh()])"
+          @click="initialLoading = true; Promise.all([onInstitutionsSearch(), onEndpointsSearch()])"
         />
 
         <v-spacer />
@@ -529,7 +529,6 @@
                     <v-textarea
                       v-model="description"
                       :label="`${$t('description')} *`"
-                      :disabled="isEditing"
                       prepend-icon="$mdi-text"
                       variant="underlined"
                       hide-details="auto"
@@ -653,6 +652,9 @@ const institutionsPage = shallowRef(1);
 const institutionsSearch = shallowRef('');
 const institutionsListRef = useTemplateRef('institutionsListRef');
 
+/**
+ * Fetch institutions from API
+ */
 const fetchInstitutions = useDebounceFn(async () => {
   institutionsStatus.value = 'pending';
   institutionsError.value = null;
@@ -675,6 +677,9 @@ const fetchInstitutions = useDebounceFn(async () => {
   }
 }, 250);
 
+/**
+ * Load next page of institutions, suited to be used with an infinite scroll
+ */
 async function loadInstitutions({ done }) {
   institutionsStatus.value = 'pending';
 
@@ -697,6 +702,9 @@ async function loadInstitutions({ done }) {
   }
 }
 
+/**
+ * Clear results and reset current page before applying search
+ */
 async function onInstitutionsSearch() {
   institutionsPage.value = 1;
   institutionsStatus.value = 'pending';
@@ -720,6 +728,9 @@ const endpointsPage = shallowRef(0);
 const endpointsSearch = shallowRef('');
 const endpointsListRef = useTemplateRef('endpointsListRef');
 
+/**
+ * Fetch endpoints from API
+ */
 const fetchEndpoints = useDebounceFn(async () => {
   endpointsStatus.value = 'pending';
   endpointsError.value = null;
@@ -742,6 +753,9 @@ const fetchEndpoints = useDebounceFn(async () => {
   }
 }, 250);
 
+/**
+ * Load next page of endpoints, suited to be used with an infinite scroll
+ */
 async function loadEndpoints({ done }) {
   endpointsStatus.value = 'pending';
 
@@ -764,6 +778,9 @@ async function loadEndpoints({ done }) {
   }
 }
 
+/**
+ * Clear results and reset current page before applying search
+ */
 async function onEndpointsSearch() {
   endpointsPage.value = 1;
   endpointsStatus.value = 'pending';
@@ -780,8 +797,9 @@ async function onEndpointsSearch() {
   }
 }
 
+// Fetch at initial load
 onMounted(() => {
-  Promise.all([onInstitutionsSearch({}), onEndpointsSearch()]);
+  Promise.all([onInstitutionsSearch(), onEndpointsSearch()]);
 });
 
 const isEditing = computed(() => !!modelValue?.id);
@@ -946,7 +964,7 @@ watchEffect(() => {
   if (isAllEndpoints.value) {
     endpointsText = t('harvest.sessions.form.settings.description.allEndpoints');
   } else if (selectedEndpoints.value.length > 0) {
-    const current = selectedEndpoints.value.map((endpoint) => `"${endpoint.vendor}"`);
+    const current = selectedEndpoints.value.map((endpoint) => `"${endpoint.vendor}"`).sort();
     // Limit count to `ITEMS_SIZE`, show `+x` more
     const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
     endpointsText = current.slice(0, size).join(', ');
@@ -960,7 +978,7 @@ watchEffect(() => {
   if (isAllInstitutions.value) {
     institutionsText = t('harvest.sessions.form.settings.description.allInstitutions');
   } else if (selectedInstitutions.value.length > 0) {
-    const current = selectedInstitutions.value.map((institution) => `"${institution.name}"`);
+    const current = selectedInstitutions.value.map((institution) => `"${institution.name}"`).sort();
     // Limit count to `ITEMS_SIZE`, show `+x` more
     const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
     institutionsText = current.slice(0, size).join(', ');
