@@ -969,7 +969,8 @@ watchEffect(() => {
     const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
     endpointsText = current.slice(0, size).join(', ');
     if (current.length > ITEMS_SIZE) {
-      endpointsText = t('harvest.sessions.form.settings.description.more', current.length - size, {
+      endpointsText = t('harvest.sessions.form.settings.description.more', {
+        n: current.length - size,
         prefix: endpointsText,
       });
     }
@@ -985,7 +986,8 @@ watchEffect(() => {
     const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
     institutionsText = current.slice(0, size).join(', ');
     if (current.length > ITEMS_SIZE) {
-      institutionsText = t('harvest.sessions.form.settings.description.more', current.length - size, {
+      institutionsText = t('harvest.sessions.form.settings.description.more', {
+        n: current.length - size,
         prefix: institutionsText,
       });
     }
