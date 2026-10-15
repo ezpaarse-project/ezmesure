@@ -1347,6 +1347,11 @@ harvest:
         title: Paramètres de moissonnage
         sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
         timeout: Délai de complétion des tâches
+        description:
+          template: Session du {date} pour moissonner {period} sur {endpoints} pour {institutions}
+          allEndpoints: tous les points d'accès
+          allInstitutions: tous les établissements
+          more: '{prefix} et 1 autre|{prefix} et {n} autres'
     unableToRetrive: Impossible de récupérer les moissonnages
     start: Démarrer la session
     stop: Arrêter la session
