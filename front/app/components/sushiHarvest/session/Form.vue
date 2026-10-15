@@ -887,13 +887,12 @@ watchEffect(() => {
   }
 
   const now = new Date();
-  const date = dateFormat(new Date(), locale.value, 'P');
-  const itemsSize = 3;
+  const dateText = dateFormat(now, locale.value, 'P');
 
-  const parts = [t('harvest.sessions.form.settings.description_template.date', { date })];
+  const ITEMS_SIZE = 3;
 
-  let period = '...';
-  // Add dates
+  // Format dates
+  let periodText = '...';
   if (beginDate.value && endDate.value) {
     const begin = parseDate(beginDate.value, 'yyyy-MM', now);
     const end = parseDate(endDate.value, 'yyyy-MM', now);
@@ -901,52 +900,52 @@ watchEffect(() => {
     const diff = differenceInYears(end, begin) + 1;
     const years = Array.from({ length: diff }, (_, i) => begin.getFullYear() + i);
 
-    period = years.join(' ~ ');
+    periodText = years.join(' ~ ');
   }
-  parts.push(t('harvest.sessions.form.settings.description_template.period', { period }));
 
   // Add endpoint names
+  let endpointsText = '...';
   if (isAllEndpoints.value) {
-    parts.push(t('harvest.sessions.form.settings.description_template.endpoints'));
+    endpointsText = t('harvest.sessions.form.settings.description.allEndpoints');
   } else if (endpointIds.value.length > 0) {
     const ids = new Set(endpointIds.value);
     const current = endpoints.value
       .filter((e) => ids.has(e.id))
       .map((endpoint) => `"${endpoint.vendor}"`);
 
-    // Limit count to `itemsSize`, show `+x` more
-    const size = current.length > itemsSize ? itemsSize - 1 : itemsSize;
-    parts.push(current.slice(0, size).join(', '));
-    if (current.length > itemsSize) {
-      parts.push(t('harvest.sessions.form.settings.description_template.more', current.length - size));
+    // Limit count to `ITEMS_SIZE`, show `+x` more
+    const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
+    endpointsText = current.slice(0, size).join(', ');
+    if (current.length > ITEMS_SIZE) {
+      endpointsText += ` ${t('harvest.sessions.form.settings.description.more', current.length - size)}`;
     }
-  } else {
-    parts.push('...');
   }
 
-  parts.push(t('harvest.sessions.form.settings.description_template.join'));
-
   // Add institution name
+  let institutionsText = '...';
   if (isAllInstitutions.value) {
-    parts.push(t('harvest.sessions.form.settings.description_template.institutions'));
+    institutionsText = t('harvest.sessions.form.settings.description.allInstitutions');
   } else if (institutionIds.value.length > 0) {
     const ids = new Set(institutionIds.value);
     const current = institutions.value
-      .filter((e) => ids.has(e.id))
+      .filter((i) => ids.has(i.id))
       .map((institution) => `"${institution.name}"`);
 
-    // Limit count to `itemsSize`, show `+x` more
-    const size = current.length > itemsSize ? itemsSize - 1 : itemsSize;
-    parts.push(current.slice(0, size).join(', '));
-    if (current.length > itemsSize) {
-      parts.push(t('harvest.sessions.form.settings.description_template.more', current.length - size));
+    // Limit count to `ITEMS_SIZE`, show `+x` more
+    const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
+    institutionsText = current.slice(0, size).join(', ');
+    if (current.length > ITEMS_SIZE) {
+      institutionsText += ` ${t('harvest.sessions.form.settings.description.more', current.length - size)}`;
     }
-  } else {
-    parts.push('...');
   }
 
-  description.value = parts.join(' ');
-}, { immediate: true });
+  description.value = t('harvest.sessions.form.settings.description.template', {
+    date: dateText,
+    period: periodText,
+    endpoints: endpointsText,
+    institutions: institutionsText,
+  });
+});
 
 const watchLock = shallowRef(false);
 watch(isAllInstitutions, (val) => {
