@@ -72,7 +72,7 @@
       </template>
 
       <v-empty-state
-        v-if="!hasSpaces"
+        v-if="!hasSpaces && !query.search && !searchIsDirty"
         :title="$t('dashboardCollections.spacesDialog.empty.title')"
         :text="$t('dashboardCollections.spacesDialog.empty.text')"
       >
@@ -90,7 +90,6 @@
       <v-data-table-server
         v-else
         :headers="headers"
-        :search="search"
         :items="spacesData.spaces"
         :loading="loading"
         :no-data-text="t('spaces.search.empty')"
@@ -160,7 +159,6 @@ const props = defineProps({
 const show = defineModel({ type: Boolean, default: false });
 
 const addMenuOpened = shallowRef(false);
-const search = shallowRef('');
 
 const snacks = useSnacksStore();
 const { t } = useI18n();
@@ -190,7 +188,7 @@ const {
 const debouncedRefresh = useDebounceFn(refresh, 250);
 
 const spaces = computed(() => spacesData.value ?? []);
-const hasSpaces = computed(() => itemLength.value.total > 0);
+const hasSpaces = computed(() => itemLength.value.current > 0);
 
 const title = computed(() => {
   if (props.title) { return props.title; }
@@ -208,8 +206,14 @@ const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) 
 const errorIcon = computed(() => (error?.value?.status === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
 
 const initialLoading = shallowRef(true);
+const searchIsDirty = shallowRef(false);
+
+watch(() => query.value.search, () => {
+  searchIsDirty.value = true;
+});
 whenever(() => loading.value === false, () => {
   initialLoading.value = false;
+  searchIsDirty.value = false;
 });
 
 whenever(show, () => {
