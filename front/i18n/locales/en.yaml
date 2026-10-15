@@ -1338,7 +1338,7 @@ harvest:
           template: Session of the {date} to harvest {period} on {endpoints} for {institutions}
           allEndpoints: every endpoints
           allInstitutions: every institutions
-          more: and 1 other|and {n} others
+          more: '{prefix} and 1 other|{prefix} and {n} others'
     unableToRetrive: Unable to retrieve harvests
     start: Start the session
     stop: Stop the session

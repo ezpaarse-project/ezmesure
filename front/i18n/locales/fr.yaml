@@ -1351,7 +1351,7 @@ harvest:
           template: Session du {date} pour moissonner {period} sur {endpoints} pour {institutions}
           allEndpoints: tous les points d'accès
           allInstitutions: tous les établissements
-          more: et 1 autre|et {n} autres
+          more: '{prefix} et 1 autre|{prefix} et {n} autres'
     unableToRetrive: Impossible de récupérer les moissonnages
     start: Démarrer la session
     stop: Arrêter la session
