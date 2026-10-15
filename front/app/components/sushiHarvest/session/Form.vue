@@ -881,6 +881,44 @@ async function save() {
   saving.value = false;
 }
 
+// Keep selected institutions in cache
+const selectedInstitutions = ref([]);
+watch(institutionIds, (newValue, oldValue) => {
+  const oldIds = new Set(oldValue);
+  const newIds = new Set(newValue);
+
+  // Remove from cache deleted values
+  const removedIds = new Set(oldValue.filter((id) => !newIds.has(id)));
+  selectedInstitutions.value = selectedInstitutions.value
+    .filter((institution) => !removedIds.has(institution.id));
+
+  // Add to cache added values
+  const addedIds = new Set(newValue.filter((id) => !oldIds.has(id)));
+  selectedInstitutions.value.push(
+    ...institutions.value
+      .filter((institution) => addedIds.has(institution.id)),
+  );
+});
+
+// Keep selected endpoints in cache
+const selectedEndpoints = ref([]);
+watch(endpointIds, (newValue, oldValue) => {
+  const oldIds = new Set(oldValue);
+  const newIds = new Set(newValue);
+
+  // Remove from cache deleted values
+  const removedIds = new Set(oldValue.filter((id) => !newIds.has(id)));
+  selectedEndpoints.value = selectedEndpoints.value
+    .filter((endpoint) => !removedIds.has(endpoint.id));
+
+  // Add to cache added values
+  const addedIds = new Set(newValue.filter((id) => !oldIds.has(id)));
+  selectedEndpoints.value.push(
+    ...endpoints.value
+      .filter((endpoint) => addedIds.has(endpoint.id)),
+  );
+});
+
 watchEffect(() => {
   if (isEditing.value || hasDescChanged.value) {
     return;
@@ -907,12 +945,8 @@ watchEffect(() => {
   let endpointsText = '...';
   if (isAllEndpoints.value) {
     endpointsText = t('harvest.sessions.form.settings.description.allEndpoints');
-  } else if (endpointIds.value.length > 0) {
-    const ids = new Set(endpointIds.value);
-    const current = endpoints.value
-      .filter((e) => ids.has(e.id))
-      .map((endpoint) => `"${endpoint.vendor}"`);
-
+  } else if (selectedEndpoints.value.length > 0) {
+    const current = selectedEndpoints.value.map((endpoint) => `"${endpoint.vendor}"`);
     // Limit count to `ITEMS_SIZE`, show `+x` more
     const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
     endpointsText = current.slice(0, size).join(', ');
@@ -925,12 +959,8 @@ watchEffect(() => {
   let institutionsText = '...';
   if (isAllInstitutions.value) {
     institutionsText = t('harvest.sessions.form.settings.description.allInstitutions');
-  } else if (institutionIds.value.length > 0) {
-    const ids = new Set(institutionIds.value);
-    const current = institutions.value
-      .filter((i) => ids.has(i.id))
-      .map((institution) => `"${institution.name}"`);
-
+  } else if (selectedInstitutions.value.length > 0) {
+    const current = selectedInstitutions.value.map((institution) => `"${institution.name}"`);
     // Limit count to `ITEMS_SIZE`, show `+x` more
     const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
     institutionsText = current.slice(0, size).join(', ');
