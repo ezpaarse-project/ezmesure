@@ -77,24 +77,19 @@
                   </template>
                 </v-card>
 
-                <v-list v-else density="compact">
-                  <v-list-subheader>
-                    {{ $t('dashboardCollections.repositorySelection') }}
-                  </v-list-subheader>
-
-                  <v-list-item
-                    v-for="repository in space.institution.repositories"
-                    :key="repository.pattern"
-                    :value="repository.pattern"
-                    :title="repository.pattern"
-                    prepend-icon="$mdi-database"
-                    @click="addSpace(space, repository.pattern)"
-                  >
-                    <template #subtitle>
-                      <RepositoryTypeChip :model-value="repository" />
-                    </template>
-                  </v-list-item>
-                </v-list>
+                <RepositoryList
+                  v-else
+                  :model-value="space.institution.repositories"
+                  :type="space.type"
+                  density="compact"
+                  @select="addSpace(space, $event)"
+                >
+                  <template #prepend>
+                    <v-list-subheader>
+                      {{ $t('dashboardCollections.repositorySelection') }}
+                    </v-list-subheader>
+                  </template>
+                </RepositoryList>
               </v-menu>
             </template>
           </v-list-item>
