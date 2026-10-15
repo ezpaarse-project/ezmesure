@@ -906,12 +906,12 @@ watch(institutionIds, (newValue, oldValue) => {
   const newIds = new Set(newValue);
 
   // Remove from cache deleted values
-  const removedIds = new Set(oldValue.filter((id) => !newIds.has(id)));
+  const removedIds = oldIds.difference(newIds);
   selectedInstitutions.value = selectedInstitutions.value
     .filter((institution) => !removedIds.has(institution.id));
 
   // Add to cache added values
-  const addedIds = new Set(newValue.filter((id) => !oldIds.has(id)));
+  const addedIds = newIds.difference(oldIds);
   selectedInstitutions.value.push(
     ...institutions.value
       .filter((institution) => addedIds.has(institution.id)),
@@ -925,12 +925,12 @@ watch(endpointIds, (newValue, oldValue) => {
   const newIds = new Set(newValue);
 
   // Remove from cache deleted values
-  const removedIds = new Set(oldValue.filter((id) => !newIds.has(id)));
+  const removedIds = oldIds.difference(newIds);
   selectedEndpoints.value = selectedEndpoints.value
     .filter((endpoint) => !removedIds.has(endpoint.id));
 
   // Add to cache added values
-  const addedIds = new Set(newValue.filter((id) => !oldIds.has(id)));
+  const addedIds = newIds.difference(oldIds);
   selectedEndpoints.value.push(
     ...endpoints.value
       .filter((endpoint) => addedIds.has(endpoint.id)),
