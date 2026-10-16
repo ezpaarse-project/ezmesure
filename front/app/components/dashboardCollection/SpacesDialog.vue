@@ -90,9 +90,6 @@
       <v-data-table-server
         v-else
         :headers="headers"
-        :items="spacesData.spaces"
-        :loading="loading"
-        :sort-by="[{ key: 'name', order: 'asc' }]"
         no-data-text="spaces.search.empty"
         density="comfortable"
         v-bind="vDataTableOptions"
