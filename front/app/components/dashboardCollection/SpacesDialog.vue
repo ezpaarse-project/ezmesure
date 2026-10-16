@@ -162,6 +162,7 @@ const { t } = useI18n();
 
 const {
   refresh,
+  resetSearch,
   itemLength,
   query,
   data: spacesData,
@@ -217,7 +218,7 @@ whenever(() => loading.value === false, () => {
 
 whenever(show, () => {
   initialLoading.value = true;
-  itemLength.value = { total: 0, current: 0 };
+  resetSearch();
   refresh();
 });
 

@@ -63,6 +63,17 @@ export default function useServerSidePagination(params = {}) {
     ...params.data,
   });
 
+  const defaultSearchData = {
+    page: query.value.page,
+    search: query.value.search,
+    sortBy: query.value.sortBy,
+  };
+
+  const resetSearch = () => {
+    itemLength.value = { total: 0, current: 0 };
+    query.value = { ...query.value, ...defaultSearchData };
+  };
+
   /**
    * Fetch data
    */
@@ -168,6 +179,7 @@ export default function useServerSidePagination(params = {}) {
     itemsPerPage,
     itemsPerPageOptions,
     query,
+    resetSearch,
     vPaginationOptions,
     vDataTableOptions,
   };
