@@ -1,7 +1,7 @@
 {
   "id": "counter-base-en-pr",
   "name": "00_Generic_PR_AllMetrics_EN",
-  "description": "Aggregates all TR 5.0 and 5.1 reports for the previous year",
+  "description": "Aggregates all PR 5.0 and 5.1 reports for the previous year",
   "kibanaVersion": "7.17.28",
   "data": [
     {
