@@ -66,13 +66,13 @@
             width="200"
             hide-details
             class="mr-2"
-            @update:model-value="debouncedRefresh()"
+            @update:model-value="onSearchInput"
           />
         </div>
       </template>
 
       <v-empty-state
-        v-if="!hasSpaces && !query.search && !searchIsDirty"
+        v-if="!hasSpaces && !query.search && !searchIsModified"
         :title="$t('dashboardCollections.spacesDialog.empty.title')"
         :text="$t('dashboardCollections.spacesDialog.empty.text')"
       >
@@ -203,14 +203,16 @@ const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) 
 const errorIcon = computed(() => (error?.value?.status === 404 ? '$mdi-ghost-outline' : '$mdi-alert-circle'));
 
 const initialLoading = shallowRef(true);
-const searchIsDirty = shallowRef(false);
+const searchIsModified = shallowRef(false);
 
-watch(() => query.value.search, () => {
-  searchIsDirty.value = true;
-});
+const onSearchInput = () => {
+  searchIsModified.value = true;
+  debouncedRefresh();
+};
+
 whenever(() => loading.value === false, () => {
   initialLoading.value = false;
-  searchIsDirty.value = false;
+  searchIsModified.value = false;
 });
 
 whenever(show, () => {
