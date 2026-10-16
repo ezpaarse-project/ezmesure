@@ -30,7 +30,7 @@ const generateRoleNameFromAlias = (alias) => `alias.${alias.pattern}`;
  */
 const generateElasticPermissions = (entity) => {
   if (entity.readonly) {
-    return { privileges: ['read', 'view_index_metadata'] };
+    return { privileges: ['read', 'view_index_metadata', 'monitor'] };
   }
   return { privileges: ['all'] };
 };
