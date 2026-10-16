@@ -98,7 +98,7 @@ export default function useServerSidePagination(params = {}) {
         // Update item length
         itemLength.value.current = Number.parseInt(res.headers.get('x-total-count'), 10) || 0;
 
-        if (!itemLength.value.total) {
+        if (!itemLength.value.total || !query.value.search) {
           itemLength.value.total = itemLength.value.current;
         }
 
