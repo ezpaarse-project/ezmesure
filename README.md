@@ -371,6 +371,13 @@ docker compose down
 > podman compose down
 > ```
 
+By default ezMESURE starts only with a default admin user (cf. `EZMESURE_ADMIN_*` variables). To have a default set of data used to quickly try main features of the application, you can use the following command before **syncing ezMESURE's data** through the administration UI:
+
+```bash
+# This assumes the app is running (or at least the postgres service)
+docker compose run --rm --no-deps --entrypoint="npx" api prisma db seed
+```
+
 ### 🔃 Update application
 
 To update ezMESURE (we're pushing 2 releases every month on average), you can run the following command :
@@ -404,6 +411,13 @@ docker compose up -d
 > # Stop postgres
 > podman compose down
 > ```
+
+You can refresh the default set of data with the following command before **syncing ezMESURE's data** through the administration UI:
+
+```bash
+# This assumes the app is running (or at least the postgres service)
+docker compose run --rm --no-deps --entrypoint="npx" api prisma db seed
+```
 
 ## 🏗️ Architecture
 
