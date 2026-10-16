@@ -177,7 +177,7 @@ const {
   },
   data: {
     sortBy: [
-      { key: 'spaceId', order: 'asc' },
+      { key: 'space.name', order: 'asc' },
     ],
   },
 });
