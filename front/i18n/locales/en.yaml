@@ -1256,6 +1256,8 @@ spaces:
   descriptions:
     ezpaarse: ezPAARSE space
     counter5: Publisher space
+  search:
+    empty: There is no space matching your search
   deleteSpace: You are about to delete "{spaceName}", which will delete the dashboards included in this space. This action cannot be undone.
   filters:
     title: Filter spaces
@@ -1495,11 +1497,23 @@ dashboardCollections:
   newCollection: New collection
   repositorySelection: Repository selection
   noRepositories: No repository available
+  addADashboard: Add a dashboard
+  addToASpace: Add to a space
   manageCollections: >
     Manage the collection
     |Manage {count} collections
   search:
     empty: There is no collection matching your search
+  dashboardsDialog:
+    empty:
+      title: No dashboards
+      text: No dashboard has been added to this collection yet
+      action: Add a dashboard
+  spacesDialog:
+    empty:
+      title: No spaces
+      text: There are no spaces containing this collection yet
+      action: Add to a space
   actions:
     delete:
       title: Delete 1 collection ?|Delete {count} collections ?

@@ -1244,7 +1244,7 @@ repoAliasTemplates:
 
 spaces:
   spaces: Espaces
-  toolbarTitle: Espace ({count})
+  toolbarTitle: Espaces ({count})
   newSpace: Nouvel espace
   editSpace: Mise à jour de l'espace
   ownedSpaces: Espaces établissement
@@ -1269,6 +1269,8 @@ spaces:
   descriptions:
     ezpaarse: Espace ezPAARSE
     counter5: Espace éditeurs
+  search:
+    empty: Aucun espace ne correspond à votre recherche
   deleteSpace: Vous allez supprimer l'espace "{spaceName}", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible.
   filters:
     title: Filtrer les espaces
@@ -1507,11 +1509,23 @@ dashboardCollections:
   newCollection: Nouvelle collection
   repositorySelection: Choix de l'entrepôt
   noRepositories: Pas d'entrepôts disponibles
+  addADashboard: Ajouter un tableau de bord
+  addToASpace: Ajouter à un espace
   manageCollections: >
     Gérer la collection
     |Gérer {count} collections
   search:
     empty: Aucune collection ne correspond à votre recherche
+  dashboardsDialog:
+    empty:
+      title: Pas de tableaux de bord
+      text: Aucun tableau de bord n'a encore été ajouté à cette collection
+      action: Ajouter un tableau de bord
+  spacesDialog:
+    empty:
+      title: Pas d'espaces
+      text: Aucun espace ne contient cette collection
+      action: Ajouter à un espace
   actions:
     delete:
       title: Supprimer 1 collection ?|Supprimer {count} collections ?
@@ -1533,6 +1547,8 @@ dashboards:
   addCollection: Ajouter une collection
   cannotAddToCollection: Impossible d'ajouter le tableau de bord dans la collection
   cannotRemoveFromCollection: Impossible de supprimer le tableau de bord de la collection
+  search:
+    empty: Aucun modèle de tableau de bord ne correspond à votre recherche
   form:
     headline:
       add: Cherchez un tableau de bord Kibana que vous souhaitez enregistrer comme modèle.
