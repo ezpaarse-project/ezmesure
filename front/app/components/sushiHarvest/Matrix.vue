@@ -119,7 +119,7 @@
 <script setup>
 import { parse } from 'date-fns';
 
-import { DEFAULT_REPORTS_IDS, SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
+import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
 
 // eslint-disable-next-line vue/max-len
 /** * @typedef {{ supported: boolean, manual: boolean, harvests: Map<string, object[]> }} ReportDef */
@@ -144,6 +144,8 @@ const props = defineProps({
 });
 
 const now = new Date();
+
+const { data: apiConfig } = await useApiConfig();
 
 /**
  * Selected period, as a `yyyy-MM` string
@@ -251,10 +253,11 @@ const unsupportedReports = computed(() => {
 
 const harvestsByReports = computed(() => {
   /** @type {Map<string, ReportDef>} */
-  const reports = new Map(DEFAULT_REPORTS_IDS.map((reportId) => {
-    const supported = supportedReports.value.get(reportId) ?? { supported: false, manual: false };
+  const reports = new Map(apiConfig.value?.counter.defaultHarvestedReports?.map((reportId) => {
+    const report = reportId.toUpperCase();
+    const supported = supportedReports.value.get(report) ?? { supported: false, manual: false };
     return [
-      reportId,
+      report,
       { ...supported, harvests: new Map() },
     ];
   }));

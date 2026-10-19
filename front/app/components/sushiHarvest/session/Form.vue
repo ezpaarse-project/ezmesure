@@ -590,7 +590,7 @@
 import { differenceInYears, parse as parseDate } from 'date-fns';
 
 import { getErrorMessage } from '@/lib/errors';
-import { DEFAULT_REPORTS_IDS, SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
+import { STANDARD_REPORTS_IDS, SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
 
 const { modelValue } = defineProps({
   modelValue: {
@@ -606,6 +606,7 @@ const emit = defineEmits({
 const snacks = useSnacksStore();
 const { t, locale } = useI18n();
 const { mdAndUp } = useVDisplay();
+const { data: apiConfig } = await useApiConfig();
 
 const initialLoading = shallowRef(true);
 const saving = shallowRef(false);
@@ -616,10 +617,7 @@ const description = shallowRef(modelValue?.description ?? '');
 const timeout = shallowRef(modelValue?.timeout ?? 600);
 const beginDate = shallowRef(modelValue?.beginDate ?? '');
 const endDate = shallowRef(modelValue?.endDate ?? '');
-const reportTypes = ref(
-  modelValue?.reportTypes?.map((report) => report.toUpperCase())
-  ?? DEFAULT_REPORTS_IDS,
-);
+const reportTypes = ref(modelValue?.reportTypes?.map((report) => report.toUpperCase()) ?? []);
 const counterVersions = ref(modelValue?.allowedCounterVersions ?? SUPPORTED_COUNTER_VERSIONS);
 const downloadUnsupported = shallowRef(modelValue?.downloadUnsupported ?? false);
 const allowFaulty = shallowRef(modelValue?.allowFaulty ?? false);
@@ -642,7 +640,6 @@ const isCustomVersionOpen = shallowRef(false);
 const customVersion = shallowRef('');
 
 /** @type {Ref<Object | null>} */
-const formRef = useTemplateRef('formRef');
 const additionalReportForm = useTemplateRef('additionalReportForm');
 
 const institutions = ref([]);
@@ -834,7 +831,7 @@ const areEndpointsValid = computed(() => {
   return endpointIds.value.length > 0;
 });
 const reportsList = computed(() => Array.from(new Set([
-  ...DEFAULT_REPORTS_IDS,
+  ...STANDARD_REPORTS_IDS,
   ...reportTypes.value,
 ])));
 const versionsList = computed(() => Array.from(new Set([
@@ -1023,9 +1020,12 @@ watch(isAllEndpoints, (val) => {
   watchLock.value = true; // Prevent other watcher to trigger
 });
 
-watch(() => institutionsStatus.value === 'pending' && endpointsStatus.value === 'pending', (isLoading) => {
-  if (!isLoading) {
-    initialLoading.value = false;
-  }
+whenever(() => apiConfig.value != null && modelValue?.reportTypes == null, () => {
+  reportTypes.value = apiConfig.value.counter.defaultHarvestedReports
+    .map((report) => report.toUpperCase());
+}, { immediate: true });
+
+whenever(() => institutionsStatus.value !== 'pending' || endpointsStatus.value !== 'pending', () => {
+  initialLoading.value = false;
 });
 </script>

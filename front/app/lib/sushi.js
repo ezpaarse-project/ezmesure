@@ -5,7 +5,7 @@ import {
   addQuarters,
 } from 'date-fns';
 
-export const DEFAULT_REPORTS_IDS = [
+export const STANDARD_REPORTS_IDS = [
   'DR',
   'DR_D1',
   'IR',
