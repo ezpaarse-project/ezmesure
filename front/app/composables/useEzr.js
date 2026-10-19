@@ -45,5 +45,6 @@ export default async function useEzr() {
     itemsPerPageOptions,
     itemsPerPage,
     refresh,
+    token: ezrProfile.value.token,
   };
 }

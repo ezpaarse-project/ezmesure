@@ -25,7 +25,17 @@
             />
           </template>
 
-          <v-card>
+          <v-card :title="$t('menu.bar.documentation.entries.api')">
+            <template #append>
+              <v-btn
+                :text="$t('menu.myspace.authentificationToken')"
+                prepend-icon="$mdi-key"
+                density="comfortable"
+                variant="tonal"
+                @click="copyToken()"
+              />
+            </template>
+
             <template #text>
               <iframe
                 src="/report/api/doc/"
@@ -107,10 +117,24 @@
 <script setup>
 const { toggle } = useDrawerStore();
 
+const { t } = useI18n();
+const { copy } = useClipboard();
+const snacks = useSnacksStore();
+
 const {
   error,
   itemsPerPage,
   itemsPerPageOptions,
   refresh,
+  token,
 } = await useEzr();
+
+async function copyToken() {
+  try {
+    await copy(token);
+    snacks.info(t('clipboard.textCopied'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
+  }
+}
 </script>
