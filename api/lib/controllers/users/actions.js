@@ -17,7 +17,7 @@ const { logoutUser, AUTH_COOKIE } = require('../../services/kibana');
 const standardQueryParams = prepareStandardQueryParams({
   schema,
   includableFields,
-  queryFields: ['username', 'fullName'],
+  queryFields: ['username', 'fullName', 'email'],
 });
 exports.standardQueryParams = standardQueryParams;
 
