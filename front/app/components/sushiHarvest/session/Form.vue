@@ -12,7 +12,7 @@
           :loading="initialLoading"
           variant="elevated"
           color="secondary"
-          @click="initialLoading = true; Promise.all([institutionsRefresh, endpointsRefresh])"
+          @click="initialLoading = true; Promise.all([onInstitutionsSearch(), onEndpointsSearch()])"
         />
 
         <v-spacer />
@@ -51,154 +51,174 @@
                   </v-col>
                 </v-row>
 
-                <v-row class="mb-2">
+                <v-row class="mb-2 ga-0">
                   <v-col cols="12" md="6" :class="mdAndUp ? ['border-e-thin', 'border-opacity'] : undefined">
-                    <v-list
-                      v-model:selected="institutionIds"
-                      lines="two"
-                      density="compact"
-                      height="490"
-                      select-strategy="leaf"
-                      class="credentials-list pa-0"
-                    >
-                      <div class="credentials-list-header">
-                        <v-list-subheader>
+                    <v-row class="mb-2 mr-2">
+                      <v-col cols="6">
+                        <v-list-subheader class="ml-2">
                           <v-icon icon="$mdi-domain" />
                           {{ $t('harvest.sessions.form.credentials.institutions.title', { count: institutionsCount }) }}
-
-                          <v-spacer />
-
-                          <div style="width: 250px">
-                            <v-text-field
-                              v-model="institutionsSearch"
-                              :placeholder="$t('search')"
-                              append-inner-icon="$mdi-magnify"
-                              variant="outlined"
-                              density="compact"
-                              hide-details
-                            />
-                          </div>
                         </v-list-subheader>
+                      </v-col>
 
-                        <v-list-item
-                          :title="$t('harvest.sessions.form.credentials.institutions.all')"
-                          :active="isAllInstitutions"
-                          @click="isAllInstitutions = !isAllInstitutions"
-                        >
-                          <template #prepend>
-                            <v-list-item-action start>
-                              <v-switch
-                                :model-value="isAllInstitutions"
-                                color="primary"
-                                hide-details
-                                readonly
-                              />
-                            </v-list-item-action>
-                          </template>
-                        </v-list-item>
+                      <v-col>
+                        <v-text-field
+                          v-model="institutionsSearch"
+                          :placeholder="$t('search')"
+                          append-inner-icon="$mdi-magnify"
+                          variant="outlined"
+                          density="compact"
+                          hide-details
+                          @update:model-value="onInstitutionsSearch()"
+                        />
+                      </v-col>
+                    </v-row>
 
-                        <v-divider v-if="!isAllInstitutions" class="border-dashed border-opacity-25 py-1" />
-                      </div>
+                    <v-list-item
+                      :title="$t('harvest.sessions.form.credentials.institutions.all')"
+                      :active="isAllInstitutions"
+                      @click="isAllInstitutions = !isAllInstitutions"
+                    >
+                      <template #prepend>
+                        <v-list-item-action start>
+                          <v-switch
+                            :model-value="isAllInstitutions"
+                            color="primary"
+                            hide-details
+                            readonly
+                          />
+                        </v-list-item-action>
+                      </template>
+                    </v-list-item>
 
-                      <div v-show="!isAllInstitutions">
-                        <v-list-item
-                          v-for="item in institutions"
-                          :key="item.id"
-                          :value="item.id"
-                          :title="item.name"
-                          :subtitle="item.acronym"
-                        >
-                          <template #prepend="{ isSelected, select }">
-                            <v-list-item-action start>
-                              <v-checkbox-btn
-                                :model-value="isSelected"
-                                color="primary"
-                                @update:model-value="select"
-                              />
-                            </v-list-item-action>
+                    <template v-if="!isAllInstitutions">
+                      <v-divider variant="dashed" opacity="0.25" class="py-1" />
 
-                            <InstitutionAvatar :institution="item" />
-                          </template>
-                        </v-list-item>
-                      </div>
-                    </v-list>
+                      <v-empty-state
+                        v-if="institutions.length <= 0 && institutionsStatus !== 'pending'"
+                        icon="$mdi-magnify"
+                        :text="$t('noMatch')"
+                        style="min-height: 0;"
+                      />
+
+                      <v-list
+                        v-else
+                        v-model:selected="institutionIds"
+                        lines="two"
+                        density="compact"
+                        select-strategy="leaf"
+                        class="credentials-list pa-0"
+                      >
+                        <v-infinite-scroll ref="institutionsListRef" height="300" empty-text="" color="primary" @load="loadInstitutions">
+                          <v-list-item
+                            v-for="item in institutions"
+                            :key="item.id"
+                            :value="item.id"
+                            :title="item.name"
+                            :subtitle="item.acronym"
+                          >
+                            <template #prepend="{ isSelected, select }">
+                              <v-list-item-action start>
+                                <v-checkbox-btn
+                                  :model-value="isSelected"
+                                  color="primary"
+                                  @update:model-value="select"
+                                />
+                              </v-list-item-action>
+
+                              <InstitutionAvatar :institution="item" />
+                            </template>
+                          </v-list-item>
+                        </v-infinite-scroll>
+                      </v-list>
+                    </template>
                   </v-col>
 
                   <v-col cols="12" md="6">
-                    <v-list
-                      v-model:selected="endpointIds"
-                      lines="two"
-                      density="compact"
-                      height="490"
-                      select-strategy="leaf"
-                      class="credentials-list pa-0"
-                    >
-                      <div class="credentials-list-header">
-                        <v-list-subheader>
+                    <v-row class="mb-2 ml-2">
+                      <v-col cols="6">
+                        <v-list-subheader class="ml-2">
                           <v-icon icon="$mdi-api" />
                           {{ $t('harvest.sessions.form.credentials.endpoints.title', { count: endpointsCount }) }}
-
-                          <v-spacer />
-
-                          <div style="width: 250px">
-                            <v-text-field
-                              v-model="endpointsSearch"
-                              :placeholder="$t('search')"
-                              append-inner-icon="$mdi-magnify"
-                              variant="outlined"
-                              density="compact"
-                              hide-details
-                            />
-                          </div>
                         </v-list-subheader>
+                      </v-col>
 
-                        <v-list-item
-                          :title="$t('harvest.sessions.form.credentials.endpoints.all')"
-                          :active="isAllEndpoints"
-                          @click="isAllEndpoints = !isAllEndpoints"
-                        >
-                          <template #prepend>
-                            <v-list-item-action start>
-                              <v-switch
-                                :model-value="isAllEndpoints"
-                                color="primary"
-                                hide-details
-                                readonly
+                      <v-col>
+                        <v-text-field
+                          v-model="endpointsSearch"
+                          :placeholder="$t('search')"
+                          append-inner-icon="$mdi-magnify"
+                          variant="outlined"
+                          density="compact"
+                          hide-details
+                          @update:model-value="onEndpointsSearch()"
+                        />
+                      </v-col>
+                    </v-row>
+
+                    <v-list-item
+                      :title="$t('harvest.sessions.form.credentials.endpoints.all')"
+                      :active="isAllEndpoints"
+                      @click="isAllEndpoints = !isAllEndpoints"
+                    >
+                      <template #prepend>
+                        <v-list-item-action start>
+                          <v-switch
+                            :model-value="isAllEndpoints"
+                            color="primary"
+                            hide-details
+                            readonly
+                          />
+                        </v-list-item-action>
+                      </template>
+                    </v-list-item>
+
+                    <template v-if="!isAllEndpoints">
+                      <v-divider variant="dashed" opacity="0.25" class="py-1" />
+
+                      <v-empty-state
+                        v-if="endpoints.length <= 0 && endpointsStatus !== 'pending'"
+                        icon="$mdi-magnify"
+                        :text="$t('noMatch')"
+                        style="min-height: 0;"
+                      />
+
+                      <v-list
+                        v-else
+                        v-model:selected="endpointIds"
+                        lines="two"
+                        density="compact"
+                        select-strategy="leaf"
+                        class="credentials-list pa-0"
+                      >
+                        <v-infinite-scroll ref="endpointsListRef" height="300" empty-text="" color="primary" @load="loadEndpoints">
+                          <v-list-item
+                            v-for="item in endpoints"
+                            :key="item.id"
+                            :value="item.id"
+                            :title="item.vendor"
+                          >
+                            <template #prepend="{ isSelected, select }">
+                              <v-list-item-action start>
+                                <v-checkbox-btn
+                                  :model-value="isSelected"
+                                  color="primary"
+                                  @update:model-value="select"
+                                />
+                              </v-list-item-action>
+                            </template>
+
+                            <template #subtitle>
+                              <SushiEndpointVersionsChip
+                                :model-value="item"
+                                size="small"
+                                density="compact"
                               />
-                            </v-list-item-action>
-                          </template>
-                        </v-list-item>
-
-                        <v-divider v-if="!isAllEndpoints" class="border-dashed border-opacity-25 py-1" />
-                      </div>
-
-                      <div v-show="!isAllEndpoints">
-                        <v-list-item
-                          v-for="item in endpoints"
-                          :key="item.id"
-                          :value="item.id"
-                          :title="item.vendor"
-                        >
-                          <template #prepend="{ isSelected, select }">
-                            <v-list-item-action start>
-                              <v-checkbox-btn
-                                :model-value="isSelected"
-                                color="primary"
-                                @update:model-value="select"
-                              />
-                            </v-list-item-action>
-                          </template>
-
-                          <template #subtitle>
-                            <SushiEndpointVersionsChip
-                              :model-value="item"
-                              size="small"
-                              density="compact"
-                            />
-                          </template>
-                        </v-list-item>
-                      </div>
-                    </v-list>
+                            </template>
+                          </v-list-item>
+                        </v-infinite-scroll>
+                      </v-list>
+                    </template>
                   </v-col>
                 </v-row>
 
@@ -250,239 +270,250 @@
                   </v-col>
                 </v-row>
 
-                <v-row class="mb-2">
-                  <v-col cols="12" md="6" :class="mdAndUp ? ['border-e-thin', 'border-opacity'] : undefined">
-                    <v-list
-                      v-model:selected="counterVersions"
-                      lines="one"
-                      density="compact"
-                      height="250"
-                      select-strategy="leaf"
-                      class="pa-0"
-                    >
-                      <v-list-subheader sticky>
-                        <v-icon icon="$mdi-numeric" size="small" />
-                        {{ $t('harvest.sessions.counts.counterVersions', counterVersions.length) }}
-                      </v-list-subheader>
+                <v-expansion-panels elevation="0" variant="accordion" rounded class="border-thin">
+                  <v-expansion-panel>
+                    <template #title>
+                      <v-icon icon="$mdi-tools" class="mr-2" />
 
-                      <v-list-item
-                        v-for="item in versionsList"
-                        :key="item"
-                        :value="item"
-                      >
-                        <template #prepend="{ isSelected, select }">
-                          <v-list-item-action start>
-                            <v-checkbox-btn
-                              :model-value="isSelected"
-                              color="primary"
-                              @update:model-value="select"
-                            />
-                          </v-list-item-action>
-                        </template>
+                      {{ $t('advancedSettings') }}
+                    </template>
 
-                        <template #title>
-                          <v-chip
-                            :text="item"
-                            :color="counterVersionsColors.get(item) || 'secondary'"
-                            variant="flat"
+                    <template #text>
+                      <v-row class="ga-0 justify-center">
+                        <v-col cols="12" md="6" :class="{ 'border-e-thin': mdAndUp, 'border-opacity': mdAndUp, 'px-2': true }">
+                          <v-list
+                            v-model:selected="counterVersions"
+                            lines="one"
                             density="compact"
-                            label
-                            class="text-black"
-                          />
-                        </template>
-                      </v-list-item>
-                    </v-list>
+                            height="250"
+                            select-strategy="leaf"
+                            class="pa-0"
+                          >
+                            <v-list-subheader sticky>
+                              <v-icon icon="$mdi-numeric" size="small" />
+                              {{ $t('harvest.sessions.counts.counterVersions', counterVersions.length) }}
+                            </v-list-subheader>
 
-                    <v-menu
-                      v-model="isAdditionalReportOpen"
-                      :close-on-content-click="false"
-                      min-width="200px"
-                      width="500px"
-                      @update:model-value="resetVersionForm()"
-                    >
-                      <template #activator="{ props: menu }">
-                        <v-btn
-                          :text="$t('endpoints.addCustomVersion')"
-                          color="secondary"
-                          prepend-icon="$mdi-plus"
-                          block
-                          class="mt-2"
-                          v-bind="menu"
-                        />
-                      </template>
+                            <v-list-item
+                              v-for="item in versionsList"
+                              :key="item"
+                              :value="item"
+                            >
+                              <template #prepend="{ isSelected, select }">
+                                <v-list-item-action start>
+                                  <v-checkbox-btn
+                                    :model-value="isSelected"
+                                    color="primary"
+                                    @update:model-value="select"
+                                  />
+                                </v-list-item-action>
+                              </template>
 
-                      <v-card>
-                        <template #text>
-                          <v-row>
-                            <v-col>
-                              <v-form
-                                id="additionalVersionForm"
-                                ref="additionalVersionForm"
-                                @submit.prevent="
-                                  counterVersions.push(customVersion);
-                                  isCustomVersionOpen = false
-                                "
-                              >
-                                <p>
-                                  {{ $t('endpoints.customVersionDesc') }}
-                                </p>
-
-                                <v-text-field
-                                  v-model="customVersion"
-                                  :label="$t('endpoints.customVersion')"
-                                  :rules="versionRules"
-                                  prepend-icon="$mdi-numeric"
-                                  variant="underlined"
-                                  hide-details="auto"
-                                  autofocus
+                              <template #title>
+                                <v-chip
+                                  :text="item"
+                                  :color="counterVersionsColors.get(item) || 'secondary'"
+                                  variant="flat"
+                                  density="compact"
+                                  label
+                                  class="text-black"
                                 />
-                              </v-form>
-                            </v-col>
-                          </v-row>
-                        </template>
+                              </template>
+                            </v-list-item>
+                          </v-list>
 
-                        <template #actions>
-                          <v-spacer />
+                          <v-menu
+                            v-model="isAdditionalReportOpen"
+                            :close-on-content-click="false"
+                            min-width="200px"
+                            width="500px"
+                            @update:model-value="resetVersionForm()"
+                          >
+                            <template #activator="{ props: menu }">
+                              <v-btn
+                                :text="$t('endpoints.addCustomVersion')"
+                                color="secondary"
+                                prepend-icon="$mdi-plus"
+                                block
+                                class="mt-2"
+                                v-bind="menu"
+                              />
+                            </template>
 
-                          <v-btn
-                            :text="$t('add')"
-                            :disabled="!customVersion"
-                            color="success"
-                            prepend-icon="$mdi-plus"
-                            variant="text"
-                            type="submit"
-                            form="additionalVersionForm"
-                          />
-                        </template>
-                      </v-card>
-                    </v-menu>
-                  </v-col>
+                            <v-card>
+                              <template #text>
+                                <v-row>
+                                  <v-col>
+                                    <v-form
+                                      id="additionalVersionForm"
+                                      @submit.prevent="
+                                        counterVersions.push(customVersion);
+                                        isCustomVersionOpen = false
+                                      "
+                                    >
+                                      <p>
+                                        {{ $t('endpoints.customVersionDesc') }}
+                                      </p>
 
-                  <v-col cols="12" md="6">
-                    <v-list
-                      v-model:selected="reportTypes"
-                      lines="one"
-                      density="compact"
-                      height="250"
-                      select-strategy="leaf"
-                      class="pa-0"
-                    >
-                      <v-list-subheader sticky>
-                        <v-icon icon="$mdi-file" size="small" />
-                        {{ $t('harvest.sessions.counts.reportTypes', reportTypes.length) }}
-                      </v-list-subheader>
+                                      <v-text-field
+                                        v-model="customVersion"
+                                        :label="$t('endpoints.customVersion')"
+                                        :rules="versionRules"
+                                        prepend-icon="$mdi-numeric"
+                                        variant="underlined"
+                                        hide-details="auto"
+                                        autofocus
+                                      />
+                                    </v-form>
+                                  </v-col>
+                                </v-row>
+                              </template>
 
-                      <v-list-item
-                        v-for="item in reportsList"
-                        :key="item"
-                        :value="item"
-                        :title="item"
-                      >
-                        <template #prepend="{ isSelected, select }">
-                          <v-list-item-action start>
-                            <v-checkbox-btn
-                              :model-value="isSelected"
-                              color="primary"
-                              @update:model-value="select"
-                            />
-                          </v-list-item-action>
-                        </template>
-                      </v-list-item>
-                    </v-list>
+                              <template #actions>
+                                <v-spacer />
 
-                    <v-menu
-                      v-model="isCustomVersionOpen"
-                      :close-on-content-click="false"
-                      min-width="200px"
-                      width="500px"
-                      @update:model-value="resetReportForm()"
-                    >
-                      <template #activator="{ props: menu }">
-                        <v-btn
-                          :text="$t('endpoints.addAdditionalReport')"
-                          color="secondary"
-                          prepend-icon="$mdi-plus"
-                          block
-                          class="mt-2"
-                          v-bind="menu"
-                        />
-                      </template>
-
-                      <v-card>
-                        <template #text>
-                          <v-row>
-                            <v-col>
-                              <v-form
-                                id="additionalReportForm"
-                                ref="additionalReportForm"
-                                @submit.prevent="
-                                  reportsList.push(additionalReport);
-                                  isCustomVersionOpen = false
-                                "
-                              >
-                                <p>
-                                  {{ $t('endpoints.addAdditionalReportDesc') }}
-                                </p>
-
-                                <v-text-field
-                                  v-model="additionalReport"
-                                  :label="$t('harvest.jobs.reportType')"
-                                  prepend-icon="$mdi-file"
-                                  variant="underlined"
-                                  hide-details="auto"
-                                  autofocus
+                                <v-btn
+                                  :text="$t('add')"
+                                  :disabled="!customVersion"
+                                  color="success"
+                                  prepend-icon="$mdi-plus"
+                                  variant="text"
+                                  type="submit"
+                                  form="additionalVersionForm"
                                 />
-                              </v-form>
-                            </v-col>
-                          </v-row>
-                        </template>
+                              </template>
+                            </v-card>
+                          </v-menu>
+                        </v-col>
 
-                        <template #actions>
-                          <v-spacer />
+                        <v-col cols="12" md="6" class="px-2">
+                          <v-list
+                            v-model:selected="reportTypes"
+                            lines="one"
+                            density="compact"
+                            height="250"
+                            select-strategy="leaf"
+                            class="pa-0"
+                          >
+                            <v-list-subheader sticky>
+                              <v-icon icon="$mdi-file" size="small" />
+                              {{ $t('harvest.sessions.counts.reportTypes', reportTypes.length) }}
+                            </v-list-subheader>
 
-                          <v-btn
-                            :text="$t('add')"
-                            :disabled="!additionalReport"
-                            color="success"
-                            prepend-icon="$mdi-plus"
-                            variant="text"
-                            type="submit"
-                            form="additionalReportForm"
+                            <v-list-item
+                              v-for="item in reportsList"
+                              :key="item"
+                              :value="item"
+                              :title="item"
+                            >
+                              <template #prepend="{ isSelected, select }">
+                                <v-list-item-action start>
+                                  <v-checkbox-btn
+                                    :model-value="isSelected"
+                                    color="primary"
+                                    @update:model-value="select"
+                                  />
+                                </v-list-item-action>
+                              </template>
+                            </v-list-item>
+                          </v-list>
+
+                          <v-menu
+                            v-model="isCustomVersionOpen"
+                            :close-on-content-click="false"
+                            min-width="200px"
+                            width="500px"
+                            @update:model-value="resetReportForm()"
+                          >
+                            <template #activator="{ props: menu }">
+                              <v-btn
+                                :text="$t('endpoints.addAdditionalReport')"
+                                color="secondary"
+                                prepend-icon="$mdi-plus"
+                                block
+                                class="mt-2"
+                                v-bind="menu"
+                              />
+                            </template>
+
+                            <v-card>
+                              <template #text>
+                                <v-row>
+                                  <v-col>
+                                    <v-form
+                                      id="additionalReportForm"
+                                      ref="additionalReportForm"
+                                      @submit.prevent="
+                                        reportsList.push(additionalReport);
+                                        isCustomVersionOpen = false
+                                      "
+                                    >
+                                      <p>
+                                        {{ $t('endpoints.addAdditionalReportDesc') }}
+                                      </p>
+
+                                      <v-text-field
+                                        v-model="additionalReport"
+                                        :label="$t('harvest.jobs.reportType')"
+                                        prepend-icon="$mdi-file"
+                                        variant="underlined"
+                                        hide-details="auto"
+                                        autofocus
+                                      />
+                                    </v-form>
+                                  </v-col>
+                                </v-row>
+                              </template>
+
+                              <template #actions>
+                                <v-spacer />
+
+                                <v-btn
+                                  :text="$t('add')"
+                                  :disabled="!additionalReport"
+                                  color="success"
+                                  prepend-icon="$mdi-plus"
+                                  variant="text"
+                                  type="submit"
+                                  form="additionalReportForm"
+                                />
+                              </template>
+                            </v-card>
+                          </v-menu>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col cols="12">
+                          <v-checkbox
+                            v-model="downloadUnsupported"
+                            :label="$t('harvest.sessions.form.reports.downloadUnsupported')"
+                            color="primary"
+                            hide-details
                           />
-                        </template>
-                      </v-card>
-                    </v-menu>
-                  </v-col>
-                </v-row>
+                        </v-col>
 
-                <v-row no-gutters>
-                  <v-col cols="12">
-                    <v-checkbox
-                      v-model="downloadUnsupported"
-                      :label="$t('harvest.sessions.form.reports.downloadUnsupported')"
-                      color="primary"
-                      hide-details
-                    />
-                  </v-col>
+                        <v-col cols="6">
+                          <v-checkbox
+                            v-model="useValidation"
+                            :label="$t('harvest.sessions.form.reports.useValidation')"
+                            color="primary"
+                            hide-details
+                          />
+                        </v-col>
 
-                  <v-col cols="6">
-                    <v-checkbox
-                      v-model="useValidation"
-                      :label="$t('harvest.sessions.form.reports.useValidation')"
-                      color="primary"
-                      hide-details
-                    />
-                  </v-col>
-
-                  <v-col cols="6">
-                    <v-checkbox
-                      v-model="useCache"
-                      :label="$t('harvest.sessions.form.reports.useCache')"
-                      color="primary"
-                      hide-details
-                    />
-                  </v-col>
-                </v-row>
+                        <v-col cols="6">
+                          <v-checkbox
+                            v-model="useCache"
+                            :label="$t('harvest.sessions.form.reports.useCache')"
+                            color="primary"
+                            hide-details
+                          />
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel>
+                </v-expansion-panels>
               </template>
             </v-card>
 
@@ -495,15 +526,13 @@
               <template #text>
                 <v-row>
                   <v-col cols="12">
-                    <v-text-field
-                      v-model="id"
-                      :label="`${$t('identifier')} *`"
-                      :rules="[v => !!v || $t('fieldIsRequired')]"
-                      :disabled="isEditing"
-                      prepend-icon="$mdi-rename"
+                    <v-textarea
+                      v-model="description"
+                      :label="`${$t('description')} *`"
+                      prepend-icon="$mdi-text"
                       variant="underlined"
                       hide-details="auto"
-                      @update:model-value="hasIdChanged = true"
+                      @update:model-value="hasDescChanged = true"
                     />
                   </v-col>
 
@@ -578,14 +607,12 @@ const snacks = useSnacksStore();
 const { t, locale } = useI18n();
 const { mdAndUp } = useVDisplay();
 
-const institutionsSearch = shallowRef('');
-const endpointsSearch = shallowRef('');
 const initialLoading = shallowRef(true);
 const saving = shallowRef(false);
 const valid = shallowRef(false);
-const hasIdChanged = shallowRef(false);
+const hasDescChanged = shallowRef(false);
 
-const id = shallowRef(modelValue?.id ?? '');
+const description = shallowRef(modelValue?.description ?? '');
 const timeout = shallowRef(modelValue?.timeout ?? 600);
 const beginDate = shallowRef(modelValue?.beginDate ?? '');
 const endDate = shallowRef(modelValue?.endDate ?? '');
@@ -617,34 +644,162 @@ const customVersion = shallowRef('');
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 const additionalReportForm = useTemplateRef('additionalReportForm');
-const additionalVersionForm = useTemplateRef('additionalVersionForm');
 
-const {
-  data: institutions,
-  status: institutionsStatus,
-  error: institutionsError,
-  refresh: institutionsRefresh,
-} = await useFetch('/api/institutions', {
-  lazy: true,
-  query: {
-    size: 0,
-    sort: 'name',
-    q: debouncedRef(institutionsSearch),
-  },
-});
+const institutions = ref([]);
+const institutionsStatus = shallowRef('idle');
+const institutionsError = ref(null);
+const institutionsPage = shallowRef(1);
+const institutionsSearch = shallowRef('');
+const institutionsListRef = useTemplateRef('institutionsListRef');
 
-const {
-  data: endpoints,
-  status: endpointsStatus,
-  error: endpointsError,
-  refresh: endpointsRefresh,
-} = await useFetch('/api/sushi-endpoints', {
-  lazy: true,
-  query: {
-    size: 0,
-    sort: 'vendor',
-    q: debouncedRef(endpointsSearch),
-  },
+/**
+ * Fetch institutions from API
+ */
+const fetchInstitutions = useDebounceFn(async () => {
+  institutionsStatus.value = 'pending';
+  institutionsError.value = null;
+
+  try {
+    const results = await $fetch('/api/institutions', {
+      query: {
+        sort: 'name',
+        q: institutionsSearch.value,
+        page: institutionsPage.value,
+      },
+    });
+
+    institutionsStatus.value = 'success';
+    return results;
+  } catch (error) {
+    institutionsError.value = error;
+    institutionsStatus.value = 'error';
+    throw error;
+  }
+}, 250);
+
+/**
+ * Load next page of institutions, suited to be used with an infinite scroll
+ */
+async function loadInstitutions({ done }) {
+  institutionsStatus.value = 'pending';
+
+  try {
+    const results = await fetchInstitutions();
+
+    if (!results) {
+      return done?.('loading');
+    }
+
+    if (results.length <= 0) {
+      return done?.('empty');
+    }
+
+    institutions.value.push(...results);
+    institutionsPage.value += 1;
+    return done?.('ok');
+  } catch {
+    return done?.('error');
+  }
+}
+
+/**
+ * Clear results and reset current page before applying search
+ */
+async function onInstitutionsSearch() {
+  institutionsPage.value = 1;
+  institutionsStatus.value = 'pending';
+
+  try {
+    const results = await fetchInstitutions();
+
+    institutions.value = results ?? [];
+    if (results) {
+      institutionsPage.value += 1;
+    }
+  } finally {
+    institutionsListRef.value?.reset();
+  }
+}
+
+const endpoints = ref([]);
+const endpointsStatus = shallowRef('idle');
+const endpointsError = ref(null);
+const endpointsPage = shallowRef(0);
+const endpointsSearch = shallowRef('');
+const endpointsListRef = useTemplateRef('endpointsListRef');
+
+/**
+ * Fetch endpoints from API
+ */
+const fetchEndpoints = useDebounceFn(async () => {
+  endpointsStatus.value = 'pending';
+  endpointsError.value = null;
+
+  try {
+    const results = await $fetch('/api/sushi-endpoints', {
+      query: {
+        sort: 'vendor',
+        q: endpointsSearch.value,
+        page: endpointsPage.value,
+      },
+    });
+
+    endpointsStatus.value = 'success';
+    return results;
+  } catch (error) {
+    endpointsError.value = error;
+    endpointsStatus.value = 'error';
+    throw error;
+  }
+}, 250);
+
+/**
+ * Load next page of endpoints, suited to be used with an infinite scroll
+ */
+async function loadEndpoints({ done }) {
+  endpointsStatus.value = 'pending';
+
+  try {
+    const results = await fetchEndpoints();
+
+    if (!results) {
+      return done('loading');
+    }
+
+    if (results.length <= 0) {
+      return done('empty');
+    }
+
+    endpoints.value.push(...results);
+    endpointsPage.value += 1;
+    return done('ok');
+  } catch {
+    return done('error');
+  }
+}
+
+/**
+ * Clear results and reset current page before applying search
+ */
+async function onEndpointsSearch() {
+  endpointsPage.value = 1;
+  endpointsStatus.value = 'pending';
+
+  try {
+    const results = await fetchEndpoints();
+
+    endpoints.value = results ?? [];
+    if (results) {
+      endpointsPage.value += 1;
+    }
+  } finally {
+    endpointsListRef.value?.reset();
+  }
+}
+
+// Fetch at initial load
+onMounted(() => {
+  Promise.all([onInstitutionsSearch(), onEndpointsSearch()]);
 });
 
 const isEditing = computed(() => !!modelValue?.id);
@@ -716,10 +871,10 @@ async function save() {
   saving.value = true;
 
   try {
-    const newSession = await $fetch(`/api/harvests-sessions/${id.value}`, {
-      method: 'PUT',
+    const newSession = await $fetch(`/api/harvests-sessions/${modelValue?.id ?? ''}`, {
+      method: modelValue?.id ? 'PUT' : 'POST',
       body: {
-        id: id.value,
+        description: description.value,
         timeout: timeout.value,
         beginDate: beginDate.value,
         endDate: endDate.value,
@@ -744,24 +899,56 @@ async function save() {
   saving.value = false;
 }
 
-function generateID() {
+// Keep selected institutions in cache
+const selectedInstitutions = ref([]);
+watch(institutionIds, (newValue, oldValue) => {
+  const oldIds = new Set(oldValue);
+  const newIds = new Set(newValue);
+
+  // Remove from cache deleted values
+  const removedIds = oldIds.difference(newIds);
+  selectedInstitutions.value = selectedInstitutions.value
+    .filter((institution) => !removedIds.has(institution.id));
+
+  // Add to cache added values
+  const addedIds = newIds.difference(oldIds);
+  selectedInstitutions.value.push(
+    ...institutions.value
+      .filter((institution) => addedIds.has(institution.id)),
+  );
+});
+
+// Keep selected endpoints in cache
+const selectedEndpoints = ref([]);
+watch(endpointIds, (newValue, oldValue) => {
+  const oldIds = new Set(oldValue);
+  const newIds = new Set(newValue);
+
+  // Remove from cache deleted values
+  const removedIds = oldIds.difference(newIds);
+  selectedEndpoints.value = selectedEndpoints.value
+    .filter((endpoint) => !removedIds.has(endpoint.id));
+
+  // Add to cache added values
+  const addedIds = newIds.difference(oldIds);
+  selectedEndpoints.value.push(
+    ...endpoints.value
+      .filter((endpoint) => addedIds.has(endpoint.id)),
+  );
+});
+
+watchEffect(() => {
+  if (isEditing.value || hasDescChanged.value) {
+    return;
+  }
+
   const now = new Date();
+  const dateText = dateFormat(now, locale.value, 'P');
 
-  const parts = [];
+  const ITEMS_SIZE = 3;
 
-  // Add institution name in id
-  if (institutionIds.value.length === 1) {
-    const institution = institutions.value.find((i) => i.id === institutionIds.value[0]);
-    parts.push(institution?.name.toLocaleLowerCase(locale.value).replace(/\s/g, '-'));
-  }
-
-  // Add endpoint name in id
-  if (endpointIds.value.length === 1) {
-    const endpoint = endpoints.value.find((e) => e.id === endpointIds.value[0]);
-    parts.push(endpoint?.vendor.toLocaleLowerCase(locale.value).replace(/\s/g, '-'));
-  }
-
-  // Add dates in id
+  // Format dates
+  let periodText = '...';
   if (beginDate.value && endDate.value) {
     const begin = parseDate(beginDate.value, 'yyyy-MM', now);
     const end = parseDate(endDate.value, 'yyyy-MM', now);
@@ -769,20 +956,50 @@ function generateID() {
     const diff = differenceInYears(end, begin) + 1;
     const years = Array.from({ length: diff }, (_, i) => begin.getFullYear() + i);
 
-    parts.push(years.join('-'));
+    periodText = years.join(' ~ ');
   }
 
-  return [
-    dateFormat(now, locale.value, 'yyyy-MM-dd'),
-    ...parts.filter((value) => !!value),
-  ].join('_');
-}
-
-watch([institutionIds, endpointIds, beginDate, endDate], () => {
-  if (!isEditing.value && !hasIdChanged.value) {
-    id.value = generateID();
+  // Add endpoint names
+  let endpointsText = '...';
+  if (isAllEndpoints.value) {
+    endpointsText = t('harvest.sessions.form.settings.description.allEndpoints');
+  } else if (selectedEndpoints.value.length > 0) {
+    const current = selectedEndpoints.value.map((endpoint) => `"${endpoint.vendor}"`).sort();
+    // Limit count to `ITEMS_SIZE`, show `+x` more
+    const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
+    endpointsText = current.slice(0, size).join(', ');
+    if (current.length > ITEMS_SIZE) {
+      endpointsText = t('harvest.sessions.form.settings.description.more', {
+        n: current.length - size,
+        prefix: endpointsText,
+      });
+    }
   }
-}, { immediate: true });
+
+  // Add institution name
+  let institutionsText = '...';
+  if (isAllInstitutions.value) {
+    institutionsText = t('harvest.sessions.form.settings.description.allInstitutions');
+  } else if (selectedInstitutions.value.length > 0) {
+    const current = selectedInstitutions.value.map((institution) => `"${institution.name}"`).sort();
+    // Limit count to `ITEMS_SIZE`, show `+x` more
+    const size = current.length > ITEMS_SIZE ? ITEMS_SIZE - 1 : ITEMS_SIZE;
+    institutionsText = current.slice(0, size).join(', ');
+    if (current.length > ITEMS_SIZE) {
+      institutionsText = t('harvest.sessions.form.settings.description.more', {
+        n: current.length - size,
+        prefix: institutionsText,
+      });
+    }
+  }
+
+  description.value = t('harvest.sessions.form.settings.description.template', {
+    date: dateText,
+    period: periodText,
+    endpoints: endpointsText,
+    institutions: institutionsText,
+  });
+});
 
 const watchLock = shallowRef(false);
 watch(isAllInstitutions, (val) => {
@@ -812,24 +1029,3 @@ watch(() => institutionsStatus.value === 'pending' && endpointsStatus.value === 
   }
 });
 </script>
-
-<style scoped>
-.credentials-list :deep(.v-list-subheader__text) {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-.credentials-list-header {
-  position: sticky;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  background: inherit;
-}
-</style>

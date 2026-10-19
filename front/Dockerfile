@@ -5,16 +5,14 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN npm run generate
 
 # ---
 
-FROM node:24.20.0-alpine3.24
+FROM nginx:1.29.1-alpine-slim
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
+LABEL org.opencontainers.image.source="https://github.com/ezpaarse-project/ezmesure"
 
-WORKDIR /usr/src/app
-COPY --chown=node:node --from=builder /app/.output .
+COPY --from=builder /app/.output/public/ /www/data/
 
-EXPOSE 3000
-
-ENTRYPOINT ["node", "server/index.mjs"]
+COPY ./nginx /etc/nginx/templates

@@ -22,6 +22,8 @@ const {
   removeFromSpace,
 } = require('./actions');
 
+const spaces = require('./spaces');
+
 router.use(requireActiveJwt, requireUser);
 
 router.route({
@@ -44,6 +46,8 @@ router.route({
     query: standardQueryParams.oneValidation,
   },
 });
+
+router.use(spaces.prefix('/:collectionId/spaces').middleware());
 
 router.use(requireAdmin);
 

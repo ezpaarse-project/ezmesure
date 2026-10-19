@@ -131,7 +131,6 @@ exports.getOneCredentials = async (ctx) => {
 exports.createOne = async (ctx) => {
   ctx.type = 'json';
   const { body } = ctx.request;
-  const { harvestId } = ctx.params;
 
   ctx.status = 200;
   ctx.body = await HarvestSessionService.$transaction(async (service) => {
@@ -149,8 +148,6 @@ exports.createOne = async (ctx) => {
         params: {},
         // Provided values
         ...body,
-        // Provided id
-        id: harvestId,
       },
       include: {
         _count: {

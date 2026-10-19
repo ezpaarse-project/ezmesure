@@ -182,7 +182,7 @@ const {
   fetch: {
     url: '/api/tasks',
     query: {
-      include: ['credentials.institution', 'credentials.endpoint', 'steps', 'logs'],
+      include: ['credentials.institution', 'credentials.endpoint'],
     },
   },
   data: {

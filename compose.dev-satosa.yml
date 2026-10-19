@@ -1,0 +1,18 @@
+# This compose file is expected to be used alongside compose.dev.yml
+
+# Add SATOSA pre-configured for dev
+include:
+  - path: docker/satosa.compose.yml
+    project_directory: .
+
+services:
+  rp:
+    environment:
+      SATOSA_HOST: satosa:8080
+
+  dex:
+    extra_hosts:
+      - satosa.${EZMESURE_DOMAIN}:host-gateway
+    environment:
+      SATOSA_ENABLED: 1
+      SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}

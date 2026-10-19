@@ -1,6 +1,7 @@
 // @ts-check
 
 const { Joi } = require('koa-joi-router');
+const { set } = require('lodash');
 
 const { arrayToString, stringToArray } = require('../utils');
 
@@ -167,12 +168,14 @@ const applyPrismaFilters = (query, fieldsFilters) => {
  * @returns {Record<string, any>} Prisma search
  */
 const applyPrismaSearch = (queryFields, search) => ({
-  OR: queryFields.map((field) => ({
-    [field]: {
+  OR: queryFields.map((field) => set(
+    {},
+    field,
+    {
       contains: search,
       mode: 'insensitive',
     },
-  })),
+  )),
 });
 
 /**

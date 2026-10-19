@@ -1,0 +1,24 @@
+services:
+  # We use SATOSA to proxy auth to Renater, you can skip that if your institutional provider already
+  # provides OIDC authentication
+  satosa:
+    build:
+      context: ./docker/satosa
+    restart: "no"
+    volumes:
+      - ./docker/satosa/certs:/etc/satosa/certs/
+      - ./docker/satosa/templates:/etc/satosa-templates/
+    env_file: .env
+    environment:
+      SATOSA_PUBLIC_URL: https://satosa.${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}
+      SATOSA_ENCRYPTION_KEY: super-secret
+      SATOSA_ENCRYPTION_SALT: randomSALTvalue
+
+      SAML_ORG_DISPLAY_NAME: CNRS - DSI
+      SAML_ORG_URL: https://www.cnrs.fr/fr/dsi
+
+      SAML_DISPLAY_NAME: ${EZMESURE_APP_NAME}
+      SAML_DS_URL: https://discovery.renater.fr/test
+      SAML_SERVERADMIN: support-sisr@inist.fr
+      SAML_ENTITY_ID: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/sp
+      SAML_METADATA_URL: https://pub.federation.renater.fr/metadata/test/idps.xml

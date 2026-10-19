@@ -1,119 +1,133 @@
 <template>
-  <v-list-item :title="modelValue.id" style="width: 98%;">
-    <v-list-item-subtitle style="opacity: 1;">
-      <v-menu
-        v-model="isCredentialsMenuOpen"
-        :close-on-content-click="false"
-        width="1200px"
-      >
-        <template #activator="{ props: menu }">
-          <v-chip
-            :text="$t('harvest.sessions.counts.credentials', status?._count?.credentials?.harvestable ?? status?._count?.credentials?.all ?? 0)"
-            :color="(status?._count?.credentials?.harvestable ?? 0) > 0 ? 'success' : 'error'"
-            :disabled="!status"
-            prepend-icon="$mdi-key"
-            size="small"
-            variant="flat"
-            class="mr-2 mt-1"
-            v-bind="menu"
-          />
-        </template>
-
-        <SushiHarvestSessionCredentials :session="modelValue" :status="status">
-          <template #append>
-            <v-btn
-              icon="$mdi-close"
-              color="secondary"
-              variant="text"
-              density="comfortable"
-              @click="isCredentialsMenuOpen = false"
+  <v-list-item style="width: 98%">
+    <v-list-item-title
+      :class="{
+        'd-flex': true,
+        'align-center': true,
+        'opacity-30': !!modelValue.deletedAt,
+      }"
+    >
+      <div class="flex-fill">
+        <v-menu
+          v-model="isCredentialsMenuOpen"
+          :close-on-content-click="false"
+          width="1200px"
+        >
+          <template #activator="{ props: menu }">
+            <v-chip
+              :text="$t('harvest.sessions.counts.credentials', status?._count?.credentials?.harvestable ?? status?._count?.credentials?.all ?? 0)"
+              :color="(status?._count?.credentials?.harvestable ?? 0) > 0 ? 'success' : 'error'"
+              :disabled="!status"
+              prepend-icon="$mdi-key"
+              size="small"
+              variant="flat"
+              class="mr-2 mt-1"
+              v-bind="menu"
             />
           </template>
-        </SushiHarvestSessionCredentials>
-      </v-menu>
 
-      <v-menu
-        v-model="isReportsMenuOpen"
-        :close-on-content-click="false"
-        width="500px"
-      >
-        <template #activator="{ props: menu }">
-          <v-chip
-            :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
-            :color="props.modelValue.reportTypes.length > 0 ? 'accent' : 'error'"
-            prepend-icon="$mdi-file"
-            size="small"
-            variant="flat"
-            class="mr-2 mt-1"
-            v-bind="menu"
-          />
-        </template>
+          <SushiHarvestSessionCredentials :session="modelValue" :status="status">
+            <template #append>
+              <v-btn
+                icon="$mdi-close"
+                color="secondary"
+                variant="text"
+                density="comfortable"
+                @click="isCredentialsMenuOpen = false"
+              />
+            </template>
+          </SushiHarvestSessionCredentials>
+        </v-menu>
 
-        <SushiHarvestSessionReports :session="modelValue" :status="status">
-          <template #append>
-            <v-btn
-              icon="$mdi-close"
-              color="secondary"
-              variant="text"
-              density="comfortable"
-              @click="isReportsMenuOpen = false"
+        <v-menu
+          v-model="isReportsMenuOpen"
+          :close-on-content-click="false"
+          width="500px"
+        >
+          <template #activator="{ props: menu }">
+            <v-chip
+              :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
+              :color="props.modelValue.reportTypes.length > 0 ? 'accent' : 'error'"
+              prepend-icon="$mdi-file"
+              size="small"
+              variant="flat"
+              class="mr-2 mt-1"
+              v-bind="menu"
             />
           </template>
-        </SushiHarvestSessionReports>
-      </v-menu>
 
-      <v-chip
-        v-if="modelValue.sendEndMail"
-        v-tooltip:top="$t('harvest.sessions.form.settings.sendEndMail')"
-        size="small"
-        variant="outlined"
-        class="mr-2 mt-1"
-      >
-        <v-icon icon="$mdi-email" />
-      </v-chip>
+          <SushiHarvestSessionReports :session="modelValue" :status="status">
+            <template #append>
+              <v-btn
+                icon="$mdi-close"
+                color="secondary"
+                variant="text"
+                density="comfortable"
+                @click="isReportsMenuOpen = false"
+              />
+            </template>
+          </SushiHarvestSessionReports>
+        </v-menu>
 
-      <v-chip
-        v-if="status?.runningTime"
-        v-tooltip:top="$t('harvest.sessions.startedAt', { date: dateFormat(modelValue?.startedAt, locale) })"
-        :text="runningTime"
-        prepend-icon="$mdi-timer-outline"
-        size="small"
-        variant="outlined"
-        class="mr-2 mt-1"
-      />
+        <v-chip
+          v-if="modelValue.sendEndMail"
+          v-tooltip:top="$t('harvest.sessions.form.settings.sendEndMail')"
+          size="small"
+          variant="outlined"
+          class="mr-2 mt-1"
+        >
+          <v-icon icon="$mdi-email" />
+        </v-chip>
+
+        <v-chip
+          v-if="status?.runningTime"
+          v-tooltip:top="$t('harvest.sessions.startedAt', { date: dateFormat(modelValue?.startedAt, locale) })"
+          :text="runningTime"
+          prepend-icon="$mdi-timer-outline"
+          size="small"
+          variant="outlined"
+          class="mr-2 mt-1"
+        />
+      </div>
+
+      <div class="d-flex align-center">
+        <SushiHarvestSessionErrorMenu
+          v-if="modelValue.error !== null"
+          :model-value="modelValue"
+        />
+
+        <v-chip
+          v-if="modelValue.status === 'prepared'"
+          :text="$t('harvest.sessions.status.list.prepared')"
+          color="orange"
+          class="mr-2"
+        />
+        <v-chip
+          v-else-if="modelValue.status === 'starting'"
+          :text="$t('harvest.sessions.status.list.starting')"
+          color="blue"
+          class="mr-2"
+        />
+        <v-chip
+          v-else-if="modelValue.status === 'stopping' || modelValue.status === 'stopped'"
+          :text="$t('harvest.sessions.status.list.stopped')"
+          color="red"
+          class="mr-2"
+        />
+        <SushiHarvestSessionProgress
+          v-else-if="status"
+          :status="status"
+          :job-count="modelValue._count.jobs"
+        />
+      </div>
+    </v-list-item-title>
+
+    <v-list-item-subtitle v-if="modelValue.description" class="mt-2">
+      {{ modelValue.description }}
     </v-list-item-subtitle>
 
     <template #append>
-      <SushiHarvestSessionErrorMenu
-        v-if="modelValue.error !== null"
-        :model-value="modelValue"
-      />
-
-      <v-chip
-        v-if="modelValue.status === 'prepared'"
-        :text="$t('harvest.sessions.status.list.prepared')"
-        color="orange"
-        class="mr-2"
-      />
-      <v-chip
-        v-else-if="modelValue.status === 'starting'"
-        :text="$t('harvest.sessions.status.list.starting')"
-        color="blue"
-        class="mr-2"
-      />
-      <v-chip
-        v-else-if="modelValue.status === 'stopping' || modelValue.status === 'stopped'"
-        :text="$t('harvest.sessions.status.list.stopped')"
-        color="red"
-        class="mr-2"
-      />
-      <SushiHarvestSessionProgress
-        v-else-if="status"
-        :status="status"
-        :job-count="modelValue._count.jobs"
-      />
-
-      <v-menu>
+      <v-menu :disabled="isDeleting">
         <template #activator="{ props: menu }">
           <v-btn
             icon="$mdi-dots-horizontal"
