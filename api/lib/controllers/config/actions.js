@@ -9,6 +9,7 @@ exports.getConfig = async (ctx) => {
     'homepage.features',
     'homepage.logos',
     'counter.registryUrl',
+    'counter.defaultHarvestedReports',
     'auth.profileUri',
     'users.deleteDurationDays',
     'users.impersonateDuration',
