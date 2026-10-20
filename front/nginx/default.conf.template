@@ -1,4 +1,4 @@
-resolver ${NGINX_RESOLVER};
+resolver ${NGINX_LOCAL_RESOLVERS};
 
 include /etc/nginx/conf.d/00-upstreams.d/*.conf;
 
