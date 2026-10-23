@@ -13,7 +13,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-left"
+            icon="$mdi-arrow-left"
             @click="changePeriod(-1)"
           />
 
@@ -25,7 +25,7 @@
             :disabled="loading"
             variant="underlined"
             density="compact"
-            prepend-icon="mdi-calendar-start"
+            prepend-icon="$mdi-calendar-start"
             hide-details
             style="width: 150px;"
             @update:model-value="$emit('update:period', { ...period, beginDate: $event })"
@@ -43,7 +43,7 @@
             :disabled="loading"
             variant="underlined"
             density="compact"
-            prepend-icon="mdi-calendar-end"
+            prepend-icon="$mdi-calendar-end"
             hide-details
             style="width: 150px;"
             @update:model-value="$emit('update:period', { ...period, endDate: $event })"
@@ -54,7 +54,7 @@
             color="primary"
             variant="text"
             density="comfortable"
-            icon="mdi-arrow-right"
+            icon="$mdi-arrow-right"
             @click="changePeriod(1)"
           />
         </div>
@@ -120,7 +120,7 @@
             indeterminate
             class="mb-4"
           >
-            <v-icon icon="mdi-table-sync" />
+            <v-icon icon="$mdi-table-sync" />
           </v-progress-circular>
         </template>
       </v-empty-state>
@@ -156,7 +156,7 @@
 
     <div v-else class="d-flex align-center justify-center">
       <v-empty-state
-        icon="mdi-table-headers-eye-off"
+        icon="$mdi-table-headers-eye-off"
         :title="$t('sushi.noMatrix.title')"
         :text="$t('sushi.noMatrix.description')"
       />

@@ -6,7 +6,7 @@
 
     <v-btn
       :text="$t('add')"
-      prepend-icon="mdi-plus"
+      prepend-icon="$mdi-plus"
       color="primary"
       variant="outlined"
       size="small"
@@ -74,7 +74,7 @@
 
         <v-btn
           :text="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           color="red"
           size="small"
           @click="removeParam(index)"

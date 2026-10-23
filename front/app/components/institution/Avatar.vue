@@ -1,5 +1,5 @@
 <template>
-  <v-avatar :image="src" icon="mdi-office-building" />
+  <v-avatar :image="src" icon="$mdi-office-building" />
 </template>
 
 <script setup>

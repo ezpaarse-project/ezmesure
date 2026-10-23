@@ -3,7 +3,7 @@
     <v-list-item
       :title="$t('menu.myspace.institutions')"
       to="/myspace"
-      prepend-icon="mdi-domain"
+      prepend-icon="$mdi-domain"
       class="text-grey-darken-3"
       exact
     />
@@ -13,14 +13,14 @@
     <v-list-item
       :title="$t('menu.myspace.deposits')"
       to="/myspace/files"
-      prepend-icon="mdi-file-upload"
+      prepend-icon="$mdi-file-upload"
       class="text-grey-darken-3"
     />
 
     <template v-if="foreignSpacesPermissions.length > 0">
       <v-list-item
         :title="$t('menu.myspace.foreignAccess')"
-        prepend-icon="mdi-tab-plus"
+        prepend-icon="$mdi-tab-plus"
         class="text-grey-darken-3"
       />
 
@@ -31,7 +31,7 @@
           v-tooltip="space.name"
           :title="space.name"
           :href="`/kibana/s/${space.id}`"
-          append-icon="mdi-open-in-app"
+          append-icon="$mdi-open-in-app"
           @click.prevent="openInTab(`/kibana/s/${space.id}`, space.id)"
         >
           <template #subtitle>
@@ -51,19 +51,19 @@
       <v-list-item
         :title="$t('menu.myspace.credentials')"
         to="/myspace/profile"
-        prepend-icon="mdi-account-key"
+        prepend-icon="$mdi-account-key"
         class="text-grey-darken-3"
       />
       <v-list-item
         :title="$t('menu.myspace.authentificationToken')"
         to="/myspace/token"
-        prepend-icon="mdi-key"
+        prepend-icon="$mdi-key"
         class="text-grey-darken-3"
       />
       <v-list-item
         :title="$t('menu.myspace.settings')"
         to="/myspace/settings"
-        prepend-icon="mdi-cog"
+        prepend-icon="$mdi-cog"
         class="text-grey-darken-3"
       />
 
@@ -71,12 +71,12 @@
         :title="user.fullName"
         :subtitle="user.username"
         lines="two"
-        prepend-icon="mdi-account"
+        prepend-icon="$mdi-account"
       >
         <template #append>
           <v-btn
             :title="$t('menu.myspace.logout')"
-            icon="mdi-logout"
+            icon="$mdi-logout"
             size="small"
             color="red"
             variant="tonal"

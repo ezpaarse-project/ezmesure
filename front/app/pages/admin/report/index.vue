@@ -7,7 +7,7 @@
     >
       <template #prepend>
         <v-btn
-          icon="mdi-menu"
+          icon="$mdi-menu"
           @click="toggle()"
         />
       </template>
@@ -17,7 +17,7 @@
           <template #activator="{ props: dialog }">
             <v-btn
               :text="$t('menu.bar.documentation.entries.api')"
-              prepend-icon="mdi-file-document-outline"
+              prepend-icon="$mdi-file-document-outline"
               color="primary"
               variant="tonal"
               class="mr-4"
@@ -25,7 +25,17 @@
             />
           </template>
 
-          <v-card>
+          <v-card :title="$t('menu.bar.documentation.entries.api')">
+            <template #append>
+              <v-btn
+                :text="$t('menu.myspace.authentificationToken')"
+                prepend-icon="$mdi-key"
+                density="comfortable"
+                variant="tonal"
+                @click="copyToken()"
+              />
+            </template>
+
             <template #text>
               <iframe
                 src="/report/api/doc/"
@@ -43,7 +53,7 @@
           <template #activator="{ props: dialog }">
             <v-btn
               :text="$t('report.health')"
-              prepend-icon="mdi-heart-outline"
+              prepend-icon="$mdi-heart-outline"
               color="green"
               variant="tonal"
               class="mr-4"
@@ -105,17 +115,26 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { toggle } = useDrawerStore();
+
+const { t } = useI18n();
+const { copy } = useClipboard();
+const snacks = useSnacksStore();
 
 const {
   error,
   itemsPerPage,
   itemsPerPageOptions,
   refresh,
+  token,
 } = await useEzr();
+
+async function copyToken() {
+  try {
+    await copy(token);
+    snacks.info(t('clipboard.textCopied'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
+  }
+}
 </script>

@@ -3,7 +3,7 @@
     <v-col cols="12">
       <v-toolbar color="transparent">
         <span
-          class="text-overline"
+          class="text-label-medium"
           style="white-space: nowrap;"
         >{{ label }}</span>
 

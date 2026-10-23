@@ -5,30 +5,9 @@ import vuetifyOptions from './config/vuetify.options';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  runtimeConfig: {
-    public: {
-      currentInstance: '',
-      oidcProfileUri: '',
-      counterRegistryUrl: 'https://registry.countermetrics.org',
-      homepage: {
-        features: {
-          dashboard: true,
-          repository: true,
-          ezpaarse: true,
-          counter: true,
-          reporting: true,
-        },
-        logos: {
-          SLSP: true,
-          CSAL: true,
-          EPFL: true,
-          UNIGE: true,
-          CNRS: true,
-          COUPERIN: true,
-          INIST: false,
-        },
-      },
-    },
+  routeRules: {
+    '/admin/**': { appLayout: 'admin', appMiddleware: ['require-auth', 'require-terms', 'require-admin'] },
+    '/myspace/**': { appLayout: 'space', appMiddleware: ['require-auth', 'require-terms'] },
   },
 
   modules: ['@nuxtjs/i18n', 'vuetify-nuxt-module', '@pinia/nuxt', '@vueuse/nuxt', '@nuxt/fonts'],
@@ -51,10 +30,5 @@ export default defineNuxtConfig({
 
   fonts: {
     weights: ['100 900'],
-  },
-
-  vite: {
-    // Prevent Vite from optimizing ezreeport in dev, allowing to replace it with a local version
-    optimizeDeps: process.env.NODE_ENV !== 'production' ? { exclude: ['@ezpaarse-project/ezreeport-vue'] } : undefined,
   },
 });

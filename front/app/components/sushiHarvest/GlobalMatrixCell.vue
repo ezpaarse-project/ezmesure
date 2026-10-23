@@ -36,13 +36,13 @@
             <DetailsField
               :label="`${$t('harvest.jobs.period')} :`"
               :value="`${modelValue.period.beginDate} ~ ${modelValue.period.endDate}`"
-              prepend-icon="mdi-calendar-blank"
+              prepend-icon="$mdi-calendar-blank"
             />
 
             <DetailsField
               v-if="modelValue.counterVersions.length > 0"
               :label="`${$t('harvest.jobs.versions')} :`"
-              prepend-icon="mdi-api"
+              prepend-icon="$mdi-api"
             >
               <v-chip
                 v-for="version in modelValue.counterVersions"
@@ -53,14 +53,14 @@
                 density="compact"
                 variant="flat"
                 label
-                class="ml-1 mt-1"
+                class="ml-1 mt-1 text-black"
               />
             </DetailsField>
           </v-col>
 
           <DetailsField
             :label="`${$t('harvest.jobs.reportType')} :`"
-            prepend-icon="mdi-file-document-outline"
+            prepend-icon="$mdi-file-document-outline"
             cols="6"
           >
             <v-chip
@@ -76,7 +76,7 @@
 
           <DetailsField
             :label="`${$t('status')} :`"
-            prepend-icon="mdi-gauge"
+            prepend-icon="$mdi-gauge"
             cols="12"
           >
             <ProgressLinearStack
@@ -117,7 +117,7 @@
               <v-chip
                 v-tooltip:top="$t('harvest.jobs.inserted')"
                 :text="`${items.inserted}`"
-                prepend-icon="mdi-file-download"
+                prepend-icon="$mdi-file-download"
                 color="success"
                 variant="outlined"
                 density="comfortable"
@@ -127,7 +127,7 @@
               <v-chip
                 v-tooltip:top="$t('harvest.jobs.updated')"
                 :text="`${items.updated}`"
-                prepend-icon="mdi-file-replace"
+                prepend-icon="$mdi-file-replace"
                 color="info"
                 variant="outlined"
                 density="comfortable"
@@ -137,7 +137,7 @@
               <v-chip
                 v-tooltip:top="$t('harvest.jobs.failed')"
                 :text="`${modelValue.items.failed}`"
-                prepend-icon="mdi-file-alert"
+                prepend-icon="$mdi-file-alert"
                 color="error"
                 variant="outlined"
               />
@@ -151,7 +151,7 @@
           <v-row>
             <DetailsField
               :label="$t('sushi.messagesFromEndpoint')"
-              prepend-icon="mdi-alert-outline"
+              prepend-icon="$mdi-alert-outline"
             >
               <v-list max-height="150" density="compact" slim>
                 <v-list-item
@@ -163,7 +163,7 @@
                   <v-icon
                     v-if="$te(`tasks.status.exceptionMeaning.${errorCode}`)"
                     v-tooltip:top="$t(`tasks.status.exceptionMeaning.${errorCode}`)"
-                    icon="mdi-information-outline"
+                    icon="$mdi-information-outline"
                     size="x-small"
                     color="info"
                     end
@@ -190,7 +190,7 @@ const props = defineProps({
 const { t, te, locale } = useI18n();
 
 const icon = computed(() => harvestStatus.get(props.modelValue.status) ?? {
-  icon: 'mdi-question',
+  icon: '$mdi-question',
   color: 'grey',
 });
 

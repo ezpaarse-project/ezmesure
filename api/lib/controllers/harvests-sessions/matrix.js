@@ -1,5 +1,7 @@
 const { createHash } = require('node:crypto');
 
+const config = require('config');
+
 const InMemoryQueue = require('../../utils/memory-queue');
 const { createCache } = require('../../utils/cache-manager');
 
@@ -9,8 +11,8 @@ const HarvestService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
 
-const CACHE_DURATION = 5 * 60 * 1000;
-const cache = createCache(CACHE_DURATION);
+const cacheDuration = config.get('cache.duration.harvestMatrix');
+const cache = createCache(cacheDuration);
 
 const queue = new InMemoryQueue(
   /**
@@ -140,9 +142,9 @@ const queue = new InMemoryQueue(
       }
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Caching matrix for [${CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][harvest-sessions.${query.sessionId}][${id}] Caching matrix for [${cacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + cacheDuration);
       data.summary = Array.from(summary.values());
       data.matrix = {
         ...matrix,

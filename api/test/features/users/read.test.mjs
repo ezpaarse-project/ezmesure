@@ -7,14 +7,13 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 
 const adminFullName = config.get('admin.fullName');
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[users]: Test read users features', () => {
   const userTest = {
@@ -29,7 +28,7 @@ describe('[users]: Test read users features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+    adminToken = await signJWT({ username: adminUsername });
   });
   describe('As admin', () => {
     describe('Get all users', () => {
@@ -106,7 +105,7 @@ describe('[users]: Test read users features', () => {
     beforeEach(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
+      userToken = await signJWT({ username: userTest.username });
     });
 
     describe('Get all users', () => {

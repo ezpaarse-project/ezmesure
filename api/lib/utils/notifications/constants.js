@@ -25,6 +25,7 @@ const NOTIFICATION_TYPES = {
 const ADMIN_NOTIFICATION_TYPES = applyModifier({
   membershipRequest: NOTIFICATION_TYPES.membershipRequest,
 
+  institutionCreated: 'institution:created',
   counterReadyChange: 'institution:counter_ready_change',
   contactForm: 'contact:form',
   appRecentActivity: 'app:recent_activity',

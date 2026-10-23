@@ -10,7 +10,7 @@
         <v-alert
           :text="$t('sushi.duplicateDialog.text.alert')"
           type="warning"
-          icon="mdi-alert"
+          icon="$mdi-alert"
           variant="tonal"
           class="mb-2"
         />
@@ -25,7 +25,7 @@
 
         <v-card
           :title="$t('sushi.duplicateDialog.text.content.title')"
-          prepend-icon="mdi-key"
+          prepend-icon="$mdi-key"
           variant="outlined"
           class="my-3"
         >
@@ -107,14 +107,14 @@
           :text="$t('sushi.duplicateDialog.actions.secondary:update')"
           :disabled="loadingUpdate"
           :loading="loadingForce"
-          prepend-icon="mdi-pencil"
+          prepend-icon="$mdi-pencil"
           size="small"
           @click="updateDuplicate(true)"
         />
 
         <v-btn
           :text="$t('sushi.duplicateDialog.actions.main:update')"
-          prepend-icon="mdi-check"
+          prepend-icon="$mdi-check"
           size="small"
           color="green"
           variant="elevated"
@@ -135,14 +135,14 @@
           :text="$t('sushi.duplicateDialog.actions.secondary:create')"
           :disabled="loadingUpdate"
           :loading="loadingForce"
-          prepend-icon="mdi-plus"
+          prepend-icon="$mdi-plus"
           size="small"
           @click="createDuplicate(true)"
         />
 
         <v-btn
           :text="similar.archived ? $t('sushi.duplicateDialog.actions.main:createArchived') : $t('sushi.duplicateDialog.actions.main:create')"
-          :prepend-icon="similar.archived ? 'mdi-archive-off' : 'mdi-pencil'"
+          :prepend-icon="similar.archived ? '$mdi-archive-off' : '$mdi-pencil'"
           :disabled="loadingForce"
           :loading="loadingUpdate"
           size="small"

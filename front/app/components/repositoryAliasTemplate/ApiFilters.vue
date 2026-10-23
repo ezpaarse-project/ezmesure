@@ -5,18 +5,18 @@
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-database-search" end />
+        <v-icon icon="$mdi-database-search" end />
       </template>
 
       <template #append>
         <v-btn
           v-tooltip="$t('reset')"
-          icon="mdi-filter-off"
+          icon="$mdi-filter-off"
           @click="clearFilters"
         />
 
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           @click="$emit('update:show', false)"
         />
       </template>
@@ -29,7 +29,7 @@
             v-model="filters.type"
             :items="typeItems"
             :label="$t('type')"
-            prepend-icon="mdi-tag"
+            prepend-icon="$mdi-tag"
             clearable
           />
         </v-col>

@@ -2,20 +2,20 @@
   <v-list>
     <v-list-item
       :title="$t('modify')"
-      prepend-icon="mdi-pencil"
+      prepend-icon="$mdi-pencil"
       @click="updateUser()"
     />
     <v-list-item
       v-if="!!user.deletedAt"
       :title="$t('delete')"
-      prepend-icon="mdi-delete"
+      prepend-icon="$mdi-delete"
       @click="deleteUser()"
     />
     <v-list-item
       v-else
       :title="$t('users.actions.disable.title')"
       :disabled="!!user.deletedAt"
-      prepend-icon="mdi-account-cancel"
+      prepend-icon="$mdi-account-cancel"
       @click="disableUser()"
     />
 
@@ -24,19 +24,19 @@
     <v-list-item
       :title="$t('users.actions.restore.title')"
       :disabled="!user.deletedAt"
-      prepend-icon="mdi-account-check"
+      prepend-icon="$mdi-account-check"
       @click="restoreUser()"
     />
 
     <v-list-item
       :title="$t('authenticate.impersonate.title')"
-      prepend-icon="mdi-login"
+      prepend-icon="$mdi-login"
       @click="impersonateUser()"
     />
     <v-list-item
       v-if="clipboard"
       :title="$t('users.createMailUserList')"
-      prepend-icon="mdi-email"
+      prepend-icon="$mdi-email"
       @click="copyUserEmail(user)"
     />
   </v-list>

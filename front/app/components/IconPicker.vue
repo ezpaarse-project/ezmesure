@@ -4,7 +4,7 @@
       <v-text-field
         v-model="search"
         :label="$t('search')"
-        prepend-inner-icon="mdi-magnify"
+        prepend-inner-icon="$mdi-magnify"
         variant="outlined"
         density="compact"
         autofocus
@@ -13,7 +13,7 @@
       <v-empty-state
         v-if="iconLines.length === 0"
         :title="$t('noMatch')"
-        icon="mdi-ghost-outline"
+        icon="$mdi-ghost-outline"
       />
 
       <v-virtual-scroll
@@ -26,10 +26,10 @@
             <v-btn
               v-for="icon in icons"
               :key="icon"
-              :color="props.modelValue === icon ? 'primary' : 'default'"
-              :icon="icon"
+              :color="modelValue === icon ? 'primary' : 'default'"
+              :icon="`$${icon}`"
               class="rounded"
-              @click="emit('update:modelValue', icon)"
+              @click="modelValue = icon"
             />
           </div>
         </template>
@@ -39,19 +39,14 @@
 </template>
 
 <script setup>
-import iconsMeta from '@mdi/svg/meta.json';
+import { allIcons } from '@/lib/icons';
 
-const allIcons = iconsMeta.map((icon) => `mdi-${icon.name}`);
-
-const emit = defineEmits({
-  'update:modelValue': (selection) => selection,
+const modelValue = defineModel({
+  type: String,
+  default: null,
 });
 
 const props = defineProps({
-  modelValue: {
-    type: [String, null],
-    default: null,
-  },
   itemsPerLine: {
     type: Number,
     default: 5,

@@ -30,6 +30,8 @@ model Space {
   permissions            SpacePermission[]
   /// Permissions granted by role for this space
   elasticRolePermissions ElasticRoleSpacePermission[]
+  /// The dashboard collections that should be loaded in the space
+  dashboardCollections   SpaceDashboardCollection[]
 }
 
 /// A space permission (access rights of a member for a specific space)
@@ -66,4 +68,29 @@ model ElasticRoleSpacePermission {
   readonly        Boolean     @default(false)
 
   @@id([elasticRoleName, spaceId])
+}
+
+/// A dashboard collection added to a space
+model SpaceDashboardCollection {
+  /// ID of the dashboard
+  collectionId       String
+  /// The dashboard collection
+  collection         DashboardCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  /// Id of the concerned space
+  spaceId            String
+  /// The concerned space
+  space              Space               @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  /// Pattern of the repository
+  repositoryPattern  String
+  /// The repository to use
+  repository         Repository          @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
+  /// IDs of the dashboards that should not be loaded into the space
+  disabledDashboards String[]
+  /// Date when the collection was last imported into the space
+  importedAt         DateTime?
+  /// Errors that occurred during the last import
+  importErrors       Json[]
+
+
+  @@id([collectionId, spaceId, repositoryPattern])
 }

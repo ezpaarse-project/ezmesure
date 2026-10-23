@@ -2,13 +2,13 @@
   <v-card
     :title="$t('spaces.spaces')"
     :subtitle="showInstitution ? institution.name : undefined"
-    prepend-icon="mdi-tab"
+    prepend-icon="$mdi-tab"
   >
     <template v-if="!userSpaced" #append>
       <v-btn
         v-if="spaceFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="text"
         density="comfortable"
         color="green"
@@ -22,10 +22,10 @@
       </div>
 
       <template v-else>
-        <v-row v-if="sortedSpaces.length > 0" dense>
+        <v-row v-if="sortedSpaces.length > 0" density="comfortable">
           <v-col v-if="sortedForeignSpaces.length > 0" cols="12" class="pt-0">
             <v-list-subheader>
-              <v-icon icon="mdi-tab" start />
+              <v-icon icon="$mdi-tab" start />
               {{ $t('spaces.ownedSpaces') }}
             </v-list-subheader>
           </v-col>
@@ -40,7 +40,7 @@
                 <v-btn
                   v-if="spaceFormDialogRef"
                   v-tooltip="$t('modify')"
-                  icon="mdi-pencil"
+                  icon="$mdi-pencil"
                   variant="text"
                   size="small"
                   density="comfortable"
@@ -58,7 +58,7 @@
                   <template #activator="{ props: confirm }">
                     <v-btn
                       v-tooltip="$t('delete')"
-                      icon="mdi-delete"
+                      icon="$mdi-delete"
                       variant="text"
                       size="small"
                       density="comfortable"
@@ -68,16 +68,26 @@
                   </template>
                 </ConfirmPopover>
               </template>
+
+              <template #actions>
+                <v-btn
+                  append-icon="$mdi-view-dashboard"
+                  :text="$t('dashboards.title')"
+                  variant="text"
+                  size="small"
+                  @click="openCollections(space.id)"
+                />
+              </template>
             </SpaceCard>
           </v-col>
         </v-row>
 
         <v-divider v-if="sortedForeignSpaces.length > 0 && sortedSpaces.length > 0" class="mt-4 mb-2" />
 
-        <v-row v-if="sortedForeignSpaces.length > 0" dense>
+        <v-row v-if="sortedForeignSpaces.length > 0" density="comfortable">
           <v-col cols="12">
             <v-list-subheader>
-              <v-icon icon="mdi-tab-plus" start />
+              <v-icon icon="$mdi-tab-plus" start />
               {{ $t('spaces.foreignSpaces') }}
             </v-list-subheader>
           </v-col>
@@ -92,7 +102,7 @@
                 <v-chip
                   v-tooltip:left="$t('shares.grantedBy')"
                   :text="elasticRole.name"
-                  append-icon="mdi-account-tag"
+                  append-icon="$mdi-account-tag"
                   color="secondary"
                   variant="outlined"
                   size="small"
@@ -120,6 +130,8 @@
 </template>
 
 <script setup>
+import SpacesDashboardCollectionsDialog from '~/components/space/DashboardCollectionsDialog.vue';
+
 const props = defineProps({
   institution: {
     type: Object,
@@ -142,6 +154,7 @@ const emit = defineEmits({
 const { t } = useI18n();
 const { user } = storeToRefs(useAuthStore());
 const snacks = useSnacksStore();
+const { openDialog } = useDialogStore();
 
 /** @type {Ref<object[]>} */
 const spaces = ref(props.institution.spaces || []);
@@ -186,5 +199,12 @@ async function removeSpace(item) {
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   }
+}
+
+function openCollections(spaceId) {
+  openDialog({
+    component: SpacesDashboardCollectionsDialog,
+    data: { spaceId },
+  });
 }
 </script>

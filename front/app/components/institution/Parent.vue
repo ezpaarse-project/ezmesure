@@ -1,5 +1,5 @@
 <template>
-  <v-card :title="$t('group.group')" prepend-icon="mdi-home-city">
+  <v-card :title="$t('group.group')" prepend-icon="$mdi-home-city">
     <template #text>
       <InstitutionAutoComplete
         :model-value="parent"

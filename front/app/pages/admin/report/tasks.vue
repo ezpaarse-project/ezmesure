@@ -16,7 +16,7 @@
       >
         <template #prepend>
           <v-btn
-            icon="mdi-menu"
+            icon="$mdi-menu"
             @click="toggle()"
           />
         </template>
@@ -32,11 +32,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { toggle } = useDrawerStore();
 
 const {

@@ -58,50 +58,10 @@ model HarvestJob {
   errorCode         String?
   /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
   sushiExceptions   Json[]
-  /// Job logs
-  logs              Log[]
-  /// Job steps
-  steps             Step[]
+  /// Job logs (format: { date: Date, level: string, message: string })
+  logs              Json[]
+  /// Job steps (format: { label: string, status: string, runningTime: number, data: JSON, startedAt: Date, createdAt: Date, updatedAt: Date })
+  steps             Json[]
   /// States affected by current job
   harvests          Harvest[]
-}
-
-/// A job log
-model Log {
-  /// ID of the log
-  id      String     @id @default(cuid())
-  /// ID the job that produced the log
-  jobId   String
-  /// The job that produced the log
-  job     HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  /// Date of the log
-  date    DateTime   @default(now())
-  /// Level of the log
-  level   String     @db.VarChar(50)
-  /// Message of the log
-  message String
-}
-
-/// A job step
-model Step {
-  /// ID of the step
-  id          String     @id @default(cuid())
-  /// ID of the job that the step is part of
-  jobId       String
-  /// The job that the step is part of
-  job         HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  /// Creation date
-  createdAt   DateTime   @default(now())
-  /// Latest update date
-  updatedAt   DateTime   @updatedAt
-  /// Start date
-  startedAt   DateTime
-  /// Step label
-  label       String     @db.VarChar(50)
-  /// Step status
-  status      String     @db.VarChar(50)
-  /// Running time
-  runningTime Int
-  /// Arbitrary data produced by the step
-  data        Json
 }

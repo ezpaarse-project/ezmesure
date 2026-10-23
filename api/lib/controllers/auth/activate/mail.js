@@ -16,10 +16,10 @@ const { sendMail, generateMail } = require('../../../services/mail');
  *
  * @returns {Promise<void>}
  */
-exports.sendActivateUserMail = (user, activateLink) => sendMail({
+exports.sendActivateUserMail = async (user, activateLink) => sendMail({
   to: user.email,
   subject: 'Bienvenue sur ezMESURE !',
-  ...generateMail('activate-user', { user, activateLink }, { locale: user.language }),
+  ...await generateMail('activate-user', { user, activateLink }, { locale: user.language }),
 });
 
 /**
@@ -32,7 +32,7 @@ exports.sendActivateUserMail = (user, activateLink) => sendMail({
  *
  * @returns {Promise<void>}
  */
-exports.sendNewUserToContact = (user, data) => sendMail({
+exports.sendNewUserToContact = async (user, data) => sendMail({
   to: user.email,
-  ...generateMail('new-account', { user, ...data }, { locale: user.language }),
+  ...await generateMail('new-account', { user, ...data }, { locale: user.language }),
 });

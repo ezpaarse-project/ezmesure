@@ -43,7 +43,7 @@ async function sendNewAssignedRole(receiver, institutionName, role) {
 
   return sendMail({
     to: email,
-    ...generateMail('assigned-role', { data }, { locale: language }),
+    ...await generateMail('assigned-role', { data }, { locale: language }),
   });
 }
 
@@ -279,10 +279,10 @@ exports.requestMembership = async (ctx) => {
   const receivers = usersToNotify.length > 0 ? usersToNotify : admins;
 
   await Promise.all(
-    receivers.map((user) => sendMail({
+    receivers.map(async (user) => sendMail({
       to: user.email,
       bcc: emails.length > 0 ? admins : undefined,
-      ...generateMail('request-membership', {
+      ...await generateMail('request-membership', {
         user: ctx.state.user.username,
         institution: ctx.state.institution.name,
         linkInstitution,

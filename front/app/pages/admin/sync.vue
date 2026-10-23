@@ -11,7 +11,7 @@
         <v-chip
           v-if="syncState?.data?.startedAt"
           :text="startedAt"
-          prepend-icon="mdi-calendar-blank"
+          prepend-icon="$mdi-calendar-blank"
           size="small"
           variant="outlined"
           class="ml-2"
@@ -20,7 +20,7 @@
         <v-chip
           v-if="syncState?.data?.runningTime"
           :text="runningTime"
-          prepend-icon="mdi-timer-outline"
+          prepend-icon="$mdi-timer-outline"
           size="small"
           variant="outlined"
           class="ml-2"
@@ -30,7 +30,7 @@
       <v-btn
         v-tooltip="$t('sync.start')"
         :disabled="isSynchronizing"
-        icon="mdi-play"
+        icon="$mdi-play"
         color="primary"
         variant="tonal"
         density="comfortable"
@@ -55,7 +55,7 @@
 
       <v-row>
         <v-col>
-          <div class="text-overline primary--text">
+          <div class="text-label-medium primary--text">
             Elastic
           </div>
 
@@ -103,7 +103,7 @@
 
       <v-row>
         <v-col cols="3">
-          <div class="text-overline primary--text">
+          <div class="text-label-medium primary--text">
             Kibana
           </div>
 
@@ -120,7 +120,7 @@
         </v-col>
 
         <v-col cols="6">
-          <div class="text-overline primary--text">
+          <div class="text-label-medium primary--text">
             ezREEPORT
           </div>
 
@@ -150,11 +150,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
@@ -185,14 +180,14 @@ const statusAlert = computed(() => {
     case 'completed':
       return {
         color: 'success',
-        icon: 'mdi-check',
+        icon: '$mdi-check',
         text: t('sync.description.completed'),
       };
 
     case 'error':
       return {
         color: 'error',
-        icon: 'mdi-alert-circle',
+        icon: '$mdi-alert-circle',
         title: t('sync.status.error'),
         text: t('sync.description.error'),
       };
@@ -201,7 +196,7 @@ const statusAlert = computed(() => {
     default:
       return {
         color: 'warning',
-        icon: 'mdi-alert',
+        icon: '$mdi-alert',
         title: t('sync.status.notSynced'),
         text: t('sync.description.notSynced'),
       };

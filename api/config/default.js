@@ -2,6 +2,7 @@ const path = require('path');
 const { format } = require('winston');
 
 const oneMinute = 60;
+const oneHour = 60 * oneMinute;
 
 module.exports = {
   port: 3000,
@@ -44,12 +45,13 @@ module.exports = {
     },
   },
   ezreeport: {
-    host: 'reporting',
+    host: 'ezreeport',
     port: 8080,
     syncSchedule: '0 0 0 * * *',
     apiKey: '00000000-0000-0000-0000-000000000000',
   },
   logs: {
+    level: 'info',
     sse: {
       maxPoolSize: 20,
       heartbeatInterval: 10000,
@@ -81,6 +83,7 @@ module.exports = {
     },
   },
   auth: {
+    profileUri: '',
     secret: 'some-secret',
     cookie: 'eztoken',
     oidc: {
@@ -126,6 +129,7 @@ module.exports = {
     },
   },
   counter: {
+    registryUrl: 'https://registry.countermetrics.org',
     defaultHarvestedReports: [
       'dr',
       'dr_d1',
@@ -170,14 +174,10 @@ module.exports = {
     },
   },
   notifications: {
-    sender: 'ezMESURE',
+    sender: 'ezMESURE <noreply.ezmesure@localhost.fr>',
     replyTo: '',
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,
-  },
-  depositors: {
-    index: 'depositors',
-    cron: '0 0 0 * * *',
   },
   opendata: {
     index: 'opendata',
@@ -186,7 +186,23 @@ module.exports = {
   cypher: {
     secret: 'some-secret',
   },
+  cache: {
+    duration: {
+      loginState: oneHour * 1000,
+      harvestMatrix: 10 * oneMinute * 1000,
+      harvestSessionJobs: 5 * oneMinute * 1000,
+      harvestSessionStatus: 60 * oneMinute * 1000,
+      institutionHarvestable: 5 * oneMinute * 1000,
+      institutionReporting: 24 * oneHour * 1000,
+      counterRegistry: 24 * oneHour * 1000,
+    },
+  },
+  homepage: {
+    features: ['dashboard', 'repository', 'ezpaarse', 'counter', 'reporting'],
+    logos: ['slsp', 'csal', 'epfl', 'unige', 'cnrs', 'couperin'],
+  },
   defaultLocale: 'en',
   appName: 'ezMESURE',
+  instanceName: '',
   publicUrl: 'https://ezmesure.couperin.org',
 };

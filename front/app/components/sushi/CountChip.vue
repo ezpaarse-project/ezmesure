@@ -3,7 +3,7 @@
     :text="`${modelValue.length}`"
     :variant="!modelValue.length ? 'outlined' : undefined"
     :to="to"
-    prepend-icon="mdi-key"
+    prepend-icon="$mdi-key"
     size="small"
   />
 
@@ -78,7 +78,7 @@ const bars = computed(() => {
 
   const entries = [
     ...sushiStatus.entries(),
-    [undefined, { color: 'grey-lighten-3', icon: 'mdi-help-circle-outline', iconColor: 'grey' }],
+    [undefined, { color: 'grey-lighten-3', icon: '$mdi-help-circle-outline', iconColor: 'grey' }],
   ];
 
   return entries.map(

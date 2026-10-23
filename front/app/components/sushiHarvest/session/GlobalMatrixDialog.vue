@@ -7,11 +7,11 @@
       :title="cardTitle"
       :subtitle="session.id"
       :loading="status === 'pending' && 'primary'"
-      prepend-icon="mdi-table-headers-eye"
+      prepend-icon="$mdi-table-headers-eye"
     >
       <template #append>
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           variant="text"
           @click="isOpen = false"
         />

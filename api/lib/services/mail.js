@@ -93,9 +93,9 @@ module.exports.sendMail = async (sendMailOptions) => {
  * @param {Record<string, unknown>} [locals] local variables to be used in the template
  * @param {GenerateMailOptions} [opts] options
  *
- * @returns {GenerateMailReturn}
+ * @returns {Promise<GenerateMailReturn>}
  */
-module.exports.generateMail = (templateName, locals = {}, opts = {}) => {
+module.exports.generateMail = async (templateName, locals = {}, opts = {}) => {
   if (!templateName) { throw new Error('No template name provided'); }
 
   const t = i18n.t(opts.locale);
@@ -113,7 +113,7 @@ module.exports.generateMail = (templateName, locals = {}, opts = {}) => {
   const subject = t(`emails.${camelCase(templateName)}.${opts?.subjectKey ?? 'subject'}`, data);
   const text = nunjucks.render(`${templateName}.txt`, data);
   const mjmlTemplate = nunjucks.render(`${templateName}.mjml`, data);
-  const { html, errors } = mjml2html(mjmlTemplate);
+  const { html, errors } = await mjml2html(mjmlTemplate, { minify: true, keepComments: false });
 
   return {
     [metaKey]: {

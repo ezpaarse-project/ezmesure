@@ -10,9 +10,9 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
-import UsersService from '../../../lib/entities/users.service';
 import rolesPrisma from '../../../lib/services/prisma/roles';
 
 const isoDatePattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
@@ -56,7 +56,7 @@ describe('[roles] Create features', () => {
 
     beforeAll(async () => {
       await usersPrisma.create({ data: adminUser });
-      adminToken = await (new UsersService()).generateToken(adminUser.username);
+      adminToken = await signJWT({ username: adminUser.username });
     });
 
     it('#01 Should be able to create a role', async () => {
@@ -91,7 +91,7 @@ describe('[roles] Create features', () => {
 
     beforeAll(async () => {
       await usersPrisma.create({ data: testUser });
-      userToken = await (new UsersService()).generateToken(testUser.username);
+      userToken = await signJWT({ username: testUser.username });
     });
 
     it('#02 Should not be able to create a role', async () => {

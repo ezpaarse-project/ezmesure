@@ -2,7 +2,7 @@
   <v-toolbar density="comfortable" class="bg-transparent">
     <template #prepend>
       <v-btn
-        icon="mdi-menu"
+        icon="$mdi-menu"
         @click="toggle()"
       />
     </template>
@@ -25,7 +25,7 @@
           v-if="icons"
           v-tooltip="$t('refresh')"
           :loading="loading"
-          icon="mdi-reload"
+          icon="$mdi-reload"
           variant="tonal"
           density="comfortable"
           color="primary"
@@ -36,7 +36,7 @@
           v-else
           :text="$t('refresh')"
           :loading="loading"
-          prepend-icon="mdi-reload"
+          prepend-icon="$mdi-reload"
           variant="tonal"
           color="primary"
           class="mr-2"
@@ -59,7 +59,7 @@
         v-if="search !== false"
         v-model="searchValue"
         :placeholder="$t('search')"
-        append-inner-icon="mdi-magnify"
+        append-inner-icon="$mdi-magnify"
         variant="outlined"
         density="compact"
         width="200"

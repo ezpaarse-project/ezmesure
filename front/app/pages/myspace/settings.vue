@@ -11,10 +11,3 @@
     </v-container>
   </div>
 </template>
-
-<script setup>
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
-</script>

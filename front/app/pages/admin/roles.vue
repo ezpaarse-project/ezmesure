@@ -11,7 +11,7 @@
       <v-btn
         v-if="roleFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -43,7 +43,7 @@
         <v-icon
           v-tooltip:top="$t(item.restricted ? 'roles.onlyAdmins' : 'roles.notOnlyAdmins')"
           :color="item.restricted ? '' : 'grey-lighten-2'"
-          :icon="item.restricted ? 'mdi-lock' : 'mdi-lock-off'"
+          :icon="item.restricted ? '$mdi-lock' : '$mdi-lock-off'"
         />
       </template>
 
@@ -51,7 +51,7 @@
         <v-chip
           :text="`${value}`"
           :variant="!value ? 'outlined' : undefined"
-          prepend-icon="mdi-account"
+          prepend-icon="$mdi-account"
           size="small"
           @click="institutionsDialogRef?.open(item)"
         />
@@ -61,7 +61,7 @@
         <v-btn
           v-tooltip:top="$t('modify')"
           :disabled="!roleFormDialogRef"
-          icon="mdi-pencil"
+          icon="$mdi-pencil"
           variant="text"
           density="comfortable"
           color="blue"
@@ -69,7 +69,7 @@
         />
         <v-btn
           v-tooltip:top="$t('delete')"
-          icon="mdi-delete"
+          icon="$mdi-delete"
           variant="text"
           density="comfortable"
           color="red"
@@ -85,7 +85,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteRole()"
         />
       </template>
@@ -104,11 +104,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t } = useI18n();
 const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
@@ -123,7 +118,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/roles',
     query: { include: '_count.membershipRoles' },
@@ -207,7 +202,7 @@ function deleteRole(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

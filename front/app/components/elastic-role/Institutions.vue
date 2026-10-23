@@ -2,14 +2,14 @@
   <v-card
     :title="$t('institutions.toolbarTitle', { count: institutions.length })"
     :subtitle="showRole ? role.name : undefined"
-    prepend-icon="mdi-domain"
+    prepend-icon="$mdi-domain"
   >
     <template #append>
       <v-text-field
         v-if="institutions.length > 0"
         v-model="search"
         :placeholder="$t('search')"
-        append-inner-icon="mdi-magnify"
+        append-inner-icon="$mdi-magnify"
         variant="outlined"
         density="compact"
         width="200"
@@ -26,7 +26,7 @@
         <template #activator="{ props: menu }">
           <v-btn
             v-tooltip="$t('add')"
-            icon="mdi-plus"
+            icon="$mdi-plus"
             variant="text"
             density="comfortable"
             color="green"
@@ -45,13 +45,13 @@
               :title="$t('repoAliasTemplates.conditions')"
               :subtitle="$t('repoAliasTemplates.conditionsDescription')"
               variant="flat"
-              prepend-icon="mdi-format-list-checks"
+              prepend-icon="$mdi-format-list-checks"
               disable-advanced
             >
               <template #actions>
                 <v-btn
                   variant="elevated"
-                  prepend-icon="mdi-sync"
+                  prepend-icon="$mdi-sync"
                   size="small"
                   :loading="loading"
                   @click="sync()"
@@ -71,7 +71,7 @@
 
                 <v-btn
                   variant="elevated"
-                  prepend-icon="mdi-content-save"
+                  prepend-icon="$mdi-content-save"
                   color="secondary"
                   size="small"
                   :loading="loading"
@@ -109,7 +109,7 @@
           <v-btn
             v-if="!hasConditions"
             v-tooltip="$t('revoke')"
-            icon="mdi-office-building-remove"
+            icon="$mdi-office-building-remove"
             variant="text"
             size="small"
             density="comfortable"

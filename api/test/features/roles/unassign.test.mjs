@@ -10,9 +10,9 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
-import UsersService from '../../../lib/entities/users.service';
 import rolesPrisma from '../../../lib/services/prisma/roles';
 import institutionsPrisma from '../../../lib/services/prisma/institutions';
 import membershipsRolesPrisma from '../../../lib/services/prisma/membership-roles';
@@ -106,7 +106,7 @@ describe('[roles] Assign features', () => {
 
     beforeAll(async () => {
       await usersPrisma.create({ data: adminUser });
-      adminToken = await (new UsersService()).generateToken(adminUser.username);
+      adminToken = await signJWT({ username: adminUser.username });
     });
 
     it('#01 Should be able to unassign a restricted role', async () => {
@@ -154,7 +154,7 @@ describe('[roles] Assign features', () => {
     let userToken;
 
     beforeAll(async () => {
-      userToken = await (new UsersService()).generateToken(privilegedMember.username);
+      userToken = await signJWT({ username: privilegedMember.username });
     });
 
     it('#03 Should be able to unassign an unrestricted role', async () => {
@@ -198,7 +198,7 @@ describe('[roles] Assign features', () => {
     let userToken;
 
     beforeAll(async () => {
-      userToken = await (new UsersService()).generateToken(regularMember.username);
+      userToken = await signJWT({ username: regularMember.username });
     });
 
     it('#05 Should not be able to unassign a restricted role', async () => {

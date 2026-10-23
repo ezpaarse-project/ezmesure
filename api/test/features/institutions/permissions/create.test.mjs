@@ -7,24 +7,19 @@ import ezmesure from '../../../setup/ezmesure';
 
 import { resetDatabase } from '../../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../../lib/services/elastic/utils';
+import { signJWT } from '../../../../lib/utils/jwt';
 
 import repositoriesPrisma from '../../../../lib/services/prisma/repositories';
 import institutionsPrisma from '../../../../lib/services/prisma/institutions';
 import membershipsPrisma from '../../../../lib/services/prisma/memberships';
 import usersPrisma from '../../../../lib/services/prisma/users';
 import usersElastic from '../../../../lib/services/elastic/users';
-import UsersService from '../../../../lib/entities/users.service';
 
 import repositoryPermissionsPrisma from '../../../../lib/services/prisma/repository-permissions';
 
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[repository permission]: Test create features', () => {
-  const allPermission = ['memberships:write', 'memberships:read'];
-  const readPermission = ['memberships:read'];
-  const emptyPermission = [];
-
   const userTest = {
     username: 'user.test',
     email: 'user.test@test.fr',
@@ -40,19 +35,9 @@ describe('[repository permission]: Test create features', () => {
     name: 'Test',
   };
 
-  const ezpaarseRepositoryConfig = {
-    pattern: 'ezpaarse-*',
-    type: 'ezPAARSE',
-  };
-
   const ezcounterRepositoryConfig = {
     pattern: 'publisher-*',
     type: 'COUNTER 5',
-  };
-
-  const randomRepositoryConfig = {
-    pattern: 'random-*',
-    type: 'random',
   };
 
   const permissionTest = {
@@ -65,7 +50,7 @@ describe('[repository permission]: Test create features', () => {
     beforeAll(async () => {
       await resetDatabase();
       await resetElastic();
-      adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+      adminToken = await signJWT({ username: adminUsername });
     });
 
     describe('Institution created by admin', () => {

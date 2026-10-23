@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="isEditing ? $t('roles.editRole') : $t('roles.newRole')"
-    :prepend-icon="isEditing ? 'mdi-tag-edit' : 'mdi-tag-plus'"
+    :prepend-icon="isEditing ? '$mdi-tag-edit' : '$mdi-tag-plus'"
   >
     <template #text>
       <v-form
@@ -16,7 +16,7 @@
               v-model="role.id"
               :label="`${$t('identifier')} *`"
               :rules="idRules"
-              prepend-icon="mdi-key-variant"
+              prepend-icon="$mdi-key-variant"
               variant="underlined"
               hide-details="auto"
             />
@@ -27,7 +27,7 @@
               v-model="role.label"
               :label="`${$t('label')} *`"
               :rules="[(v) => !!v || t('fieldIsRequired')]"
-              prepend-icon="mdi-label-outline"
+              prepend-icon="$mdi-label-outline"
               variant="underlined"
               hide-details="auto"
             />
@@ -52,7 +52,7 @@
             <v-text-field
               :model-value="role.icon"
               :label="$t('icon')"
-              :prepend-icon="role.icon || 'mdi-tag-outline'"
+              :prepend-icon="role.icon ? `$${role.icon}` : '$mdi-tag-outline'"
               variant="underlined"
               hide-details="auto"
               clearable
@@ -76,7 +76,7 @@
             <v-textarea
               v-model="role.description"
               :label="$t('description')"
-              prepend-icon="mdi-book-open-page-variant"
+              prepend-icon="$mdi-book-open-page-variant"
               variant="underlined"
               hide-details
             />
@@ -84,7 +84,7 @@
 
           <v-col cols="12">
             <v-input
-              prepend-icon="mdi-bell"
+              prepend-icon="$mdi-bell"
               hide-details
             >
               <v-expansion-panels>
@@ -132,7 +132,7 @@
 
           <v-col cols="12">
             <v-input
-              prepend-icon="mdi-refresh-auto"
+              prepend-icon="$mdi-refresh-auto"
               hide-details
             >
               <v-expansion-panels>
@@ -184,7 +184,7 @@
               :label="$t('roles.onlyAdmins')"
               density="compact"
               color="primary"
-              prepend-icon="mdi-lock"
+              prepend-icon="$mdi-lock"
               hide-details
             />
             <v-checkbox
@@ -192,7 +192,7 @@
               :label="$t('roles.exposeMembers')"
               density="compact"
               color="primary"
-              prepend-icon="mdi-earth"
+              prepend-icon="$mdi-earth"
               hide-details
             />
             <v-checkbox
@@ -200,7 +200,7 @@
               :label="$t('roles.definePermissionsPreset')"
               density="compact"
               color="primary"
-              prepend-icon="mdi-shield"
+              prepend-icon="$mdi-shield"
               hide-details
               @update:model-value="$event => role.permissionsPreset = $event ? {} : null"
             />
@@ -235,7 +235,7 @@
 
       <v-btn
         :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="!isEditing ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="saving"
         type="submit"

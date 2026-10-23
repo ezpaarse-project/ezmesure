@@ -38,7 +38,7 @@
         <v-btn
           :text="$t('copy')"
           :disabled="loadingEmails || selectedEmails.size === 0"
-          prepend-icon="mdi-content-copy"
+          prepend-icon="$mdi-content-copy"
           variant="elevated"
           color="primary"
           @click="copyEmails()"

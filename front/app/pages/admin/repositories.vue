@@ -15,7 +15,7 @@
       <v-btn
         v-if="repositoryFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -43,7 +43,7 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
-          prepend-icon="mdi-domain"
+          prepend-icon="$mdi-domain"
           size="small"
           @click="repoInstitutionsDialogRef?.open(item)"
         />
@@ -53,7 +53,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -64,12 +64,12 @@
             <v-list-item
               v-if="repositoryUpdateFormDialogRef"
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="repositoryUpdateFormDialogRef.open(item)"
             />
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteRepositories([item])"
             />
 
@@ -78,7 +78,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyRepositoryPattern(item)"
             />
           </v-list>
@@ -93,7 +93,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteRepositories()"
         />
       </template>
@@ -117,11 +117,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
@@ -138,7 +133,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/repositories',
     query: {
@@ -213,7 +208,7 @@ function deleteRepositories(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

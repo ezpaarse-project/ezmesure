@@ -1,6 +1,7 @@
 // @ts-check
 
 const { Joi } = require('koa-joi-router');
+const { set } = require('lodash');
 
 const { arrayToString, stringToArray } = require('../utils');
 
@@ -53,6 +54,22 @@ const prepareJoiAndFilters = (schema) => {
   const filters = {};
   const arrayFields = [];
 
+  /**
+   * @template {string} Modifier
+   *
+   * @param {string} key
+   * @param {Modifier[]} modifiers
+   * @param {(modifier: Modifier, field: string) => import('./filters').ValidationAndFilter} handler
+   */
+  const useModifiers = (key, modifiers, handler) => {
+    modifiers.forEach((modifier) => {
+      const field = modifier ? `${key}[${modifier}]` : key;
+      const { validation: modV, filter: modF } = handler(modifier, field);
+      if (modV) { validations[field] = modV; }
+      if (modF) { filters[field] = modF; }
+    });
+  };
+
   // eslint-disable-next-line no-restricted-syntax
   for (const [key, def] of Object.entries(schema)) {
     /* eslint-disable no-underscore-dangle */
@@ -66,7 +83,8 @@ const prepareJoiAndFilters = (schema) => {
     let filter;
     switch (def.type) {
       case 'string':
-        ({ validation, filter } = stringJoiAndFilter(key, regex));
+        useModifiers(key, ['', 'not'], (modifier) => stringJoiAndFilter(key, modifier, regex));
+
         arrayFields.push(key);
         break;
       case 'boolean':
@@ -75,36 +93,21 @@ const prepareJoiAndFilters = (schema) => {
       case 'array': {
         const subtypes = def.$_terms.items?.map((i) => i.type) ?? [];
 
-        ({ validation, filter } = arrayJoiAndFilter(key, subtypes));
-
-        validations[`${key}:loose`] = Joi.boolean().default(false);
-        // filter for ${key}:loose will be handled in arrayJoiAndFilter
+        useModifiers(key, ['', 'some', 'every'], (modifier) => arrayJoiAndFilter(key, modifier || 'every', subtypes));
 
         arrayFields.push(key);
         break;
       }
 
       case 'number': {
-        const { validation: fromV, filter: fromF } = numberJoiAndFilter(key, 'gte', isNullable);
-        const { validation: toV, filter: toF } = numberJoiAndFilter(key, 'lte', isNullable);
+        useModifiers(key, ['', 'gte', 'lte'], (modifier) => numberJoiAndFilter(key, modifier || 'eq', isNullable));
 
-        validations[`${key}:from`] = fromV;
-        validations[`${key}:to`] = toV;
-
-        filters[`${key}:from`] = fromF;
-        filters[`${key}:to`] = toF;
         break;
       }
 
       case 'date': {
-        const { validation: fromV, filter: fromF } = dateJoiAndFilter(key, 'gte', isNullable);
-        const { validation: toV, filter: toF } = dateJoiAndFilter(key, 'lte', isNullable);
+        useModifiers(key, ['gte', 'lte'], (modifier) => dateJoiAndFilter(key, modifier, isNullable));
 
-        validations[`${key}:from`] = fromV;
-        validations[`${key}:to`] = toV;
-
-        filters[`${key}:from`] = fromF;
-        filters[`${key}:to`] = toF;
         break;
       }
 
@@ -165,12 +168,14 @@ const applyPrismaFilters = (query, fieldsFilters) => {
  * @returns {Record<string, any>} Prisma search
  */
 const applyPrismaSearch = (queryFields, search) => ({
-  OR: queryFields.map((field) => ({
-    [field]: {
+  OR: queryFields.map((field) => set(
+    {},
+    field,
+    {
       contains: search,
       mode: 'insensitive',
     },
-  })),
+  )),
 });
 
 /**

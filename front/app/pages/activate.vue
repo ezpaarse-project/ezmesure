@@ -8,7 +8,7 @@
 
             <v-spacer />
 
-            <v-icon icon="mdi-text" />
+            <v-icon icon="$mdi-text" />
           </v-card-title>
 
           <v-card-text class="pt-4">

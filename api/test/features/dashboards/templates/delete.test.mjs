@@ -1,0 +1,116 @@
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  beforeEach,
+} from 'vitest';
+
+import config from 'config';
+
+import ezmesure from '../../../setup/ezmesure';
+
+import { resetDatabase } from '../../../../lib/services/prisma/utils';
+import { resetElastic } from '../../../../lib/services/elastic/utils';
+import { signJWT } from '../../../../lib/utils/jwt';
+
+import usersPrisma from '../../../../lib/services/prisma/users';
+import dashboardsPrisma from '../../../../lib/services/prisma/dashboards';
+
+const adminUsername = config.get('admin.username');
+
+describe('[dashboard-templates] Delete features', () => {
+  const adminUser = {
+    username: 'admin.user',
+    email: 'admin@test.fr',
+    fullName: 'Admin',
+    isAdmin: true,
+  };
+
+  const testUser = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
+  const testDashboard = {
+    id: 'test-dashboard-id',
+    sourceSpaceId: 'source-space-id',
+    sourceDashboardId: 'source-dashboard-id',
+  };
+
+  beforeAll(async () => {
+    await resetDatabase();
+    await resetElastic();
+  });
+
+  beforeEach(async () => {
+    await dashboardsPrisma.removeAll();
+    await dashboardsPrisma.create({ data: testDashboard });
+  });
+
+  describe('An admin', () => {
+    let adminToken;
+
+    beforeAll(async () => {
+      await usersPrisma.create({ data: adminUser });
+      adminToken = await signJWT({ username: adminUsername });
+    });
+
+    it('#01 Should be able to delete a dashboard template', async () => {
+      const httpAppResponse = await ezmesure.raw(`/dashboard-templates/${testDashboard.id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+
+      // Test API
+      expect(httpAppResponse).toHaveProperty('status', 204);
+
+      // Check DB state
+      const nbDashboards = await dashboardsPrisma.count();
+      expect(nbDashboards).toEqual(0);
+    });
+  });
+
+  describe('An authenticated user', () => {
+    let userToken;
+
+    beforeAll(async () => {
+      await usersPrisma.create({ data: testUser });
+      userToken = await signJWT({ username: testUser.username });
+    });
+
+    it('#02 Should not be able to delete a dashboard template', async () => {
+      const httpAppResponse = await ezmesure.raw(`/dashboard-templates/${testDashboard.id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+
+      // Check API response
+      expect(httpAppResponse).toHaveProperty('status', 403);
+
+      const nbDashboards = await dashboardsPrisma.count();
+      expect(nbDashboards).toEqual(1);
+    });
+  });
+
+  describe('An unauthenticated user', () => {
+    it('#03 Should not be able to delete a dashboard template', async () => {
+      const httpAppResponse = await ezmesure.raw(`/dashboard-templates/${testDashboard.id}`, {
+        method: 'DELETE',
+      });
+
+      // Check API response
+      expect(httpAppResponse).toHaveProperty('status', 401);
+
+      // Check DB state
+      const nbDashboards = await dashboardsPrisma.count();
+      expect(nbDashboards).toEqual(1);
+    });
+  });
+});

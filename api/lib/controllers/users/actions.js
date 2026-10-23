@@ -17,7 +17,7 @@ const { logoutUser, AUTH_COOKIE } = require('../../services/kibana');
 const standardQueryParams = prepareStandardQueryParams({
   schema,
   includableFields,
-  queryFields: ['username', 'fullName'],
+  queryFields: ['username', 'fullName', 'email'],
 });
 exports.standardQueryParams = standardQueryParams;
 
@@ -50,9 +50,11 @@ exports.list = async (ctx) => {
   const {
     source = 'fullName,username',
     roles: rolesParam,
-    'roles:loose': hasSomeRoles,
+    'roles[some]': someRolesParam,
+    'roles[every]': everyRolesParam,
     permissions,
-    'permissions:loose': hasSomePermissions,
+    'permissions[some]': somePermissions,
+    'permissions[every]': everyPermissions,
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
@@ -61,15 +63,17 @@ exports.list = async (ctx) => {
     prismaQuery.where.memberships = {
       ...prismaQuery.where.memberships,
       some: {
-        permissions: arrayFilter(permissions, hasSomePermissions),
+        permissions: somePermissions ? arrayFilter(somePermissions, 'some') : arrayFilter(everyPermissions ?? permissions, 'every'),
       },
     };
   }
 
-  if (rolesParam != null) {
+  if (rolesParam != null || someRolesParam != null || everyRolesParam != null) {
     const roles = stringToArray(rolesParam);
+    const someRoles = stringToArray(someRolesParam);
+    const everyRoles = stringToArray(everyRolesParam);
 
-    if (roles.length === 0) {
+    if (roles.length + someRoles.length + everyRoles.length === 0) {
       prismaQuery.where.memberships = {
         AND: [
           prismaQuery.where.memberships ?? {},
@@ -77,11 +81,11 @@ exports.list = async (ctx) => {
         ],
       };
     } else {
-      const operator = hasSomeRoles ? 'OR' : 'AND';
+      const operator = someRoles.length > 0 ? 'OR' : 'AND';
 
       prismaQuery.where[operator] = [
         ...(prismaQuery.where[operator] ?? []),
-        ...roles.map((role) => ({
+        ...[...someRoles, ...everyRoles, ...roles].map((role) => ({
           memberships: {
             some: {
               roles: { some: { roleId: role } },
@@ -92,12 +96,13 @@ exports.list = async (ctx) => {
     }
   }
 
-  prismaQuery.select = Object.assign(
-    {},
-    ...source.split(',').map((field) => ({ [field.trim()]: true })),
-  );
-  if (source === '*') {
-    prismaQuery.select = undefined;
+  if (source !== '*') {
+    prismaQuery.select = Object.assign(
+      {},
+      ...source.split(',').map((field) => ({ [field.trim()]: true })),
+      prismaQuery.include,
+    );
+    prismaQuery.include = undefined;
   }
 
   if (!ctx.state?.user?.isAdmin) {
@@ -309,7 +314,7 @@ exports.deleteUser = async (ctx) => {
   try {
     await sendMail({
       to: user.email,
-      ...generateMail(
+      ...await generateMail(
         'user-deletion-requested',
         {
           loginURL: new URL('/authenticate', publicUrl).href,

@@ -2,13 +2,13 @@
   <v-card
     :title="$t('repositories.repositories')"
     :subtitle="showInstitution ? institution.name : undefined"
-    prepend-icon="mdi-database"
+    prepend-icon="$mdi-database"
   >
     <template v-if="!userSpaced" #append>
       <v-btn
         v-if="repositoryFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="text"
         density="comfortable"
         color="green"
@@ -24,7 +24,7 @@
       <template v-else>
         <v-list v-if="sortedRepositories.length > 0" density="compact">
           <v-list-subheader v-if="sortedForeignRepositories.length > 0">
-            <v-icon icon="mdi-database" start />
+            <v-icon icon="$mdi-database" start />
             {{ $t('repositories.ownedRepositories') }}
           </v-list-subheader>
 
@@ -42,7 +42,7 @@
               <v-btn
                 v-if="repositoryUpdateFormDialogRef"
                 v-tooltip="$t('modify')"
-                icon="mdi-pencil"
+                icon="$mdi-pencil"
                 variant="text"
                 size="small"
                 density="comfortable"
@@ -60,7 +60,7 @@
                 <template #activator="{ props: confirm }">
                   <v-btn
                     v-tooltip="$t('delete')"
-                    icon="mdi-delete"
+                    icon="$mdi-delete"
                     variant="text"
                     size="small"
                     density="comfortable"
@@ -77,7 +77,7 @@
 
         <v-list v-if="sortedForeignRepositories.length > 0" density="compact">
           <v-list-subheader>
-            <v-icon icon="mdi-database-plus" start />
+            <v-icon icon="$mdi-database-plus" start />
             {{ $t('repositories.foreignRepositories') }}
           </v-list-subheader>
 
@@ -95,7 +95,7 @@
               <v-chip
                 v-tooltip:left="$t('shares.grantedBy')"
                 :text="elasticRole.name"
-                append-icon="mdi-account-tag"
+                append-icon="$mdi-account-tag"
                 color="secondary"
                 variant="outlined"
                 size="small"

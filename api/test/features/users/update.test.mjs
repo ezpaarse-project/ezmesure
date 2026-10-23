@@ -7,13 +7,12 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[users]: Test update users features', () => {
   const userTest = {
@@ -35,7 +34,7 @@ describe('[users]: Test update users features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+    adminToken = await signJWT({ username: adminUsername });
   });
   describe('Update', () => {
     describe('As admin', () => {

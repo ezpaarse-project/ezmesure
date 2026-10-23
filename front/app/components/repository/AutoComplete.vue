@@ -14,7 +14,7 @@
     :hide-no-data="!search"
     item-title="pattern"
     item-value="pattern"
-    prepend-icon="mdi-form-textbox"
+    prepend-icon="$mdi-form-textbox"
     variant="underlined"
     hide-details="auto"
     no-filter
@@ -22,7 +22,7 @@
     return-object
     @update:model-value="$emit('update:modelValue', $event);"
   >
-    <template #item="{ item: { raw: item }, props: listItem }">
+    <template #item="{ item, props: listItem }">
       <v-list-item
         :title="item.pattern"
         lines="two"

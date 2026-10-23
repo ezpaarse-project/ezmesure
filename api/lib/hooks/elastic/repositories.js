@@ -2,6 +2,7 @@
 const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
+const elastic = require('../../services/elastic');
 
 const {
   syncRepository,
@@ -11,6 +12,29 @@ const {
 /**
  * @typedef {import('../../.prisma/client.mjs').Repository} Repository
  */
+
+/**
+ * @param { Repository } repository
+ */
+const onRepositoryCreate = async (repository) => {
+  try {
+    await syncRepository(repository);
+  } catch (error) {
+    appLogger.error(
+      `[elastic][hooks] Repository [${repository?.pattern}] could not be synchronized:\n${error}`,
+    );
+  }
+
+  // Create default index (allowing for spaces using this repository to not throw errors)
+  // The index can be manually deleted later
+  const index = repository?.pattern.replace(/[*]/g, '');
+  try {
+    await elastic.indices.create({ index });
+    appLogger.verbose(`[elastic][hooks] Created default index for repository [${repository?.pattern}]: ${index}`);
+  } catch (error) {
+    appLogger.warn(`[elastic][hooks] Could not create default index for repository [${repository?.pattern}] (tried to create [${index}]): ${error}`);
+  }
+};
 
 /**
  * @param { Repository } repository
@@ -40,7 +64,7 @@ const onRepositoryDelete = async (repository) => {
 
 const hookOptions = { uniqueResolver: (repository) => repository.pattern };
 
-registerHook('repository:create', onRepositoryUpsert, hookOptions);
+registerHook('repository:create', onRepositoryCreate, hookOptions);
 registerHook('repository:update', onRepositoryUpsert, hookOptions);
 registerHook('repository:upsert', onRepositoryUpsert, hookOptions);
 registerHook('repository:delete', onRepositoryDelete, hookOptions);

@@ -9,7 +9,7 @@
         <v-form id="spaceForm" @submit.prevent="submit()">
           <v-row>
             <v-col>
-              <SpaceAutoComplete v-model="space" />
+              <SpaceAutoComplete v-model="space" hide-details />
             </v-col>
           </v-row>
         </v-form>
@@ -27,7 +27,7 @@
         <v-btn
           :text="$t('add')"
           :disabled="!space"
-          prepend-icon="mdi-plus"
+          prepend-icon="$mdi-plus"
           type="submit"
           form="spaceForm"
           variant="elevated"

@@ -5,7 +5,7 @@
         <v-btn
           v-show="modelValue.length > 0"
           :text="text"
-          :prepend-icon="open ? 'mdi-chevron-down' : 'mdi-chevron-up'"
+          :prepend-icon="open ? '$mdi-chevron-down' : '$mdi-chevron-up'"
           color="primary"
           position="fixed"
           location="bottom right"
@@ -27,7 +27,7 @@
 
       <v-list-item
         :title="$t('deselect')"
-        prepend-icon="mdi-close"
+        prepend-icon="$mdi-close"
         @click="$emit('update:modelValue', [])"
       />
     </v-list>

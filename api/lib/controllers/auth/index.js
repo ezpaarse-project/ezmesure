@@ -27,8 +27,6 @@ router.use(activate.prefix('/_activate').middleware());
 
 router.use(requireActiveJwt, requireUser);
 
-const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
-
 router.route({
   method: 'GET',
   path: '/',
@@ -102,23 +100,7 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: Joi.array().items(
-      Joi.string().valid(...NOTIFICATION_KEYS),
-    ),
-  },
-});
-router.route({
-  method: 'PUT',
-  path: '/excludeNotifications',
-  handler: [
-    bodyParser(),
-    changeExcludeNotifications,
-  ],
-  validate: {
-    type: 'json',
-    body: Joi.array().items(
-      Joi.string().valid(...NOTIFICATION_KEYS),
-    ),
+    body: Joi.array().items(Joi.string()),
   },
 });
 

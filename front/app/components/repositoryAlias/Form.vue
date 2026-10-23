@@ -2,7 +2,7 @@
   <v-card
     :loading="loading && 'primary'"
     :title="$t('repositoryAliases.newAlias')"
-    prepend-icon="mdi-eye-plus"
+    prepend-icon="$mdi-eye-plus"
   >
     <template #text>
       <v-row>
@@ -22,7 +22,7 @@
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9_-]+$/i.test(v) || $t('invalidFormat'),
                   ]"
-                  prepend-icon="mdi-form-textbox"
+                  prepend-icon="$mdi-form-textbox"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -32,7 +32,7 @@
               <v-col cols="12">
                 <RepositoryAutoComplete
                   :label="`${$t('repositoryAliases.target')} *`"
-                  prepend-icon="mdi-database"
+                  prepend-icon="$mdi-database"
                   :model-value="repository"
                   @update:model-value="applyRepository($event)"
                 />
@@ -64,7 +64,7 @@
 
       <v-btn
         :text="alias.exist && institution ? $t('add') : $t('create')"
-        :prepend-icon="alias.exist && institution ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="alias.exist && institution ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="loading"
         type="submit"

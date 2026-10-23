@@ -16,7 +16,7 @@
       <template #activator="{ props: menu }">
         <CurrentUserInstitutionListItem
           :institution="institution"
-          append-icon="mdi-chevron-right"
+          append-icon="$mdi-chevron-right"
           class="text-grey-darken-3"
           v-bind="menu"
           @click.prevent=""
@@ -37,7 +37,7 @@
 
     <InstitutionFormDialog
       ref="institutionFormDialogRef"
-      @update:model-value="currentUser.fetchMemberships()"
+      @submit="currentUser.fetchMemberships()"
     />
   </v-list>
 </template>

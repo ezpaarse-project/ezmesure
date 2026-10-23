@@ -12,14 +12,14 @@
             indeterminate
             class="mb-4"
           >
-            <v-icon icon="mdi-login" />
+            <v-icon icon="$mdi-login" />
           </v-progress-circular>
         </template>
 
         <template #actions>
           <v-slide-y-transition>
             <v-row v-if="userIsWaiting" class="text-center mx-auto" style="max-width: 500px;">
-              <v-col cols="12" class="text-body-2">
+              <v-col cols="12" class="text-body-medium">
                 {{ $t('authenticate.longLoadingDesc') }}
               </v-col>
 
@@ -27,7 +27,7 @@
                 <v-btn
                   :text="$t('authenticate.longLoadingBtn')"
                   :href="redirectUrl.href"
-                  append-icon="mdi-login-variant"
+                  append-icon="$mdi-login-variant"
                   variant="outlined"
                   color="primary"
                 />
@@ -41,12 +41,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  auth: {
-    unauthenticatedOnly: true,
-  },
-});
-
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
 const { query } = useRoute();

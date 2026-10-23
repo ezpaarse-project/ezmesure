@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('shares.newShare')"
-    prepend-icon="mdi-account-tag"
+    prepend-icon="$mdi-account-tag"
   >
     <template #text>
       <v-row>
@@ -20,7 +20,7 @@
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9_-]+$/i.test(v) || $t('invalidFormat'),
                   ]"
-                  prepend-icon="mdi-form-textbox"
+                  prepend-icon="$mdi-form-textbox"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -39,7 +39,7 @@
 
       <v-btn
         :text="$t('add')"
-        :prepend-icon="'mdi-plus'"
+        :prepend-icon="'$mdi-plus'"
         :disabled="!valid"
         :loading="loading"
         type="submit"

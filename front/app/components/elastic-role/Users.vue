@@ -2,7 +2,7 @@
   <v-card
     :title="$t('shares.users')"
     :subtitle="showRole ? role.name : undefined"
-    prepend-icon="mdi-account-multiple"
+    prepend-icon="$mdi-account-multiple"
   >
     <template #append>
       <UserAddMenu
@@ -13,7 +13,7 @@
         <template #activator="{ props: menu }">
           <v-btn
             v-tooltip="$t('add')"
-            icon="mdi-plus"
+            icon="$mdi-plus"
             variant="text"
             density="comfortable"
             color="green"
@@ -43,7 +43,7 @@
           <template #append>
             <v-btn
               v-tooltip="$t('revoke')"
-              icon="mdi-account-off"
+              icon="$mdi-account-off"
               variant="text"
               size="small"
               density="comfortable"

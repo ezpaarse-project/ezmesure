@@ -36,7 +36,7 @@
               <v-btn
                 v-if="institutionFormDialogRef"
                 v-tooltip="$t('modify')"
-                icon="mdi-pencil"
+                icon="$mdi-pencil"
                 variant="text"
                 density="comfortable"
                 color="blue"
@@ -91,11 +91,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { params } = useRoute();
 const { t } = useI18n();
 const snacks = useSnacksStore();

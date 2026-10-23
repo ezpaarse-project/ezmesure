@@ -1,3 +1,5 @@
+const { setTimeout } = require('node:timers/promises');
+
 const { ofetch } = require('ofetch');
 
 const { appLogger } = require('./logger');
@@ -120,7 +122,6 @@ async function fetchESClusterStats() {
 function getESAggsOfRepositoryType(type) {
   if (type === 'ezpaarse') {
     return {
-      events: { cardinality: { field: '_id' } },
       titles: { cardinality: { field: 'publication_title' } },
       platforms: { cardinality: { field: 'platform' } },
       maxDate: { max: { field: 'datetime' } },
@@ -139,6 +140,36 @@ function getESAggsOfRepositoryType(type) {
 }
 
 /**
+ * Submit a async search to ES then wait for it's completion
+ *
+ * @param {import('@elastic/elasticsearch').estypes.AsyncSearchSubmit} params - Params to search
+ *
+ * @returns The search result
+ */
+async function elasticAsyncSearch(params) {
+  const request = await elastic.asyncSearch.submit(params);
+
+  const { id } = request.body;
+  let { response } = request.body;
+
+  let done = !id;
+  while (!done) {
+    // eslint-disable-next-line no-await-in-loop
+    await setTimeout(500);
+
+    // eslint-disable-next-line no-await-in-loop
+    const status = await elastic.asyncSearch.get({ id });
+
+    done = !status.is_running;
+    if (done) {
+      ({ response } = status.body);
+    }
+  }
+
+  return response;
+}
+
+/**
  * Fetch stats of Repositories in ElasticSearch cluster
  *
  * @returns {Promise<Record<string, unknown>>} The resolved stats
@@ -152,10 +183,6 @@ async function fetchESRepositoriesStats() {
       (repo) => repo.type,
     );
 
-    const m = elastic.helpers.msearch({
-      operations: Object.keys(reposPerType).length,
-    });
-
     const entries = await Promise.all(
       Object.entries(reposPerType)
         .map(async ([type, repos]) => {
@@ -167,10 +194,20 @@ async function fetchESRepositoriesStats() {
           }
 
           // Query ES
-          const { body: { aggregations: result } } = await m.search(
-            { index: indices, ignore_unavailable: true },
-            { size: 0, aggs },
-          );
+          const { aggregations: result, hits } = await elasticAsyncSearch({
+            index: '_all',
+            keep_alive: '1h',
+            ignore_unavailable: true,
+            body: {
+              aggs,
+              // We don't need documents
+              size: 0,
+              // Avoid cardinality on every document if not needed
+              track_total_hits: !aggs.events,
+              // Using filter to select indices to avoid length issues
+              query: { bool: { filter: [{ terms: { _index: indices } }] } },
+            },
+          });
 
           if (!result) {
             return [type, undefined];
@@ -187,13 +224,13 @@ async function fetchESRepositoriesStats() {
 
           return [type, {
             count: repos.length,
-            events: result.events?.value ?? undefined,
+            events: result.events?.value ?? hits?.total?.value ?? undefined,
             titles: result.titles?.value ?? undefined,
             platforms: result.platforms?.value ?? undefined,
             date,
           }];
         }),
-    ).finally(() => m.stop());
+    );
 
     return Object.fromEntries(entries);
   } catch (err) {

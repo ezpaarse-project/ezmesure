@@ -79,7 +79,7 @@ async function refreshForm() {
     roleData.value = await $fetch(`/api/roles/${roleId.value}`);
   } catch (err) {
     errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
-    errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
+    errorIcon.value = err?.statusCode === 404 ? '$mdi-file-hidden' : '$mdi-alert-circle';
   }
 
   loading.value = false;

@@ -5,6 +5,7 @@ import {
   useI18n,
   useSnacksStore,
   useLocalStorage,
+  toValue,
 } from '#imports';
 
 /**
@@ -30,7 +31,7 @@ import {
 /**
  * @param {Params} params Params to setup pagination, not reactive.
  */
-export default async function useServerSidePagination(params = {}) {
+export default function useServerSidePagination(params = {}) {
   if (!params?.fetch?.url) {
     throw new Error('Please provide a URL to fetch');
   }
@@ -62,6 +63,17 @@ export default async function useServerSidePagination(params = {}) {
     ...params.data,
   });
 
+  const defaultSearchData = {
+    page: query.value.page,
+    search: query.value.search,
+    sortBy: query.value.sortBy,
+  };
+
+  const resetSearch = () => {
+    itemLength.value = { total: 0, current: 0 };
+    query.value = { ...query.value, ...defaultSearchData };
+  };
+
   /**
    * Fetch data
    */
@@ -92,12 +104,12 @@ export default async function useServerSidePagination(params = {}) {
           sort,
         };
 
-        const res = await $fetch.raw(url, fetchOpts);
+        const res = await $fetch.raw(toValue(url), fetchOpts);
 
         // Update item length
         itemLength.value.current = Number.parseInt(res.headers.get('x-total-count'), 10) || 0;
 
-        if (!itemLength.value.total) {
+        if (!itemLength.value.total || !query.value.search) {
           itemLength.value.total = itemLength.value.current;
         }
 
@@ -167,6 +179,7 @@ export default async function useServerSidePagination(params = {}) {
     itemsPerPage,
     itemsPerPageOptions,
     query,
+    resetSearch,
     vPaginationOptions,
     vDataTableOptions,
   };

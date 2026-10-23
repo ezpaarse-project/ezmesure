@@ -19,7 +19,7 @@
         </a>
 
         <v-icon
-          icon="mdi-open-in-new"
+          icon="$mdi-open-in-new"
           size="small"
           color="secondary"
           end
@@ -66,7 +66,7 @@ const props = defineProps({
 });
 
 const { t, locale } = useI18n();
-const { public: { counterRegistryUrl } } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 
 function formatDate(date) {
   return dateFormat(date, locale.value, 'PPPpp');
@@ -89,6 +89,6 @@ const registryUrl = computed(() => {
     return undefined;
   }
 
-  return URL.parse(`/platform/${props.modelValue.registryId}`, counterRegistryUrl);
+  return URL.parse(`/platform/${props.modelValue.registryId}`, apiConfig.value.counter.registryUrl);
 });
 </script>

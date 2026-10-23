@@ -1,4 +1,4 @@
-FROM node:24.4.1-alpine3.22 AS base
+FROM node:24.22.1-alpine3.24 AS base
 
 WORKDIR /app
 
@@ -24,6 +24,7 @@ RUN NODE_ENV=production npm ci --omit=dev
 
 FROM base
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
+LABEL org.opencontainers.image.source="https://github.com/ezpaarse-project/ezmesure"
 
 WORKDIR /usr/src/app
 
@@ -33,4 +34,4 @@ COPY --chown=node:node --from=dependencies /app/node_modules ./node_modules
 
 EXPOSE 3000
 
-ENTRYPOINT ["npm", "start"]
+CMD ["npm", "start"]

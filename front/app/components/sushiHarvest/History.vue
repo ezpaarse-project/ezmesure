@@ -2,7 +2,7 @@
   <v-card
     :title="$t('tasks.history')"
     :loading="status === 'pending' && 'primary'"
-    prepend-icon="mdi-history"
+    prepend-icon="$mdi-history"
   >
     <template v-if="showSushi" #subtitle>
       <SushiSubtitle :model-value="sushi" />
@@ -12,7 +12,7 @@
       <v-btn
         :text="$t('refresh')"
         :loading="status === 'pending'"
-        prepend-icon="mdi-reload"
+        prepend-icon="$mdi-reload"
         variant="tonal"
         color="primary"
         class="mr-2"
@@ -45,6 +45,7 @@
             variant="flat"
             size="small"
             label
+            class="text-black"
           />
         </template>
 
@@ -88,12 +89,12 @@ const {
   status,
   data: tasks,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/tasks',
     query: {
       credentialsId: props.sushi.id,
-      include: ['steps', 'logs', 'session'],
+      include: ['session'],
     },
   },
   data: {

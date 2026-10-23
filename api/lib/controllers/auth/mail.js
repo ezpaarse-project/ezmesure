@@ -7,9 +7,9 @@ const { sendMail, generateMail } = require('../../services/mail');
  *
  * @returns {Promise<void>}
  */
-exports.sendWelcomeMail = function sendWelcomeMail(user) {
+exports.sendWelcomeMail = async function sendWelcomeMail(user) {
   return sendMail({
     to: user.email,
-    ...generateMail('welcome', { user }, { locale: user.language }),
+    ...await generateMail('welcome', { user }, { locale: user.language }),
   });
 };

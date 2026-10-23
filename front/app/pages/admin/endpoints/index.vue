@@ -15,7 +15,7 @@
       <v-btn
         v-if="endpointFormDialogRef"
         v-tooltip="$t('add')"
-        icon="mdi-plus"
+        icon="$mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
@@ -27,23 +27,20 @@
     <v-data-table-server
       v-model="selectedEndpoints"
       :headers="headers"
+      :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
       show-select
       show-expand
       return-object
       v-bind="vDataTableOptions"
     >
-      <template #[`item.tags`]="{ value }">
-        <v-chip
-          v-for="(tag, index) in value"
-          :key="index"
-          variant="outlined"
-          color="primary"
-          size="small"
-          label
-          class="ml-1"
-        >
-          {{ tag }}
-        </v-chip>
+      <template #[`item.vendor`]="{ item }">
+        <div>
+          {{ item.vendor }}
+
+          <SushiEndpointStatusChip :model-value="item" size="small" class="ml-2" />
+        </div>
+
+        <SushiEndpointTagsChip :model-value="item" size="small" />
       </template>
 
       <template #[`item.disabledUntil`]="{ item }">
@@ -80,7 +77,7 @@
         <v-menu>
           <template #activator="{ props: menu }">
             <v-btn
-              icon="mdi-cog"
+              icon="$mdi-cog"
               variant="plain"
               density="compact"
               v-bind="menu"
@@ -91,18 +88,18 @@
             <v-list-item
               v-if="endpointFormDialogRef"
               :title="$t('modify')"
-              prepend-icon="mdi-pencil"
+              prepend-icon="$mdi-pencil"
               @click="endpointFormDialogRef.open(item)"
             />
             <v-list-item
               v-if="endpointFormDialogRef"
               :title="$t('duplicate')"
-              prepend-icon="mdi-content-copy"
+              prepend-icon="$mdi-content-copy"
               @click="endpointFormDialogRef.open({ ...item, id: null })"
             />
             <v-list-item
               :title="$t('delete')"
-              prepend-icon="mdi-delete"
+              prepend-icon="$mdi-delete"
               @click="deleteEndpoints([item])"
             />
 
@@ -112,7 +109,7 @@
               v-if="item.registryId"
               :title="$t('endpoints.goToRegistry')"
               :href="generateRegistryURL(item).href"
-              prepend-icon="mdi-open-in-new"
+              prepend-icon="$mdi-open-in-new"
               target="_blank"
               rel="noopener noreferrer"
             />
@@ -120,7 +117,7 @@
             <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
-              prepend-icon="mdi-identifier"
+              prepend-icon="$mdi-identifier"
               @click="copyEndpointId(item)"
             />
           </v-list>
@@ -143,7 +140,7 @@
       <template #actions>
         <v-list-item
           :title="$t('delete')"
-          prepend-icon="mdi-delete"
+          prepend-icon="$mdi-delete"
           @click="deleteEndpoints()"
         />
 
@@ -151,7 +148,7 @@
 
         <v-list-item
           :title="$t('institutions.sushi.activeSwitch')"
-          prepend-icon="mdi-toggle-switch"
+          prepend-icon="$mdi-toggle-switch"
           @click="toggleActiveStates()"
         />
       </template>
@@ -165,13 +162,8 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'admin',
-  middleware: ['require-auth', 'require-terms', 'require-admin'],
-});
-
 const { t, locale } = useI18n();
-const { public: { counterRegistryUrl } } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
 const snacks = useSnacksStore();
@@ -186,7 +178,7 @@ const {
   itemLength,
   query,
   vDataTableOptions,
-} = await useServerSidePagination({
+} = useServerSidePagination({
   fetch: {
     url: '/api/sushi-endpoints',
     query: {
@@ -215,12 +207,6 @@ const headers = computed(() => [
   {
     title: t('endpoints.vendor'),
     value: 'vendor',
-    sortable: true,
-  },
-  {
-    title: t('endpoints.tags'),
-    value: 'tags',
-    align: 'center',
     sortable: true,
   },
   {
@@ -272,7 +258,7 @@ const debouncedRefresh = useDebounceFn(refresh, 250);
 /**
  * Generate COUNTER registry URL
  */
-const generateRegistryURL = (item) => URL.parse(`/platform/${item.registryId}`, counterRegistryUrl);
+const generateRegistryURL = (item) => URL.parse(`/platform/${item.registryId}`, apiConfig.value.counter.generateRegistryURL);
 
 /**
  * Toggle active states for selected endpoints
@@ -331,7 +317,7 @@ function deleteEndpoints(items) {
       toDelete.length,
     ),
     agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+    agreeIcon: '$mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
         toDelete.map(

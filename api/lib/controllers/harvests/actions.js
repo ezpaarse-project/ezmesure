@@ -1,5 +1,7 @@
 const { createHash } = require('node:crypto');
 
+const config = require('config');
+
 const InMemoryQueue = require('../../utils/memory-queue');
 const { createCache } = require('../../utils/cache-manager');
 
@@ -27,8 +29,8 @@ exports.standardQueryParams = standardQueryParams;
 
 exports.getHarvests = async (ctx) => {
   const {
-    'period:from': from,
-    'period:to': to,
+    'period[gte]': from,
+    'period[lte]': to,
     endpointId,
     institutionId,
     tags,
@@ -88,8 +90,8 @@ exports.deleteHarvestsByQuery = async (ctx) => {
   ctx.body = { deleted };
 };
 
-const MATRIX_CACHE_DURATION = 5 * 60 * 1000;
-const matrixCache = createCache(MATRIX_CACHE_DURATION);
+const matrixCacheDuration = config.get('cache.duration.harvestMatrix');
+const matrixCache = createCache(matrixCacheDuration);
 
 const institutionsMatrixQueue = new InMemoryQueue(
   /**
@@ -107,8 +109,8 @@ const institutionsMatrixQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][institutions][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
@@ -156,9 +158,9 @@ const institutionsMatrixQueue = new InMemoryQueue(
       });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${matrixCacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + matrixCacheDuration);
       data.unharvested = unharvested;
       data.matrix = {
         ...matrix,
@@ -192,8 +194,8 @@ const endpointsMatrixQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
@@ -220,9 +222,9 @@ const endpointsMatrixQueue = new InMemoryQueue(
       const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${MATRIX_CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${matrixCacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + MATRIX_CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + matrixCacheDuration);
       data.matrix = {
         ...matrix,
         headers: {

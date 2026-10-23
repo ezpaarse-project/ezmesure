@@ -31,12 +31,13 @@
           density="comfortable"
           variant="flat"
           label
+          class="text-black"
         />
 
         <v-btn
           v-if="user?.isAdmin"
           v-tooltip:top="$t('tasks.history')"
-          icon="mdi-history"
+          icon="$mdi-history"
           color="primary"
           variant="text"
           density="comfortable"
@@ -72,7 +73,7 @@
 
         <v-row v-if="(modelValue.sushiExceptions?.length ?? 0) > 0">
           <v-col>
-            <p class="text-subtitle-2">
+            <p class="text-title-small">
               {{ $t('sushi.messagesFromEndpoint') }}
             </p>
 
@@ -142,7 +143,7 @@ async function openTaskHistoryFromHarvest() {
   try {
     task.value = await $fetch(`/api/tasks/${props.modelValue.harvestedById}`, {
       params: {
-        include: ['steps', 'logs', 'session'],
+        include: ['session'],
       },
     });
 

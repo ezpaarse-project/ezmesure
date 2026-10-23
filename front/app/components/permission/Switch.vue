@@ -37,9 +37,9 @@
 
 <script setup>
 const LEVEL_ICONS = {
-  none: 'mdi-eye-off',
-  read: 'mdi-book',
-  write: 'mdi-book-edit',
+  none: '$mdi-eye-off',
+  read: '$mdi-book',
+  write: '$mdi-book-edit',
 };
 
 const props = defineProps({

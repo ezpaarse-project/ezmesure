@@ -16,9 +16,9 @@
 {% if spaceURL %}{{ spaceURL }}{% endif %}
 
 {% if REPLY_TO %}
-{{ t('emails.harvestEnd.body.p4.withoutAddress') }}
-{% else %}
 {{ t('emails.harvestEnd.body.p4.withAddress', { replyTo: REPLY_TO }) | striptags }}
+{% else %}
+{{ t('emails.harvestEnd.body.p4.withoutAddress') }}
 {% endif %}
 
 {{ t('emails.harvestEnd.body.p5', { credentialsURL: credentialsURL }) | striptags }}

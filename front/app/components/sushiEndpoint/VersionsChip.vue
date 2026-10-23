@@ -7,9 +7,9 @@
     :color="counterVersionsColors.get(version) || 'secondary'"
     :size="size"
     :density="density"
-    :class="[end ? 'ml-2' : 'mr-2']"
     variant="flat"
     label
+    :class="[end ? 'ml-2' : 'mr-2', 'text-black']"
   />
 </template>
 

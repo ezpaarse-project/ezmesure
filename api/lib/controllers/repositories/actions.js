@@ -70,28 +70,19 @@ exports.createOne = async (ctx) => {
 
   let repository;
 
-  const configUpsert = {
-    create: {
-      ...body,
-      institutionId: undefined,
-    },
-    update: {
-      institutionId: undefined,
-    },
+  const data = {
+    ...body,
+    institutionId: undefined,
   };
 
   if (body?.institutionId) {
-    configUpsert.create.institutions = { connect: { id: body?.institutionId } };
-    configUpsert.update.institutions = { connect: { id: body?.institutionId } };
+    data.institutions = { connect: { id: body?.institutionId } };
   }
 
   const repositoriesService = new RepositoriesService();
 
   try {
-    repository = await repositoriesService.upsert({
-      where: { pattern: body.pattern },
-      ...configUpsert,
-    });
+    repository = await repositoriesService.create({ data });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       switch (e?.code) {

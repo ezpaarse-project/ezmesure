@@ -23,7 +23,7 @@ const content = computed(() => {
     return {
       text: t('deleted'),
       tooltip: t('deletedSince', { date: dateFormat(props.modelValue.deletedAt, locale.value) }),
-      icon: 'mdi-delete',
+      icon: '$mdi-delete',
       color: 'red',
     };
   }
@@ -32,7 +32,7 @@ const content = computed(() => {
     return {
       text: t('archived'),
       tooltip: t('archivedSince', { date: dateFormat(props.modelValue.archivedUpdatedAt, locale.value) }),
-      icon: 'mdi-archive',
+      icon: '$mdi-archive',
       color: 'blue',
     };
   }
@@ -41,14 +41,14 @@ const content = computed(() => {
     return {
       text: t('inactive'),
       tooltip: t('endpoints.inactiveSince', { date: dateFormat(props.modelValue.activeUpdatedAt, locale.value) }),
-      icon: 'mdi-close',
+      icon: '$mdi-close',
     };
   }
 
   return {
     text: t('active'),
     tooltip: t('endpoints.activeSince', { date: dateFormat(props.modelValue.activeUpdatedAt, locale.value) }),
-    icon: 'mdi-check',
+    icon: '$mdi-check',
     color: 'green',
   };
 });

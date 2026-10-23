@@ -7,14 +7,13 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 import repositoriesPrisma from '../../../lib/services/prisma/repositories';
 
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[repositories]: Test create features', () => {
   const userTest = {
@@ -44,7 +43,7 @@ describe('[repositories]: Test create features', () => {
     beforeAll(async () => {
       await resetDatabase();
       await resetElastic();
-      adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+      adminToken = await signJWT({ username: adminUsername });
     });
 
     describe(`Create new repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
@@ -157,7 +156,7 @@ describe('[repositories]: Test create features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
+      userToken = await signJWT({ username: userTest.username });
     });
 
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {

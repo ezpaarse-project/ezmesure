@@ -5,6 +5,12 @@ exports.getConfig = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = pick(config, [
+    'instanceName',
+    'homepage.features',
+    'homepage.logos',
+    'counter.registryUrl',
+    'counter.defaultHarvestedReports',
+    'auth.profileUri',
     'users.deleteDurationDays',
     'users.impersonateDuration',
   ]);

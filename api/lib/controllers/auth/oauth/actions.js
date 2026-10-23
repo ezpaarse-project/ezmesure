@@ -11,13 +11,13 @@ const { createCache } = require('../../../utils/cache-manager');
 
 const { cookie } = config.get('auth');
 
-const loginStateCache = createCache(3600 * 1000);
+const loginStateCache = createCache(config.get('cache.duration.loginState'));
 
 const logoutFromKibana = async (ctx) => {
   try {
     await logoutUser(ctx.cookies.get(AUTH_COOKIE.name));
   } catch (err) {
-    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user.username}: ${err}`);
+    appLogger.warn(`Failed to logout from kibana for ${ctx.state.user?.username ?? 'unknown'}: ${err}`);
   }
 
   // Reset cookie on client side

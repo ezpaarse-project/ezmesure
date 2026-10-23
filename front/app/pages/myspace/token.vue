@@ -19,7 +19,7 @@
             :label="$t('token.token')"
             :model-value="token"
             :type="showToken ? 'text' : 'password'"
-            :append-inner-icon="showToken ? 'mdi-eye-off' : 'mdi-eye'"
+            :append-inner-icon="showToken ? '$mdi-eye-off' : '$mdi-eye'"
             variant="outlined"
             hide-details
             readonly
@@ -28,7 +28,7 @@
             <template v-if="clipboard" #append>
               <v-btn variant="text" @click="copyTokenToClipboard">
                 <v-icon left>
-                  mdi-clipboard-text
+                  $mdi-clipboard-text
                 </v-icon>
                 {{ $t('copy') }}
               </v-btn>
@@ -41,11 +41,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  layout: 'space',
-  middleware: ['require-auth', 'require-terms'],
-});
-
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();

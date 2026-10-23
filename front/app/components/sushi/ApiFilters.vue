@@ -5,18 +5,18 @@
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-key" end />
+        <v-icon icon="$mdi-key" end />
       </template>
 
       <template #append>
         <v-btn
           v-tooltip="$t('reset')"
-          icon="mdi-filter-off"
+          icon="$mdi-filter-off"
           @click="clearFilters"
         />
 
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           @click="$emit('update:show', false)"
         />
       </template>
@@ -35,15 +35,15 @@
             chips
             closable-chips
             multiple
-            prepend-icon="mdi-api"
+            prepend-icon="$mdi-api"
             clearable
           />
         </v-col>
 
         <v-col v-if="institution" cols="12">
           <ApiFiltersSelect
-            v-model="filters.packages"
-            v-model:loose="filters['packages:loose']"
+            v-model="packages"
+            v-model:mode="packagesMode"
             :items="availablePackages"
             :label="$t('institutions.sushi.packages')"
             :loading="loadingPackages && 'primary'"
@@ -51,7 +51,7 @@
             chips
             closable-chips
             multiple
-            prepend-icon="mdi-tag"
+            prepend-icon="$mdi-tag"
           />
         </v-col>
 
@@ -60,7 +60,7 @@
             v-model="filters.connection"
             :label="$t('status')"
             :items="statuses"
-            prepend-icon="mdi-connection"
+            prepend-icon="$mdi-connection"
           />
         </v-col>
 
@@ -68,7 +68,7 @@
           <ApiFiltersButtonsGroup
             v-model="filters.active"
             :label="$t('endpoints.active')"
-            prepend-icon="mdi-toggle-switch"
+            prepend-icon="$mdi-toggle-switch"
           />
         </v-col>
 
@@ -76,7 +76,7 @@
           <ApiFiltersButtonsGroup
             v-model="filters.archived"
             :label="$t('archived')"
-            prepend-icon="mdi-archive"
+            prepend-icon="$mdi-archive"
           />
         </v-col>
       </v-row>
@@ -108,7 +108,10 @@ const {
   emptySymbol,
   filters,
   resetFilters,
+  defineArrayFilter,
 } = useFilters(() => props.modelValue, emit);
+
+const { state: packages, modifier: packagesMode } = defineArrayFilter('packages');
 
 const loadingEndpoints = shallowRef(false);
 const loadingPackages = shallowRef(false);
@@ -155,7 +158,7 @@ const availablePackages = computedAsync(
     onCancel(() => abortController.abort());
 
     try {
-      const items = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+      const data = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
         signal: abortController.signal,
         query: {
           size: 0,
@@ -164,9 +167,9 @@ const availablePackages = computedAsync(
       });
 
       // Merge all packages in one array them make unique
-      const packages = new Set(items.flatMap((item) => item.packages ?? []));
+      const items = new Set(data.flatMap((item) => item.packages ?? []));
 
-      return Array.from(packages)
+      return Array.from(items)
         .sort((a, b) => a.localeCompare(b, locale.value, { sensitivity: 'base' }));
     } catch (err) {
       snacks.error(t('anErrorOccurred'), err);

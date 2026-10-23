@@ -36,9 +36,11 @@ router.route({
     query: standardQueryParams.manyValidation.append({
       source: Joi.string().trim(),
       roles: stringOrArrayValidation,
-      'roles:loose': Joi.boolean().default(false),
+      'roles[every]': stringOrArrayValidation,
+      'roles[some]': stringOrArrayValidation,
       permissions: stringOrArrayValidation,
-      'permissions:loose': Joi.boolean().default(false),
+      'permissions[every]': stringOrArrayValidation,
+      'permissions[some]': stringOrArrayValidation,
     }),
   },
 });

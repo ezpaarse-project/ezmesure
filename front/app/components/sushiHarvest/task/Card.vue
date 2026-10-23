@@ -5,7 +5,7 @@
         <DetailsField
           :label="$t('harvest.jobs.startedAt')"
           :value="modelValue.startedAt"
-          prepend-icon="mdi-timer-play-outline"
+          prepend-icon="$mdi-timer-play-outline"
         >
           <LocalDate v-if="modelValue.startedAt" :model-value="modelValue.startedAt" format="PPPpp" />
         </DetailsField>
@@ -13,7 +13,7 @@
         <DetailsField
           :label="$t('harvest.jobs.updatedAt')"
           :value="modelValue.updatedAt"
-          prepend-icon="mdi-update"
+          prepend-icon="$mdi-update"
         >
           <LocalDate v-if="modelValue.updatedAt" :model-value="modelValue.updatedAt" format="PPPpp" />
         </DetailsField>
@@ -23,7 +23,7 @@
         <DetailsField
           :label="$t('harvest.jobs.index')"
           :value="modelValue.index"
-          prepend-icon="mdi-database-outline"
+          prepend-icon="$mdi-database-outline"
         >
           <code>{{ modelValue.index }}</code>
         </DetailsField>
@@ -33,7 +33,7 @@
         <DetailsField
           v-if="modelValue.runningTime > 0"
           :label="$t('harvest.jobs.runningTime')"
-          prepend-icon="mdi-timer-outline"
+          prepend-icon="$mdi-timer-outline"
         >
           <v-chip
             :text="runningTime"
@@ -47,7 +47,7 @@
         <DetailsField
           v-if="modelValue.result"
           :label="$t('harvest.jobs.coveredPeriods')"
-          prepend-icon="mdi-calendar-blank"
+          prepend-icon="$mdi-calendar-blank"
         >
           <v-chip
             v-for="month in modelValue.result.coveredPeriods"
@@ -69,7 +69,7 @@
             <v-chip
               v-tooltip:top="$t('harvest.jobs.inserted')"
               :text="`${result.inserted}`"
-              prepend-icon="mdi-file-download"
+              prepend-icon="$mdi-file-download"
               color="success"
               variant="outlined"
             />
@@ -78,7 +78,7 @@
             <v-chip
               v-tooltip:top="$t('harvest.jobs.updated')"
               :text="`${result.updated}`"
-              prepend-icon="mdi-file-replace"
+              prepend-icon="$mdi-file-replace"
               color="info"
               variant="outlined"
             />
@@ -87,7 +87,7 @@
             <v-chip
               v-tooltip:top="$t('harvest.jobs.failed')"
               :text="`${result.failed}`"
-              prepend-icon="mdi-file-alert"
+              prepend-icon="$mdi-file-alert"
               color="error"
               variant="outlined"
             />
@@ -96,7 +96,7 @@
           <v-col v-if="result.total <= 0" cols="12">
             <v-empty-state
               :title="$t('harvest.jobs.noData')"
-              icon="mdi-file-hidden"
+              icon="$mdi-file-hidden"
               size="x-large"
             />
           </v-col>

@@ -7,15 +7,13 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import indicesPrisma from '../../../lib/services/elastic/indices';
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
 
-import UsersService from '../../../lib/entities/users.service';
-
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[indices]: Test delete features', () => {
   const userTest = {
@@ -31,7 +29,7 @@ describe('[indices]: Test delete features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+    adminToken = await signJWT({ username: adminUsername });
   });
   describe('As admin', () => {
     beforeEach(async () => {
@@ -60,7 +58,7 @@ describe('[indices]: Test delete features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
+      userToken = await signJWT({ username: userTest.username });
     });
     beforeEach(async () => {
       await indicesPrisma.create(indexName, null, { ignore: [404] });

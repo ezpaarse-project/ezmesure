@@ -157,7 +157,7 @@ async function sendNotifications(logger = appLogger) {
       try {
         await sendMail({
           to: admin.email,
-          ...generateMail(
+          ...await generateMail(
             'recent-activity',
             {
               noActions: actions.length === 0,

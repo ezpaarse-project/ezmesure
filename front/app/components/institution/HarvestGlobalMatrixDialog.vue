@@ -7,12 +7,12 @@
       :title="cardTitle"
       :subtitle="institution.name"
       :loading="status === 'pending' && 'primary'"
-      prepend-icon="mdi-table-headers-eye"
+      prepend-icon="$mdi-table-headers-eye"
       max-height="100vh"
     >
       <template #append>
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           variant="text"
           @click="isOpen = falase"
         />
@@ -69,7 +69,7 @@
                           <v-icon
                             v-if="row.header.tooltip"
                             v-tooltip:top="row.header.tooltip"
-                            icon="mdi-information-outline"
+                            icon="$mdi-information-outline"
                             size="x-small"
                             color="info"
                             end
@@ -138,8 +138,8 @@ const {
 } = useFetch(`/api/institutions/${props.institution.id}/sushi/_matrix`, {
   params: {
     retryCode: 425,
-    'period:from': computed(() => period.value.beginDate),
-    'period:to': computed(() => period.value.endDate),
+    'period[gte]': computed(() => period.value.beginDate),
+    'period[lte]': computed(() => period.value.endDate),
   },
 
   // Try for 1 minute

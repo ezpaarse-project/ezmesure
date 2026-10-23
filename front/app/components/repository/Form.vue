@@ -2,7 +2,7 @@
   <v-card
     :loading="loading && 'primary'"
     :title="$t('repositories.newRepository')"
-    prepend-icon="mdi-database-plus"
+    prepend-icon="$mdi-database-plus"
   >
     <template #text>
       <v-row>
@@ -30,7 +30,7 @@
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9*_-]+$/i.test(v) || $t('invalidFormat'),
                   ]"
-                  prepend-icon="mdi-form-textbox"
+                  prepend-icon="$mdi-form-textbox"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -45,7 +45,7 @@
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
                   ]"
-                  prepend-icon="mdi-tag"
+                  prepend-icon="$mdi-tag"
                   variant="underlined"
                   hide-details="auto"
                   required
@@ -70,7 +70,7 @@
 
       <v-btn
         :text="repository.exist && institution ? $t('add') : $t('create')"
-        :prepend-icon="repository.exist && institution ? 'mdi-plus' : 'mdi-content-save'"
+        :prepend-icon="repository.exist && institution ? '$mdi-plus' : '$mdi-content-save'"
         :disabled="!valid"
         :loading="loading"
         type="submit"

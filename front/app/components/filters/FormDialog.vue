@@ -24,7 +24,7 @@
 
         <v-btn
           :text="$t('save')"
-          prepend-icon="mdi-content-save"
+          prepend-icon="$mdi-content-save"
           variant="elevated"
           color="primary"
           @click="onSave()"

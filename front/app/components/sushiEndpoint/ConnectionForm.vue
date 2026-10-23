@@ -2,7 +2,7 @@
   <v-card
     :title="$t('endpoints.checkEndpoint')"
     :loading="loading && 'primary'"
-    prepend-icon="mdi-connection"
+    prepend-icon="$mdi-connection"
   >
     <template #append>
       <slot name="append" />
@@ -28,7 +28,7 @@
               :required="authFields.customerId.required"
               :rules="authFields.customerId.rules"
               :persistent-hint="authFields.customerId.required"
-              prepend-icon="mdi-account"
+              prepend-icon="$mdi-account"
               variant="underlined"
               hide-details="auto"
               @update:model-value="connection = undefined"
@@ -42,7 +42,7 @@
               :required="authFields.requestorId.required"
               :rules="authFields.requestorId.rules"
               :persistent-hint="authFields.requestorId.required"
-              prepend-icon="mdi-account-arrow-down"
+              prepend-icon="$mdi-account-arrow-down"
               variant="underlined"
               hide-details="auto"
               @update:model-value="connection = undefined"
@@ -56,7 +56,7 @@
               :required="authFields.apiKey.required"
               :rules="authFields.apiKey.rules"
               :persistent-hint="authFields.apiKey.required"
-              prepend-icon="mdi-key-variant"
+              prepend-icon="$mdi-key-variant"
               variant="underlined"
               hide-details="auto"
               @update:model-value="connection = undefined"

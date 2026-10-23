@@ -5,18 +5,18 @@
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-account-search" end />
+        <v-icon icon="$mdi-account-search" end />
       </template>
 
       <template #append>
         <v-btn
           v-tooltip="$t('reset')"
-          icon="mdi-filter-off"
+          icon="$mdi-filter-off"
           @click="clearFilters"
         />
 
         <v-btn
-          icon="mdi-close"
+          icon="$mdi-close"
           @click="$emit('update:show', false)"
         />
       </template>
@@ -28,26 +28,26 @@
           <ApiFiltersButtonsGroup
             v-model="filters.isAdmin"
             :label="$t('users.user.isAdmin')"
-            prepend-icon="mdi-security"
+            prepend-icon="$mdi-security"
           />
         </v-col>
 
         <v-col cols="12" sm="6">
           <ApiFiltersButtonsGroup
-            v-model="deletedFilter"
+            v-model="isDeleted"
             :label="$t('users.user.deletedAt')"
-            prepend-icon="mdi-delete"
+            prepend-icon="$mdi-delete"
           />
         </v-col>
 
         <v-col cols="12">
           <ApiFiltersSelect
-            v-model="filters.permissions"
-            v-model:loose="filters['permissions:loose']"
+            v-model="permissions"
+            v-model:mode="permsMode"
             :empty-symbol="emptySymbol"
             :items="permissionsItems"
             :label="$t('users.user.permissions')"
-            prepend-icon="mdi-key"
+            prepend-icon="$mdi-key"
             chips
             closable-chips
             multiple
@@ -56,15 +56,15 @@
 
         <v-col cols="12">
           <ApiFiltersSelect
-            v-model="filters.roles"
-            v-model:loose="filters['roles:loose']"
+            v-model="roles"
+            v-model:mode="rolesMode"
             :empty-symbol="emptySymbol"
             :items="roleItems"
             :label="$t('users.user.roles')"
             :loading="loadingRoles"
             item-title="label"
             item-value="id"
-            prepend-icon="mdi-tag"
+            prepend-icon="$mdi-tag"
             chips
             closable-chips
             multiple
@@ -76,8 +76,6 @@
 </template>
 
 <script setup>
-import { format, startOfDay } from 'date-fns';
-
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -96,7 +94,36 @@ const {
   emptySymbol,
   filters,
   resetFilters,
+  defineArrayFilter,
+  defineDateFilter,
 } = useFilters(() => props.modelValue, emit);
+
+const { state: permissions, modifier: permsMode } = defineArrayFilter('permissions');
+const { state: roles, modifier: rolesMode } = defineArrayFilter('roles');
+
+// Transform deletedAt filter into a boolean
+const { state: deletedAt, modifier: deletedAtMode } = defineDateFilter('deletedAt');
+const isDeleted = computed({
+  get: () => {
+    if (deletedAt.value === '') {
+      return false;
+    }
+
+    return deletedAt.value ? true : undefined;
+  },
+  set: (value) => {
+    deletedAtMode.value = 'gte';
+    if (value === true) {
+      deletedAt.value = new Date(0);
+      return;
+    }
+    if (value === false) {
+      deletedAt.value = emptySymbol;
+      return;
+    }
+    deletedAt.value = undefined;
+  },
+});
 
 const {
   data: roleItems,
@@ -122,26 +149,6 @@ const permissionsItems = computed(() => {
       },
     }),
   ));
-});
-
-const deletedFilter = computed({
-  get: () => {
-    if (filters['deletedAt:from'] === '') {
-      return false;
-    }
-
-    return filters['deletedAt:from'] ? true : undefined;
-  },
-  set: (value) => {
-    if (value === true) {
-      const date = startOfDay(new Date());
-      filters['deletedAt:from'] = format(date, 'yyyy-MM-dd');
-      return;
-    }
-
-    // filters resolves `emptySymbol` as `""` but resolves `""` as `undefined`
-    filters['deletedAt:from'] = value === false ? emptySymbol : undefined;
-  },
 });
 
 function clearFilters() {

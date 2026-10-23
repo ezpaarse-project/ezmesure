@@ -38,6 +38,10 @@ menu:
     shares: Shares
     sushiEndpoints: COUNTER endpoints
     customFields: Custom fields
+    dashboards:
+      title: Dashboards
+      templates: Templates
+      collections: Collections
     harvest:
       title: Harvest
       entries:
@@ -161,6 +165,8 @@ myspace:
         user: Notifications related to a user
         app: Notifications from application
       types:
+        institution:created:
+          admin: A new institution has been created
         institution:validated:
           user: One of your institutions has been validated
           admin: One institution has been validated
@@ -396,7 +402,12 @@ endpoints:
   searchRegistryDataHint: Search for a platform by name
   registryId: Platform ID in the COUNTER registry
   registryIdHint: You can directly paste the URL of the COUNTER registry
+  registryIdNoDescription: This endpoint is not in the COUNTER registry
+  compliant: COUNTER compliant
+  compliantDescription: This endpoint has been audited and harvests are mostly successful
+  compliantHint: Meaning that endpoint has been audited and harvests are successful
   registryUrl: Link to the COUNTER registry
+  inRegistry: Present in the COUNTER registry
   goToRegistry: COUNTER registry
 institutions:
   toolbarTitle: Institutions ({count})
@@ -907,6 +918,7 @@ sushi:
       institutionIsNotReady: Your entry is not complete
       institutionHasNoCredentials: No COUNTER credentials has been declared
       institutionHasFaultyCredentials: Some of your credentials have not been tested or are invalid
+      institutionIsHarvested: Institution is already harvested for the period
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
@@ -1228,8 +1240,8 @@ spaces:
     Manage spaces
     |Manage {count} spaces
   deleteNbSpaces: >
-    Vous allez supprimer 1 espace.
-    |Vous allez supprimer {count} espaces.
+    You are about to delete 1 space.
+    |You are about to delete {count} spaces.
   xSpaces: >
     1 space
     |{count} spaces
@@ -1244,9 +1256,17 @@ spaces:
   descriptions:
     ezpaarse: ezPAARSE space
     counter5: Publisher space
+  search:
+    empty: There is no space matching your search
   deleteSpace: You are about to delete "{spaceName}", which will delete the dashboards included in this space. This action cannot be undone.
   filters:
     title: Filter spaces
+  collections: Collections
+  collectionsDialog:
+    empty:
+      title: No collections
+      text: No dashboard collection has been assigned to this space yet
+      action: Add a collection
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
@@ -1316,6 +1336,11 @@ harvest:
         title: Harvest settings
         sendEndMail: A mail will be sent on harvest end
         timeout: Completion time of tasks
+        description:
+          template: Session of the {date} to harvest {period} on {endpoints} for {institutions}
+          allEndpoints: every endpoints
+          allInstitutions: every institutions
+          more: '{prefix} and 1 other|{prefix} and {n} others'
     unableToRetrive: Unable to retrieve harvests
     start: Start the session
     stop: Stop the session
@@ -1458,6 +1483,75 @@ admin:
     title: Application logs
     connecting: Connecting...
     connectionError: Connection error
+    actions:
+      level:
+        title: Modify logging level
+        buttonText: Logging level
+        level: Level
+        duration: Duration
+        durationHint: Once the period expires, the default level will be restored
+dashboardCollections:
+  toolbarTitle: Dashboard collections ({count})
+  pageDesc: Here you can create the dashboard collections that you want to be able to add into the spaces.
+  updateCollection: Update the collection
+  newCollection: New collection
+  repositorySelection: Repository selection
+  noRepositories: No repository available
+  addADashboard: Add a dashboard
+  addToASpace: Add to a space
+  manageCollections: >
+    Manage the collection
+    |Manage {count} collections
+  search:
+    empty: There is no collection matching your search
+  dashboardsDialog:
+    empty:
+      title: No dashboards
+      text: No dashboard has been added to this collection yet
+      action: Add a dashboard
+  spacesDialog:
+    empty:
+      title: No spaces
+      text: There are no spaces containing this collection yet
+      action: Add to a space
+  actions:
+    delete:
+      title: Delete 1 collection ?|Delete {count} collections ?
+      text: The associated templates will also be deleted.
+dashboards:
+  title: Dashboards
+  toolbarTitle: Dashboard templates ({count})
+  pageDesc: On this page, you can save dashboards from Kibana. Then, associate them with a collection in order to integrate them into spaces.
+  updateTemplate: Update template
+  newTemplate: New template
+  sourceSpace: Space
+  sourceDashboard: Dashboard
+  collection: Collection
+  templates: Templates
+  noCollection: No collection
+  kibanaVersion: Kibana version
+  tags: Tags
+  manageDashboards: Manage 1 dashboard|Manage {count} dashboards
+  addCollection: Add a collection
+  cannotAddToCollection: Failed to add the dashboard to the collection
+  cannotRemoveFromCollection: Failed to remove the dashboard from the collection
+  form:
+    headline:
+      add: Search for a Kibana dashboard that you want to save as a template.
+      modify: Update the Kibana dashboard that you want to use as a template.
+  actions:
+    update:
+      title: Update 1 dashboard ?|Update {count} dashboards ?
+      text: >
+        The current version will be replaced by the one found in Kibana.
+        |The current versions will be replaced by the one found in Kibana.
+      confirm: Update
+    delete:
+      title: Delete 1 dashboard ?|Delete {count} dashboards ?
+      text: >
+        The current saved template will be deleted. The Kibana dashboard from which it was created will not be affected.
+        |The current saved templates will be deleted. The Kibana dashboards from which they were created will not be affected.
+      confirm: Delete
 anErrorOccurred: An error occurred
 url: URL
 type: Type

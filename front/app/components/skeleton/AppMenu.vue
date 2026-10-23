@@ -11,7 +11,7 @@
               :text="item.text"
               v-bind="props"
               variant="text"
-              append-icon="mdi-chevron-down"
+              append-icon="$mdi-chevron-down"
             />
           </template>
 
@@ -46,7 +46,7 @@
       <SkeletonLangMenu>
         <template #activator="{ props, currentLang, isOpen }">
           <v-btn
-            :append-icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            :append-icon="isOpen ? '$mdi-chevron-up' : '$mdi-chevron-down'"
             :text="currentLang"
             v-bind="props"
           />
@@ -61,7 +61,7 @@
       <SkeletonLangMenu>
         <template #activator="{ props, currentLang, isOpen }">
           <v-btn
-            :append-icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            :append-icon="isOpen ? '$mdi-chevron-up' : '$mdi-chevron-down'"
             :text="currentLang"
             v-bind="props"
           />
@@ -71,7 +71,7 @@
       <v-bottom-sheet>
         <template #activator="{ props }">
           <v-btn
-            icon="mdi-menu"
+            icon="$mdi-menu"
             variant="text"
             v-bind="props"
           />
@@ -139,12 +139,12 @@ const items = computed(() => [
         href: docHref.value,
         target: '_blank',
         rel: 'noopener noreferrer',
-        prependIcon: 'mdi-book-open',
+        prependIcon: '$mdi-book-open',
       },
       {
         text: t('menu.bar.documentation.entries.api'),
         to: '/api-reference',
-        prependIcon: 'mdi-code-tags',
+        prependIcon: '$mdi-code-tags',
       },
     ],
   },

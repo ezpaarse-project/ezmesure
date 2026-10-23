@@ -13,7 +13,7 @@
   >
     <template v-if="readonly" #append-inner>
       <v-chip
-        prepend-icon="mdi-lock"
+        prepend-icon="$mdi-lock"
         variant="tonal"
         size="small"
         label
@@ -32,7 +32,7 @@
           <v-slide-x-reverse-transition>
             <v-btn
               v-if="hasItemsUrls"
-              icon="mdi-open-in-new"
+              icon="$mdi-open-in-new"
               density="comfortable"
               color="accent"
               variant="text"
@@ -49,7 +49,7 @@
             :href="itemUrl"
             target="_blank"
             rel="noopener noreferrer"
-            append-icon="mdi-open-in-new"
+            append-icon="$mdi-open-in-new"
           />
         </v-list>
       </v-menu>
@@ -66,7 +66,7 @@
   >
     <template v-if="readonly" #append-inner>
       <v-chip
-        prepend-icon="mdi-lock"
+        prepend-icon="$mdi-lock"
         variant="tonal"
         size="small"
         label
@@ -85,7 +85,7 @@
           v-if="hasItemsUrls"
           :title="itemsUrl[0]"
           :href="itemsUrl[0]"
-          icon="mdi-open-in-new"
+          icon="$mdi-open-in-new"
           density="comfortable"
           color="accent"
           variant="text"
