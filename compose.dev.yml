@@ -31,7 +31,7 @@ services:
     extends:
       file: compose.yml
       service: api
-    image: node:24.20.0-alpine3.24
+    image: node:24.22.1-alpine3.24
     restart: "no"
     working_dir: /usr/src/app
     ports:
@@ -104,7 +104,7 @@ services:
       SMTP_IGNORE_TLS: "true"
 
   front:
-    image: node:24.20.0-alpine3.24
+    image: node:24.22.1-alpine3.24
     command: npm run dev
     restart: "no"
     working_dir: /usr/src/app
