@@ -258,7 +258,7 @@ const debouncedRefresh = useDebounceFn(refresh, 250);
 /**
  * Generate COUNTER registry URL
  */
-const generateRegistryURL = (item) => URL.parse(`/platform/${item.registryId}`, apiConfig.value.counter.generateRegistryURL);
+const generateRegistryURL = (item) => URL.parse(`/platform/${item.registryId}`, apiConfig.value.counter.registryUrl);
 
 /**
  * Toggle active states for selected endpoints
