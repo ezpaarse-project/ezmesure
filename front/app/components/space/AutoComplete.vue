@@ -58,6 +58,7 @@ const {
   status,
   data: availableSpaces,
 } = await useFetch('/api/kibana-spaces', {
+  lazy: true,
   query: {
     q: debouncedName,
     sort: 'name',

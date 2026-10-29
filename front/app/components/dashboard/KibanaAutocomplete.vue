@@ -45,6 +45,7 @@ const {
   status,
   data: kibanaResponse,
 } = await useFetch(searchUrl, {
+  lazy: true,
   query: {
     search: computed(() => `${debouncedSearch.value}*`),
     type: 'dashboard',
