@@ -1620,7 +1620,7 @@ cannotDeleteItems: Impossible de supprimer {count} élément(s)
 cannotDeleteItem: Impossible de supprimer l'élément {id}
 cannotUpdateItem: Impossible de mettre à jour l'élément {id}
 itemsDeleted: "{count} élement(s) supprimé(s)"
-itemsUpdated: "{count} élement(s) modifié(s)"
+itemsUpdated: "{count} élement(s) mis à jour"
 update: Mettre à jour
 create: Créer
 download: Télécharger
