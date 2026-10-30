@@ -10,7 +10,7 @@ COPY package*.json prisma.config.js ./
 COPY prisma ./prisma
 
 RUN npm ci && \
-  npx prisma generate
+  npx prisma@^7 generate
 
 # ---
 
