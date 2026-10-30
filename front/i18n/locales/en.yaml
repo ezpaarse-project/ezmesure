@@ -1337,7 +1337,7 @@ harvest:
         sendEndMail: A mail will be sent on harvest end
         timeout: Completion time of tasks
         description:
-          template: Session of the {date} to harvest {period} on {endpoints} for {institutions}
+          template: '{date} - {period} harvest on {endpoints} for {institutions}'
           allEndpoints: every endpoints
           allInstitutions: every institutions
           more: '{prefix} and 1 other|{prefix} and {n} others'
