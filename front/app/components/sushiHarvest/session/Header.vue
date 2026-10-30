@@ -13,11 +13,12 @@
           :close-on-content-click="false"
           width="1200px"
         >
-          <template #activator="{ props: menu }">
+          <template #activator="{ props: menu, isActive }">
             <v-chip
               :text="$t('harvest.sessions.counts.credentials', status?._count?.credentials?.harvestable ?? status?._count?.credentials?.all ?? 0)"
               :color="(status?._count?.credentials?.harvestable ?? 0) > 0 ? 'success' : 'error'"
               :disabled="!status"
+              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
               prepend-icon="$mdi-key"
               size="small"
               variant="flat"
@@ -44,10 +45,11 @@
           :close-on-content-click="false"
           width="500px"
         >
-          <template #activator="{ props: menu }">
+          <template #activator="{ props: menu, isActive }">
             <v-chip
               :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
               :color="props.modelValue.reportTypes.length > 0 ? 'accent' : 'error'"
+              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
               prepend-icon="$mdi-file"
               size="small"
               variant="flat"
