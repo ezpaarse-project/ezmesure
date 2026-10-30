@@ -533,6 +533,14 @@ Development setup already includes watch mode (for api) and hot module reloading
 > podman compose down
 > ```
 
+By default ezMESURE starts only with a default admin user (cf. `EZMESURE_ADMIN_*` variables). To have a default set of data used to quickly try main features of the application, you can use the following command before **syncing ezMESURE's data** through the administration UI:
+
+```bash
+# This assumes the app is running (or at least the postgres service)
+docker compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma generate
+docker compose -f compose.dev.yml run --rm --no-deps --entrypoint="npx" api prisma db seed
+```
+
 ### 🔒 SATOSA (optional)
 
 If you want to test SATOSA to test signin from the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all), you'll have additional configuration to do
