@@ -64,7 +64,7 @@ services:
       dex:
         condition: service_started
     pre_start:
-      - command: ["/bin/sh", "-c", "npx prisma generate"]
+      - command: ["/bin/sh", "-c", "npx prisma@^7 generate"]
         entrypoint: ""
 
   rp:
