@@ -665,12 +665,18 @@ institutions:
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
   harvestable:
     title: Harvestable institutions
-    harvestableInstitutions: Harvestable
+    eligibleInstitutions: Eligible for a new harvest
     status:
       harvestable: Harvestable
       non-harvestable: Non harvestable
-      selectable: Selectable
+      eligible: Eligible
+      non-eligible: Non eligible
       harvested: Already harvested
+    tooltips:
+      noRepositories: No COUNTER repository is defined, attempting to harvest data for this institution will result in an error
+      noSpaces: No COUNTER space is defined, members of this institution will not be able to view the harvested data
+      noCredentials: No valid and active credentials are defined, no harvesting will be performed for this institution
+      isHarvested: The institution has already been harvested for this period
     members: Contacts
     repositories: 'COUNTER @:repositories.repositories'
     spaces: 'COUNTER @:spaces.spaces'
@@ -679,7 +685,7 @@ institutions:
     allowFaulty: Include invalid credentials
     allowHarvested: Include harvested institutions
     harvestedMonth: Target period
-    nSelectable: ({n} selectable)
+    nHarvestable: ({n} harvestable)
     institutions: Institutions
   unableToRetriveInformations: Unable to retrieve institution information
   unableToRetrivePlatforms: Unable to retrieve plateform information
@@ -908,17 +914,21 @@ sushi:
       main:update: I will edit the already registered credentials
       secondary:create: Create new credentials
       secondary:update: Continue editing
-  isHarvestable:
+  isEligible:
     title: Your institution is eligible for harvesting
     text: Your institution will be included in next harvest session, no action is need from your end.
-  isNotHarvestable:
+  isNotEligible:
     title: Your institution is currently not eligible for harvesting
     text: 'You need to address the following issues in order to be harvested :'
     reasons:
       institutionIsNotReady: Your entry is not complete
       institutionHasNoCredentials: No COUNTER credentials has been declared
       institutionHasFaultyCredentials: Some of your credentials have not been tested or are invalid
-      institutionIsHarvested: Institution is already harvested for the period
+  isNotHarvestable:
+    title: Your institution is currently not harvestable
+    text: "A configuration setting is missing for your institution. Please contact the administrators with the following reasons:"
+    reasons:
+      institutionHasNoRepositories: The institution has no COUNTER repositories
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
