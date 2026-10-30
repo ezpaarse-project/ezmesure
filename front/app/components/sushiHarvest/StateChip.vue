@@ -86,28 +86,24 @@ defineEmits({
 const { t, locale } = useI18n();
 
 const supportedReports = computed(() => {
-  if (!props.endpoint?.supportedData) {
-    return undefined;
-  }
+  const supportedVersions = props.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS;
+  // Legacy way to handle unsupported reports
+  const unsupportedReports = new Set(props.endpoint.ignoredReports ?? []);
 
-  const versions = props.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS;
-  const entries = versions.flatMap(
-    // We don't need first/last month available, so we can merge all versions
-    (version) => Object.entries(props.endpoint?.supportedData?.[version] ?? {})
-      .filter(([, reportData]) => !!reportData?.supported?.value),
-  );
+  // Using flatMap cause we don't use the version
+  return new Set(supportedVersions.flatMap((version) => {
+    const data = props.endpoint?.supportedData[version] ?? {};
 
-  // Legacy way to handle supported reports
-  if (props.endpoint?.supportedReports?.length > 0) {
-    entries.push(...props.endpoint.supportedReports.map((reportId) => [reportId]));
-  }
-
-  // Legacy way to handle additional reports
-  if (props.endpoint?.additionalReports?.length > 0) {
-    entries.push(...props.endpoint.additionalReports.map((reportId) => [reportId]));
-  }
-
-  return new Set(entries.map(([reportId]) => reportId));
+    return [
+      ...Object.entries(data)
+        .filter(([, reportData]) => !!reportData?.supported?.value)
+        .map(([report]) => report),
+      // Legacy way to handle supported reports
+      ...(props.endpoint.supportedReports ?? []),
+      // Legacy way to handle additional reports
+      ...(props.endpoint.additionalReports ?? []),
+    ].filter((report) => !unsupportedReports.has(report));
+  }));
 });
 
 const harvests = computed(() => {
@@ -156,26 +152,26 @@ const bars = computed(() => {
       key: 'success',
       label: t('tasks.status.finished'),
       ...getValue(['finished']),
-      ...harvestStatus.get('finished') ?? {},
+      ...harvestStatus.get('finished'),
     },
     {
       key: 'missing',
       label: t('tasks.status.missing'),
       ...getValue(['missing']),
-      ...harvestStatus.get('missing') ?? {},
+      ...harvestStatus.get('missing'),
     },
     {
       key: 'failed',
       label: t('tasks.status.error'),
       ...getValue(['failed', 'interrupted', 'cancelled']),
-      ...harvestStatus.get('failed') ?? {},
+      ...harvestStatus.get('failed'),
     },
     {
       key: 'pending',
       type: 'stream',
       label: t('tasks.status.waiting'),
       ...getValue(['running', 'delayed', 'waiting']),
-      ...harvestStatus.get('waiting') ?? {},
+      ...harvestStatus.get('waiting'),
     },
   ];
 });
