@@ -70,6 +70,9 @@
           <v-table>
             <thead>
               <tr>
+                <th class="text-end">
+                  {{ $t('sushi.matrix.supportedBy') }}
+                </th>
                 <th>
                   {{ $t('sushi.report') }}
                 </th>
@@ -79,30 +82,33 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="[reportId, report] in harvestsByReports"
-                :key="reportId"
-                :class="{
-                  'unsupported-row': !report.supported,
-                  'manual-row': report.manual,
-                }"
-              >
-                <td>
-                  {{ reportId }}
-                </td>
-
-                <template v-if="report.supported">
-                  <td v-for="month in periods" :key="`${reportId}-${month}`">
-                    <SushiHarvestMatrixCell :model-value="report.harvests.get(month)" />
+              <template v-for="[reportId, report] in harvestsByReports">
+                <tr
+                  v-if="report.force || report.harvests.size > 0"
+                  :key="reportId"
+                  :class="{
+                    'unsupported-row': report.supported.value.length <= 0,
+                    'manual-row': report.supported.manual,
+                  }"
+                >
+                  <td class="text-end">
+                    <SushiEndpointVersionsChip :model-value="{ counterVersions: report.supported.value }" size="small" end />
                   </td>
-                </template>
-
-                <template v-else>
-                  <td :colspan="periods.length" class="text-center">
-                    {{ report.manual ? $t('sushi.matrix.ignored') : $t('sushi.matrix.unsupported') }}
+                  <td>
+                    {{ reportId }}
                   </td>
-                </template>
-              </tr>
+
+                  <template v-if="report.supported.value.length > 0">
+                    <td v-for="month in periods" :key="`${reportId}-${month}`">
+                      <SushiHarvestMatrixCell :model-value="report.harvests.get(month)" />
+                    </td>
+                  </template>
+
+                  <td v-else :colspan="periods.length" class="text-center">
+                    {{ report.supported.manual ? $t('sushi.matrix.ignored') : $t('sushi.matrix.unsupported') }}
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </v-table>
         </v-col>
@@ -121,8 +127,15 @@ import { parse } from 'date-fns';
 
 import { SUPPORTED_COUNTER_VERSIONS } from '@/lib/sushi';
 
-// eslint-disable-next-line vue/max-len
-/** * @typedef {{ supported: boolean, manual: boolean, harvests: Map<string, object[]> }} ReportDef */
+/**
+  * @typedef {object} ReportDef
+  * @property {Map<string, object[]>} harvests - The harvests grouped by period
+  * @property {true} [force] - Should force the display even if empty
+
+  * @property {object} supported - Info about support
+  * @property {string[]} supported.value - Releases that supports the report
+  * @property {boolean} supported.manual - Is the info was manually set
+  */
 
 const props = defineProps({
   modelValue: {
@@ -178,105 +191,84 @@ const {
   },
 });
 
-const endpointVersions = computed(
-  () => props.sushi?.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS,
-);
-
-const supportedReports = computed(() => {
-  const legacySupported = (props.sushi?.endpoint?.supportedReports ?? []).map((r) => [
-    r.toUpperCase(),
-    {
-      supported: true,
-      manual: false,
-    },
-  ]);
-
-  const legacyAdditional = (props.sushi?.endpoint?.additionalReports ?? []).map((r) => [
-    r.toUpperCase(),
-    {
-      supported: true,
-      manual: true,
-    },
-  ]);
-
-  // We don't need first/last month available, so we can merge all versions
-  const supported = endpointVersions.value.flatMap(
-    (version) => Object.entries(props.sushi?.endpoint?.supportedData?.[version] ?? {}).map(
-      ([r, reportData]) => {
-        if (!reportData?.supported?.value) {
-          return [];
-        }
-
-        return [
-          r.toUpperCase(),
-          {
-            supported: reportData?.supported?.value,
-            manual: reportData?.supported?.manual,
-          },
-        ];
-      },
-    ),
-  );
-
-  return new Map([...legacySupported, ...legacyAdditional, ...supported]);
-});
-
-const unsupportedReports = computed(() => {
-  const legacy = (props.sushi?.endpoint?.ignoredReports ?? []).map((r) => [
-    r.toUpperCase(),
-    {
-      supported: false,
-      manual: false,
-    },
-  ]);
-
-  // We don't need first/last month available, so we can merge all versions
-  const unsupported = endpointVersions.value.flatMap(
-    (version) => Object.entries(props.sushi?.endpoint?.supportedData?.[version] ?? {}).map(
-      ([r, reportData]) => {
-        if (reportData?.supported?.value === true) {
-          return [];
-        }
-        return [
-          r.toUpperCase(),
-          {
-            supported: reportData?.supported?.value,
-            manual: reportData?.supported?.manual,
-          },
-        ];
-      },
-    ),
-  );
-
-  return new Map([...legacy, ...unsupported]);
-});
-
 const harvestsByReports = computed(() => {
+  // Init map with reports harvested by API
   /** @type {Map<string, ReportDef>} */
-  const reports = new Map(apiConfig.value?.counter.defaultHarvestedReports?.map((reportId) => {
-    const report = reportId.toUpperCase();
-    const supported = supportedReports.value.get(report) ?? { supported: false, manual: false };
-    return [
-      report,
-      { ...supported, harvests: new Map() },
-    ];
-  }));
+  const reports = new Map(
+    apiConfig.value?.counter.defaultHarvestedReports?.map((reportId) => [
+      reportId.toUpperCase(),
+      {
+        harvests: new Map(),
+        force: true,
+        supported: {
+          value: [],
+          manual: false,
+        },
+      },
+    ]),
+  );
 
+  // Regroup harvests into sub-maps across the map
   // eslint-disable-next-line no-restricted-syntax
   for (const harvest of harvests.value) {
-    const id = harvest.reportId?.toUpperCase();
-    if (id) {
-      const acc = reports.get(id) ?? { manual: false, harvests: new Map() };
-      acc.supported = true; // Maybe not really supported, but allow to show harvests
-      acc.harvests.set(harvest.period, harvest);
-      reports.set(id, acc);
-    }
+    const id = harvest.reportId.toUpperCase();
+
+    // Get definition (or init one)
+    const def = reports.get(id) ?? {
+      harvests: new Map(),
+      supported: {
+        value: [],
+        manual: false,
+      },
+    };
+
+    def.harvests.set(harvest.period, harvest);
+
+    reports.set(id, def);
   }
 
+  // Fille the support data
+  const supportedVersions = props.sushi?.endpoint?.counterVersions ?? SUPPORTED_COUNTER_VERSIONS;
   // eslint-disable-next-line no-restricted-syntax
-  for (const [reportId, data] of unsupportedReports.value) {
-    if (reportId) {
-      reports.set(reportId, { ...data, harvests: new Map() });
+  for (const version of supportedVersions) {
+    const data = props.sushi?.endpoint?.supportedData[version] ?? {};
+
+    const reportsOfVersion = new Map([
+      ...Object.entries(data),
+      // Legacy way to handle supported reports
+      ...(props.sushi?.endpoint.supportedReports ?? [])
+        .map((report) => [report, { supported: { value: true, manual: false } }]),
+      // Legacy way to handle additional reports
+      ...(props.sushi?.endpoint.additionalReports ?? [])
+        .map((report) => [report, { supported: { value: true, manual: true } }]),
+      // Legacy way to handle unsupported reports
+      ...(props.sushi?.endpoint.unsupportedReports ?? [])
+        .map((report) => [report, { supported: { value: false, manual: true } }]),
+    ]);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [reportId, reportData] of reportsOfVersion) {
+      const id = reportId.toUpperCase();
+
+      // Get definition (or init one)
+      const def = reports.get(id) ?? {
+        harvests: new Map(),
+        supported: {
+          value: [],
+          manual: false,
+        },
+      };
+
+      // Update releases that support report
+      if (reportData.supported?.value) {
+        def.supported.value = [...def.supported.value, version].sort();
+      }
+      // Update releases that support report
+      if (!def.supported.manual) {
+        def.supported.manual = reportData.supported.manual;
+      }
+
+      reports.set(id, def);
     }
   }
 
@@ -288,11 +280,9 @@ const harvestsByReports = computed(() => {
 <style lang="css" scoped>
 .unsupported-row {
   color: grey;
-}
-.manual-row {
-  color: green;
-}
-.unsupported-row.manual-row {
-  color: red;
+
+  &.manual-row {
+    color: red;
+  }
 }
 </style>

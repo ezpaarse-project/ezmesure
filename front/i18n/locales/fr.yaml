@@ -865,6 +865,7 @@ sushi:
   matrix:
     unsupported: Rapport non supporté (déclaration éditeur)
     ignored: Rapport non supporté (constat ezMESURE)
+    supportedBy: Versions
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
     description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez valider vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.

@@ -855,6 +855,7 @@ sushi:
   matrix:
     unsupported: Report not supported (editor declaration)
     ignored: Report not supported (ezMESURE finding)
+    supportedBy: Releases
   noMatrix:
     title: No harvested report for these credentials on this period
     description: These credentials have not yet been harvested for this period. Please validate your COUNTER credentials to be harvested in the future by the administration team.
