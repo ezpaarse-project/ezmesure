@@ -638,11 +638,22 @@ exports.harvestableInstitutions = async (ctx) => {
   const institutionsService = new InstitutionsService();
   const institutions = await institutionsService.findMany({
     where: {
-      sushiCredentials: {
-        some: {
-          ...SushiCredentialsService.enabledCredentialsQuery,
+      OR: [
+        {
+          sushiCredentials: {
+            some: {
+              ...SushiCredentialsService.enabledCredentialsQuery,
+            },
+          },
         },
-      },
+        {
+          repositories: {
+            some: {
+              type: 'counter5',
+            },
+          },
+        },
+      ],
     },
     orderBy: {
       name: 'asc',
@@ -665,10 +676,25 @@ exports.harvestableInstitutions = async (ctx) => {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const institution of institutions) {
+    // Is having the minimal setup to be harvested without erros
+    // eslint-disable-next-line no-await-in-loop
+    const harvestable = await institutionsService.isHarvestable(institution.id, ctx.query);
+    // Fulfil conditions to be (re)harvested.
+    // eslint-disable-next-line no-await-in-loop
+    const eligible = await institutionsService.isHarvestEligibile(institution.id, ctx.query);
+    // Is already harvested
+    let harvested = false;
+    // eslint-disable-next-line no-underscore-dangle
+    if (!ctx.query.allowHarvested && institution._count.sushiCredentials > 0) {
+      // eslint-disable-next-line no-await-in-loop
+      harvested = await institutionsService.isHarvested(institution.id, ctx.query);
+    }
+
     response.push({
       institution,
-      // eslint-disable-next-line no-await-in-loop
-      harvestable: await institutionsService.isHarvestable(institution.id, ctx.query),
+      harvestable,
+      eligible,
+      harvested,
     });
   }
 
