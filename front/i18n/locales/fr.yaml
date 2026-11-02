@@ -678,7 +678,7 @@ institutions:
       harvested: Déjà moissonné
     tooltips:
       noRepositories: Aucun entrepôt COUNTER n'est défini, lancer un moissonnage pour cet établissement entraînera une erreur
-      noSpaces: Aucun espace COUNTER n'est défini, les membres de cet établissement ne pourront voir les donnés récupérées
+      noSpaces: Aucun espace COUNTER n'est défini, les membres de cet établissement ne pourront pas voir les données récupérées
       noCredentials: Aucun identifiant valide et actif n'est défini, aucune moisson ne sera faite pour cet établissement
       isHarvested: L'établissement a déjà été moissonné pour la période
     members: Contacts
