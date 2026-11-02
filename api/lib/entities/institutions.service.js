@@ -297,7 +297,7 @@ module.exports = class InstitutionsService extends BasePrismaService {
 
   /**
    * Check if an institution is harvestable, meaning it have the minimal setup
-   * to be harvested without errros.
+   * to be harvested without errors.
    *
    * @param {string} institutionId - The id of institution to check
    *
@@ -405,19 +405,19 @@ module.exports = class InstitutionsService extends BasePrismaService {
   }
 
   /**
-     * Check if an institution is already harvested
-     *
-     * @param {string} institutionId - The id of institution to check
-     * @param {Object} [opts] - Options to custom harvest status
-     * @param {boolean} [opts.allowNotReady] - Allow not ready institutions
-     * @param {boolean} [opts.allowFaulty] - Allow faulty credentials
-     * @param {boolean} [opts.allEndpointsMustBeUnharvested] - All endpoints must be unharvested to
-     * consider the institution harvestable
-     * @param {string} [opts.harvestedMonth] - Allow institutions harvested after
-     * ready date, but still not harvested for given month
-     *
-     * @returns {Promise<boolean>}
-     */
+   * Check if an institution is already harvested
+   *
+   * @param {string} institutionId - The id of institution to check
+   * @param {Object} [opts] - Options to custom harvest status
+   * @param {boolean} [opts.allowNotReady] - Allow not ready institutions
+   * @param {boolean} [opts.allowFaulty] - Allow faulty credentials
+   * @param {boolean} [opts.allEndpointsMustBeUnharvested] - All endpoints must be unharvested to
+   * consider the institution harvestable
+   * @param {string} [opts.harvestedMonth] - Allow institutions harvested after
+   * ready date, but still not harvested for given month
+   *
+   * @returns {Promise<boolean>}
+   */
   async isHarvested(institutionId, opts = {}) {
     const { sushiReadySince } = await this.findUnique({
       where: { id: institutionId },
