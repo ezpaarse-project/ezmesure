@@ -76,40 +76,10 @@
 
       <v-slide-y-transition>
         <v-row v-if="data">
-          <v-col cols="3">
+          <v-col cols="4">
             <SimpleMetric
-              :title="$t('institutions.harvestable.harvestableInstitutions')"
-              icon="$mdi-check"
-              color="success"
-            >
-              <template #value>
-                {{ harvestableInstitutions.length }}
-
-                <span
-                  v-if="harvestableInstitutions.length !== selectableInstitutions.length"
-                  style="font-size: 0.65em"
-                >
-                  {{ $t('institutions.harvestable.nSelectable', selectableInstitutions.length) }}
-                </span>
-              </template>
-
-              <template #actions>
-                <v-btn
-                  :text="$t('select')"
-                  :disabled="harvestableInstitutions.length <= 0"
-                  :loading="status === 'pending'"
-                  size="small"
-                  variant="outlined"
-                  @click="selected = selectableInstitutions.map(({ id }) => id)"
-                />
-              </template>
-            </SimpleMetric>
-          </v-col>
-
-          <v-col cols="3">
-            <SimpleMetric
-              :value="`${data.length}`"
-              :title="$t('institutions.harvestable.institutions', data.length)"
+              :value="eligibleInstitutions.length"
+              :title="$t('institutions.harvestable.eligibleInstitutions')"
             >
               <template #icon>
                 <v-menu
@@ -159,6 +129,17 @@
                   </v-sheet>
                 </v-menu>
               </template>
+
+              <template #actions>
+                <v-btn
+                  :text="$t('select')"
+                  :disabled="eligibleInstitutions.length <= 0"
+                  :loading="status === 'pending'"
+                  size="small"
+                  variant="outlined"
+                  @click="selected = eligibleInstitutions.map(({ id }) => id)"
+                />
+              </template>
             </SimpleMetric>
           </v-col>
         </v-row>
@@ -172,7 +153,7 @@
       :loading="status === 'pending' && 'primary'"
       :headers="headers"
       :search="search"
-      :sort-by="[{ key: 'harvestable.value', order: 'desc' }, { key: 'institution.name', order: 'asc' }]"
+      :sort-by="[{ key: 'status', order: 'desc' }, { key: 'institution.name', order: 'asc' }]"
       :items-per-page-options="[10, 25, 50, 100]"
       item-value="institution.id"
       show-select
@@ -181,7 +162,7 @@
         <v-chip
           :text="`${value}`"
           :to="`/admin/institutions/${item.institution.id}/members`"
-          :color="!value ? 'orange' : undefined"
+          :variant="!value ? 'outlined' : undefined"
           prepend-icon="$mdi-account-multiple"
           size="small"
         />
@@ -189,8 +170,10 @@
 
       <template #[`item.institution._count.repositories`]="{ value, item }">
         <v-chip
+          v-tooltip:top="{ disabled: !!value, text: $t('institutions.harvestable.tooltips.noRepositories') }"
           :text="`${value}`"
           :color="!value ? 'red' : undefined"
+          :variant="!value ? 'outlined' : undefined"
           prepend-icon="$mdi-database-outline"
           size="small"
           @click="institutionRepositoriesDialogRef?.open(item.institution)"
@@ -199,8 +182,10 @@
 
       <template #[`item.institution._count.spaces`]="{ value, item }">
         <v-chip
+          v-tooltip:top="{ disabled: !!value, text: $t('institutions.harvestable.tooltips.noSpaces') }"
           :text="`${value}`"
           :color="!value ? 'orange' : undefined"
+          :variant="!value ? 'outlined' : undefined"
           prepend-icon="$mdi-tab"
           size="small"
           @click="institutionSpacesDialogRef?.open(item.institution)"
@@ -209,42 +194,74 @@
 
       <template #[`item.institution._count.sushiCredentials`]="{ value, item }">
         <v-chip
+          v-tooltip:top="{ disabled: !!value, text: $t('institutions.harvestable.tooltips.noCredentials') }"
           :text="`${value}`"
           :to="`/admin/institutions/${item.institution.id}/sushi`"
-          :color="!value ? 'red' : undefined"
+          :color="!value ? 'orange' : undefined"
+          :variant="!value ? 'outlined' : undefined"
           prepend-icon="$mdi-key"
           size="small"
         />
       </template>
 
-      <template #[`item.harvestable.value`]="{ value, item }">
+      <template #[`item.status`]="{ item }">
+        <v-chip
+          v-if="item.harvested"
+          v-tooltip:top="$t('institutions.harvestable.tooltips.isHarvested')"
+          :text="$t('institutions.harvestable.status.harvested')"
+          prepend-icon="$mdi-cloud"
+          color="blue"
+        />
+
+        <v-chip
+          v-else-if="item.harvestable.value && item.eligible.value"
+          :text="$t('institutions.harvestable.status.eligible')"
+          prepend-icon="$mdi-check"
+          color="green"
+        />
+
         <v-menu
-          :disabled="item.harvestable.reasons.length <= 0"
+          v-else
+          :disabled="(item.eligible.reasons.length + item.harvestable.reasons.length) <= 0"
           :close-on-content-click="false"
           open-on-hover
         >
-          <template #activator="{ props }">
+          <template #activator="{ props, isActive }">
             <v-chip
-              :text="value ? $t('institutions.harvestable.status.harvestable') : $t('institutions.harvestable.status.non-harvestable')"
-              :prepend-icon="value ? '$mdi-check' : '$mdi-close'"
-              :color="value ? 'green' : 'red'"
-              variant="text"
+              v-if="item.harvestable.value"
+              :text="$t('institutions.harvestable.status.non-eligible')"
+              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
+              prepend-icon="$mdi-close"
+              color="grey"
+              v-bind="props"
+            />
+            <v-chip
+              v-else
+              :text="$t('institutions.harvestable.status.non-harvestable')"
+              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
+              prepend-icon="$mdi-alert"
+              variant="flat"
+              color="red"
               v-bind="props"
             />
           </template>
 
-          <v-card>
-            <template #text>
-              <v-list>
-                <v-list-item
-                  v-for="reason of item.harvestable.reasons"
-                  :key="reason"
-                  :title="$t(`sushi.isNotHarvestable.reasons.${reason}`)"
-                  prepend-icon="$mdi-alert"
-                />
-              </v-list>
-            </template>
-          </v-card>
+          <v-list density="compact" slim>
+            <v-list-item
+              v-for="reason of item.eligible.reasons"
+              :key="reason"
+              :title="$t(`sushi.isNotEligible.reasons.${reason}`)"
+              :prepend-icon="REASONS_ICONS.get(reason) || '$mdi-alert'"
+              :class="`text-${REASONS_COLORS.get(reason)}`"
+            />
+            <v-list-item
+              v-for="reason of item.harvestable.reasons"
+              :key="reason"
+              :title="$t(`sushi.isNotHarvestable.reasons.${reason}`)"
+              :prepend-icon="REASONS_ICONS.get(reason) || '$mdi-alert'"
+              :class="`text-${REASONS_COLORS.get(reason)}`"
+            />
+          </v-list>
         </v-menu>
       </template>
 
@@ -319,6 +336,17 @@ import { formatDate } from 'date-fns';
 
 const MAX_PERIOD = formatDate(new Date(), 'yyyy-MM');
 
+const REASONS_COLORS = new Map([
+  ['institutionHasNoRepositories', 'red'],
+]);
+
+const REASONS_ICONS = new Map([
+  ['institutionIsNotReady', '$mdi-text-box-remove-outline'],
+  ['institutionHasNoCredentials', '$mdi-key-alert-outline'],
+  ['institutionHasFaultyCredentials', '$mdi-bell-alert'],
+  ['institutionHasNoRepositories', '$mdi-database-off'],
+]);
+
 const { t, locale } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
@@ -337,6 +365,19 @@ const institutionRepositoriesDialogRef = useTemplateRef('institutionRepositories
 const institutionSpacesDialogRef = useTemplateRef('institutionSpacesDialogRef');
 const harvestSessionFormDialogRef = useTemplateRef('harvestSessionFormDialogRef');
 const emailsCopyDialogRef = useTemplateRef('emailsCopyDialogRef');
+
+const calcResultScore = (res) => {
+  if (!res.harvestable.value) {
+    return 1;
+  }
+  if (res.harvested) {
+    return 2;
+  }
+  if (res.eligible.value) {
+    return 3;
+  }
+  return 0;
+};
 
 const headers = computed(() => [
   {
@@ -370,9 +411,10 @@ const headers = computed(() => [
   },
   {
     title: t('institutions.institution.status'),
-    value: 'harvestable.value',
+    value: 'status',
     sortable: true,
     align: 'center',
+    sortRaw: (a, b) => calcResultScore(a) - calcResultScore(b),
   },
   {
     title: t('actions'),
@@ -396,33 +438,42 @@ const {
   },
 });
 
-const harvestableInstitutions = computed(
+const nonHarvestableInstitutions = computed(
   () => (data.value ?? [])
-    .filter(({ harvestable }) => harvestable.value)
+    .filter((res) => !res.harvestable.value && !res.harvested)
     .map(({ institution }) => institution),
 );
 
-const selectableInstitutions = computed(
-  () => harvestableInstitutions.value.filter(
-    /* eslint-disable no-underscore-dangle */
-    (institution) => institution._count.sushiCredentials > 0
-                  && institution._count.repositories > 0,
-    /* eslint-enable no-underscore-dangle */
-  ),
+const eligibleInstitutions = computed(
+  () => (data.value ?? [])
+    .filter((res) => res.harvestable.value && res.eligible.value && !res.harvested)
+    .map(({ institution }) => institution),
+);
+
+const nonEligibleInstitutions = computed(
+  () => (data.value ?? [])
+    .filter((res) => res.harvestable.value && !res.eligible.value && !res.harvested)
+    .map(({ institution }) => institution),
 );
 
 const harvestedInstitutions = computed(
   () => (data.value ?? [])
-    .filter(({ harvestable }) => harvestable.reasons.length === 1 && harvestable.reasons[0] === 'institutionIsHarvested')
+    .filter(({ harvested }) => harvested)
     .map(({ institution }) => institution),
 );
 
 const loaders = computed(() => [
   {
-    key: 'selectable',
-    originalValue: selectableInstitutions.value.length,
+    key: 'eligible',
+    originalValue: eligibleInstitutions.value.length,
     color: 'green',
     icon: '$mdi-check',
+  },
+  {
+    key: 'non-harvestable',
+    originalValue: nonHarvestableInstitutions.value.length,
+    color: 'red',
+    icon: '$mdi-alert',
   },
   {
     key: 'harvested',
@@ -431,18 +482,9 @@ const loaders = computed(() => [
     icon: '$mdi-cloud',
   },
   {
-    key: 'harvestable',
-    originalValue: harvestableInstitutions.value.length - selectableInstitutions.value.length,
-    color: 'orange',
-    icon: '$mdi-alert',
-  },
-  {
-    key: 'non-harvestable',
-    originalValue:
-        (data.value?.length ?? 0)
-        - harvestableInstitutions.value.length
-        - harvestedInstitutions.value.length,
-    color: 'red',
+    key: 'non-eligible',
+    originalValue: nonEligibleInstitutions.value.length,
+    color: 'grey',
     icon: '$mdi-close',
   },
 ].map((loader) => ({

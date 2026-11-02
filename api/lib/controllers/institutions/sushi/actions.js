@@ -88,16 +88,19 @@ exports.getMetrics = async (ctx) => {
     ),
   );
 
-  // Get if institution is harvestable
   const institutionService = new InstitutionsService();
+  // Is having the minimal setup to be harvested without errors
+  const harvestable = await institutionService.isHarvestable(ctx.state.institution.id);
+  // Fulfil conditions to be (re)harvested.
+  const eligible = !harvestable.value
+    ? { value: false, reasons: [] }
+    : await institutionService.isHarvestEligibile(ctx.state.institution.id);
 
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = {
-    harvestable: await institutionService.isHarvestable(
-      ctx.state.institution.id,
-      { allowHarvested: true },
-    ),
+    harvestable,
+    eligible,
     statuses: {
       untested,
       unauthorized,
