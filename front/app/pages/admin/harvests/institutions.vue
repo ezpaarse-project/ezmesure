@@ -228,22 +228,16 @@
         >
           <template #activator="{ props, isActive }">
             <v-chip
-              v-if="item.harvestable.value"
-              :text="$t('institutions.harvestable.status.non-eligible')"
-              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
-              prepend-icon="$mdi-close"
-              color="grey"
-              v-bind="props"
-            />
-            <v-chip
-              v-else
-              :text="$t('institutions.harvestable.status.non-harvestable')"
-              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
-              prepend-icon="$mdi-alert"
+              :text="item.harvestable.value ? $t('institutions.harvestable.status.non-eligible') : $t('institutions.harvestable.status.non-harvestable')"
+              :prepend-icon="item.harvestable.value ? '$mdi-close' : '$mdi-alert'"
+              :color="item.harvestable.value ? 'grey' : 'red'"
               variant="flat"
-              color="red"
               v-bind="props"
-            />
+            >
+              <template #append>
+                <ChevronAnimatedIcon :rotate="isActive" />
+              </template>
+            </v-chip>
           </template>
 
           <v-list density="compact" slim>
