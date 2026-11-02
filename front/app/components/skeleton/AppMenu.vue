@@ -6,13 +6,16 @@
         <v-spacer v-if="item.separator" :key="item.key" />
 
         <v-menu v-else-if="item.items" :key="`${item.key}-menu`">
-          <template #activator="{ props }">
+          <template #activator="{ props, isActive }">
             <v-btn
               :text="item.text"
               v-bind="props"
               variant="text"
-              append-icon="$mdi-chevron-down"
-            />
+            >
+              <template #append>
+                <ChevronAnimatedIcon :rotate="isActive" />
+              </template>
+            </v-btn>
           </template>
 
           <v-list>
@@ -46,10 +49,13 @@
       <SkeletonLangMenu>
         <template #activator="{ props, currentLang, isOpen }">
           <v-btn
-            :append-icon="isOpen ? '$mdi-chevron-up' : '$mdi-chevron-down'"
             :text="currentLang"
             v-bind="props"
-          />
+          >
+            <template #append>
+              <ChevronAnimatedIcon :rotate="isOpen" />
+            </template>
+          </v-btn>
         </template>
       </SkeletonLangMenu>
     </div>
@@ -61,10 +67,13 @@
       <SkeletonLangMenu>
         <template #activator="{ props, currentLang, isOpen }">
           <v-btn
-            :append-icon="isOpen ? '$mdi-chevron-up' : '$mdi-chevron-down'"
             :text="currentLang"
             v-bind="props"
-          />
+          >
+            <template #append>
+              <ChevronAnimatedIcon :rotate="isOpen" />
+            </template>
+          </v-btn>
         </template>
       </SkeletonLangMenu>
 

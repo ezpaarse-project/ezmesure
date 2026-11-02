@@ -18,13 +18,16 @@
               :text="$t('harvest.sessions.counts.credentials', status?._count?.credentials?.harvestable ?? status?._count?.credentials?.all ?? 0)"
               :color="(status?._count?.credentials?.harvestable ?? 0) > 0 ? 'success' : 'error'"
               :disabled="!status"
-              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
               prepend-icon="$mdi-key"
               size="small"
               variant="flat"
               class="mr-2 mt-1"
               v-bind="menu"
-            />
+            >
+              <template #append>
+                <ChevronAnimatedIcon :rotate="isActive" />
+              </template>
+            </v-chip>
           </template>
 
           <SushiHarvestSessionCredentials :session="modelValue" :status="status">
@@ -49,13 +52,16 @@
             <v-chip
               :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
               :color="props.modelValue.reportTypes.length > 0 ? 'accent' : 'error'"
-              :append-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
               prepend-icon="$mdi-file"
               size="small"
               variant="flat"
               class="mr-2 mt-1"
               v-bind="menu"
-            />
+            >
+              <template #append>
+                <ChevronAnimatedIcon :rotate="isActive" />
+              </template>
+            </v-chip>
           </template>
 
           <SushiHarvestSessionReports :session="modelValue" :status="status">

@@ -5,7 +5,6 @@
         <v-btn
           v-show="modelValue.length > 0"
           :text="text"
-          :prepend-icon="open ? '$mdi-chevron-down' : '$mdi-chevron-up'"
           color="primary"
           position="fixed"
           location="bottom right"
@@ -16,7 +15,11 @@
             transition: 'bottom .3s ease',
           }"
           v-bind="menu"
-        />
+        >
+          <template #append>
+            <ChevronAnimatedIcon :rotate="open" />
+          </template>
+        </v-btn>
       </v-slide-y-reverse-transition>
     </template>
 
