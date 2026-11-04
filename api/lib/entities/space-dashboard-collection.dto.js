@@ -8,10 +8,12 @@ const schema = {
   collectionId: Joi.string().trim(),
   spaceId: Joi.string().trim(),
   repositoryPattern: Joi.string().trim(),
+  aliasPattern: Joi.string().trim(),
 
   collection: Joi.object(),
   space: Joi.object(),
   repository: Joi.object(),
+  repositoryAlias: Joi.object(),
 
   disabledDashboards: Joi.array().items(Joi.string().trim()),
   importedAt: Joi.date(),
@@ -37,6 +39,8 @@ const includableFields = [
   'collection',
   'space',
   'repository',
+  'repositoryAlias',
+  'repositoryAlias.repository',
 ];
 
 module.exports = {

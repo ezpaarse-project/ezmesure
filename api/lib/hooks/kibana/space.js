@@ -57,5 +57,6 @@ registerHook('space:create', onSpaceUpsert);
 registerHook('space:update', onSpaceUpsert);
 registerHook('space:upsert', onSpaceUpsert);
 registerHook('space:delete', onSpaceDelete);
-registerHook('dashboard_collection:added_to_space', onCollectionChange);
-registerHook('dashboard_collection:removed_from_space', onCollectionChange);
+registerHook('space_dashboard_collection:update', onCollectionChange);
+registerHook('space_dashboard_collection:upsert', onCollectionChange);
+registerHook('space_dashboard_collection:delete', onCollectionChange);

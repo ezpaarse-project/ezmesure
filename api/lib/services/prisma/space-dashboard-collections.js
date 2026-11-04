@@ -12,6 +12,7 @@ const { client: prisma } = require('./index');
  * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceDashboardCollectionFindFirstArgs} SpaceDashboardCollectionFindFirstArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceDashboardCollectionFindManyArgs} SpaceDashboardCollectionFindManyArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceDashboardCollectionCreateArgs} SpaceDashboardCollectionCreateArgs
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceDashboardCollectionDeleteArgs} SpaceDashboardCollectionDeleteArgs
  */
 /* eslint-enable max-len */
 
@@ -78,6 +79,30 @@ function count(params, tx = prisma) {
   return tx.spaceDashboardCollection.count(params);
 }
 
+/**
+ * @param {SpaceDashboardCollectionDeleteArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<SpaceDashboardCollection | null>}
+ */
+async function remove(params, tx = prisma) {
+  /** @param {TransactionClient} txx */
+  const transaction = async (txx) => {
+    const spaceCollection = await txx.spaceDashboardCollection.findUnique({
+      where: params.where,
+    });
+
+    if (!spaceCollection) {
+      return null;
+    }
+
+    return txx.spaceDashboardCollection.delete(params);
+  };
+
+  if (tx) { return transaction(tx); }
+
+  return prisma.$transaction(transaction);
+}
+
 module.exports = {
   create,
   findMany,
@@ -86,4 +111,5 @@ module.exports = {
   update,
   upsert,
   count,
+  remove,
 };

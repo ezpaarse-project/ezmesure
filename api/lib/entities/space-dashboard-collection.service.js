@@ -11,6 +11,7 @@ const SpaceDashboardCollectionsPrisma = require('../services/prisma/space-dashbo
 /** @typedef {import('../.prisma/client.mts').Prisma.SpaceDashboardCollectionFindFirstArgs} SpaceDashboardCollectionFindFirstArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.SpaceDashboardCollectionFindManyArgs} SpaceDashboardCollectionFindManyArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.SpaceDashboardCollectionCreateArgs} SpaceDashboardCollectionCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.SpaceDashboardCollectionDeleteArgs} SpaceDashboardCollectionDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositoriesService extends BasePrismaService {
@@ -23,7 +24,7 @@ module.exports = class RepositoriesService extends BasePrismaService {
    */
   async create(params) {
     const dashboardCollection = await SpaceDashboardCollectionsPrisma.create(params, this.prisma);
-    this.triggerHooks('dashboard_collection:create', dashboardCollection);
+    this.triggerHooks('space_dashboard_collection:create', dashboardCollection);
     return dashboardCollection;
   }
 
@@ -57,7 +58,7 @@ module.exports = class RepositoriesService extends BasePrismaService {
    */
   async update(params) {
     const dashboardCollection = await SpaceDashboardCollectionsPrisma.update(params, this.prisma);
-    this.triggerHooks('dashboard_collection:update', dashboardCollection);
+    this.triggerHooks('space_dashboard_collection:update', dashboardCollection);
     return dashboardCollection;
   }
 
@@ -67,7 +68,7 @@ module.exports = class RepositoriesService extends BasePrismaService {
    */
   async upsert(params) {
     const dashboardCollection = await SpaceDashboardCollectionsPrisma.upsert(params, this.prisma);
-    this.triggerHooks('dashboard_collection:upsert', dashboardCollection);
+    this.triggerHooks('space_dashboard_collection:upsert', dashboardCollection);
     return dashboardCollection;
   }
 
@@ -77,5 +78,21 @@ module.exports = class RepositoriesService extends BasePrismaService {
    */
   async count(params) {
     return SpaceDashboardCollectionsPrisma.count(params, this.prisma);
+  }
+
+  /**
+   * @param {SpaceDashboardCollectionDeleteArgs} params
+   * @returns {Promise<SpaceDashboardCollection | null>}
+   */
+  async delete(params) {
+    const deletedSpaceCol = await SpaceDashboardCollectionsPrisma.remove(params, this.prisma);
+
+    if (!deletedSpaceCol) {
+      return null;
+    }
+
+    this.triggerHooks('space_dashboard_collection:delete', deletedSpaceCol);
+
+    return deletedSpaceCol;
   }
 };

@@ -1,4 +1,7 @@
+const SpaceDashboardCollectionsService = require('../../entities/space-dashboard-collection.service');
 const DashboardCollectionsService = require('../../entities/dashboard-collection.service');
+const RepositoriesService = require('../../entities/repositories.service');
+const RepositoryAliasesService = require('../../entities/repository-aliases.service');
 
 const { schema, includableFields, adminImportSchema } = require('../../entities/dashboard-collection.dto');
 const { prepareStandardQueryParams } = require('../../services/std-query');
@@ -90,19 +93,68 @@ exports.deleteOne = async (ctx) => {
 };
 
 exports.addToSpace = async (ctx) => {
-  const { id, spaceId } = ctx.params;
-  const { repositoryPattern } = ctx.request.body;
+  const { id: collectionId, spaceId } = ctx.params;
+  const {
+    repositoryPattern = null,
+    aliasPattern = null,
+  } = ctx.request.body;
 
-  await (new DashboardCollectionsService()).addToSpace(id, spaceId, repositoryPattern);
+  const newDashboardCollection = await SpaceDashboardCollectionsService.$transaction(
+    async (spaceColService) => {
+      if (repositoryPattern) {
+        if (!(await (new RepositoriesService(spaceColService)).findByPattern(repositoryPattern))) {
+          ctx.throw(404, ctx.$t('errors.repository.notFound'));
+        }
+      }
 
-  ctx.status = 204;
+      if (aliasPattern) {
+        if (!(await (new RepositoryAliasesService(spaceColService)).findByPattern(aliasPattern))) {
+          ctx.throw(404, ctx.$t('errors.repositoryAlias.notFound'));
+        }
+      }
+
+      return spaceColService.upsert(
+        {
+          where: {
+            collectionId_spaceId: {
+              collectionId,
+              spaceId,
+            },
+          },
+          create: {
+            repository: repositoryPattern ? { connect: { pattern: repositoryPattern } } : undefined,
+            repositoryAlias: aliasPattern ? { connect: { pattern: aliasPattern } } : undefined,
+            collection: { connect: { id: collectionId } },
+            space: { connect: { id: spaceId } },
+          },
+          update: {
+            repository: repositoryPattern
+              ? { connect: { pattern: repositoryPattern } }
+              : { disconnect: true },
+            repositoryAlias: aliasPattern
+              ? { connect: { pattern: aliasPattern } }
+              : { disconnect: true },
+          },
+        },
+      );
+    },
+  );
+
+  ctx.status = 200;
+  ctx.body = newDashboardCollection;
 };
 
 exports.removeFromSpace = async (ctx) => {
-  const { id, spaceId } = ctx.params;
-  const { repositoryPattern } = ctx.request.body;
+  const { id: collectionId, spaceId } = ctx.params;
 
-  await (new DashboardCollectionsService()).removeFromSpace(id, spaceId, repositoryPattern);
+  await (new SpaceDashboardCollectionsService()).delete({
+    where: {
+      collectionId_spaceId: {
+        collectionId,
+        spaceId,
+      },
+    },
+  });
 
   ctx.status = 204;
 };
