@@ -1574,7 +1574,7 @@ dashboards:
     delete:
       title: Supprimer 1 tableau de bord ?|Supprimer {count} tableaux de bord ?
       text: >
-        Le modèle actuellement sauvegardé sera supprimé. Le tableau de bord Kibana ayant servi à sa création sera pas affecté.
+        Le modèle actuellement sauvegardé sera supprimé. Le tableau de bord Kibana ayant servi à sa création ne sera pas affecté.
         |Les modèles actuellement sauvegardés seront supprimés. Les tableaux de bord Kibana ayant servi à leur création ne seront pas affectés.
       confirm: Supprimer
 anErrorOccurred: Une erreur est survenue
