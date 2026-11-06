@@ -16,8 +16,8 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
-  sourceDashboardId: Joi.string().trim().min(1),
-  sourceSpaceId: Joi.string().trim().min(1),
+  sourceDashboardId: Joi.string().trim().min(1).allow(null),
+  sourceSpaceId: Joi.string().trim().min(1).allow(null),
 
   data: Joi.array().items(Joi.object()),
   tags: Joi.array().items(Joi.object()),

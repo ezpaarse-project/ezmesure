@@ -20,19 +20,21 @@
           v-model="dashboard.sourceSpaceId"
           :label="$t('dashboards.sourceSpace')"
           :return-object="false"
-          :rules="[]"
+          :rules="isEditing ? [] : [v => !!v || $t('fieldIsRequired')]"
+          clearable
           prepend-icon="$mdi-form-textbox"
           variant="underlined"
-          @update:model-value="dashboard.sourceDashboardId = undefined"
+          @update:model-value="dashboard.sourceDashboardId = null"
         />
 
         <DashboardKibanaAutocomplete
           v-model="dashboard.sourceDashboardId"
           :disabled="!dashboard.sourceSpaceId"
           :label="$t('dashboards.sourceDashboard')"
-          :rules="[v => !!v || $t('fieldIsRequired')]"
+          :rules="isEditing ? [] : [v => !!v || $t('fieldIsRequired')]"
           :return-object="false"
           :space-id="dashboard.sourceSpaceId"
+          clearable
           prepend-icon="$mdi-view-dashboard"
           variant="underlined"
         />

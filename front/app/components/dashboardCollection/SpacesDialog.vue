@@ -115,10 +115,21 @@
           </v-list-item>
         </template>
 
-        <template #[`item.repository.pattern`]=" { item, value }">
-          <v-list-item class="pl-0" :title="value">
+        <template #[`item.repository.pattern`]=" { item }">
+          <v-list-item class="pl-0" :title="item.repository?.pattern ?? item.repositoryAlias?.pattern">
             <template #subtitle>
-              <RepositoryTypeChip :model-value="item.repository" />
+              <RepositoryTypeChip
+                :model-value="item.repository ?? item.repositoryAlias?.repository"
+              />
+              <v-chip
+                v-if="item.repositoryAlias"
+                v-tooltip:start="$t('repositoryAliases.aliasOf', { pattern: item.repositoryAlias.repository?.pattern })"
+                :text="$t('repositoryAliases.alias')"
+                color="blue"
+                class="ml-1"
+                density="comfortable"
+                size="x-small"
+              />
             </template>
           </v-list-item>
         </template>
@@ -173,7 +184,7 @@ const {
   fetch: {
     url: () => `/api/dashboard-collections/${props.collectionId}/spaces`,
     query: {
-      include: ['space', 'repository'],
+      include: ['space', 'repository', 'repositoryAlias.repository'],
     },
   },
   data: {
@@ -243,7 +254,7 @@ const headers = computed(() => [
   },
 ]);
 
-async function addSpace({ space, pattern }) {
+async function addSpace({ space, repositoryPattern, aliasPattern }) {
   if (!space?.id || loadingSpaces.value.has(space.id)) {
     return;
   }
@@ -254,7 +265,8 @@ async function addSpace({ space, pattern }) {
     await $fetch(`/api/dashboard-collections/${props.collectionId}/spaces/${space.id}`, {
       method: 'PUT',
       body: {
-        repositoryPattern: pattern,
+        repositoryPattern,
+        aliasPattern,
       },
     });
 
@@ -268,7 +280,6 @@ async function addSpace({ space, pattern }) {
 
 async function removeSpace(spaceCollection) {
   const spaceId = spaceCollection?.spaceId;
-  const repositoryPattern = spaceCollection?.repositoryPattern;
 
   if (!spaceId || loadingSpaces.value.has(spaceId)) {
     return;
@@ -279,9 +290,6 @@ async function removeSpace(spaceCollection) {
   try {
     await $fetch(`/api/dashboard-collections/${props.collectionId}/spaces/${spaceId}`, {
       method: 'DELETE',
-      body: {
-        repositoryPattern,
-      },
     });
 
     refresh();
