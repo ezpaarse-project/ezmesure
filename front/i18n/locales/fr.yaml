@@ -1200,6 +1200,7 @@ repositoryAliases:
     Gérer les alias
     |Gérer {count} alias
   alias: Alias
+  aliasOf: Alias de {pattern}
   target: Pattern de l'entrepôt cible
   template: Modèle
   filtered: Filtré ?
