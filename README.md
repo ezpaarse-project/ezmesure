@@ -152,7 +152,7 @@ EZMESURE_AUTH_SECRET="<auth secret to persist>"
 EZREEPORT_ADMIN_KEY="<api key to save somewhere>"
 ```
 
-You can find all the available variables in the [`.env`](./.env) file.
+You can find all the available variables in the [`.env`](./.env.example) file.
 
 #### 🌐 HTTPS
 
