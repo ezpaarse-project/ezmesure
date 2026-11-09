@@ -11,7 +11,7 @@ const {
 
 /* eslint-disable max-len */
 /** @typedef {import('../../.prisma/client.mjs').Space} Space */
-/** @typedef {import('../../entities/dashboard-collection.service').SpaceCollectionChangeHookPayload} SpaceCollectionChangeHookPayload */
+/** @typedef {import('../../.prisma/client.mjs').SpaceDashboardCollection} SpaceDashboardCollection */
 /* eslint-enable max-len */
 
 /**
@@ -41,7 +41,7 @@ const onSpaceDelete = async (space) => {
 };
 
 /**
- * @param {SpaceCollectionChangeHookPayload} payload
+ * @param {SpaceDashboardCollection} payload
  */
 const onCollectionChange = async ({ spaceId }) => {
   try {
@@ -57,5 +57,6 @@ registerHook('space:create', onSpaceUpsert);
 registerHook('space:update', onSpaceUpsert);
 registerHook('space:upsert', onSpaceUpsert);
 registerHook('space:delete', onSpaceDelete);
-registerHook('dashboard_collection:added_to_space', onCollectionChange);
-registerHook('dashboard_collection:removed_from_space', onCollectionChange);
+registerHook('space_dashboard_collection:update', onCollectionChange);
+registerHook('space_dashboard_collection:upsert', onCollectionChange);
+registerHook('space_dashboard_collection:delete', onCollectionChange);

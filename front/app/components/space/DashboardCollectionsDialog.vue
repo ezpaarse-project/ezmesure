@@ -40,11 +40,10 @@
           v-model:open="addMenuOpened"
           :model-value="collections"
           :title="$t('dashboards.addCollection')"
-          :dashboard-id="spaceId"
           :loading-items="loadingCollections"
-          :repositories="repositories"
+          :institution-id="spaceData?.institutionId"
+          :space-type="spaceData?.type"
           @add-collection="addCollection($event)"
-          @update:model-value="refresh()"
         >
           <template #activator="{ props: menu }">
             <v-btn
@@ -88,7 +87,7 @@
             <div class="d-flex align-center ga-2">
               {{ spaceCol.collection.name }}
               <v-chip
-                :text="spaceCol.repositoryPattern"
+                :text="spaceCol.repositoryPattern ?? spaceCol.aliasPattern"
                 size="x-small"
                 label
               />
@@ -152,14 +151,11 @@ const {
   error,
   refresh,
 } = await useFetch(computed(() => `/api/kibana-spaces/${props.spaceId}`), {
-  query: { include: ['dashboardCollections.collection', 'institution.repositories'] },
+  query: {
+    include: 'dashboardCollections.collection',
+  },
   lazy: true,
   dedupe: 'defer',
-});
-
-const repositories = computed(() => {
-  const allRepositories = spaceData.value.institution?.repositories ?? [];
-  return allRepositories.filter((repository) => repository?.type === spaceData.value?.type);
 });
 
 const collections = computed(
@@ -187,7 +183,7 @@ whenever(show, () => {
 
 const loadingCollections = ref(new Set());
 
-async function addCollection({ collection, pattern }) {
+async function addCollection({ collection, repositoryPattern, aliasPattern }) {
   if (!collection?.id || loadingCollections.value.has(collection.id)) {
     return;
   }
@@ -198,7 +194,8 @@ async function addCollection({ collection, pattern }) {
     await $fetch(`/api/dashboard-collections/${collection.id}/spaces/${props.spaceId}`, {
       method: 'PUT',
       body: {
-        repositoryPattern: pattern,
+        repositoryPattern,
+        aliasPattern,
       },
     });
 
@@ -212,7 +209,6 @@ async function addCollection({ collection, pattern }) {
 
 async function removeCollection(spaceCollection) {
   const collectionId = spaceCollection?.collection?.id;
-  const repositoryPattern = spaceCollection?.repositoryPattern;
 
   if (!collectionId || loadingCollections.value.has(collectionId)) {
     return;
@@ -223,9 +219,6 @@ async function removeCollection(spaceCollection) {
   try {
     await $fetch(`/api/dashboard-collections/${collectionId}/spaces/${props.spaceId}`, {
       method: 'DELETE',
-      body: {
-        repositoryPattern,
-      },
     });
 
     refresh();

@@ -56,9 +56,11 @@
             </template>
 
             <template v-if="!selectedSpaces.has(space.id)" #append>
-              <v-menu
-                location="start center"
-                min-width="250px"
+              <RepositoryPicker
+                :institution-id="space.institutionId"
+                :type="space.type"
+                @select:repository="addSpace(space, { repository: $event })"
+                @select:alias="addSpace(space, { alias: $event })"
               >
                 <template #activator="{ props: menuProps }">
                   <v-btn
@@ -70,27 +72,7 @@
                     v-bind="menuProps"
                   />
                 </template>
-
-                <v-card v-if="space.institution.repositories.length === 0" class="text-center">
-                  <template #text>
-                    {{ $t('dashboardCollections.noRepositories') }}
-                  </template>
-                </v-card>
-
-                <RepositoryList
-                  v-else
-                  :model-value="space.institution.repositories"
-                  :type="space.type"
-                  density="compact"
-                  @select="addSpace(space, $event)"
-                >
-                  <template #prepend>
-                    <v-list-subheader>
-                      {{ $t('dashboardCollections.repositorySelection') }}
-                    </v-list-subheader>
-                  </template>
-                </RepositoryList>
-              </v-menu>
+              </RepositoryPicker>
             </template>
           </v-list-item>
         </v-list>
@@ -123,7 +105,9 @@ const snacks = useSnacksStore();
 const { t } = useI18n();
 
 const emit = defineEmits({
-  'add-space': (payload) => (payload?.space?.id && payload?.pattern),
+  'add-space': (payload) => (
+    payload?.space?.id && (payload?.repositoryPattern ?? payload?.aliasPattern)
+  ),
 });
 
 const isOpen = defineModel('open', { type: Boolean, default: false });
@@ -142,12 +126,12 @@ const {
   enabled: isOpen,
   query: {
     q: debouncedSearch,
-    include: 'institution.repositories',
   },
   onResponseError({ response }) {
     const { _data: data } = response;
     snacks.error(getErrorMessage({ data }, t('anErrorOccurred')));
   },
+  lazy: true,
 });
 
 watch(isOpen, (isVisible) => {
@@ -158,7 +142,17 @@ watch(isOpen, (isVisible) => {
   }
 });
 
-function addSpace(space, pattern) {
-  emit('add-space', { space, pattern });
+/**
+ * @param {object} space - The space to add
+ * @param {object} repoOptions - The repository options
+ * @param {string} [repoOptions.repository] - The repository to use
+ * @param {string} [repoOptions.alias] - The alias to use
+ */
+function addSpace(space, { repository, alias }) {
+  emit('add-space', {
+    space,
+    repositoryPattern: repository?.pattern,
+    aliasPattern: alias?.pattern,
+  });
 }
 </script>

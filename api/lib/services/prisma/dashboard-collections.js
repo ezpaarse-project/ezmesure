@@ -4,7 +4,7 @@ const { client: prisma } = require('./index');
 /* eslint-disable max-len */
 /**
  * @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient
- * @typedef {import('../../.prisma/client.mjs').SpaceDashboardCollections} Dashboard
+ * @typedef {import('../../.prisma/client.mjs').Dashboard} Dashboard
  * @typedef {import('../../.prisma/client.mjs').DashboardCollection} DashboardCollection
  * @typedef {import('../../.prisma/client.mjs').Prisma.DashboardCollectionUpdateArgs} DashboardCollectionUpdateArgs
  * @typedef {import('../../.prisma/client.mjs').Prisma.DashboardCollectionUpsertArgs} DashboardCollectionUpsertArgs
@@ -94,60 +94,6 @@ function count(params, tx = prisma) {
 }
 
 /**
- * Add a dashboard to a collection
- * @param {string} collectionId
- * @param {string} spaceId
- * @param {string} repositoryPattern
- * @param {TransactionClient} [tx]
- */
-function addToSpace(collectionId, spaceId, repositoryPattern, tx = prisma) {
-  return tx.dashboardCollection.update({
-    where: { id: collectionId },
-    data: {
-      spaces: {
-        connectOrCreate: {
-          where: {
-            collectionId_spaceId_repositoryPattern: {
-              collectionId,
-              spaceId,
-              repositoryPattern,
-            },
-          },
-          create: {
-            spaceId,
-            repositoryPattern,
-          },
-        },
-      },
-    },
-  });
-}
-
-/**
- * Remove a dashboard from a collection
- * @param {string} collectionId
- * @param {string} spaceId
- * @param {string} repositoryPattern
- * @param {TransactionClient} [tx]
- */
-async function removeFromSpace(collectionId, spaceId, repositoryPattern, tx = prisma) {
-  return tx.dashboardCollection.update({
-    where: { id: collectionId },
-    data: {
-      spaces: {
-        delete: {
-          collectionId_spaceId_repositoryPattern: {
-            collectionId,
-            spaceId,
-            repositoryPattern,
-          },
-        },
-      },
-    },
-  });
-}
-
-/**
  * @param {DashboardCollectionDeleteArgs} params
  * @param {TransactionClient} [tx]
  * @returns {Promise<DashboardCollectionRemoved | null>}
@@ -218,8 +164,6 @@ module.exports = {
   update,
   upsert,
   count,
-  addToSpace,
-  removeFromSpace,
   remove,
   removeAll,
 };

@@ -1200,6 +1200,7 @@ repositoryAliases:
     Gérer les alias
     |Gérer {count} alias
   alias: Alias
+  aliasOf: Alias de {pattern}
   target: Pattern de l'entrepôt cible
   template: Modèle
   filtered: Filtré ?
@@ -1574,7 +1575,7 @@ dashboards:
     delete:
       title: Supprimer 1 tableau de bord ?|Supprimer {count} tableaux de bord ?
       text: >
-        Le modèle actuellement sauvegardé sera supprimé. Le tableau de bord Kibana ayant servi à sa création sera pas affecté.
+        Le modèle actuellement sauvegardé sera supprimé. Le tableau de bord Kibana ayant servi à sa création ne sera pas affecté.
         |Les modèles actuellement sauvegardés seront supprimés. Les tableaux de bord Kibana ayant servi à leur création ne seront pas affectés.
       confirm: Supprimer
 anErrorOccurred: Une erreur est survenue
@@ -1631,7 +1632,7 @@ cannotDeleteItems: Impossible de supprimer {count} élément(s)
 cannotDeleteItem: Impossible de supprimer l'élément {id}
 cannotUpdateItem: Impossible de mettre à jour l'élément {id}
 itemsDeleted: "{count} élement(s) supprimé(s)"
-itemsUpdated: "{count} élement(s) modifié(s)"
+itemsUpdated: "{count} élement(s) mis à jour"
 update: Mettre à jour
 create: Créer
 download: Télécharger

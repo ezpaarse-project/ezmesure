@@ -53,9 +53,11 @@
             lines="two"
           >
             <template v-if="!selectedCollections.has(collection.id)" #append>
-              <v-menu
-                location="start center"
-                min-width="250px"
+              <RepositoryPicker
+                :institution-id="props.institutionId"
+                :type="props.spaceType"
+                @select:repository="addCollection(collection, { repository: $event })"
+                @select:alias="addCollection(collection, { alias: $event })"
               >
                 <template #activator="{ props: menuProps }">
                   <v-btn
@@ -67,32 +69,7 @@
                     v-bind="menuProps"
                   />
                 </template>
-
-                <v-card v-if="!hasRepositories" class="text-center">
-                  <template #text>
-                    {{ $t('dashboardCollections.noRepositories') }}
-                  </template>
-                </v-card>
-
-                <v-list v-else density="compact">
-                  <v-list-subheader>
-                    {{ $t('dashboardCollections.repositorySelection') }}
-                  </v-list-subheader>
-
-                  <v-list-item
-                    v-for="repository in props.repositories"
-                    :key="repository.pattern"
-                    :value="repository.pattern"
-                    :title="repository.pattern"
-                    prepend-icon="$mdi-database"
-                    @click="addCollection(collection, repository.pattern)"
-                  >
-                    <template #subtitle>
-                      <RepositoryTypeChip :model-value="repository" />
-                    </template>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+              </RepositoryPicker>
             </template>
           </v-list-item>
         </v-list>
@@ -103,6 +80,14 @@
 
 <script setup>
 const props = defineProps({
+  institutionId: {
+    type: String,
+    required: true,
+  },
+  spaceType: {
+    type: String,
+    default: () => '',
+  },
   title: {
     type: String,
     default: undefined,
@@ -110,10 +95,6 @@ const props = defineProps({
   subtitle: {
     type: String,
     default: undefined,
-  },
-  repositories: {
-    type: Array,
-    default: () => [],
   },
   loadingItems: {
     type: Set,
@@ -124,7 +105,9 @@ const props = defineProps({
 const affectedCollections = defineModel({ type: Array, default: () => [] });
 
 const emit = defineEmits({
-  'add-collection': (payload) => (payload?.collection?.id && payload?.pattern),
+  'add-collection': (payload) => (
+    payload?.collection?.id && (payload?.repositoryPattern ?? payload?.aliasPattern)
+  ),
 });
 
 const isOpen = defineModel('open', { type: Boolean, default: false });
@@ -134,10 +117,6 @@ const debouncedSearch = refDebounced(search, 250);
 
 const selectedCollections = computed(() => new Set(affectedCollections.value.map((i) => i.id)));
 
-const hasRepositories = computed(
-  () => Array.isArray(props.repositories) && props.repositories.length > 0,
-);
-
 const {
   data: collections,
   status,
@@ -146,9 +125,20 @@ const {
   query: {
     q: debouncedSearch,
   },
+  lazy: true,
 });
 
-function addCollection(collection, pattern) {
-  emit('add-collection', { collection, pattern });
+/**
+ * @param {object} collection - The collection to add
+ * @param {object} repoOptions - The repository options
+ * @param {string} [repoOptions.repository] - The repository to use
+ * @param {string} [repoOptions.alias] - The alias to use
+ */
+function addCollection(collection, { repository, alias }) {
+  emit('add-collection', {
+    collection,
+    repositoryPattern: repository?.pattern,
+    aliasPattern: alias?.pattern,
+  });
 }
 </script>

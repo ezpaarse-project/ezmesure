@@ -119,11 +119,11 @@ const syncIndexPatterns = async (space) => {
 
 /**
  * Sync dashboards for a given space
- * @param {Space|Space['id']} spaceToSync - The space we want to sync
+ * @param {string} spaceId - The space we want to sync
  */
-const syncDashboards = async (spaceToSync) => {
+const syncDashboards = async (spaceId) => {
   const space = await (new SpacesService()).findUnique({
-    where: { id: typeof spaceToSync === 'string' ? spaceToSync : spaceToSync.id },
+    where: { id: spaceId },
     include: {
       dashboardCollections: {
         include: {
@@ -138,14 +138,14 @@ const syncDashboards = async (spaceToSync) => {
   });
 
   if (!space) {
-    appLogger.verbose(`[kibana] Space ${spaceToSync.id} does not exist anymore, ignoring dashboard sync`);
+    appLogger.verbose(`[kibana] Space ${spaceId} does not exist anymore, ignoring dashboard sync`);
     return;
   }
 
   const kibanaExport = await kibana.exportObjects({ type: 'dashboard', spaceId: space.id });
 
   if (!kibanaExport) {
-    appLogger.verbose(`[kibana] Unable to get objects of ${spaceToSync.id}`);
+    appLogger.verbose(`[kibana] Unable to get objects of ${spaceId}`);
     return;
   }
 
@@ -268,13 +268,26 @@ const syncDashboards = async (spaceToSync) => {
   };
 
   const syncSpaceCollection = async (dashboardCollection) => {
-    const { collection, repositoryPattern, importedAt } = dashboardCollection;
+    const {
+      collection,
+      repositoryPattern,
+      aliasPattern,
+      importedAt,
+    } = dashboardCollection;
 
-    const indexPatternId = indexPatterns.find((p) => p.title === repositoryPattern)?.id;
+    const repoPattern = repositoryPattern ?? aliasPattern;
+
+    if (!repoPattern) {
+      const cause = 'no associated repository';
+      appLogger.warn(`[kibana] Collection [${collection.name}] cannot be imported into space [${space.id}]: ${cause}`);
+      return;
+    }
+
+    const indexPatternId = indexPatterns.find((p) => p.title === repoPattern)?.id;
 
     if (!indexPatternId) {
-      const cause = `index pattern [${repositoryPattern}] does not exist`;
-      appLogger.error(`[kibana] Collection [${collection.name}] cannot be imported into space [${space.id}]: ${cause}`);
+      const cause = `index pattern [${repoPattern}] does not exist`;
+      appLogger.warn(`[kibana] Collection [${collection.name}] cannot be imported into space [${space.id}]: ${cause}`);
       return;
     }
 
@@ -316,10 +329,9 @@ const syncDashboards = async (spaceToSync) => {
 
     await (new SpaceDashboardCollectionsService()).update({
       where: {
-        collectionId_spaceId_repositoryPattern: {
+        collectionId_spaceId: {
           spaceId: space.id,
           collectionId: collection.id,
-          repositoryPattern,
         },
       },
       data: {
@@ -390,7 +402,7 @@ const syncSpace = async (space) => {
 
   await syncIndexPatterns(space);
 
-  await syncDashboards(space);
+  await syncDashboards(space.id);
 };
 
 /**
