@@ -20,7 +20,7 @@
           v-model="dashboard.sourceSpaceId"
           :label="$t('dashboards.sourceSpace')"
           :return-object="false"
-          :rules="isEditing ? [] : [v => !!v || $t('fieldIsRequired')]"
+          :rules="[v => isEditing || !!v || $t('fieldIsRequired')]"
           clearable
           prepend-icon="$mdi-form-textbox"
           variant="underlined"
@@ -31,7 +31,7 @@
           v-model="dashboard.sourceDashboardId"
           :disabled="!dashboard.sourceSpaceId"
           :label="$t('dashboards.sourceDashboard')"
-          :rules="isEditing ? [] : [v => !!v || $t('fieldIsRequired')]"
+          :rules="[v => isEditing || !!v || $t('fieldIsRequired')]"
           :return-object="false"
           :space-id="dashboard.sourceSpaceId"
           clearable

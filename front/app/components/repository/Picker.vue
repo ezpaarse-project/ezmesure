@@ -8,19 +8,22 @@
       <slot name="activator" v-bind="menu" />
     </template>
 
-    <v-card
-      :loading="pending"
-      rounded="lg"
-    >
-      <template v-if="!hasRepositories && !hasAliases">
-        <v-skeleton-loader
-          v-if="pending"
-          type="list-item-avatar-two-line"
+    <v-card>
+      <v-skeleton-loader v-if="pending" type="list-item-avatar-two-line" />
+
+      <v-card-text
+        v-else-if="!hasRepositories && !hasAliases"
+      >
+        <v-alert
+          v-if="errorMessage"
+          type="error"
+          :text="errorMessage"
         />
-        <v-card-text v-else class="text-center">
+
+        <div v-else class="text-center">
           {{ $t('dashboardCollections.noRepositories') }}
-        </v-card-text>
-      </template>
+        </div>
+      </v-card-text>
 
       <v-list v-else density="compact" slim :disabled="pending">
         <template v-if="hasRepositories">
@@ -67,6 +70,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const props = defineProps({
   institutionId: {
     type: String,
@@ -78,12 +83,14 @@ const props = defineProps({
   },
 });
 
-const isOpen = shallowRef(false);
-
 const emit = defineEmits({
   'select:repository': (payload) => payload?.pattern,
   'select:alias': (payload) => (payload?.pattern && payload?.repository?.pattern),
 });
+
+const { t } = useI18n();
+
+const isOpen = shallowRef(false);
 
 const {
   data: institution,
@@ -100,7 +107,9 @@ const {
   },
 });
 
-whenever(isOpen, () => { refresh(); });
+whenever(isOpen, () => refresh());
+
+const errorMessage = computed(() => (error ? getErrorMessage(error, t('anErrorOccurred')) : null));
 
 const filteredRepositories = computed(() => {
   const repos = institution.value?.repositories;
