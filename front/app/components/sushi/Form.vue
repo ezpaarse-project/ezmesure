@@ -147,11 +147,13 @@
           >
             <template #append>
               <v-btn
-                :icon="isAdvancedOpen ? '$mdi-chevron-up' : '$mdi-chevron-down'"
+                icon
                 density="compact"
                 variant="text"
                 @click="isAdvancedOpen = !isAdvancedOpen"
-              />
+              >
+                <ChevronAnimatedIcon :rotate="isAdvancedOpen" />
+              </v-btn>
             </template>
 
             <template v-if="isAdvancedOpen" #text>

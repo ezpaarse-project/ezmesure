@@ -4,14 +4,14 @@ services:
       file: compose.yml
       service: api
     build:
-      context: ${PWD}/api
+      context: ./api
 
   front:
     extends:
       file: compose.yml
       service: front
     build:
-      context: ${PWD}/front
+      context: ./front
 
 # Volumes are needed when extending
 volumes:

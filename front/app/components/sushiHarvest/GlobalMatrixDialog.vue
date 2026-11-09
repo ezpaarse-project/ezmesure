@@ -110,25 +110,32 @@
                         <template #activator="{ props: menu, isActive }">
                           <v-btn
                             :text="$t('sushi.globalHarvestState.showUnharvested')"
-                            :prepend-icon="isActive ? '$mdi-chevron-up' : '$mdi-chevron-down'"
                             color="secondary"
                             block
                             v-bind="menu"
-                          />
+                          >
+                            <template #append>
+                              <ChevronAnimatedIcon :rotate="isActive" />
+                            </template>
+                          </v-btn>
                         </template>
 
                         <v-list lines="2" density="compact" slim>
-                          <v-list-item
-                            v-for="institution in institutionsData.unharvested"
-                            :key="institution.id"
-                            :title="institution.name"
-                            :subtitle="institution.acronym"
-                            :to="`/admin/institutions/${institution.id}/sushi`"
+                          <v-virtual-scroll
+                            :items="institutionsData.unharvested"
                           >
-                            <template #prepend>
-                              <InstitutionAvatar :institution="institution" />
+                            <template #default="{ item: institution }">
+                              <v-list-item
+                                :title="institution.name"
+                                :subtitle="institution.acronym"
+                                :to="`/admin/institutions/${institution.id}/sushi`"
+                              >
+                                <template #prepend>
+                                  <InstitutionAvatar :institution="institution" />
+                                </template>
+                              </v-list-item>
                             </template>
-                          </v-list-item>
+                          </v-virtual-scroll>
                         </v-list>
                       </v-menu>
                     </template>

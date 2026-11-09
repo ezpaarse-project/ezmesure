@@ -32,6 +32,23 @@
       </DetailsField>
 
       <DetailsField
+        v-if="registryUrl"
+        :label="$t('endpoints.registryUrl')"
+        cols="12"
+      >
+        <a :href="registryUrl.href" target="_blank" rel="noopener noreferrer">
+          {{ registryUrl.href }}
+        </a>
+
+        <v-icon
+          icon="$mdi-open-in-new"
+          size="small"
+          color="secondary"
+          end
+        />
+      </DetailsField>
+
+      <DetailsField
         :label="$t('institutions.sushi.sushiUrl')"
         cols="12"
       >
@@ -118,6 +135,7 @@ const props = defineProps({
 });
 
 const { t, locale } = useI18n();
+const { data: apiConfig } = await useApiConfig();
 
 const sushiUrls = computedAsync(async () => {
   try {
@@ -174,4 +192,12 @@ const fields = computed(() => [
   { value: props.modelValue.requestorId, label: t('institutions.sushi.requestorId'), cols: 4 },
   { value: props.modelValue.apiKey, label: t('institutions.sushi.apiKey'), cols: 4 },
 ].filter((f) => f.value));
+
+const registryUrl = computed(() => {
+  if (!props.modelValue.endpoint?.registryId) {
+    return undefined;
+  }
+
+  return URL.parse(`/platform/${props.modelValue?.endpoint?.registryId}`, apiConfig.value.counter.registryUrl);
+});
 </script>

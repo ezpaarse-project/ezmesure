@@ -13,7 +13,7 @@
           :close-on-content-click="false"
           width="1200px"
         >
-          <template #activator="{ props: menu }">
+          <template #activator="{ props: menu, isActive }">
             <v-chip
               :text="$t('harvest.sessions.counts.credentials', status?._count?.credentials?.harvestable ?? status?._count?.credentials?.all ?? 0)"
               :color="(status?._count?.credentials?.harvestable ?? 0) > 0 ? 'success' : 'error'"
@@ -23,7 +23,11 @@
               variant="flat"
               class="mr-2 mt-1"
               v-bind="menu"
-            />
+            >
+              <template #append>
+                <ChevronAnimatedIcon :rotate="isActive" />
+              </template>
+            </v-chip>
           </template>
 
           <SushiHarvestSessionCredentials :session="modelValue" :status="status">
@@ -44,7 +48,7 @@
           :close-on-content-click="false"
           width="500px"
         >
-          <template #activator="{ props: menu }">
+          <template #activator="{ props: menu, isActive }">
             <v-chip
               :text="$t('harvest.sessions.counts.reportTypes', props.modelValue.reportTypes.length)"
               :color="props.modelValue.reportTypes.length > 0 ? 'accent' : 'error'"
@@ -53,7 +57,11 @@
               variant="flat"
               class="mr-2 mt-1"
               v-bind="menu"
-            />
+            >
+              <template #append>
+                <ChevronAnimatedIcon :rotate="isActive" />
+              </template>
+            </v-chip>
           </template>
 
           <SushiHarvestSessionReports :session="modelValue" :status="status">
