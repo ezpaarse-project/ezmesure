@@ -16,7 +16,7 @@ const winstonTransports = {
 };
 
 /** @typedef {'app'|'http'} LoggerType */
-/** @typedef {keyof winstonTransports} TransportKey */
+/** @typedef {keyof typeof winstonTransports} TransportKey */
 /**
  * @typedef {{
  *  File?: winston.transports.FileTransportOptions
@@ -47,10 +47,13 @@ function createLogger(transportsConfig) {
   return winston.createLogger({ transports, level: logsConfig.level });
 }
 
+const appLogger = createLogger(config.get('logs.app'));
+const httpLogger = createLogger(config.get('logs.http'));
+
 /** @type {Map<LoggerType, winston.Logger>} */
 const loggers = new Map([
-  ['app', createLogger(config.get('logs.app'))],
-  ['http', createLogger(config.get('logs.http'))],
+  ['app', appLogger],
+  ['http', httpLogger],
 ]);
 
 /** @type {Map<LoggerType, string>} */
@@ -124,8 +127,8 @@ function getLevels(type) {
 }
 
 module.exports = {
-  appLogger: loggers.get('app'),
-  httpLogger: loggers.get('http'),
+  appLogger,
+  httpLogger,
   getLevel,
   getLevels,
   setLevel,
