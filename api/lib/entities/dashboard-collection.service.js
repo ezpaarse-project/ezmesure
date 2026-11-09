@@ -17,8 +17,8 @@ const dashboardCollectionsPrisma = require('../services/prisma/dashboard-collect
 
 /* eslint-enable max-len */
 
-module.exports = class RepositoriesService extends BasePrismaService {
-  /** @type {BasePrismaService.TransactionFnc<RepositoriesService>} */
+module.exports = class DashboardCollectionService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<DashboardCollectionService>} */
   static $transaction = super.$transaction;
 
   /**

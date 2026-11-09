@@ -14,8 +14,8 @@ const SpaceDashboardCollectionsPrisma = require('../services/prisma/space-dashbo
 /** @typedef {import('../.prisma/client.mts').Prisma.SpaceDashboardCollectionDeleteArgs} SpaceDashboardCollectionDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class RepositoriesService extends BasePrismaService {
-  /** @type {BasePrismaService.TransactionFnc<RepositoriesService>} */
+module.exports = class SpaceDashboardCollectionService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<SpaceDashboardCollectionService>} */
   static $transaction = super.$transaction;
 
   /**
