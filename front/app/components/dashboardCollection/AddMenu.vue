@@ -125,6 +125,7 @@ const {
   query: {
     q: debouncedSearch,
   },
+  lazy: true,
 });
 
 /**

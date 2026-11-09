@@ -131,6 +131,7 @@ const {
     const { _data: data } = response;
     snacks.error(getErrorMessage({ data }, t('anErrorOccurred')));
   },
+  lazy: true,
 });
 
 watch(isOpen, (isVisible) => {
