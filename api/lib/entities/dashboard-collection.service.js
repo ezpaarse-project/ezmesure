@@ -14,14 +14,7 @@ const dashboardCollectionsPrisma = require('../services/prisma/dashboard-collect
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardCollectionFindManyArgs} DashboardCollectionFindManyArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardCollectionCreateArgs} DashboardCollectionCreateArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardCollectionDeleteArgs} DashboardCollectionDeleteArgs */
-/**
- * @typedef {{
- *  collection: DashboardCollection
- *  spaceId: Space['id']
- *  repositoryPattern?: SpaceDashboardCollection['repositoryPattern']
- *  aliasPattern?: SpaceDashboardCollection['aliasPattern']
- * }} SpaceCollectionChangeHookPayload
- */
+
 /* eslint-enable max-len */
 
 module.exports = class RepositoriesService extends BasePrismaService {

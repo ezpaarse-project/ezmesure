@@ -11,7 +11,7 @@ const {
 
 /* eslint-disable max-len */
 /** @typedef {import('../../.prisma/client.mjs').Space} Space */
-/** @typedef {import('../../entities/dashboard-collection.service').SpaceCollectionChangeHookPayload} SpaceCollectionChangeHookPayload */
+/** @typedef {import('../../.prisma/client.mjs').SpaceDashboardCollection} SpaceDashboardCollection */
 /* eslint-enable max-len */
 
 /**
@@ -41,7 +41,7 @@ const onSpaceDelete = async (space) => {
 };
 
 /**
- * @param {SpaceCollectionChangeHookPayload} payload
+ * @param {SpaceDashboardCollection} payload
  */
 const onCollectionChange = async ({ spaceId }) => {
   try {
