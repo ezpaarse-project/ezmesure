@@ -11,24 +11,33 @@ const ezrReportingUsers = require('../../services/ezreeport/reportingUsers');
  */
 
 /**
+ * @param {{ repository: Repository, institutionId: string }} opts
+ */
+const onRepositoryConnected = async ({ institutionId }) => {
+  let username;
+  try {
+    ({ username } = await ezrReportingUsers.upsertReportUserFromInstitutionId(institutionId));
+    appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is upserted in elastic`);
+  } catch (error) {
+    appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);
+  }
+};
+
+/**
  * @param { Repository } repository
  */
 const onRepositoryModified = async (repository) => {
   const institutionService = new InstitutionService();
   const institutions = await institutionService.findMany({
     where: { repositories: { some: { pattern: repository.pattern } } },
+    select: { id: true },
   });
 
   await Promise.all(
-    institutions.map(async ({ id }) => {
-      let username;
-      try {
-        ({ username } = await ezrReportingUsers.upsertReportUserFromInstitutionId(id));
-        appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is upserted in elastic`);
-      } catch (error) {
-        appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);
-      }
-    }),
+    institutions.map(async ({ id }) => onRepositoryConnected({
+      repository,
+      institutionId: id,
+    })),
   );
 };
 
