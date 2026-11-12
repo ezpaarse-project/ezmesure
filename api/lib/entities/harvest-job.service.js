@@ -6,6 +6,7 @@ const BasePrismaService = require('./base-prisma.service');
 /** @typedef {import('../.prisma/client.mts').HarvestJob} HarvestJob */
 /** @typedef {import('../.prisma/client.mts').HarvestJobStatus} HarvestJobStatus */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpdateManyAndReturnArgs} HarvestJobUpdateManyAndReturnArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobDeleteManyArgs} HarvestJobDeleteManyArgs */
@@ -16,6 +17,7 @@ const BasePrismaService = require('./base-prisma.service');
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobAggregateArgs} HarvestJobAggregateArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobCreateManyAndReturnArgs} HarvestJobCreateManyAndReturnArgs */
 /* eslint-enable max-len */
 
 module.exports = class HarvestJobsService extends BasePrismaService {
@@ -54,6 +56,21 @@ module.exports = class HarvestJobsService extends BasePrismaService {
     this.triggerHooks('harvest-job:create', job);
 
     return job;
+  }
+
+  /**
+   * @param {HarvestJobCreateManyAndReturnArgs} params
+   * @returns {Promise<HarvestJob[]>}
+   */
+  async createMany(params) {
+    const jobs = await harvestJobPrisma.createMany(params, this.prisma);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const job of jobs) {
+      this.triggerHooks('harvest-job:create', job);
+    }
+
+    return jobs;
   }
 
   /**
@@ -114,6 +131,21 @@ module.exports = class HarvestJobsService extends BasePrismaService {
     this.triggerHooks('harvest-job:update', job);
 
     return job;
+  }
+
+  /**
+   * @param {HarvestJobUpdateManyAndReturnArgs} params
+   * @returns {Promise<HarvestJob[]>}
+   */
+  async updateMany(params) {
+    const jobs = await harvestJobPrisma.updateMany(params, this.prisma);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const job of jobs) {
+      this.triggerHooks('harvest-job:update', job);
+    }
+
+    return jobs;
   }
 
   /**

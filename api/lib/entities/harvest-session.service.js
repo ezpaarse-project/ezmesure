@@ -757,56 +757,52 @@ module.exports = class HarvestSessionService extends BasePrismaService {
      * @returns {Promise<import('../.prisma/client.mts').HarvestJob[]>} Created jobs
      */
     const createJobs = async (jobs) => {
+      if (options.dryRun) {
+        return jobs.map((data) => ({
+          ...data,
+          credentialsId: data.credentials.id,
+          sessionId: data.session.id,
+        }));
+      }
+
       const service = new HarvestJobsService();
 
       try {
-        const created = await Promise.all(
-          jobs.map(async (data) => {
-            if (options.dryRun) {
-              return {
-                ...data,
-                credentialsId: data.credentials.id,
-                sessionId: data.session.id,
-              };
-            }
-
+        // Getting existing jobs
+        const existing = await Promise.all(
+          jobs.map(async (data, index) => {
             const job = await service.findFirst({
               where: {
                 ...data,
                 status: { not: 'finished' },
               },
+              select: { id: true },
             });
-            // if job exists, move it into waiting
-            if (job) {
-              return service.update({
-                where: { id: job.id },
-                data: {
-                  status: 'waiting',
-                  beginDate: data.beginDate,
-                  endDate: data.endDate,
-                },
-              });
-            }
-            // if not, create new job
-            return service.create({
-              data: {
-                ...data,
-                repositoryPattern: undefined,
-                repository: {
-                  connect: data.repository,
-                },
-                credentials: {
-                  connect: data.credentials,
-                },
-                session: {
-                  connect: data.session,
-                },
-              },
-            });
+
+            return job ? { index, id: job.id } : { index, id: '' };
           }),
         );
 
-        return created;
+        // Move into waiting existing jobs
+        const updated = await service.updateMany({
+          where: {
+            id: { in: existing.map((job) => job.id) },
+          },
+          data: {
+            status: 'waiting',
+          },
+        });
+
+        // Create new jobs
+        const created = await service.createMany({
+          data: existing
+            // Filter non existing indices
+            .filter((job) => !job.id)
+            // Resolve job to create
+            .map(({ index }) => jobs[index]),
+        });
+
+        return [...created, ...updated];
       } catch (error) {
         appLogger.error(`[harvest-start][${session.id}] Unable to create jobs: ${error.message}`);
 
