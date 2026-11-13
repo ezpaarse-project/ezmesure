@@ -233,15 +233,4 @@ module.exports = class HarvestJobsService extends BasePrismaService {
       },
     });
   }
-
-  /**
-   * Cancel a job
-   * @param {HarvestJob} job - The job to cancel
-   */
-  cancel(job) {
-    return this.update({
-      where: { id: job.id },
-      data: { status: 'cancelled' },
-    });
-  }
 };

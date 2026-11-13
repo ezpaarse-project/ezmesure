@@ -799,7 +799,18 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             // Filter non existing indices
             .filter((job) => !job.id)
             // Resolve job to create
-            .map(({ index }) => jobs[index]),
+            .map(({ index }) => {
+              const {
+                credentials, session: sess, repository, ...data
+              } = jobs[index];
+
+              return {
+                ...data,
+                credentialsId: credentials.id,
+                sessionId: sess.id,
+                repositoryPattern: repository.pattern,
+              };
+            }),
         });
 
         return [...created, ...updated];
@@ -842,6 +853,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
     if (buffer.length > 0) {
       const createdJobs = await createJobs(buffer);
+      appLogger.verbose(`[harvest-start][${session.id}] Created [${createdJobs.length}] jobs`);
       yield* createdJobs;
     }
 
@@ -884,11 +896,15 @@ module.exports = class HarvestSessionService extends BasePrismaService {
      *
      * @returns {Promise<import('../.prisma/client.mts').HarvestJob[]>} Canceled jobs
      */
-    const cancelJobs = async (jobs) => HarvestJobsService.$transaction(
-      async (service) => Promise.all(
-        jobs.map(async (job) => (!HarvestJobsService.isDone(job) ? service.cancel(job) : job)),
-      ),
-    );
+    const cancelJobs = (jobs) => (new HarvestJobsService()).updateMany({
+      where: {
+        id: { in: jobs.map((job) => job.id) },
+        status: { in: HarvestJobsService.endStatuses },
+      },
+      data: {
+        status: 'cancelled',
+      },
+    });
 
     let buffer = [];
     // eslint-disable-next-line no-restricted-syntax
@@ -900,17 +916,19 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       }
 
       // eslint-disable-next-line no-await-in-loop
-      const canceledJob = await cancelJobs(buffer);
+      const cancelledJob = await cancelJobs(buffer);
+      appLogger.verbose(`[harvest-start][${session.id}] Cancelled [${cancelledJob.length}] jobs`);
       buffer = [];
-      yield* canceledJob;
+      yield* cancelledJob;
 
       // eslint-disable-next-line no-await-in-loop
       await setTimeout(JOB_BATCH_DELAY); // Throttle requests to DB, avoiding connection issues
     }
 
     if (buffer.length > 0) {
-      const canceledJob = await cancelJobs(buffer);
-      yield* canceledJob;
+      const cancelledJob = await cancelJobs(buffer);
+      appLogger.verbose(`[harvest-start][${session.id}] Cancelled [${cancelledJob.length}] jobs`);
+      yield* cancelledJob;
     }
 
     this.triggerHooks('harvest-session:stop', session);
