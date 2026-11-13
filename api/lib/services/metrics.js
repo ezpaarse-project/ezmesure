@@ -274,7 +274,7 @@ async function calcDBMetrics() {
       spaces,
       users,
       sushiEndpoints,
-    ] = await prisma.client.$transaction([
+    ] = await Promise.all([
       prisma.client.institution.count({
         select: { id: true },
         where: {
