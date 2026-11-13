@@ -191,7 +191,7 @@ module.exports = {
       loginState: oneHour * 1000,
       harvestMatrix: 10 * oneMinute * 1000,
       harvestSessionJobs: 5 * oneMinute * 1000,
-      harvestSessionStatus: 60 * oneMinute * 1000,
+      harvestSessionStatus: 24 * oneHour * 1000,
       institutionHarvestable: 5 * oneMinute * 1000,
       institutionReporting: 24 * oneHour * 1000,
       counterRegistry: 24 * oneHour * 1000,
