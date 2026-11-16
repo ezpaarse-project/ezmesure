@@ -15,17 +15,18 @@ const {
 let harvestedButUnsupportedJobIsRunning = false;
 
 async function updateHarvestedButUnsupported() {
+  const start = Date.now();
   harvestedButUnsupportedJobIsRunning = true;
-  appLogger.info('[sushi-alerts] Starting updating HARVEST_BUT_UNSUPPORTED alerts');
+  appLogger.info('[sushi-alerts][update] Starting updating HARVEST_BUT_UNSUPPORTED alerts');
 
   const service = new SushiAlertsService();
   try {
     await service.updateHarvestedButUnsupported();
   } catch (err) {
-    appLogger.error(`[sushi-alerts] Couldn't update HARVEST_BUT_UNSUPPORTED alerts: ${err instanceof Error ? err.message : err}`);
+    appLogger.error(`[sushi-alerts][update] Couldn't update HARVEST_BUT_UNSUPPORTED alerts: ${err instanceof Error ? err.message : err}`);
   }
 
-  appLogger.verbose('[sushi-alerts] Update of HARVEST_BUT_UNSUPPORTED alerts ended');
+  appLogger.verbose(`[sushi-alerts][update] Update of HARVEST_BUT_UNSUPPORTED alerts ended | took: ${Date.now() - start}ms`);
   harvestedButUnsupportedJobIsRunning = false;
 }
 
@@ -61,17 +62,18 @@ async function startUpdateHarvestButUnsupportedAlerts() {
 let endpointJobIsRunning = false;
 
 async function updateEndpointAlerts() {
+  const start = Date.now();
   endpointJobIsRunning = true;
-  appLogger.info('[sushi-alerts] Starting updating ENDPOINT alerts');
+  appLogger.info('[sushi-alerts][update] Starting updating ENDPOINT alerts');
 
   const service = new SushiAlertsService();
   try {
     await service.updateEndpointAlerts();
   } catch (err) {
-    appLogger.error(`[sushi-alerts] Couldn't update ENDPOINT alerts: ${err instanceof Error ? err.message : err}`);
+    appLogger.error(`[sushi-alerts][update] Couldn't update ENDPOINT alerts: ${err instanceof Error ? err.message : err}`);
   }
 
-  appLogger.verbose('[sushi-alerts] Update of ENDPOINT alerts ended');
+  appLogger.verbose(`[sushi-alerts][update] Update of ENDPOINT alerts ended | took: ${Date.now() - start}ms`);
   endpointJobIsRunning = false;
 }
 

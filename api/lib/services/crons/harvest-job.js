@@ -33,14 +33,17 @@ async function startJobDeletion() {
     cronTime: config.schedule,
     runOnInit: true,
     onTick: async () => {
+      const start = Date.now();
       appLogger.verbose('[harvest-job][delete-job] Starting jobs deletion');
+
       try {
         await deleteMarkedJobsAndSessions();
-        appLogger.verbose('[harvest-job][delete-job] Jobs deletion ended');
       } catch (error) {
         const err = error instanceof Error ? error : new Error(`${error}`);
         appLogger.error(`[harvest-job][delete-job] Failed to clean: ${err.message}`);
       }
+
+      appLogger.verbose(`[harvest-job][delete-job] Jobs deletion ended | took: ${Date.now() - start}ms`);
     },
   });
 

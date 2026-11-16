@@ -26,6 +26,7 @@ const isExpired = (user) => {
 };
 
 async function removeExpiredTestUsers() {
+  const start = Date.now();
   appLogger.verbose('[test-users] Checking for expired test users...');
 
   const testUsers = await esUsers.getUsersByWildcard('*__test__*');
@@ -45,7 +46,7 @@ async function removeExpiredTestUsers() {
     }
   }
 
-  appLogger.verbose(`[test-users] Found ${testUsers.length} test users, with ${nbExpired} expired`);
+  appLogger.info(`[test-users] Found ${testUsers.length} test users, with ${nbExpired} expired  took: ${Date.now() - start}ms`);
 }
 
 async function startExpiredCron() {

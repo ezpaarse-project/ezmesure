@@ -31,6 +31,7 @@ const emailTypesToIgnore = [
 let lastSummaryDate = new Date();
 
 async function sendEmailsSummaryToAdmins() {
+  const start = Date.now();
   appLogger.verbose('[emails-summary] Sending a summary of sent emails...');
 
   const outgoingEmails = await (new OutgoingEmailsService()).findMany({
@@ -46,7 +47,7 @@ async function sendEmailsSummaryToAdmins() {
   });
 
   if (outgoingEmails.length === 0) {
-    appLogger.verbose('[emails-summary] No email to summerize');
+    appLogger.info(`[emails-summary] No email to summerize | took: ${Date.now() - start}ms`);
     lastSummaryDate = new Date();
     return;
   }
@@ -100,12 +101,13 @@ async function sendEmailsSummaryToAdmins() {
     }),
   );
 
-  appLogger.verbose(`[emails-summary] Sent a summary of ${outgoingEmails.length} emails to ${admins.length} admins`);
+  appLogger.info(`[emails-summary] Sent a summary of ${outgoingEmails.length} emails to ${admins.length} admins | took: ${Date.now() - start}ms`);
 
   lastSummaryDate = new Date();
 }
 
 async function cleanupEmails() {
+  const start = Date.now();
   const limit = subDays(new Date(), maxDayAge);
   appLogger.verbose(`[emails-cleanup] Cleaning up outgoing emails older than ${limit.toISOString()}...`);
 
@@ -117,7 +119,7 @@ async function cleanupEmails() {
     },
   });
 
-  appLogger.verbose(`[emails-cleanup] Cleaned up ${count} emails`);
+  appLogger.info(`[emails-cleanup] Cleaned up ${count} emails | took: ${Date.now() - start}ms`);
 }
 
 async function startEmailsSummaryCron() {
