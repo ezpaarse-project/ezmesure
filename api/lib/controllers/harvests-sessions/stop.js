@@ -4,6 +4,7 @@ const { appLogger } = require('../../services/logger');
 
 const HarvestSessionService = require('../../entities/harvest-session.service');
 const ActionsService = require('../../entities/actions.service');
+const HarvestJobsService = require('../../entities/harvest-job.service');
 
 const { harvestQueue } = require('../../services/jobs');
 const { createCache } = require('../../utils/cache-manager');
@@ -28,24 +29,16 @@ async function stopSession(session) {
         });
 
         const job = await harvestQueue.getJob(harvestJob.id);
-        if (!job) {
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-
-        // Remove job if not currently running
-        if (!await job.isActive()) {
-          await job.remove();
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-
         // Kill job if currently running
-        if (!job?.data?.pid) {
-          throw new Error('Cannot cancel job without PID');
-        }
+        if (await job?.isActive()) {
+          if (!job.data?.pid) {
+            throw new Error('Cannot cancel job without PID');
+          }
 
-        process.kill(job.data.pid, 'SIGTERM');
+          process.kill(job.data.pid, 'SIGTERM');
+        } else if (job) {
+          await job.remove();
+        }
       } catch (error) {
         appLogger.error(`[Harvest Queue] Failed to stop job ${harvestJob.id}: ${error}`);
       }
@@ -82,8 +75,8 @@ exports.getStopStatus = async (ctx) => {
   const harvestSessionService = new HarvestSessionService();
 
   const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
-    select: { id: true, status: true, jobs: true },
+    where: { id: harvestId, deletedAt: null },
+    select: { id: true, status: true, jobs: { NOT: HarvestJobsService.whereSoftDeleted } },
   });
 
   if (!session) {
@@ -104,7 +97,7 @@ exports.stopOne = async (ctx) => {
   const harvestSessionService = new HarvestSessionService();
 
   const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
+    where: { id: harvestId, deletedAt: null },
   });
 
   if (!session) {

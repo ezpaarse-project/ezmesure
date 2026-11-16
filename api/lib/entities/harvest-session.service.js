@@ -50,8 +50,8 @@ const { appLogger } = require('../services/logger');
  */
 /* eslint-enable max-len */
 
-const JOB_BATCH_SIZE = 100; // Number of jobs to process per batch
-const JOB_BATCH_DELAY = 100; // Time to wait between batches in ms
+const JOB_BATCH_SIZE = 1000; // Number of jobs to process per batch
+const JOB_BATCH_DELAY = 250; // Time to wait between batches in ms
 const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
 const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) => r.toLowerCase());
 
@@ -125,7 +125,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         include: {
           _count: {
             select: {
-              jobs: true,
+              jobs: {
+                where: { NOT: HarvestJobsService.whereSoftDeleted },
+              },
             },
           },
         },
@@ -339,13 +341,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const result = await harvestSessionPrisma.remove(params, this.prisma);
 
     if (!result) { return null; }
-    const { deleteResult, deletedSession } = result;
 
-    this.triggerHooks('harvest-session:delete', deleteResult);
+    this.triggerHooks('harvest-session:delete', result);
 
-    deletedSession.jobs.map((job) => this.triggerHooks('harvest-job:delete', job));
-
-    return deleteResult;
+    return result;
   }
 
   /**
@@ -381,6 +380,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const sessionJobs = await harvestJobsService.findMany({
       where: {
         sessionId: session.id,
+        NOT: HarvestJobsService.whereSoftDeleted,
       },
       include: {
         credentials: {
@@ -417,7 +417,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         .map((job) => job.credentialsId),
     );
 
-    return credentialsToHarvest.filter((credential) => !harvestedCredentials.has(credential.id));
+    return credentialsToHarvest.filter((creds) => !harvestedCredentials.has(creds.id));
   }
 
   /**
@@ -818,7 +818,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         appLogger.error(`[harvest-start][${session.id}] Unable to create jobs: ${error.message}`);
 
         try {
-          await service.deleteMany({ where: { sessionId: session.id } });
+          await service.updateMany({
+            where: { sessionId: session.id },
+            data: { deletedAt: new Date() },
+          });
         } catch (suberror) {
           appLogger.error(`[harvest-start][${session.id}] Unable to delete created jobs: ${suberror.message}`);
           throw new Error(`Unable to create jobs and delete created jobs: ${error.message} - ${suberror.message}. Please delete session and try again.`);

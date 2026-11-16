@@ -10,6 +10,7 @@ const { appLogger } = require('../../services/logger');
 const HarvestService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
+const HarvestSessionService = require('../../entities/harvest-session.service');
 
 const cacheDuration = config.get('cache.duration.harvestMatrix');
 const cache = createCache(cacheDuration);
@@ -177,6 +178,12 @@ exports.getMatrix = async (ctx) => {
   const { retryCode = 202 } = ctx.request.query;
 
   const query = { sessionId: harvestId };
+
+  const harvestSessionService = new HarvestSessionService();
+  if (!await harvestSessionService.findUnique({ where: { id: harvestId } })) {
+    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
+    return;
+  }
 
   const requestId = createHash('md5').update(JSON.stringify(query)).digest('hex');
   const cached = await cache.get(requestId);

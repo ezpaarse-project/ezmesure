@@ -9,8 +9,9 @@ const { sendMail, generateMail } = require('../../services/mail');
 
 const { client: prisma } = require('../../services/prisma');
 
-const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
-const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const HarvestJobsService = require('../../entities/harvest-job.service');
 /**
  * @typedef {object} SushiConnection
  * @property {number} date
@@ -41,6 +42,7 @@ async function sendEndMail(session) {
           harvestJobs: {
             some: {
               sessionId: session.id,
+              NOT: HarvestJobsService.whereSoftDeleted,
             },
           },
         },
@@ -60,6 +62,7 @@ async function sendEndMail(session) {
           harvestJobs: {
             some: {
               sessionId: session.id,
+              NOT: HarvestJobsService.whereSoftDeleted,
             },
           },
         },
@@ -138,7 +141,7 @@ async function sendEndMail(session) {
               });
 
               appLogger.verbose(`[harvest-session][hooks] Mail sent to ${contact.email} for ${institution.name}`);
-            } catch (e) {
+            } catch {
               appLogger.error(`[harvest-session][hooks] Failed to send mail to ${contact.email} for ${institution.name}`);
             }
           }),

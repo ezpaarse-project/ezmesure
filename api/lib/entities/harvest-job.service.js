@@ -27,6 +27,20 @@ module.exports = class HarvestJobsService extends BasePrismaService {
   /** @type {HarvestJobStatus[]} */
   static endStatuses = ['finished', 'failed', 'cancelled', 'interrupted'];
 
+  /** @type {import('../.prisma/models.mts').HarvestJobWhereInput} */
+  static whereSoftDeleted = {
+    OR: [
+      // Job is marked as deleted
+      { deletedAt: { not: null } },
+      // Job's session is marked as deleted (fallback)
+      { session: { deletedAt: { not: null } } },
+      // Job is orphan
+      { credentialsId: null },
+      // Job's credentials are marked as deleted
+      { credentials: { deletedAt: { not: null } } },
+    ],
+  };
+
   /** @type {HarvestJobStatus} */
   static delayedStatus = 'delayed';
 
