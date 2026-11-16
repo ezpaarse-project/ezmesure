@@ -13,19 +13,7 @@ const LocalizedError = require('./lib/models/LocalizedError');
 const i18n = require('./lib/services/i18n');
 const actions = require('./lib/services/actions');
 const elastic = require('./lib/services/elastic');
-
-// Crons
-const notifications = require('./lib/services/crons/notifications');
-const opendata = require('./lib/services/crons/opendata');
-const ezreeportSync = require('./lib/services/crons/sync/ezreeport');
-const sushi = require('./lib/services/crons/sushi');
-const sushiCredentials = require('./lib/services/crons/sushi-credentials');
-const sushiAlerts = require('./lib/services/crons/sushi-alerts');
-const harvest = require('./lib/services/crons/harvest');
-const cronMetrics = require('./lib/services/crons/metrics');
-const users = require('./lib/services/crons/users');
-const testUsers = require('./lib/services/crons/test-users');
-const outgoingEmails = require('./lib/services/crons/outgoing-emails');
+const crons = require('./lib/services/crons');
 
 /**
  * Register hooks. Must not be called elsewhere. Some services can both
@@ -150,18 +138,7 @@ function start() {
   actions.ensureIndex()
     .catch((err) => appLogger.error(`Couldn't ensure index for actions: ${err}`));
 
-  notifications.startBroadcastCron();
-  opendata.startRefreshCron();
-  ezreeportSync.startSyncCron();
-  sushi.startCleanCron();
-  sushiCredentials.startDeletionCron();
-  sushiAlerts.startFetchCron();
-  harvest.startCancelCron();
-  cronMetrics.start();
-  users.startDeletionCron();
-  testUsers.startExpiredCron();
-  outgoingEmails.startEmailsSummaryCron();
-  outgoingEmails.startEmailsCleanupCron();
+  crons.startAll();
 
   const server = app.listen(config.port);
   server.setTimeout(1000 * 60 * 30);
@@ -182,7 +159,7 @@ function start() {
 }
 
 async function waitForElasticsearch() {
-  appLogger.info('Waiting for Elasticsearch...');
+  appLogger.verbose('Waiting for Elasticsearch...');
 
   for (let i = 0; i < 10; i += 1) {
     try {
