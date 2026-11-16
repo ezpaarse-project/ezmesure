@@ -69,7 +69,7 @@
                 </ConfirmPopover>
               </template>
 
-              <template #actions>
+              <template v-if="!userSpaced" #actions>
                 <v-btn
                   append-icon="$mdi-view-dashboard"
                   :text="$t('dashboards.title')"
