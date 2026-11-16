@@ -20,8 +20,8 @@ async function deleteMarkedJobsAndSessions() {
   // Sessions are deleted after jobs to avoid errors
   const sessions = await prisma.harvestSession.deleteMany({
     where: {
-      // As session's deletedAt is one of the conditions for jobs,
-      // we just need to clean empty sessions (even if not marked as delete)
+      deletedAt: { not: null },
+      // Make sure to delete sessions without jobs to avoid errors
       jobs: { none: {} },
     },
   });
