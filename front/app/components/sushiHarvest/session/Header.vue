@@ -148,13 +148,14 @@
         <v-list>
           <v-list-item
             :title="$t('modify')"
-            :disabled="modelValue.status === 'starting' ? !modelValue.error : modelValue.status !== 'prepared'"
+            :disabled="(modelValue.status === 'starting' && !modelValue.error) || modelValue.status !== 'prepared'"
             prepend-icon="$mdi-pencil"
             @click="emit('click:update', modelValue)"
           />
 
           <v-list-item
             :title="$t('delete')"
+            :disabled="(modelValue.status === 'starting' && !modelValue.error) || modelValue.status === 'running' || (modelValue.status === 'stopping' && !modelValue.error)"
             prepend-icon="$mdi-delete"
             @click="deleteSession()"
           />
@@ -163,7 +164,7 @@
 
           <v-list-item
             :title="$t('harvest.sessions.start')"
-            :disabled="modelValue.status === 'starting' ? !modelValue.error : modelValue.status !== 'prepared'"
+            :disabled="(modelValue.status === 'starting' && !modelValue.error) || modelValue.status !== 'prepared'"
             prepend-icon="$mdi-play"
             @click="startSession()"
           />
