@@ -899,7 +899,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const cancelJobs = (jobs) => (new HarvestJobsService()).updateMany({
       where: {
         id: { in: jobs.map((job) => job.id) },
-        status: { in: HarvestJobsService.endStatuses },
+        status: { notIn: HarvestJobsService.endStatuses },
       },
       data: {
         status: 'cancelled',

@@ -9,8 +9,9 @@ const { sendMail, generateMail } = require('../../services/mail');
 
 const { client: prisma } = require('../../services/prisma');
 
-const { getNotificationRecipients, getNotificationMembershipWhere } = require('../../utils/notifications');
-const { NOTIFICATION_TYPES, ADMIN_NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+const { getNotificationMembershipWhere } = require('../../utils/notifications');
+const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
+
 /**
  * @typedef {object} SushiConnection
  * @property {number} date
@@ -81,9 +82,9 @@ async function sendEndMail(session) {
     },
   });
 
-  await Promise.all(
-    institutions.map(async (institution) => {
-      try {
+  try {
+    await Promise.all(
+      institutions.map(async (institution) => {
         const contacts = institution.memberships.map((m) => m.user);
 
         // TODO: what if multiple spaces
@@ -95,7 +96,7 @@ async function sendEndMail(session) {
           periodEnd: session.endDate,
           institution: institution.name,
           credentialsURL: new URL(`myspace/institutions/${institution.id}/sushi`, publicUrl).href,
-          spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
+          spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : '',
           endpoints:
             // Group credentials per endpoint (and keep only list of credentials per endpoint)
             Object.values(
@@ -137,17 +138,17 @@ async function sendEndMail(session) {
                 ...await generateMail('harvest-end', data, { locale: contact.language }),
               });
 
-              appLogger.verbose(`[harvest-session][hooks] Mail sent to ${contact.email} for ${institution.name}`);
-            } catch (e) {
-              appLogger.error(`[harvest-session][hooks] Failed to send mail to ${contact.email} for ${institution.name}`);
+              appLogger.verbose(`[harvest-session][hooks] Mail sent to [${contact.email}] for [${institution.name}]`);
+            } catch (error) {
+              appLogger.error(`[harvest-session][hooks] Failed to send mail to [${contact.email}] for [${institution.name}]: ${error}`);
             }
           }),
         );
-      } catch (error) {
-        appLogger.error(`[harvest-session][hooks] Error while sending mail for ${institution.name}: ${error}`);
-      }
-    }),
-  );
+      }),
+    );
+  } catch (error) {
+    appLogger.error(`[harvest-session][hooks] Error while sending mail for session [${session.id}]: ${error}`);
+  }
 }
 
 /* eslint-disable max-len */
