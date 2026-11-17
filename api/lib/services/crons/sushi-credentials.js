@@ -290,6 +290,7 @@ async function resumeCredentialsDeletions() {
 }
 
 async function deleteMarkedCredentials() {
+  const start = Date.now();
   appLogger.verbose('[delete-sushi] Starting credentials deletions');
   await startCredentialsDeletions();
 
