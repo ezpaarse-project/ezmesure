@@ -107,9 +107,8 @@ const onHarvestJobEnd = async (harvestJob) => {
   const { id: activeCount } = await (new HarvestJobsService()).count({
     where: {
       sessionId: harvestJob.sessionId,
-      status: {
-        notIn: HarvestJobsService.endStatuses,
-      },
+      NOT: HarvestJobsService.whereSoftDeleted,
+      status: { notIn: HarvestJobsService.endStatuses },
     },
     select: { id: true },
   });
