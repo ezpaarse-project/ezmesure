@@ -301,7 +301,7 @@ emails:
       p3: The data is available via your usual Kibana dashboards, provided you adjust the temporality to the period you want.
       p4:
         withoutAddress: If you notice missing or invalid data, please contact us immediately to allow us to notify the publishers.
-        withAddress: If you notice missing or invalid data, please contact us immediately at <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a> to allow us to notify the publishers.
+        withAddress: If you notice missing or invalid data, please contact us immediately at <a href="mailto:{{ replyTo }}">{{ replyTo }}</a> to allow us to notify the publishers.
       p5: 'You can continue to enter new COUNTER credentials in <a href="{{ credentialsURL }}">the ezCOUNTER form</a>. After this entry, please click again on the "VALIDATE MY CREDENTIALS" button if you want the reports to be re-harvested for your institution: we perform regular harvests, at least once a month.'
       outOfDate: These credentials are out of date !
       getToYourSpace: Access your space

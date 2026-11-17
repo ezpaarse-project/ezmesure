@@ -68,7 +68,7 @@ const hookEmitter = new EventEmitter();
  * @returns {boolean} Returns `true` if the event had listeners, `false` otherwise.
  */
 const triggerHooks = (event, ...payload) => {
-  appLogger.verbose(`[hooks] "${event}" triggered`);
+  appLogger.debug(`[hooks] "${event}" triggered`);
   return hookEmitter.emit(event, ...payload);
 };
 
@@ -87,7 +87,7 @@ const triggerHooks = (event, ...payload) => {
 const registerHook = (event, handler, opts = {}) => {
   const safeHandler = async (...params) => {
     try {
-      appLogger.verbose(`[hooks] "${event}" running`);
+      appLogger.debug(`[hooks] "${event}" running`);
       await handler(...params);
     } catch (error) {
       appLogger.error(`[hooks] "${event}" encountered an error: ${error.message}`);
@@ -108,7 +108,7 @@ const registerHook = (event, handler, opts = {}) => {
 
   const uniqueResolver = opts.uniqueResolver ?? ((payload) => payload?.id);
 
-  appLogger.verbose(`[hooks] "${event}" registered with options "${JSON.stringify(opts)}"`);
+  appLogger.debug(`[hooks] "${event}" registered with options "${JSON.stringify(opts)}"`);
   return hookEmitter.on(
     event,
     (payload) => {
