@@ -261,28 +261,9 @@ exports.deleteOne = async (ctx) => {
 
   const harvestSessionService = new HarvestSessionService();
 
-  const where = { id: harvestId, deletedAt: null };
-
-  const session = await harvestSessionService.findUnique({ where });
-  if (!session) {
-    return null;
-  }
-
-  const deletedAt = new Date();
-  await harvestSessionService.update({
-    where,
-    data: {
-      deletedAt,
-      jobs: {
-        updateMany: {
-          data: { deletedAt },
-          where: { sessionId: harvestId },
-        },
-      },
-    },
+  const session = await harvestSessionService.delete({
+    where: { id: harvestId, deletedAt: null },
   });
-
-  // Actual deletion will be handled later (with jobs)
 
   // Remove status from cache
   await statusCache.del(harvestId);

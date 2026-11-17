@@ -179,7 +179,13 @@ module.exports = class HarvestJobsService extends BasePrismaService {
    * @returns {Promise<HarvestJob | null>}
    */
   async delete(params) {
-    const job = await harvestJobPrisma.remove(params, this.prisma);
+    // Mark job as deleted
+    const job = await harvestJobPrisma.update({
+      ...params,
+      data: { deletedAt: new Date() },
+    }, this.prisma);
+
+    // Actual deletion will be handled later
 
     this.triggerHooks('harvest-job:delete', job);
 

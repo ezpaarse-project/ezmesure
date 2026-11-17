@@ -111,15 +111,12 @@ exports.deleteOne = async (ctx) => {
   }
 
   const harvestJobService = new HarvestJobService();
-  await harvestJobService.update({
+  await harvestJobService.delete({
     where: {
       id: taskId,
       NOT: HarvestJobService.whereSoftDeleted,
     },
-    data: { deletedAt: new Date() },
   });
-
-  // Actual deletion will be handled later
 
   ctx.status = 204;
 };

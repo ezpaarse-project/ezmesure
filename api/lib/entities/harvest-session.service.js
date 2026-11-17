@@ -338,11 +338,37 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    * @returns {Promise<HarvestSession | null>}
    */
   async delete(params) {
-    const result = await harvestSessionPrisma.remove(params, this.prisma);
+    const session = await harvestSessionPrisma.findUnique({
+      where: params.where,
+      select: { id: true, jobs: true },
+    }, this.prisma);
 
-    if (!result) { return null; }
+    if (!session) {
+      return null;
+    }
+
+    const deletedAt = new Date();
+    // Mark session as deleted
+    const result = await harvestSessionPrisma.update({
+      ...params,
+      data: {
+        deletedAt,
+        jobs: {
+          updateMany: {
+            data: { deletedAt },
+            where: { sessionId: session.id },
+          },
+        },
+      },
+    }, this.prisma);
+
+    // Actual deletion will be handled later (with jobs)
 
     this.triggerHooks('harvest-session:delete', result);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const job of session.jobs) {
+      this.triggerHooks('harvest-job:delete', job);
+    }
 
     return result;
   }
@@ -765,7 +791,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         }));
       }
 
-      const service = new HarvestJobsService();
+      const service = new HarvestJobsService(this);
 
       try {
         // Getting existing jobs
@@ -899,7 +925,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
      *
      * @returns {Promise<import('../.prisma/client.mts').HarvestJob[]>} Canceled jobs
      */
-    const cancelJobs = (jobs) => (new HarvestJobsService()).updateMany({
+    const cancelJobs = (jobs) => harvestJobsService.updateMany({
       where: {
         id: { in: jobs.map((job) => job.id) },
         status: { in: HarvestJobsService.endStatuses },
