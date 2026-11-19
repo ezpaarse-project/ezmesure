@@ -71,7 +71,7 @@ services:
     extends:
       file: compose.yml
       service: front
-    image: nginx:1.29.1-alpine-slim
+    image: nginx:1.31.9-alpine3.24-slim
     restart: "no"
     ports:
       - 8443:443
