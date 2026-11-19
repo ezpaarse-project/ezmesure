@@ -9,7 +9,7 @@ RUN npm run generate
 
 # ---
 
-FROM nginx:1.31.8-alpine-slim
+FROM nginx:1.31.9-alpine3.24-slim
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
 LABEL org.opencontainers.image.source="https://github.com/ezpaarse-project/ezmesure"
 
