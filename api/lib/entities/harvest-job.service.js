@@ -27,6 +27,20 @@ module.exports = class HarvestJobsService extends BasePrismaService {
   /** @type {HarvestJobStatus[]} */
   static endStatuses = ['finished', 'failed', 'cancelled', 'interrupted'];
 
+  /** @type {import('../.prisma/models.mts').HarvestJobWhereInput} */
+  static whereSoftDeleted = {
+    OR: [
+      // Job is marked as deleted
+      { deletedAt: { not: null } },
+      // Job's session is marked as deleted (fallback)
+      { session: { deletedAt: { not: null } } },
+      // Job is orphan
+      { credentialsId: null },
+      // Job's credentials are marked as deleted
+      { credentials: { deletedAt: { not: null } } },
+    ],
+  };
+
   /** @type {HarvestJobStatus} */
   static delayedStatus = 'delayed';
 
@@ -165,7 +179,13 @@ module.exports = class HarvestJobsService extends BasePrismaService {
    * @returns {Promise<HarvestJob | null>}
    */
   async delete(params) {
-    const job = await harvestJobPrisma.remove(params, this.prisma);
+    // Mark job as deleted
+    const job = await harvestJobPrisma.update({
+      ...params,
+      data: { deletedAt: new Date() },
+    }, this.prisma);
+
+    // Actual deletion will be handled later
 
     this.triggerHooks('harvest-job:delete', job);
 

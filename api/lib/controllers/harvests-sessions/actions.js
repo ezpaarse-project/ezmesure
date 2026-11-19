@@ -2,7 +2,6 @@ const config = require('config');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
-const { appLogger } = require('../../services/logger');
 
 const HTTPError = require('../../models/HTTPError');
 
@@ -13,6 +12,7 @@ const { Prisma } = require('../../services/prisma');
 
 const { schema, includableFields } = require('../../entities/harvest-session.dto');
 const { createCache } = require('../../utils/cache-manager');
+const HarvestJobsService = require('../../entities/harvest-job.service');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -23,11 +23,15 @@ exports.standardQueryParams = standardQueryParams;
 
 exports.getAll = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  prismaQuery.where = {
+    ...prismaQuery.where,
+    deletedAt: null,
+  };
   prismaQuery.include = {
     ...prismaQuery.include,
     _count: {
       select: {
-        jobs: true,
+        jobs: { where: { NOT: HarvestJobsService.whereSoftDeleted } },
       },
     },
   };
@@ -43,12 +47,15 @@ exports.getAll = async (ctx) => {
 exports.getOne = async (ctx) => {
   const { harvestId } = ctx.params;
 
-  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: harvestId });
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, {
+    id: harvestId,
+    deletedAt: null,
+  });
   prismaQuery.include = {
     ...prismaQuery.include,
     _count: {
       select: {
-        jobs: true,
+        jobs: { where: { NOT: HarvestJobsService.whereSoftDeleted } },
       },
     },
   };
@@ -78,7 +85,7 @@ exports.getManyStatus = async (ctx) => {
     (harvestSessionService) => Promise.all(
       harvestIds.map(async (id) => {
         const session = await harvestSessionService.findUnique({
-          where: { id },
+          where: { id, deletedAt: null },
           select: { status: true },
         });
         if (!session) {
@@ -113,7 +120,9 @@ exports.getOneCredentials = async (ctx) => {
 
   const harvestSessionService = new HarvestSessionService();
 
-  const session = await harvestSessionService.findUnique({ where: { id: harvestId } });
+  const session = await harvestSessionService.findUnique({
+    where: { id: harvestId, deletedAt: null },
+  });
   if (!session) {
     ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
     return;
@@ -152,7 +161,7 @@ exports.createOne = async (ctx) => {
       include: {
         _count: {
           select: {
-            jobs: true,
+            jobs: { where: { NOT: HarvestJobsService.whereSoftDeleted } },
           },
         },
       },
@@ -188,7 +197,7 @@ exports.upsertOne = async (ctx) => {
         include: {
           _count: {
             select: {
-              jobs: true,
+              jobs: { where: { NOT: HarvestJobsService.whereSoftDeleted } },
             },
           },
         },
@@ -224,7 +233,7 @@ exports.upsertOne = async (ctx) => {
         include: {
           _count: {
             select: {
-              jobs: true,
+              jobs: { where: { NOT: HarvestJobsService.whereSoftDeleted } },
             },
           },
         },
@@ -252,19 +261,12 @@ exports.deleteOne = async (ctx) => {
 
   const harvestSessionService = new HarvestSessionService();
 
-  const where = { id: harvestId };
+  const session = await harvestSessionService.delete({
+    where: { id: harvestId, deletedAt: null },
+  });
 
-  const session = await harvestSessionService.findUnique({ where });
-  if (!session) {
-    return null;
-  }
-
-  await harvestSessionService.update({ where, data: { deletedAt: new Date() } });
-
-  // Don't wait for promise to allow running in the background
-  harvestSessionService.delete({ where: { id: harvestId } })
-    .then(() => { appLogger.info(`[harvest-sessions] Deleted ${harvestId}`); })
-    .catch((error) => { appLogger.error(`[harvest-sessions] Couldn't delete ${harvestId}: ${error}`); });
+  // Remove status from cache
+  await statusCache.del(harvestId);
 
   const actionService = new ActionsService();
   await actionService.create({

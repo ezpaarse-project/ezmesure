@@ -89,24 +89,18 @@ function upsert(params, tx = prisma) {
 /**
  * @param {HarvestSessionDeleteArgs} params
  * @param {TransactionClient} [tx]
- * @returns {Promise<SessionRemoved | null>}
+ * @returns {Promise<HarvestSession | null>}
  */
 async function remove(params, tx = prisma) {
   const session = await tx.harvestSession.findUnique({
     where: params.where,
-    include: {
-      jobs: true,
-    },
   });
 
   if (!session) {
     return null;
   }
 
-  return {
-    deleteResult: await tx.harvestSession.delete(params),
-    deletedSession: session,
-  };
+  return tx.harvestSession.delete(params);
 }
 
 /**

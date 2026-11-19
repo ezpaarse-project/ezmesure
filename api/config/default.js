@@ -144,6 +144,9 @@ module.exports = {
       schedule: '0 0 0 * * *',
       maxDayAge: 7,
     },
+    deleteJobs: {
+      schedule: '0 2 * * SAT',
+    },
     deleteSushi: {
       schedule: '0 */15 * * * *',
       followInterval: 10000,

@@ -5,6 +5,7 @@ const HarvestSessionService = require('../../entities/harvest-session.service');
 
 const { harvestQueue } = require('../../services/jobs');
 const { createCache } = require('../../utils/cache-manager');
+const HarvestJobsService = require('../../entities/harvest-job.service');
 
 const cache = createCache(config.get('cache.duration.harvestSessionJobs'));
 
@@ -78,8 +79,8 @@ exports.getStartStatus = async (ctx) => {
   const harvestSessionService = new HarvestSessionService();
 
   const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
-    select: { id: true, status: true, jobs: true },
+    where: { id: harvestId, deletedAt: null },
+    select: { id: true, status: true, jobs: { NOT: HarvestJobsService.whereSoftDeleted } },
   });
 
   if (!session) {
@@ -105,7 +106,7 @@ exports.startOne = async (ctx) => {
   const harvestSessionService = new HarvestSessionService();
 
   const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
+    where: { id: harvestId, deletedAt: null },
   });
 
   if (!session) {

@@ -50,8 +50,8 @@ const { appLogger } = require('../services/logger');
  */
 /* eslint-enable max-len */
 
-const JOB_BATCH_SIZE = 100; // Number of jobs to process per batch
-const JOB_BATCH_DELAY = 100; // Time to wait between batches in ms
+const JOB_BATCH_SIZE = 1000; // Number of jobs to process per batch
+const JOB_BATCH_DELAY = 250; // Time to wait between batches in ms
 const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
 const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) => r.toLowerCase());
 
@@ -125,7 +125,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         include: {
           _count: {
             select: {
-              jobs: true,
+              jobs: {
+                where: { NOT: HarvestJobsService.whereSoftDeleted },
+              },
             },
           },
         },
@@ -336,16 +338,39 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    * @returns {Promise<HarvestSession | null>}
    */
   async delete(params) {
-    const result = await harvestSessionPrisma.remove(params, this.prisma);
+    const session = await harvestSessionPrisma.findUnique({
+      where: params.where,
+      select: { id: true, jobs: true },
+    }, this.prisma);
 
-    if (!result) { return null; }
-    const { deleteResult, deletedSession } = result;
+    if (!session) {
+      return null;
+    }
 
-    this.triggerHooks('harvest-session:delete', deleteResult);
+    const deletedAt = new Date();
+    // Mark session as deleted
+    const result = await harvestSessionPrisma.update({
+      ...params,
+      data: {
+        deletedAt,
+        jobs: {
+          updateMany: {
+            data: { deletedAt },
+            where: { sessionId: session.id },
+          },
+        },
+      },
+    }, this.prisma);
 
-    deletedSession.jobs.map((job) => this.triggerHooks('harvest-job:delete', job));
+    // Actual deletion will be handled later (with jobs)
 
-    return deleteResult;
+    this.triggerHooks('harvest-session:delete', result);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const job of session.jobs) {
+      this.triggerHooks('harvest-job:delete', job);
+    }
+
+    return result;
   }
 
   /**
@@ -381,6 +406,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const sessionJobs = await harvestJobsService.findMany({
       where: {
         sessionId: session.id,
+        NOT: HarvestJobsService.whereSoftDeleted,
       },
       include: {
         credentials: {
@@ -417,7 +443,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         .map((job) => job.credentialsId),
     );
 
-    return credentialsToHarvest.filter((credential) => !harvestedCredentials.has(credential.id));
+    return credentialsToHarvest.filter((creds) => !harvestedCredentials.has(creds.id));
   }
 
   /**
@@ -765,7 +791,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         }));
       }
 
-      const service = new HarvestJobsService();
+      const service = new HarvestJobsService(this);
 
       try {
         // Getting existing jobs
@@ -818,7 +844,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         appLogger.error(`[harvest-start][${session.id}] Unable to create jobs: ${error.message}`);
 
         try {
-          await service.deleteMany({ where: { sessionId: session.id } });
+          await service.updateMany({
+            where: { sessionId: session.id },
+            data: { deletedAt: new Date() },
+          });
         } catch (suberror) {
           appLogger.error(`[harvest-start][${session.id}] Unable to delete created jobs: ${suberror.message}`);
           throw new Error(`Unable to create jobs and delete created jobs: ${error.message} - ${suberror.message}. Please delete session and try again.`);
@@ -896,9 +925,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
      *
      * @returns {Promise<import('../.prisma/client.mts').HarvestJob[]>} Canceled jobs
      */
-    const cancelJobs = (jobs) => (new HarvestJobsService()).updateMany({
+    const cancelJobs = (jobs) => harvestJobsService.updateMany({
       where: {
         id: { in: jobs.map((job) => job.id) },
+        NOT: HarvestJobsService.whereSoftDeleted,
         status: { notIn: HarvestJobsService.endStatuses },
       },
       data: {

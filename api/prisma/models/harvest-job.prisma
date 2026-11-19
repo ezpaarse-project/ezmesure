@@ -19,17 +19,19 @@ enum HarvestJobStatus {
 /// Represent the execution of a harvest job
 model HarvestJob {
   /// ID of the job
-  id                String           @id @default(cuid())
+  id                String            @id @default(cuid())
   /// ID of the SUSHI credentials
-  credentialsId     String
+  credentialsId     String?
   /// SUSHI credentials used to harvest
-  credentials       SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  credentials       SushiCredentials? @relation(fields: [credentialsId], references: [id], onDelete: Restrict)
   /// Creation date
-  createdAt         DateTime         @default(now())
+  createdAt         DateTime          @default(now())
   /// Latest update date
-  updatedAt         DateTime         @updatedAt
+  updatedAt         DateTime          @updatedAt
   /// Start date (when the job moved from waiting to running)
   startedAt         DateTime?
+  /// Deletion date
+  deletedAt         DateTime?
   /// Job status
   status            HarvestJobStatus
   /// ID of the harvested report (ex: tr_j1)
@@ -39,7 +41,7 @@ model HarvestJob {
   /// ID of the harvest session
   sessionId         String
   /// Session that created the job
-  session           HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session           HarvestSession    @relation(fields: [sessionId], references: [id], onDelete: Restrict)
   /// Beginning of the requested period, may differ from session's cause of supported periods
   beginDate         String
   /// End of the requested period, may differ from session's cause of supported periods
@@ -49,7 +51,7 @@ model HarvestJob {
   /// Repository pattern including the index
   repositoryPattern String?
   /// Repository including the index
-  repository        Repository?      @relation(fields: [repositoryPattern], references: [pattern], onDelete: SetNull)
+  repository        Repository?       @relation(fields: [repositoryPattern], references: [pattern], onDelete: SetNull)
   /// Job running time
   runningTime       Int?
   /// Job result

@@ -159,7 +159,12 @@ async function handleErrorTypes(job, task, err, lockToken) {
     const errExceptions = Array.isArray(err.cause?.exceptions) ? err.cause.exceptions : [];
 
     await SushiCredentialsService.$transaction(async (service) => {
-      const credentials = await service.findUnique({ where: { id: task.credentialsId } });
+      const id = task.credentialsId;
+      if (!id) {
+        return;
+      }
+
+      const credentials = await service.findUnique({ where: { id } });
       if (!credentials) {
         return;
       }
@@ -174,7 +179,7 @@ async function handleErrorTypes(job, task, err, lockToken) {
       );
 
       return service.update({
-        where: { id: task.credentialsId },
+        where: { id },
         data: {
           connection: {
             date: Date.now(),
@@ -199,7 +204,7 @@ module.exports = async function handle(job, lockToken) {
 
   if (!task) {
     appLogger.error(`[Harvest Job #${job?.id}] Associated task [${taskId || 'n/a'}] does not exist, removing job`);
-    return job.remove(); // throw error ?!
+    return;
   }
 
   await delayIfEndpointDisabled(job, task.data, lockToken);
