@@ -457,6 +457,9 @@ Unlike production setup, the development setup are including an OIDC provider ([
 
 You should clone the repository using `git`, it contains configuration files for running and developing ezMESURE with a dedicated `compose.dev.yml` (extending default `compose.yml`) to ease development. You'll also need default environment and to install dependencies :
 
+> [!IMPORTANT]
+> Do not set `NODE_ENV=production` in your `.env` file (or in your shell) when developing. When `NODE_ENV` is `production`, `npm ci` and `npm install` skip `devDependencies` (such as `nodemon`, `eslint` or `vitest`), which makes `npm run dev` fail with `sh: nodemon: not found`. Use `NODE_ENV=development` instead, or leave it unset.
+
 ```bash
 # Clone project
 git clone https://github.com/ezpaarse-project/ezmesure.git
