@@ -57,9 +57,13 @@ function calcDateLimits(date, previous) {
 /**
  * Read a CSV stream and insert rows in elastic search
  * @param  {stream}   stream
+ * @param  {String}   index
+ * @param  {String}   username
+ * @param  {Array}    splittedFields fields to split into arrays of strings
+ * @param  {Array}    jsonFields     fields containing a JSON string to parse
  * @return {Promise}
  */
-function readStream(stream, index, username, splittedFields) {
+function readStream(stream, index, username, splittedFields, jsonFields = []) {
   let busy = false;
   const buffer = [];
 
@@ -123,6 +127,31 @@ function readStream(stream, index, username, splittedFields) {
             ec[split.field] = ec[split.field].split(split.delimiter);
           }
         });
+
+        // Fields sent as JSON strings in the CSV are parsed into real objects/arrays,
+        // otherwise Elasticsearch rejects them for object/nested mappings
+        let jsonParsingFailed = false;
+
+        // eslint-disable-next-line no-loop-func
+        jsonFields.forEach((field) => {
+          if (typeof ec[field] !== 'string' || !ec[field].trim()) { return; }
+
+          try {
+            ec[field] = JSON.parse(ec[field]);
+          } catch (e) {
+            ec[field] = undefined;
+            jsonParsingFailed = true;
+            // eslint-disable-next-line no-use-before-define
+            addError({ reason: `${field} is not a valid JSON` });
+          }
+        });
+
+        if (jsonParsingFailed) {
+          result.total += 1;
+          result.failed += 1;
+          // eslint-disable-next-line no-continue
+          continue;
+        }
 
         if (result.total < 50) {
           try {
@@ -338,6 +367,11 @@ module.exports = async function upload(ctx) {
     }
   }
 
+  const jsonHeader = ctx.request.headers['json-fields'];
+  const jsonFields = jsonHeader
+    ? jsonHeader.split(',').map((f) => f.trim()).filter(Boolean)
+    : [];
+
   if (!isMultipart) {
     const now = new Date();
     const encoding = ctx.request.headers['content-encoding'];
@@ -354,7 +388,7 @@ module.exports = async function upload(ctx) {
     ctx.type = 'json';
 
     try {
-      const { metadata, ...result } = await readStream(stream, index, username, splittedFields);
+      const { metadata, ...result } = await readStream(stream, index, username, splittedFields, jsonFields);
 
       // Transforming dates into human readable string
       metadata.minDate = metadata.minDate && formatDateISO(metadata.minDate);
@@ -412,7 +446,7 @@ module.exports = async function upload(ctx) {
     let result;
     try {
       // eslint-disable-next-line no-await-in-loop
-      result = await readStream(stream, index, username, splittedFields);
+      result = await readStream(stream, index, username, splittedFields, jsonFields);
     } catch (e) {
       try {
         // eslint-disable-next-line no-await-in-loop
