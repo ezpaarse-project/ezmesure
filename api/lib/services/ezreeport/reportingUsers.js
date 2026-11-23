@@ -23,13 +23,10 @@ const getReportUserFromInstitution = (institution) => ({
  */
 async function upsertReportUserFromInstitutionId(id) {
   const institution = await prisma.institution.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
     include: {
       repositories: true,
       repositoryAliases: true,
-      elasticRoles: true,
     },
   });
 
@@ -40,7 +37,6 @@ async function upsertReportUserFromInstitutionId(id) {
   const roles = [
     ...institution.repositories.map((repository) => generateRoleNameFromRepository(repository, 'readonly')),
     ...institution.repositoryAliases.map((alias) => generateRoleNameFromAlias(alias)),
-    ...institution.elasticRoles.map((role) => role.name),
   ];
 
   const user = {

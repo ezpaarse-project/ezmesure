@@ -318,7 +318,7 @@ async function calcDBMetrics() {
  */
 async function calcMetrics() {
   const start = new Date();
-  appLogger.info('[metric]: Get metric is started');
+  appLogger.verbose('[metric]: Get metric is started');
 
   const [cluster, counts, git] = await Promise.all([
     calcESMetrics(),
@@ -328,7 +328,7 @@ async function calcMetrics() {
 
   const took = Date.now() - start.getTime();
   const used = (cluster.stats.fsUsed / cluster.stats.fsAvailable).toFixed(4);
-  appLogger.info(`[metric]: took: ${took} | docs: ${cluster.stats.docs} | indices: ${cluster.stats.indices} | fs: ${used}`);
+  appLogger.info(`[metric]: took: ${took}ms | docs: ${cluster.stats.docs} | indices: ${cluster.stats.indices} | fs: ${used}%`);
 
   return {
     took,

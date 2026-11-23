@@ -234,7 +234,7 @@ function search(queryString) {
 }
 
 async function reloadIndex(datasets, appLogger) {
-  appLogger.info('[OpenData] Recreating index');
+  appLogger.verbose('[OpenData] Recreating index');
 
   await recreateIndex();
 
@@ -266,7 +266,7 @@ async function reloadIndex(datasets, appLogger) {
     }
   }
 
-  appLogger.info('[OpenData] Datasets refreshed');
+  appLogger.verbose('[OpenData] Datasets refreshed');
 }
 
 module.exports = {

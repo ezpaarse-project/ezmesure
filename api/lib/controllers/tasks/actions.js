@@ -24,6 +24,10 @@ exports.getAll = async (ctx) => {
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  prismaQuery.where = {
+    ...prismaQuery.where,
+    NOT: HarvestJobService.whereSoftDeleted,
+  };
 
   if (institutionId || endpointId || tags || packages) {
     prismaQuery.where.credentials = {
@@ -45,7 +49,10 @@ exports.getAll = async (ctx) => {
 exports.getOne = async (ctx) => {
   const { taskId } = ctx.params;
 
-  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: taskId });
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, {
+    id: taskId,
+    NOT: HarvestJobService.whereSoftDeleted,
+  });
 
   const harvestJobService = new HarvestJobService();
   const task = await harvestJobService.findUnique(prismaQuery);
@@ -104,7 +111,12 @@ exports.deleteOne = async (ctx) => {
   }
 
   const harvestJobService = new HarvestJobService();
-  await harvestJobService.delete({ where: { id: taskId } });
+  await harvestJobService.delete({
+    where: {
+      id: taskId,
+      NOT: HarvestJobService.whereSoftDeleted,
+    },
+  });
 
   ctx.status = 204;
 };

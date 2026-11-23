@@ -23,7 +23,7 @@ async function cleanFiles() {
     path.resolve(storageDir, '*/*/*/*/*.json'),
   );
 
-  appLogger.verbose(`[counter-cleanup] Found ${reportPaths.length} reports`);
+  appLogger.verbose(`[sushi][report-cleanup] Found ${reportPaths.length} reports`);
   const reportRes = await Promise.allSettled(
     reportPaths.map(async (filePath) => {
       try {
@@ -40,7 +40,7 @@ async function cleanFiles() {
         }
         return false;
       } catch (error) {
-        appLogger.error(`[counter-cleanup] Error when ${filePath}: ${error}`);
+        appLogger.error(`[sushi][report-cleanup] Error when ${filePath}: ${error}`);
         throw error;
       }
     }),
@@ -50,7 +50,7 @@ async function cleanFiles() {
   const reportSkipped = reportRes.filter((v) => v.value === false).length;
   const reportDeleted = reportRes.length - reportErrors - reportSkipped;
 
-  appLogger.info(`[counter-cleanup] When cleaning reports : ${reportErrors} errors, ${reportSkipped} skipped, ${reportDeleted} deleted`);
+  appLogger.info(`[sushi][report-cleanup] When cleaning reports : ${reportErrors} errors, ${reportSkipped} skipped, ${reportDeleted} deleted`);
 }
 
 async function startCleanCron() {
@@ -58,14 +58,17 @@ async function startCleanCron() {
     cronTime: cleanConfig.schedule,
     runOnInit: true,
     onTick: async () => {
-      appLogger.verbose('[counter-cleanup] Starting cleanup');
+      const start = Date.now();
+      appLogger.verbose('[sushi][report-cleanup] Starting cleanup');
+
       try {
         await cleanFiles();
-        appLogger.info('[counter-cleanup] Cleaned');
       } catch (e) {
         const message = e?.response?.data?.content?.message || e.message;
-        appLogger.error(`[counter-cleanup] Failed to clean: ${message}`);
+        appLogger.error(`[sushi][report-cleanup] Failed to clean: ${message}`);
       }
+
+      appLogger.verbose(`[sushi][report-cleanup] Cleanup ended | took: ${Date.now() - start}ms`);
     },
   });
 
