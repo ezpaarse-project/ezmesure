@@ -464,11 +464,12 @@ You should clone the repository using `git`, it contains configuration files for
 # Clone project
 git clone https://github.com/ezpaarse-project/ezmesure.git
 cd ezmesure
+# Setup environment
+cp .env.example .env
+sed -i 's/^NODE_ENV=.*/NODE_ENV=development/' .env
 # Install dependencies
 npm --prefix api ci
 npm --prefix front ci
-# Setup environment
-cp .env.example .env
 ```
 
 > [!TIP]
