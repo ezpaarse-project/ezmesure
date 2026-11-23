@@ -63,7 +63,7 @@ async function hardDeleteCredentials(ids) {
  */
 async function updateCredentialsDeletionProgression(taskId) {
   const { body } = await getTask(taskId);
-  appLogger.verbose(`[delete-sushi][${taskId}] Got progression update`);
+  appLogger.verbose(`[sushi-credentials][delete-job][${taskId}] Got progression update`);
 
   const { task } = body;
 
@@ -112,7 +112,7 @@ function watchJob(taskId) {
       await updateCredentialsDeletionProgression(taskId);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(`${error}`);
-      appLogger.error(`[delete-sushi][${taskId}] Failed to update credentials deletion progression: ${err.message}`);
+      appLogger.error(`[sushi-credentials][delete-job][${taskId}] Failed to update credentials deletion progression: ${err.message}`);
       unwatchJob(taskId);
     }
   }, deleteConfig.followInterval);
@@ -140,7 +140,7 @@ async function startCredentialsDataDeletion(sushiCredentials, indexPattern, oldI
     return;
   }
 
-  appLogger.debug(`[delete-sushi][${body.task}] Started deletion task with [${ids.length}] credentials`);
+  appLogger.debug(`[sushi-credentials][delete-job][${body.task}] Started deletion task with [${ids.length}] credentials`);
 
   const data = {
     id: `${body.task}`,
@@ -193,14 +193,14 @@ async function startCredentialsDeletions() {
     if (repositories.length > 0) {
       try {
         const indexPattern = repositoriesToIndexPattern(repositories);
-        appLogger.info(`[delete-sushi] Data of credentials for [${id}] are being deleted from elastic (using [${indexPattern}])`);
+        appLogger.info(`[sushi-credentials][delete-job] Data of credentials for [${id}] are being deleted from elastic (using [${indexPattern}])`);
 
         // Wait for deletion to be started to avoid overloading Elastic and/or Postgres
         // eslint-disable-next-line no-await-in-loop
         await startCredentialsDataDeletion(sushiCredentials, indexPattern);
       } catch (error) {
         const err = error instanceof Error ? error : new Error(`${error}`);
-        appLogger.error(`[delete-sushi] Data of credentials for [${id}] cannot be deleted from elastic: ${err.message}`);
+        appLogger.error(`[sushi-credentials][delete-job] Data of credentials for [${id}] cannot be deleted from elastic: ${err.message}`);
       }
     } else {
       try {
@@ -210,7 +210,7 @@ async function startCredentialsDeletions() {
         appLogger.info(`[sushi-credentials][delete-job] Institution doesn't have any repositories, deleted [${count}] credentials`);
       } catch (error) {
         const err = error instanceof Error ? error : new Error(`${error}`);
-        appLogger.error(`[delete-sushi] Credentials for [${id}] cannot be deleted from DB: ${err.message}`);
+        appLogger.error(`[sushi-credentials][delete-job] Credentials for [${id}] cannot be deleted from DB: ${err.message}`);
       }
     }
   }
@@ -263,7 +263,7 @@ async function resumeCredentialsDeletions() {
       await startCredentialsDataDeletion(task.credentials, task.indexPattern, task.id);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(`${error}`);
-      appLogger.error(`[delete-sushi][${task.id}] Data of credentials cannot be deleted from elastic: ${err.message}`);
+      appLogger.error(`[sushi-credentials][delete-job][${task.id}] Data of credentials cannot be deleted from elastic: ${err.message}`);
     }
   }
 
@@ -291,7 +291,7 @@ async function resumeCredentialsDeletions() {
 
 async function deleteMarkedCredentials() {
   const start = Date.now();
-  appLogger.verbose('[delete-sushi] Starting credentials deletions');
+  appLogger.verbose('[sushi-credentials][delete-job] Starting credentials deletions');
   await startCredentialsDeletions();
 
   await resumeCredentialsDeletions();

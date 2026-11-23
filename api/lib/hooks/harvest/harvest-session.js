@@ -12,6 +12,8 @@ const { client: prisma } = require('../../services/prisma');
 const { getNotificationMembershipWhere } = require('../../utils/notifications');
 const { NOTIFICATION_TYPES } = require('../../utils/notifications/constants');
 
+const HarvestJobsService = require('../../entities/harvest-job.service');
+
 /**
  * @typedef {object} SushiConnection
  * @property {number} date
@@ -42,6 +44,7 @@ async function sendEndMail(session) {
           harvestJobs: {
             some: {
               sessionId: session.id,
+              NOT: HarvestJobsService.whereSoftDeleted,
             },
           },
         },
@@ -61,6 +64,7 @@ async function sendEndMail(session) {
           harvestJobs: {
             some: {
               sessionId: session.id,
+              NOT: HarvestJobsService.whereSoftDeleted,
             },
           },
         },

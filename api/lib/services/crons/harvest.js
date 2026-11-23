@@ -32,12 +32,12 @@ async function cancelPendingHarvest() {
     },
   });
 
-  await Promise.all(
+  const hasBeenCancelled = await Promise.all(
     harvests.map(async (harvest) => {
       try {
         if (!harvest.harvestedById) {
           // If the harvest state is active but no job has been linked to it, mark it as interrupted
-          return harvestsService.update({
+          await harvestsService.update({
             data: { status: HarvestJobStatus.interrupted },
             where: {
               credentialsId_reportId_period: {
@@ -47,13 +47,14 @@ async function cancelPendingHarvest() {
               },
             },
           });
+          return true;
         }
 
         // If the job is still in the queue, it means it is still running so don't cancel it
         const job = await harvestQueue.getJob(harvest.harvestedById);
         if (job) {
-          appLogger.warn(`[harvest-pending-cancel] ${harvest.status} job (${job.id}) still in queue while started ${formatDistanceToNow(harvest.harvestedAt, { addSuffix: true })}`);
-          return;
+          appLogger.warn(`[harvest][pending-cancel] ${harvest.status} job (${job.id}) still in queue while started ${formatDistanceToNow(harvest.harvestedAt, { addSuffix: true })}`);
+          return false;
         }
 
         // Mark the harvest job as interrupted, the hooks will update the harvest state
@@ -61,11 +62,17 @@ async function cancelPendingHarvest() {
           where: { id: harvest.harvestedById },
           data: { status: HarvestJobStatus.interrupted },
         });
+        return true;
       } catch (error) {
-        appLogger.error(`[harvest-pending-cancel] Failed to clean job (${harvest.harvestedById}): ${error.message}`);
+        const err = error instanceof Error ? error : new Error(`${error}`);
+        appLogger.error(`[harvest][pending-cancel] Failed to clean job (${harvest.harvestedById}): ${err.message}`);
+        return false;
       }
     }),
   );
+
+  const count = hasBeenCancelled.filter((value) => !!value).length;
+  appLogger.info(`[harvest][pending-cancel] Marked ${count} jobs as interrupted`);
 }
 
 async function startCancelCron() {
@@ -73,13 +80,17 @@ async function startCancelCron() {
     cronTime: harvestConfig.cancelSchedule,
     runOnInit: true,
     onTick: async () => {
-      appLogger.verbose('[harvest-pending-cancel] Starting cleanup');
+      const start = Date.now();
+      appLogger.verbose('[harvest][pending-cancel] Starting cleanup');
+
       try {
         await cancelPendingHarvest();
-        appLogger.info('[harvest-pending-cancel] Cleaned');
-      } catch (e) {
-        appLogger.error(`[harvest-pending-cancel] Failed to clean: ${e.message}`);
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(`${error}`);
+        appLogger.error(`[harvest][pending-cancel] Failed to clean: ${err.message}`);
       }
+
+      appLogger.verbose(`[harvest][pending-cancel] Cleaned | took: ${Date.now() - start}ms`);
     },
   });
 

@@ -136,6 +136,9 @@
       "schedule": "EZMESURE_CLEAN_COUNTER_SCHEDULE",
       "maxDayAge": "EZMESURE_COUNTER_MAX_AGE"
     },
+    "deleteJobs": {
+      "schedule": "EZMESURE_COUNTER_DELETE_JOBS_SCHEDULE"
+    },
     "deleteSushi": {
       "schedule": "EZMESURE_DELETE_SUSHI_COUNTER_SCHEDULE",
       "followInterval": "EZMESURE_DELETE_SUSHI_COUNTER_FOLLOW_INTERVAL"
