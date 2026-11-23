@@ -38,6 +38,10 @@ menu:
     shares: Partages
     sushiEndpoints: Points d'accès COUNTER
     customFields: Champs personnalisés
+    dashboards:
+      title: Tableaux de bord
+      templates: Modèles
+      collections: Collections
     harvest:
       title: Moissonnage
       entries:
@@ -162,6 +166,8 @@ myspace:
         user: Notifications liées à un utilisateur
         app: Notifications de l'application
       types:
+        institution:created:
+          admin: Un établissement a été déclaré
         institution:validated:
           user: Un de vos établissements a été validé
           admin: Un établissement a été validé
@@ -398,7 +404,12 @@ endpoints:
   searchRegistryDataHint: Chercher une plateforme par nom
   registryId: ID de la plateforme dans le registre COUNTER
   registryIdHint: Vous pouvez directement coller l'URL du registre COUNTER
+  registryIdNoDescription: Ce point d'accès n'est pas présent dans le registre COUNTER
+  compliant: Conforme COUNTER
+  compliantDescription: Ce point d'accès a fait l'objet d'un audit et les moissons sont généralement couronnées de succès
+  compliantHint: Cela signifie que le point d'accès a fait l'objet d'un audit et que les moissons sont couronnées de succès
   registryUrl: Lien vers le registre COUNTER
+  inRegistry: Présent dans le registre COUNTER
   goToRegistry: Registre COUNTER
   filters:
     title: Filtrer les points d'accès
@@ -661,12 +672,18 @@ institutions:
       completed: Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous.
   harvestable:
     title: Établissements moissonnables
-    harvestableInstitutions: Moissonnables
+    eligibleInstitutions: Éligibles à un nouveau moissonnage
     status:
       harvestable: Moissonnable
       non-harvestable: Non moissonnable
-      selectable: Sélectionnable
+      eligible: Éligible
+      non-eligible: Non éligible
       harvested: Déjà moissonné
+    tooltips:
+      noRepositories: Aucun entrepôt COUNTER n'est défini, lancer un moissonnage pour cet établissement entraînera une erreur
+      noSpaces: Aucun espace COUNTER n'est défini, les membres de cet établissement ne pourront pas voir les données récupérées
+      noCredentials: Aucun identifiant valide et actif n'est défini, aucune moisson ne sera faite pour cet établissement
+      isHarvested: L'établissement a déjà été moissonné pour la période
     members: Contacts
     repositories: '@:repositories.repositories COUNTER'
     spaces: '@:spaces.spaces COUNTER'
@@ -675,7 +692,7 @@ institutions:
     allowFaulty: Inclure les identifiants invalides
     allowHarvested: Inclure les établissements déjà moissonnés
     harvestedMonth: Période cible
-    nSelectable: (1 sélectionnable)|({n} sélectionnables)
+    nHarvestable: (1 moissonnable)|({n} moissonnables)
     institutions: Établissement|Établissements
   unableToRetriveInformations: Impossible de récupérer les informations d'établissement
   unableToRetrivePlatforms: Impossible de récupérer les informations d'établissement
@@ -857,6 +874,7 @@ sushi:
   matrix:
     unsupported: Rapport non supporté (déclaration éditeur)
     ignored: Rapport non supporté (constat ezMESURE)
+    supportedBy: Versions
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
     description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez valider vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
@@ -910,16 +928,21 @@ sushi:
       main:update: Je modifie les identifiants déjà déclarés
       secondary:create: Créer de nouveaux identifiants
       secondary:update: Poursuivre l'édition
-  isHarvestable:
+  isEligible:
     title: Votre établissement est éligible au moissonnage
     text: Votre établissement sera inclus dans la prochaine vague de moissonnage, aucune action n'est nécessaire de votre part.
-  isNotHarvestable:
+  isNotEligible:
     title: Votre établissement n'est actuellement pas éligible au moissonnage
     text: "Vous devez corriger les problèmes suivants afin d'être moissonné :"
     reasons:
       institutionIsNotReady: Votre saisie n'est pas terminée
       institutionHasNoCredentials: Aucun identifiant COUNTER n'a été déclaré
       institutionHasFaultyCredentials: Certains de vos identifiants n'ont pas été testés ou sont invalides
+  isNotHarvestable:
+    title: Votre établissement n'est actuellement pas moissonnable
+    text: "Une configuration est manquante pour votre établissement. Merci de contacter les administrateurs avec les raisons suivantes :"
+    reasons:
+      institutionHasNoRepositories: L'établissement ne possède aucun entrepôt COUNTER
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
@@ -1181,6 +1204,7 @@ repositoryAliases:
     Gérer les alias
     |Gérer {count} alias
   alias: Alias
+  aliasOf: Alias de {pattern}
   target: Pattern de l'entrepôt cible
   template: Modèle
   filtered: Filtré ?
@@ -1236,7 +1260,7 @@ repoAliasTemplates:
 
 spaces:
   spaces: Espaces
-  toolbarTitle: Espace ({count})
+  toolbarTitle: Espaces ({count})
   newSpace: Nouvel espace
   editSpace: Mise à jour de l'espace
   ownedSpaces: Espaces établissement
@@ -1261,9 +1285,17 @@ spaces:
   descriptions:
     ezpaarse: Espace ezPAARSE
     counter5: Espace éditeurs
+  search:
+    empty: Aucun espace ne correspond à votre recherche
   deleteSpace: Vous allez supprimer l'espace "{spaceName}", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible.
   filters:
     title: Filtrer les espaces
+  collections: Collections
+  collectionsDialog:
+    empty:
+      title: Pas de collections
+      text: Aucune collection de tableaux de bord n'a encore été attribuée à cet espace
+      action: Ajouter une collection
 harvest:
   toolbarTitle: Sessions ({count})
   sessions:
@@ -1333,6 +1365,11 @@ harvest:
         title: Paramètres de moissonnage
         sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
         timeout: Délai de complétion des tâches
+        description:
+          template: '{date} - Moisson {period} sur {endpoints} pour {institutions}'
+          allEndpoints: tous les points d'accès
+          allInstitutions: tous les établissements
+          more: '{prefix} et 1 autre|{prefix} et {n} autres'
     unableToRetrive: Impossible de récupérer les moissonnages
     start: Démarrer la session
     stop: Arrêter la session
@@ -1501,6 +1538,77 @@ admin:
     title: Journaux applicatifs
     connecting: Connexion...
     connectionError: Erreur de connexion
+    actions:
+      level:
+        title: Modifier le niveau de log
+        buttonText: Niveau de log
+        level: Niveau
+        duration: Durée
+        durationHint: Une fois la durée écoulée, le niveau par défaut sera rétabli
+dashboardCollections:
+  toolbarTitle: Collections de tableaux de bord ({count})
+  pageDesc: Créez ici les collections de tableaux de bord que vous souhaitez pouvoir intégrer dans les espaces.
+  updateCollection: Modifier la collection
+  newCollection: Nouvelle collection
+  repositorySelection: Choix de l'entrepôt
+  noRepositories: Pas d'entrepôts disponibles
+  addADashboard: Ajouter un tableau de bord
+  addToASpace: Ajouter à un espace
+  manageCollections: >
+    Gérer la collection
+    |Gérer {count} collections
+  search:
+    empty: Aucune collection ne correspond à votre recherche
+  dashboardsDialog:
+    empty:
+      title: Pas de tableaux de bord
+      text: Aucun tableau de bord n'a encore été ajouté à cette collection
+      action: Ajouter un tableau de bord
+  spacesDialog:
+    empty:
+      title: Pas d'espaces
+      text: Aucun espace ne contient cette collection
+      action: Ajouter à un espace
+  actions:
+    delete:
+      title: Supprimer 1 collection ?|Supprimer {count} collections ?
+      text: Les modèles associés seront également supprimés.
+dashboards:
+  title: Tableaux de bord
+  toolbarTitle: Modèles de tableaux de bord ({count})
+  pageDesc: Dans cette page, vous pouvez sauvegarder des tableaux de bord issus de Kibana. Associez les ensuite à une collection pour les intégrer dans les espaces.
+  updateTemplate: Modifier le modèle
+  newTemplate: Nouveau modèle
+  sourceSpace: Espace
+  sourceDashboard: Tableau de bord
+  collection: Collection
+  templates: Modèles
+  noCollection: Pas de collection
+  kibanaVersion: Version de Kibana
+  tags: Étiquettes
+  manageDashboards: Gérer 1 tableau de bord|Gérer {count} tableaux de bord
+  addCollection: Ajouter une collection
+  cannotAddToCollection: Impossible d'ajouter le tableau de bord dans la collection
+  cannotRemoveFromCollection: Impossible de supprimer le tableau de bord de la collection
+  search:
+    empty: Aucun modèle de tableau de bord ne correspond à votre recherche
+  form:
+    headline:
+      add: Cherchez un tableau de bord Kibana que vous souhaitez enregistrer comme modèle.
+      modify: Modifiez le tableau de bord Kibana que vous souhaitez utiliser comme modèle.
+  actions:
+    update:
+      title: Mettre à jour 1 tableau de bord ?|Mettre à jour {count} tableaux de bord ?
+      text: >
+        La version actuelle sera remplacée par celle présente dans Kibana.
+        |Les versions actuelles seront remplacées par celles présentes dans Kibana.
+      confirm: Mettre à jour
+    delete:
+      title: Supprimer 1 tableau de bord ?|Supprimer {count} tableaux de bord ?
+      text: >
+        Le modèle actuellement sauvegardé sera supprimé. Le tableau de bord Kibana ayant servi à sa création ne sera pas affecté.
+        |Les modèles actuellement sauvegardés seront supprimés. Les tableaux de bord Kibana ayant servi à leur création ne seront pas affectés.
+      confirm: Supprimer
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
@@ -1555,7 +1663,7 @@ cannotDeleteItems: Impossible de supprimer {count} élément(s)
 cannotDeleteItem: Impossible de supprimer l'élément {id}
 cannotUpdateItem: Impossible de mettre à jour l'élément {id}
 itemsDeleted: "{count} élement(s) supprimé(s)"
-itemsUpdated: "{count} élement(s) modifié(s)"
+itemsUpdated: "{count} élement(s) mis à jour"
 update: Mettre à jour
 create: Créer
 download: Télécharger

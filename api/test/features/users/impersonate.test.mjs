@@ -1,16 +1,17 @@
 import {
   describe, it, expect, beforeAll, afterAll,
 } from 'vitest';
+import { parseSetCookie, stringifyCookie } from 'cookie';
 import config from 'config';
 
 import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 
 const adminUsername = config.get('admin.username');
 const authCookie = config.get('auth.cookie');
@@ -49,9 +50,8 @@ describe('[users]: Test impersonation features', () => {
     await usersPrisma.create({ data: regularUser });
     await usersElastic.createUser(regularUser);
 
-    const usersService = new UsersService();
-    adminToken = await (usersService).generateToken(adminUsername);
-    regularUserToken = await (usersService).generateToken(regularUser.username);
+    adminToken = await signJWT({ username: adminUsername });
+    regularUserToken = await signJWT({ username: regularUser.username });
   });
 
   describe('An admin', () => {
@@ -63,20 +63,26 @@ describe('[users]: Test impersonation features', () => {
         },
       });
 
-      const tokenPattern = new RegExp(`^${authCookie}=([a-z0-9._-]+)`, 'i');
-
       expect(httpAppResponse).toHaveProperty('status', 200);
 
-      const cookieHeader = httpAppResponse.headers.get('set-cookie');
+      const cookies = httpAppResponse.headers.getSetCookie().map(parseSetCookie);
+      const jwePattern = /^[a-z0-9_-]+(\.[a-z0-9_-]*){4}$/i;
 
-      expect(cookieHeader).toMatch(tokenPattern);
+      expect(cookies).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: authCookie,
+            value: expect.stringMatching(jwePattern),
+          }),
+        ]),
+      );
 
-      const targetUserToken = tokenPattern.exec(cookieHeader)?.[1];
+      const userTokenCookie = cookies.find((cookie) => cookie.name === authCookie);
 
       const profileResponse = await ezmesure.raw('/auth', {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${targetUserToken}`,
+          Cookie: stringifyCookie({ [userTokenCookie.name]: userTokenCookie.value }),
         },
       });
 

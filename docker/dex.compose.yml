@@ -1,0 +1,14 @@
+services:
+  # We use dex as default authentication provider, you can choose another one that fits your needs,
+  # as longs as it provides OIDC authentication
+  dex:
+    image: 'dexidp/dex:v2.45.1-alpine'
+    restart: "no"
+    env_file: .env
+    environment:
+      EZMESURE_OIDC_ISSUER_URI: https://${EZMESURE_DOMAIN}${EZMESURE_PUBLIC_PORT}/auth
+      # echo changeme | htpasswd -BinC 10 admin | cut -d: -f2
+      EZMESURE_ADMIN_PASSWORD_HASH: "$2y$10$/Ctv48gjpa9DbcRB3djGQOujxIoUCfxrfFlwYKtW4k6D6.SgC6OP."
+    volumes:
+      - ./docker/dex/dex.yaml:/etc/dex/config.docker.yaml
+      - ./docker/certs/ca.pem:/etc/ssl/ezmesure.pem:ro

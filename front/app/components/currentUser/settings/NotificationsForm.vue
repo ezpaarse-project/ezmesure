@@ -115,6 +115,7 @@ const NOTIFICATION_TYPES = [
 ];
 
 const ADMIN_NOTIFICATION_TYPES = [
+  'institution:created',
   'institution:membership_request',
   'institution:counter_ready_change',
 

@@ -30,12 +30,12 @@
       <slot name="selection" v-bind="selection" />
     </template>
 
-    <template v-if="looseEnabled" #append>
+    <template v-if="modeEnabled" #append>
       <v-btn
-        v-tooltip="loose ? $t('looseFilter') : $t('strictFilter')"
-        :icon="loose ? '$mdi-approximately-equal' : '$mdi-equal'"
+        v-tooltip="mode === 'some' ? $t('looseFilter') : $t('strictFilter')"
+        :icon="mode === 'some' ? '$mdi-approximately-equal' : '$mdi-equal'"
         density="comfortable"
-        @click="emit('update:loose', !loose)"
+        @click="emit('update:mode', mode === 'some' ? 'every' : 'some')"
       />
     </template>
   </v-autocomplete>
@@ -55,24 +55,24 @@ const props = defineProps({
     type: Symbol,
     default: undefined,
   },
-  loose: {
-    type: Boolean,
+  mode: {
+    type: String,
     default: undefined,
   },
 });
 
 const emit = defineEmits({
   'update:modelValue': (v) => Array.isArray(v) || typeof v === 'string' || v === undefined,
-  'update:loose': (v) => v === true || v === false,
+  'update:mode': (v) => v === 'every' || v === 'some',
 });
 
 const { t } = useI18n();
 
 const search = shallowRef('');
 
-const looseEnabled = computed(() => {
-  const { 'onUpdate:loose': looseListener } = getCurrentInstance()?.vnode.props ?? {};
-  return !!looseListener;
+const modeEnabled = computed(() => {
+  const { 'onUpdate:mode': modeListener } = getCurrentInstance()?.vnode.props ?? {};
+  return !!modeListener;
 });
 
 const value = computed({
@@ -113,7 +113,7 @@ const selectItems = computed(() => {
       props: {
         disabled: props.emptySymbol && isEmptyActive.value,
         color: 'primary',
-        ...(i.props ?? {}),
+        ...i.props,
       },
     };
   });

@@ -99,7 +99,7 @@
 
               <v-row>
                 <v-col cols="8">
-                  <p class="text-medium-emphasis">
+                  <div class="text-medium-emphasis">
                     {{ $t('$ezreeport.editor.filters.hints.type') }}
 
                     <ul class="pl-3">
@@ -107,7 +107,7 @@
                       <li>{{ $t('$ezreeport.editor.filters.hints.type:is') }}</li>
                       <li>{{ $t('$ezreeport.editor.filters.hints.type:in') }}</li>
                     </ul>
-                  </p>
+                  </div>
                 </v-col>
 
                 <v-col cols="4">

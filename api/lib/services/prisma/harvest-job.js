@@ -5,6 +5,7 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('../../.prisma/client.mjs').Prisma.TransactionClient} TransactionClient */
 /** @typedef {import('../../.prisma/client.mjs').HarvestJob} HarvestJob */
 /** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobUpdateManyAndReturnArgs} HarvestJobUpdateManyAndReturnArgs */
 /** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
 /** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
 /** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobDeleteManyArgs} HarvestJobDeleteManyArgs */
@@ -15,6 +16,7 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobAggregateArgs} HarvestJobAggregateArgs */
 /** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
+/** @typedef {import('../../.prisma/client.mjs').Prisma.HarvestJobCreateManyAndReturnArgs} HarvestJobCreateManyAndReturnArgs */
 /* eslint-enable max-len */
 
 /**
@@ -24,6 +26,15 @@ const { client: prisma, Prisma } = require('./index');
  */
 function create(params, tx = prisma) {
   return tx.harvestJob.create(params);
+}
+
+/**
+ * @param {HarvestJobCreateManyAndReturnArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<HarvestJob[]>}
+ */
+function createMany(params, tx = prisma) {
+  return tx.harvestJob.createManyAndReturn(params);
 }
 
 /**
@@ -88,6 +99,15 @@ function count(params, tx = prisma) {
  */
 function update(params, tx = prisma) {
   return tx.harvestJob.update(params);
+}
+
+/**
+ * @param {HarvestJobUpdateManyAndReturnArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<HarvestJob[]>}
+ */
+function updateMany(params, tx = prisma) {
+  return tx.harvestJob.updateManyAndReturn(params);
 }
 
 /**
@@ -162,6 +182,7 @@ function cancel(job) {
 
 module.exports = {
   create,
+  createMany,
   findMany,
   findUnique,
   findFirst,
@@ -169,6 +190,7 @@ module.exports = {
   aggregate,
   count,
   update,
+  updateMany,
   upsert,
   remove,
   removeMany,

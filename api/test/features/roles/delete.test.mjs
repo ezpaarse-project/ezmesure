@@ -12,9 +12,9 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import usersPrisma from '../../../lib/services/prisma/users';
-import UsersService from '../../../lib/entities/users.service';
 import rolesPrisma from '../../../lib/services/prisma/roles';
 
 const adminUsername = config.get('admin.username');
@@ -59,7 +59,7 @@ describe('[roles] Delete features', () => {
 
     beforeAll(async () => {
       await usersPrisma.create({ data: adminUser });
-      adminToken = await (new UsersService()).generateToken(adminUsername);
+      adminToken = await signJWT({ username: adminUsername });
     });
 
     it('#01 Should be able to delete a role', async () => {
@@ -84,7 +84,7 @@ describe('[roles] Delete features', () => {
 
     beforeAll(async () => {
       await usersPrisma.create({ data: testUser });
-      userToken = await (new UsersService()).generateToken(testUser.username);
+      userToken = await signJWT({ username: testUser.username });
     });
 
     it('#02 Should not be able to delete a role', async () => {

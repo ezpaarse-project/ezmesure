@@ -169,13 +169,13 @@
               <template #text>
                 {{ harvestableLabels.text }}
 
-                <ul v-if="(sushiMetrics?.harvestable.reasons.length ?? 0) > 0" class="mt-2">
+                <ul v-if="harvestableLabels.items.length > 0" class="mt-2">
                   <li
-                    v-for="reason in sushiMetrics.harvestable.reasons"
-                    :key="reason"
+                    v-for="(reason, i) in harvestableLabels.items"
+                    :key="i"
                     class="font-weight-bold"
                   >
-                    - {{ $t(`sushi.isNotHarvestable.reasons.${reason}`) }}
+                    - {{ reason }}
                   </li>
                 </ul>
               </template>
@@ -412,20 +412,32 @@ const harvestableLabels = computed(() => {
     return undefined;
   }
 
-  if (sushiMetrics.value.harvestable.value) {
+  if (!sushiMetrics.value.harvestable.value) {
     return {
-      title: t('sushi.isHarvestable.title'),
-      text: t('sushi.isHarvestable.text'),
-      type: 'success',
-      icon: '$mdi-check',
+      title: t('sushi.isNotHarvestable.title'),
+      text: t('sushi.isNotHarvestable.text'),
+      type: 'error',
+      icon: '$mdi-close',
+      items: sushiMetrics.value.harvestable.reasons.map((reason) => t(`sushi.isNotHarvestable.reasons.${reason}`)),
+    };
+  }
+
+  if (!sushiMetrics.value.eligible.value) {
+    return {
+      title: t('sushi.isNotEligible.title'),
+      text: t('sushi.isNotEligible.text'),
+      type: 'warning',
+      icon: '$mdi-alert',
+      items: sushiMetrics.value.eligible.reasons.map((reason) => t(`sushi.isNotEligible.reasons.${reason}`)),
     };
   }
 
   return {
-    title: t('sushi.isNotHarvestable.title'),
-    text: t('sushi.isNotHarvestable.text'),
-    type: 'warning',
-    icon: '$mdi-alert',
+    title: t('sushi.isEligible.title'),
+    text: t('sushi.isEligible.text'),
+    type: 'success',
+    icon: '$mdi-check',
+    items: [],
   };
 });
 

@@ -10,8 +10,7 @@ const { appLogger } = require('../../services/logger');
 const { username } = config.get('admin');
 let reportingAdminToken;
 
-const REPORTING_CACHE_DURATION = 24 * 3600 * 1000;
-const reportingCache = createCache(REPORTING_CACHE_DURATION);
+const reportingCache = createCache(config.get('cache.duration.institutionReporting'));
 
 const getTokenOfAdmin = async () => {
   if (!reportingAdminToken) {

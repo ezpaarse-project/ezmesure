@@ -45,6 +45,16 @@
         </nuxt-link>
       </template>
 
+      <template #[`item._count.dashboardCollections`]="{ value, item }">
+        <v-chip
+          :text="`${value ?? 0}`"
+          :variant="!value ? 'outlined' : undefined"
+          prepend-icon="$mdi-view-dashboard"
+          size="small"
+          @click="openCollections(item.id)"
+        />
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ props: menu }">
@@ -109,9 +119,12 @@
 </template>
 
 <script setup>
+import SpacesDashboardCollectionsDialog from '~/components/space/DashboardCollectionsDialog.vue';
+
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
+const { openDialog } = useDialogStore();
 const snacks = useSnacksStore();
 
 const selectedSpaces = ref([]);
@@ -127,11 +140,11 @@ const {
   fetch: {
     url: '/api/kibana-spaces',
     query: {
-      include: ['institution'],
+      include: ['institution', '_count.dashboardCollections'],
     },
   },
   sortMapping: {
-    institutions: 'institutions._count',
+    '_count.dashboardCollections': 'dashboardCollections._count',
   },
   data: {
     sortBy: [
@@ -165,6 +178,12 @@ const headers = computed(() => [
   {
     title: t('institutions.title'),
     value: 'institution.name',
+    sortable: true,
+  },
+  {
+    title: t('spaces.collections'),
+    value: '_count.dashboardCollections',
+    align: 'center',
     sortable: true,
   },
   {
@@ -229,6 +248,13 @@ function deleteSpaces(items) {
 
       await refresh();
     },
+  });
+}
+
+function openCollections(spaceId) {
+  openDialog({
+    component: SpacesDashboardCollectionsDialog,
+    data: { spaceId },
   });
 }
 

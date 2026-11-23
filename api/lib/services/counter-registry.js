@@ -1,11 +1,13 @@
 const { ofetch } = require('ofetch');
+const config = require('config');
+
 const { createCache } = require('../utils/cache-manager');
 
 const registry = ofetch.create({
-  baseURL: 'https://registry.countermetrics.org/api/v1',
+  baseURL: config.get('counter.registryUrl'),
 });
 
-const cache = createCache(24 * 3600 * 1000);
+const cache = createCache(config.get('cache.duration.counterRegistry'));
 
 /**
  * Get all platforms from counter registry, and cache them for 1 day
@@ -18,7 +20,7 @@ async function getAllPlatforms() {
     return cached;
   }
 
-  const data = await registry('/platform');
+  const data = await registry('/api/v1/platform');
   await cache.set('platforms:*', data);
 
   return data;
@@ -37,7 +39,7 @@ async function getPlatform(id) {
     return cached;
   }
 
-  const data = await registry(`/platform/${id}`);
+  const data = await registry(`/api/v1/platform/${id}`);
   await cache.set(`platforms:${id}`, data, 3600 * 1000);
 
   return data;
@@ -56,7 +58,7 @@ async function getDataHost(id) {
     return cached;
   }
 
-  const data = await registry(`/usage-data-host/${id}`);
+  const data = await registry(`/api/v1/usage-data-host/${id}`);
   await cache.set(`data-hosts:${id}`, data);
 
   return data;

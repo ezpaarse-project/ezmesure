@@ -1,5 +1,7 @@
 const { createHash } = require('node:crypto');
 
+const config = require('config');
+
 const InMemoryQueue = require('../../utils/memory-queue');
 const { createCache } = require('../../utils/cache-manager');
 
@@ -9,8 +11,8 @@ const HarvestsService = require('../../entities/harvest.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const EndpointsService = require('../../entities/sushi-endpoints.service');
 
-const CACHE_DURATION = 5 * 60 * 1000;
-const cache = createCache(CACHE_DURATION);
+const cacheDuration = config.get('cache.duration.harvestMatrix');
+const cache = createCache(cacheDuration);
 
 const institutionsQueue = new InMemoryQueue(
   /**
@@ -28,8 +30,8 @@ const institutionsQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][institutions][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
@@ -77,9 +79,9 @@ const institutionsQueue = new InMemoryQueue(
       });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][institutions][${id}] Caching matrix for [${cacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + cacheDuration);
       data.unharvested = unharvested;
       data.matrix = {
         ...matrix,
@@ -113,8 +115,8 @@ const endpointsQueue = new InMemoryQueue(
       appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Generating matrix...`);
 
       const {
-        'period:from': from,
-        'period:to': to,
+        'period[gte]': from,
+        'period[lte]': to,
       } = query;
 
       const harvests = new HarvestsService();
@@ -141,9 +143,9 @@ const endpointsQueue = new InMemoryQueue(
       const rows = await endpoints.findMany({ where: { id: { in: matrix.headers.rows } } });
 
       // Cache matrix
-      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${CACHE_DURATION}ms]...`);
+      appLogger.verbose(`[harvest-matrix][sushi-endpoints][${id}] Caching matrix for [${cacheDuration}ms]...`);
       data.generatedAt = new Date();
-      data.validUntil = new Date(data.generatedAt.getTime() + CACHE_DURATION);
+      data.validUntil = new Date(data.generatedAt.getTime() + cacheDuration);
       data.matrix = {
         ...matrix,
         headers: {

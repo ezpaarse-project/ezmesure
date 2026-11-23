@@ -11,9 +11,14 @@
       v-model:search="search"
       v-model:filters="filters"
       :refresh="refresh"
-      :title="endpoint.vendor"
       icons
     >
+      <template #title>
+        {{ endpoint.vendor }}
+
+        <SushiEndpointStatusChip :model-value="endpoint" size="small" class="ml-2" />
+      </template>
+
       <template #filters-panel="props">
         <SushiApiFilters v-bind="props" />
       </template>
@@ -405,7 +410,7 @@ const MAX_HARVEST_YEAR = new Date().getFullYear();
 
 const { params } = useRoute();
 const { t, locale } = useI18n();
-const { public: { counterRegistryUrl } } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 const { addToCheck } = useSushiCheckQueueStore();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
@@ -509,7 +514,7 @@ const registryUrl = computed(() => {
     return undefined;
   }
 
-  return new URL(`/platform/${endpoint.value.registryId}`, counterRegistryUrl);
+  return new URL(`/platform/${endpoint.value.registryId}`, apiConfig.value.counter.registryUrl);
 });
 
 function shouldGreyRow(item) {

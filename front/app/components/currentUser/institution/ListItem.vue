@@ -4,7 +4,7 @@
     :subtitle="institution.acronym"
     :active="isActive"
     color="primary"
-    class="text-grey-darken-3"
+    :class="{ 'text-grey-darken-3': !isActive }"
   >
     <template #prepend>
       <InstitutionAvatar :institution="institution" />

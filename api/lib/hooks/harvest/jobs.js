@@ -14,7 +14,8 @@ const HarvestSessionService = require('../../entities/harvest-session.service');
 /**
  * @typedef {import('../../.prisma/client.mjs').HarvestJob} HarvestJob
  * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestUncheckedCreateInput} HarvestUncheckedCreateInput
- * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestUncheckedUpdateInput} HarvestUncheckedUpdateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestUpdateInput} HarvestUpdateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.HarvestUpdateManyArgs} HarvestUpdateManyArgs
 */
 /* eslint-enable max-len */
 
@@ -26,93 +27,194 @@ const SUSHI_CODES_UNAVAILABLE_PERIODS = new Set([
   SUSHI_CODES.usageNotAvailable,
 ].map((c) => `sushi:${c}`));
 
-const onHarvestJobUpdate = async (harvestJob) => {
+/**
+ * @param {HarvestJob} harvestJob
+ * @param {string[]} periods
+ */
+const onHarvestJobFailed = async (harvestJob, periods) => {
+  const jobSlug = `${harvestJob.credentialsId}:${harvestJob.reportType}`;
+  const { credentialsId } = harvestJob;
+  if (!credentialsId) {
+    return;
+  }
+
+  const harvestService = new HarvestService();
+
+  // Handle some SUSHI codes
+  if (SUSHI_CODES_UNAVAILABLE_PERIODS.has(harvestJob.errorCode || '')) {
+    try {
+      const count = await harvestService.updateMany({
+        where: {
+          credentialsId,
+          reportId: harvestJob.reportType,
+          period: { in: periods },
+        },
+        data: {
+          status: 'missing',
+        },
+      });
+      appLogger.verbose(`[harvest][hooks][${jobSlug}] Updated [${count}] harvest states as missing from SUSHI code`);
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`${error}`);
+      appLogger.error(`[harvest][hooks][${jobSlug}] Cannot update harvest states: ${err.message}`);
+    }
+  }
+};
+
+/**
+ * @param {HarvestJob} harvestJob
+ * @param {string[]} periods
+ */
+const onHarvestJobFinished = async (harvestJob, periods) => {
+  const jobSlug = `${harvestJob.credentialsId}:${harvestJob.reportType}`;
+  const { credentialsId } = harvestJob;
+  if (!credentialsId) {
+    return;
+  }
+
+  const harvestService = new HarvestService();
+
+  // Update missing periods
+  try {
+    const missingPeriods = new Set(periods)
+      .difference(new Set(harvestJob.result?.coveredPeriods ?? []));
+
+    if (missingPeriods.size > 0) {
+      const count = await harvestService.updateMany({
+        where: {
+          credentialsId,
+          reportId: harvestJob.reportType,
+          period: { in: Array.from(missingPeriods) },
+        },
+        data: {
+          status: 'missing',
+          errorCode: `sushi:${SUSHI_CODES.unavailablePeriod}`,
+        },
+      });
+      appLogger.verbose(`[harvest][hooks][${jobSlug}] Updated [${count}] harvest states as missing in report`);
+    }
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(`${error}`);
+    appLogger.error(`[harvest][hooks][${jobSlug}] Cannot update harvest states: ${err.message}`);
+  }
+};
+
+/**
+ * @param {HarvestJob} harvestJob
+ */
+const onHarvestJobEnd = async (harvestJob) => {
+  // Check if a job is still active. If not, trigger hook as session ended
+  const { id: activeCount } = await (new HarvestJobsService()).count({
+    where: {
+      sessionId: harvestJob.sessionId,
+      status: {
+        notIn: HarvestJobsService.endStatuses,
+      },
+    },
+    select: { id: true },
+  });
+
+  const session = await (new HarvestSessionService()).findUnique({
+    where: { id: harvestJob.sessionId },
+  });
+
+  if (!session || activeCount > 0) {
+    return;
+  }
+
+  triggerHooks('harvest-session:end', session);
+};
+
+/**
+ * @param {HarvestJob} harvestJob
+ */
+const onHarvestJobUpsert = async (harvestJob) => {
+  const jobSlug = `${harvestJob.credentialsId}:${harvestJob.reportType}`;
+  const { credentialsId } = harvestJob;
+  if (!credentialsId) {
+    return;
+  }
+
+  const harvestService = new HarvestService();
+
   const now = new Date();
 
-  await HarvestService.$transaction(async (harvestService) => {
-    /** @type {HarvestUncheckedCreateInput & HarvestUncheckedUpdateInput} */
-    const harvestData = {
-      harvestedAt: now,
-      harvestedById: harvestJob.id,
-      credentialsId: harvestJob.credentialsId,
-      period: harvestJob.beginDate,
-      reportId: harvestJob.reportType,
-      status: harvestJob.status,
-      insertedItems: harvestJob.result?.inserted || 0,
-      updatedItems: harvestJob.result?.updated || 0,
-      failedItems: harvestJob.result?.failed || 0,
-      errorCode: harvestJob.errorCode,
-      sushiExceptions: harvestJob.sushiExceptions,
-    };
+  const periods = eachMonthOfInterval({
+    start: parse(harvestJob.beginDate, HARVEST_FORMAT, now),
+    end: parse(harvestJob.endDate, HARVEST_FORMAT, now),
+  })
+    .map((period) => format(period, HARVEST_FORMAT));
 
-    let coveredPeriods;
-    const periods = eachMonthOfInterval({
-      start: parse(harvestJob.beginDate, HARVEST_FORMAT, now),
-      end: parse(harvestJob.endDate, HARVEST_FORMAT, now),
-    });
-    if (harvestJob.result?.coveredPeriods) {
-      coveredPeriods = new Set(harvestJob.result.coveredPeriods);
-    }
-
-    // Update harvest states
-    await Promise.all(
-      periods.map(async (period) => {
-        const periodStr = format(period, HARVEST_FORMAT);
-        const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${periodStr}`;
-
-        try {
-          const data = { ...harvestData, period: periodStr };
-          if (data.status === 'failed' && SUSHI_CODES_UNAVAILABLE_PERIODS.has(data.errorCode || '')) {
-            data.status = 'missing';
-          } else if (data.status === 'finished' && !coveredPeriods?.has(periodStr)) {
-            data.status = 'missing';
-            data.errorCode = `sushi:${SUSHI_CODES.unavailablePeriod}`;
-          }
-
-          await harvestService.upsert({
-            where: {
-              credentialsId_reportId_period: {
-                credentialsId: harvestJob.credentialsId,
-                reportId: harvestJob.reportType,
-                period: periodStr,
-              },
-            },
-            create: data,
-            update: data,
-          });
-          appLogger.verbose(`[harvest][hooks] Harvest state [${harvestStateId}] has been updated`);
-        } catch (error) {
-          appLogger.error(`[harvest][hooks] Harvest state [${harvestStateId}] cannot be updated: ${error.message}`);
-        }
-      }),
-    );
-
-    // Check if a job is still active. If not, trigger hook as session ended
-    const harvestJobsService = new HarvestJobsService(harvestService);
-    const { id: activeCount } = await harvestJobsService.count({
+  // Ensuring harvest states exists
+  try {
+    const existing = await harvestService.count({
       where: {
-        sessionId: harvestJob.sessionId,
-        status: {
-          notIn: HarvestJobsService.endStatuses,
-        },
+        credentialsId,
+        reportId: harvestJob.reportType,
+        period: { in: periods },
       },
-      select: { id: true },
     });
 
-    if (activeCount <= 0) {
-      const harvestSessionService = new HarvestSessionService(harvestService);
-      const session = await harvestSessionService.findUnique({
-        where: { id: harvestJob.sessionId },
+    if (existing < periods.length) {
+      const count = await harvestService.createMany({
+        // Ignore states that already exists
+        skipDuplicates: true,
+        data: periods.map((period) => ({
+          harvestedById: harvestJob.id,
+          credentialsId,
+          status: harvestJob.status,
+          period,
+          reportId: harvestJob.reportType,
+        })),
       });
-      if (!session) { throw new Error(`session ${harvestJob.sessionId} not found`); }
-
-      triggerHooks('harvest-session:end', session);
+      appLogger.verbose(`[harvest][hooks][${jobSlug}] Created [${count}] harvest states`);
     }
-  });
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(`${error}`);
+    appLogger.error(`[harvest][hooks][${jobSlug}] Cannot create harvest states: ${err.message}`);
+  }
+
+  // Update info of all states
+  try {
+    const count = await harvestService.updateMany({
+      where: {
+        credentialsId,
+        reportId: harvestJob.reportType,
+        period: { in: periods },
+      },
+      data: {
+        harvestedAt: now,
+        status: harvestJob.status,
+        insertedItems: harvestJob.result?.inserted ?? 0,
+        updatedItems: harvestJob.result?.updated ?? 0,
+        failedItems: harvestJob.result?.failed ?? 0,
+        errorCode: harvestJob.errorCode,
+        sushiExceptions: { set: harvestJob.sushiExceptions.filter((ex) => typeof ex === 'object' && !!ex) },
+      },
+    });
+    appLogger.verbose(`[harvest][hooks][${jobSlug}] Updated [${count}] harvest states`);
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(`${error}`);
+    appLogger.error(`[harvest][hooks][${jobSlug}] Cannot update harvest states: ${err.message}`);
+  }
+
+  // Apply specific updates
+
+  if (harvestJob.status === 'failed') {
+    await onHarvestJobFailed(harvestJob, periods);
+  }
+
+  if (harvestJob.status === 'finished') {
+    await onHarvestJobFinished(harvestJob, periods);
+  }
+
+  if (HarvestJobsService.endStatuses.includes(harvestJob.status)) {
+    await onHarvestJobEnd(harvestJob);
+  }
 };
 
 const queueName = 'harvestjob-harvest-sync';
 
-registerHook('harvest-job:create', onHarvestJobUpdate, { queue: queueName });
-registerHook('harvest-job:update', onHarvestJobUpdate, { queue: queueName });
-registerHook('harvest-job:upsert', onHarvestJobUpdate, { queue: queueName });
+registerHook('harvest-job:create', onHarvestJobUpsert, { queue: queueName });
+registerHook('harvest-job:update', onHarvestJobUpsert, { queue: queueName });
+registerHook('harvest-job:upsert', onHarvestJobUpsert, { queue: queueName });

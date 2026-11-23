@@ -34,8 +34,8 @@ router.route({
   validate: {
     query: standardQueryParams.manyValidation.append({
       period: Joi.forbidden(),
-      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
-      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      'period[gte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      'period[lte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endpointId: stringOrArrayValidation,
       institutionId: stringOrArrayValidation,
       tags: stringOrArrayValidation,
@@ -73,8 +73,8 @@ router.route({
   validate: {
     query: {
       retryCode: Joi.number(),
-      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
-      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period[gte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period[lte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
     },
   },
 });
@@ -88,8 +88,8 @@ router.route({
   validate: {
     query: {
       retryCode: Joi.number().integer(),
-      'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
-      'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period[gte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
+      'period[lte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/).required(),
     },
   },
 });

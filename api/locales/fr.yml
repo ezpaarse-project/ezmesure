@@ -134,6 +134,7 @@ errors:
     notFound: Tableau de bord [%s] introuvable
     failedToExport: Impossible d'exporter les tableaux de bord [%s] depuis l'espace [%s]
     failedToImport: Impossible d'importer les tableaux de bord dans l'espace [%s]
+    noSourceDashboard: Pas de tableau de bord source associé
 
   index:
     notFound: Index [%s] introuvable
@@ -244,6 +245,14 @@ emails:
       browser: "Navigateur :"
       message: "Message :"
 
+  newInstitution:
+    subject: Un nouvel établissement a été déclaré
+    title: Un nouvel établissement a été déclaré
+    body:
+      headline: Bonjour,
+      p1: Sur demande de {{ user }}, l'établissement {{ name }} à été créé dans ezMESURE.
+      p2: En tant qu'administrateur, vous pouvez à présent <a target="_blank" href="{{ manageInstitutionLink }}">vérifier et compléter les informations</a> de l'établissement avant de le valider.
+
   validateInstitution:
     subject: Votre établissement a été validé
     title: Votre établissement a été validé
@@ -291,7 +300,7 @@ emails:
       p3: Les données sont accessibles via vos tableaux de bord habituels, à condition d'en régler la temporalité à la période voulue.
       p4:
         withoutAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement pour nous permettre de le signaler aux éditeurs.
-        withAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement à <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a> pour nous permettre de le signaler aux éditeurs.
+        withAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement à <a href="mailto:{{ replyTo }}">{{ replyTo }}</a> pour nous permettre de le signaler aux éditeurs.
       p5: 'Vous pouvez continuer à saisir de nouveaux identifiants dans <a href="{{ credentialsURL }}">le formulaire ezCOUNTER</a>. À l’issue de cette saisie, merci de cliquer à nouveau sur le bouton “VALIDER MES IDENTIFIANTS” si vous souhaitez que les rapports soient à nouveau moissonnés pour votre établissement : nous procédons à des moissonnages réguliers, au moins une fois par mois.'
       outOfDate: Ces identifiants sont périmés !
       getToYourSpace: Accéder à votre espace
@@ -350,5 +359,6 @@ emails:
         request-membership: Demande d'intégration à un établissement
         user-deleted: Confirmation de suppression de compte
         user-deletion-requested: Demande de suppression de compte
+        new-institution: Nouvel établissement
         validate-institution: Établissement validé
         welcome: Bienvenue sur ezMESURE

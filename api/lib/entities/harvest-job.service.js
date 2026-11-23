@@ -6,8 +6,10 @@ const BasePrismaService = require('./base-prisma.service');
 /** @typedef {import('../.prisma/client.mts').HarvestJob} HarvestJob */
 /** @typedef {import('../.prisma/client.mts').HarvestJobStatus} HarvestJobStatus */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpdateManyAndReturnArgs} HarvestJobUpdateManyAndReturnArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobDeleteManyArgs} HarvestJobDeleteManyArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
@@ -15,6 +17,7 @@ const BasePrismaService = require('./base-prisma.service');
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobAggregateArgs} HarvestJobAggregateArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
+/** @typedef {import('../.prisma/client.mts').Prisma.HarvestJobCreateManyAndReturnArgs} HarvestJobCreateManyAndReturnArgs */
 /* eslint-enable max-len */
 
 module.exports = class HarvestJobsService extends BasePrismaService {
@@ -53,6 +56,21 @@ module.exports = class HarvestJobsService extends BasePrismaService {
     this.triggerHooks('harvest-job:create', job);
 
     return job;
+  }
+
+  /**
+   * @param {HarvestJobCreateManyAndReturnArgs} params
+   * @returns {Promise<HarvestJob[]>}
+   */
+  async createMany(params) {
+    const jobs = await harvestJobPrisma.createMany(params, this.prisma);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const job of jobs) {
+      this.triggerHooks('harvest-job:create', job);
+    }
+
+    return jobs;
   }
 
   /**
@@ -116,6 +134,21 @@ module.exports = class HarvestJobsService extends BasePrismaService {
   }
 
   /**
+   * @param {HarvestJobUpdateManyAndReturnArgs} params
+   * @returns {Promise<HarvestJob[]>}
+   */
+  async updateMany(params) {
+    const jobs = await harvestJobPrisma.updateMany(params, this.prisma);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const job of jobs) {
+      this.triggerHooks('harvest-job:update', job);
+    }
+
+    return jobs;
+  }
+
+  /**
    * @param {HarvestJobUpsertArgs} params
    * @returns {Promise<HarvestJob>}
    */
@@ -140,14 +173,45 @@ module.exports = class HarvestJobsService extends BasePrismaService {
   }
 
   /**
+   * @param {HarvestJobDeleteManyArgs} params
+   * @returns {Promise<number>}
+   */
+  async deleteMany(params) {
+    const { count } = await harvestJobPrisma.removeMany(params, this.prisma);
+
+    return count;
+  }
+
+  /**
+   * Shorthand to add a log to an HarvestJob
+   *
+   * @param {string} jobId - The job to update
+   * @param {string} level - Log level
+   * @param {string} message - Log message
+   *
+   * @returns {Promise<HarvestJob>} The updated job
+   */
+  log(jobId, level, message) {
+    return this.update({
+      where: { id: jobId },
+      data: {
+        logs: {
+          push: { level, message, date: new Date() },
+        },
+      },
+    });
+  }
+
+  /**
    * @param {HarvestJob} job
    * @param {object} options
    * @param {string} [options.status=finished] - The status of the task
    * @param {string} [options.errorCode] - An error code
+   * @param {{ level: string, message: string }} [options.log] - Log to create
    * @returns {Promise<HarvestJob>}
    */
   finish(job, options = {}) {
-    const { status = 'finished', errorCode } = options;
+    const { status = 'finished', errorCode, log } = options;
     const { startedAt, createdAt } = job;
 
     let runningTime;
@@ -165,18 +229,8 @@ module.exports = class HarvestJobsService extends BasePrismaService {
         status,
         runningTime,
         errorCode,
+        logs: log ? { push: { ...log, date: new Date() } } : undefined,
       },
-    });
-  }
-
-  /**
-   * Cancel a job
-   * @param {HarvestJob} job - The job to cancel
-   */
-  cancel(job) {
-    return this.update({
-      where: { id: job.id },
-      data: { status: 'cancelled' },
     });
   }
 };

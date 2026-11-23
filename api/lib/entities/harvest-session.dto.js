@@ -18,8 +18,10 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
   startedAt: Joi.date(),
+  deletedAt: Joi.date(),
 
   status: Joi.string().allow(...Object.values(enums.HarvestSessionStatus)),
+  description: Joi.string().trim(),
 
   credentialsQuery: Joi.object({
     sushiIds: Joi.array().items(Joi.string()),

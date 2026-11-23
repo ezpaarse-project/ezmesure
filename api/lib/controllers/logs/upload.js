@@ -285,6 +285,7 @@ module.exports = async function upload(ctx) {
   const { email } = ctx.state.user; // ?
 
   let canWrite = false;
+
   try {
     canWrite = await hasElasticPermission(index, 'write', username);
   } catch (err) {
@@ -299,6 +300,9 @@ module.exports = async function upload(ctx) {
   if (!email) {
     return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
+
+  const isMultipart = ctx.request.is('multipart/*');
+  appLogger.verbose(`[ec-upload] Starting upload in [${index}] as [${username}] (multipart=${isMultipart})`);
 
   let exists;
   try {
@@ -329,7 +333,7 @@ module.exports = async function upload(ctx) {
     }
   }
 
-  if (!ctx.request.is('multipart/*')) {
+  if (!isMultipart) {
     const now = new Date();
     const encoding = ctx.request.headers['content-encoding'];
     const isGzip = encoding && encoding.toLowerCase().includes('gzip');
@@ -364,7 +368,10 @@ module.exports = async function upload(ctx) {
       }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
-    return appLogger.info(`[ec-upload] Insert into [${index}]`, ctx.body);
+
+    const stats = Object.entries(ctx.body).map((entry) => entry.join('=')).join(' ');
+    appLogger.info(`[ec-upload] Inserted into [${index}]: ${stats}`);
+    return;
   }
 
   let total = 0;
@@ -442,5 +449,7 @@ module.exports = async function upload(ctx) {
     failed,
     errors,
   };
-  return appLogger.info(`[ec-upload] Insert into [${index}]`, ctx.body);
+
+  const stats = Object.entries(ctx.body).map((entry) => entry.join('=')).join(' ');
+  appLogger.info(`[ec-upload] Inserted into [${index}]: ${stats}`);
 };

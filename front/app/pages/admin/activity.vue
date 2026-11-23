@@ -232,8 +232,8 @@ const {
     },
   },
   data: {
-    'datetime:from': format(DATE_NOW, DATE_FORMAT),
-    'datetime:to': format(DATE_NOW, DATE_FORMAT),
+    'datetime[gte]': format(DATE_NOW, DATE_FORMAT),
+    'datetime[lte]': format(DATE_NOW, DATE_FORMAT),
     sortBy: [{ key: 'datetime', order: 'desc' }],
     search: undefined, // q parameter is not allowed
   },
@@ -244,8 +244,8 @@ const {
  */
 const date = computed({
   get: () => eachDayOfInterval({
-    start: parse(query.value['datetime:from'], DATE_FORMAT, DATE_NOW),
-    end: parse(query.value['datetime:to'], DATE_FORMAT, DATE_NOW),
+    start: parse(query.value['datetime[gte]'], DATE_FORMAT, DATE_NOW),
+    end: parse(query.value['datetime[lte]'], DATE_FORMAT, DATE_NOW),
   }),
   set: (value) => {
     if (!Array.isArray(value)) {
@@ -254,9 +254,9 @@ const date = computed({
 
     const from = Math.min(...value);
     const to = Math.max(...value);
-    query.value['datetime:from'] = format(from, DATE_FORMAT);
-    query.value['datetime:to'] = format(to, DATE_FORMAT);
-    if (query.value['datetime:from'] && query.value['datetime:to']) {
+    query.value['datetime[gte]'] = format(from, DATE_FORMAT);
+    query.value['datetime[lte]'] = format(to, DATE_FORMAT);
+    if (query.value['datetime[gte]'] && query.value['datetime[lte]']) {
       query.value.page = 1;
       refresh();
     }
@@ -267,7 +267,7 @@ const daysCount = computed(() => differenceInDays(date.value.at(-1), date.value.
 
 const dateLabel = computed(() => {
   const from = dateFormat(date.value.at(0), locale.value, 'PPP');
-  if (query.value['datetime:from'] === query.value['datetime:to']) {
+  if (query.value['datetime[gte]'] === query.value['datetime[lte]']) {
     return from;
   }
 

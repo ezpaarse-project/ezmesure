@@ -2,7 +2,14 @@
   <div class="d-flex flex-column">
     <SkeletonPageBar
       :title="$t('admin.logs.title')"
-    />
+    >
+      <v-btn
+        :text="$t('admin.logs.actions.level.buttonText')"
+        variant="flat"
+        prepend-icon="$mdi-cog"
+        @click="changeLoggingLevel"
+      />
+    </SkeletonPageBar>
 
     <AppLogs
       class="mx-2"
@@ -15,4 +22,11 @@
 </template>
 
 <script setup>
+import LoggingLevelSelectorDialog from '~/components/logging/LevelSelectorDialog.vue';
+
+const { openDialog } = useDialogStore();
+
+const changeLoggingLevel = () => {
+  openDialog({ component: LoggingLevelSelectorDialog });
+};
 </script>

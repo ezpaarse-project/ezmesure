@@ -44,6 +44,7 @@ const schema = {
   description: Joi.string().allow('').empty(null),
   registryId: Joi.string().allow('').empty(null),
   technicalProvider: Joi.string().allow('').empty(null),
+  compliant: Joi.boolean(),
 
   counterVersions: Joi.array().items(COUNTER_VERSION_VALIDATION).min(1),
   counterVersionsAvailability: Joi.object().pattern(COUNTER_VERSION_VALIDATION, Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/)),

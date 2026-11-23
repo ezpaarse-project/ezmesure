@@ -182,12 +182,12 @@ const {
   fetch: {
     url: '/api/tasks',
     query: {
-      include: ['credentials.institution', 'credentials.endpoint', 'steps', 'logs'],
-      sessionId: props.modelValue.id,
+      include: ['credentials.institution', 'credentials.endpoint'],
     },
   },
   data: {
     sortBy: [{ key: 'startedAt', order: 'desc' }],
+    sessionId: computed(() => props.modelValue.id),
     search: undefined, // q parameter is not allowed
   },
 });

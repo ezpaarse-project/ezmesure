@@ -3,7 +3,6 @@
 const { appLogger } = require('../../../logger');
 
 const HarvestJobService = require('../../../../entities/harvest-job.service');
-const LogService = require('../../../../entities/log.service');
 
 const HarvestError = require('../HarvestError');
 
@@ -16,12 +15,11 @@ module.exports = async function process(params) {
   const { job, task: { data: task }, timeout } = params;
   const { id: jobId = '' } = job;
 
-  const logService = new LogService();
   const harvestJobService = new HarvestJobService();
 
   if (job.attemptsMade > 1) {
     appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade})`);
-    await logService.log(jobId, 'info', `New attempt (total: ${job.attemptsMade})`);
+    await harvestJobService.log(jobId, 'info', `New attempt (total: ${job.attemptsMade})`);
     timeout.reset();
   }
 
@@ -39,14 +37,14 @@ module.exports = async function process(params) {
 
   task.status = 'running';
   task.startedAt = new Date();
-  await logService.log(jobId, 'info', 'Sushi import task initiated');
-  await logService.log(jobId, 'info', `Requested report type: ${reportType?.toUpperCase?.()}`);
+  await harvestJobService.log(jobId, 'info', 'Sushi import task initiated');
+  await harvestJobService.log(jobId, 'info', `Requested report type: ${reportType?.toUpperCase?.()}`);
   timeout.reset();
 
   if (beginDate || endDate) {
-    await logService.log(jobId, 'info', `Requested period: from ${beginDate || endDate} to ${endDate || beginDate}`);
+    await harvestJobService.log(jobId, 'info', `Requested period: from ${beginDate || endDate} to ${endDate || beginDate}`);
   } else {
-    await logService.log(jobId, 'info', 'No period requested, defaulting to last month');
+    await harvestJobService.log(jobId, 'info', 'No period requested, defaulting to last month');
   }
   timeout.reset();
 
@@ -55,9 +53,12 @@ module.exports = async function process(params) {
     // @ts-ignore
     data: {
       ...task,
+      result: task.result || undefined,
+      // Don't update the following
+      logs: undefined,
+      steps: undefined,
       updatedAt: undefined,
       session: undefined,
-      result: task.result || undefined,
       credentials: undefined,
     },
   });

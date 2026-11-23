@@ -1,5 +1,4 @@
 const HarvestJobService = require('../../../entities/harvest-job.service');
-const LogService = require('../../../entities/log.service');
 
 const { appLogger } = require('../../logger');
 
@@ -40,14 +39,10 @@ module.exports = function prepareTimeout(job, task) {
       return; // Process was already killed
     }
 
-    HarvestJobService.$transaction(async (harvestJobService) => {
-      const logService = new LogService(harvestJobService);
-
-      // Try to gracefully fail
-      await Promise.all([
-        harvestJobService.finish(task, { status: 'failed' }),
-        logService.log(task.id, 'error', `Timeout of ${jobTimeout}s exceeded`),
-      ]);
+    // Try to gracefully fail
+    new HarvestJobService().finish(task, {
+      status: 'failed',
+      log: { level: 'error', message: `Timeout of ${jobTimeout}s exceeded` },
     }).finally(() => {
       exit(job, 'timeout', 1);
     });
@@ -62,17 +57,9 @@ module.exports = function prepareTimeout(job, task) {
     appLogger.debug(`[Harvest Job #${job?.id}] Received SIGTERM, discarding job and exiting with code ${exitCode}`);
 
     // Try to gracefully fail
-    HarvestJobService.$transaction(async (harvestJobService) => {
-      if (!task) {
-        return;
-      }
-
-      const logService = new LogService(harvestJobService);
-
-      await Promise.all([
-        harvestJobService.finish(task, { status: 'cancelled' }),
-        logService.log(task.id, 'error', 'The task was cancelled'),
-      ]);
+    new HarvestJobService().finish(task, {
+      status: 'cancelled',
+      log: { level: 'error', message: 'The task was cancelled' },
     }).finally(() => exit(job, 'cancel', exitCode));
 
     // Kill process if it's taking too long to gracefully stop

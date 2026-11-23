@@ -2,9 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireActiveAuth, requireUser, requireAuthuireUser } = require('../../services/auth');
-
-const { NOTIFICATION_KEYS } = require('../../utils/notifications/constants');
+const { requireActiveAuth, requireUser } = require('../../services/auth');
 
 const {
   standardMembershipsQueryParams,
@@ -110,23 +108,7 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: Joi.array().items(
-      Joi.string().valid(...NOTIFICATION_KEYS),
-    ),
-  },
-});
-router.route({
-  method: 'PUT',
-  path: '/excludeNotifications',
-  handler: [
-    bodyParser(),
-    changeExcludeNotifications,
-  ],
-  validate: {
-    type: 'json',
-    body: Joi.array().items(
-      Joi.string().valid(...NOTIFICATION_KEYS),
-    ),
+    body: Joi.array().items(Joi.string()),
   },
 });
 

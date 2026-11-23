@@ -62,8 +62,6 @@
 </template>
 
 <script setup>
-import { DEFAULT_REPORTS_IDS } from '@/lib/sushi';
-
 const props = defineProps({
   session: {
     type: Object,
@@ -75,18 +73,21 @@ const props = defineProps({
   },
 });
 
+const { data: apiConfig } = await useApiConfig();
+
 const items = computed(() => {
-  const defIds = new Set(DEFAULT_REPORTS_IDS);
+  const defaultIds = apiConfig.value?.counter.defaultHarvestedReports ?? [];
+  const defaultIdsSet = new Set(defaultIds);
 
   return new Map(
     [
-      ...DEFAULT_REPORTS_IDS.map((id) => [id.toLowerCase(), {
-        text: id,
+      ...defaultIds.map((id) => [id, {
+        text: id.toUpperCase(),
         color: 'red',
       }]),
       ...props.session.reportTypes.map((id) => [id, {
         text: id.toUpperCase(),
-        color: defIds.has(id.toUpperCase()) ? undefined : 'blue',
+        color: defaultIdsSet.has(id) ? undefined : 'blue',
       }]),
     ].sort(([a], [b]) => a.localeCompare(b)),
   );

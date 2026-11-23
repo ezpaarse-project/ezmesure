@@ -12,28 +12,29 @@ const { appLogger } = require('../logger');
 
 const harvestConfig = config.get('jobs.harvest');
 
-function cancelPendingHarvest() {
-  return HarvestsService.$transaction(async (harvestsService) => {
-    const harvestJobService = new HarvestJobsService(harvestsService);
+async function cancelPendingHarvest() {
+  const harvestsService = new HarvestsService();
+  const harvestJobService = new HarvestJobsService();
 
-    // Get all pending/running harvests older than 1 day (rounded)
-    const harvests = await harvestsService.findMany({
-      where: {
-        status: {
-          in: [
-            HarvestJobStatus.waiting,
-            HarvestJobStatus.delayed,
-            HarvestJobStatus.running,
-          ],
-        },
-        harvestedAt: {
-          lte: endOfDay(subDays(new Date(), 1)),
-        },
+  // Get all pending/running harvests older than 1 day (rounded)
+  const harvests = await harvestsService.findMany({
+    where: {
+      status: {
+        in: [
+          HarvestJobStatus.waiting,
+          HarvestJobStatus.delayed,
+          HarvestJobStatus.running,
+        ],
       },
-    });
+      harvestedAt: {
+        lte: endOfDay(subDays(new Date(), 1)),
+      },
+    },
+  });
 
-    await Promise.all(
-      harvests.map(async (harvest) => {
+  await Promise.all(
+    harvests.map(async (harvest) => {
+      try {
         if (!harvest.harvestedById) {
           // If the harvest state is active but no job has been linked to it, mark it as interrupted
           return harvestsService.update({
@@ -60,9 +61,11 @@ function cancelPendingHarvest() {
           where: { id: harvest.harvestedById },
           data: { status: HarvestJobStatus.interrupted },
         });
-      }),
-    );
-  });
+      } catch (error) {
+        appLogger.error(`[harvest-pending-cancel] Failed to clean job (${harvest.harvestedById}): ${error.message}`);
+      }
+    }),
+  );
 }
 
 async function startCancelCron() {

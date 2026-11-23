@@ -14,7 +14,6 @@ const {
 } = require('date-fns');
 
 const HarvestJobService = require('../../../entities/harvest-job.service');
-const LogService = require('../../../entities/log.service');
 const SushiCredentialsService = require('../../../entities/sushi-credentials.service');
 const SushiEndpointService = require('../../../entities/sushi-endpoints.service');
 
@@ -74,20 +73,17 @@ async function deferJob(job, task, timestamp, lockToken, options = {}) {
     timesDelayed += 1;
   }
 
-  await HarvestJobService.$transaction(async (harvestJobService) => {
-    const logService = new LogService(harvestJobService);
-
-    if (timesDelayed <= maxDeferrals) {
-      return harvestJobService.finish(task, { status: 'delayed' });
-    }
-
-    await Promise.all([
-      harvestJobService.finish(task, { status: 'failed', errorCode: ERROR_CODES.maxDeferralsExceeded }),
-      logService.log(task.id, 'error', 'Maximum deferral times exceeded'),
-    ]);
+  const harvestJobService = new HarvestJobService();
+  if (timesDelayed > maxDeferrals) {
+    await harvestJobService.finish(task, {
+      status: 'failed',
+      errorCode: ERROR_CODES.maxDeferralsExceeded,
+      log: { level: 'error', message: 'Maximum deferral times exceeded' },
+    });
     throw new HarvestError('Maximum number of download deferral exceeded');
-  });
+  }
 
+  await harvestJobService.finish(task, { status: 'delayed' });
   await job.updateData({ ...job.data, timesDelayed });
   await job.moveToDelayed(timestamp, lockToken);
   throw new DelayedError();

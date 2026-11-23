@@ -18,6 +18,8 @@ enum HarvestSessionStatus {
 model HarvestSession {
   /// ID of the session
   id                     String               @id @default(cuid())
+  /// Description of the session
+  description            String               @default("")
   /// Beginning of the requested period
   beginDate              String
   /// End of the requested period

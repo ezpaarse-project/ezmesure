@@ -53,6 +53,18 @@
           </v-col>
         </v-row>
 
+        <v-row v-if="modelValue.errorCode">
+          <v-col>
+            <p class="font-weight-bold">
+              {{ $t('reason', { reason: reason.title }) }}
+            </p>
+
+            <p v-if="reason.description">
+              {{ reason.description }}
+            </p>
+          </v-col>
+        </v-row>
+
         <v-row v-if="counts.length > 0 && modelValue.harvestedBy">
           <v-col>
             <i18n-t v-for="item in counts" :key="item.path" :keypath="item.path">
@@ -133,6 +145,10 @@ const statusText = computed(() => {
     text: te(textKey) ? t(textKey) : '',
   };
 });
+const reason = computed(() => ({
+  title: (te(`tasks.status.exceptions.${props.modelValue.errorCode}`) ? t(`tasks.status.exceptions.${props.modelValue.errorCode}`) : props.modelValue.errorCode),
+  description: (te(`tasks.status.exceptionMeaning.${props.modelValue.errorCode}`) ? t(`tasks.status.exceptionMeaning.${props.modelValue.errorCode}`) : ''),
+}));
 const counterVersion = computed(() => props.modelValue.harvestedBy?.counterVersion);
 
 async function openTaskHistoryFromHarvest() {
@@ -143,7 +159,7 @@ async function openTaskHistoryFromHarvest() {
   try {
     task.value = await $fetch(`/api/tasks/${props.modelValue.harvestedById}`, {
       params: {
-        include: ['steps', 'logs', 'session'],
+        include: ['session'],
       },
     });
 

@@ -7,17 +7,16 @@ import ezmesure from '../../setup/ezmesure';
 
 import { resetDatabase } from '../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../lib/services/elastic/utils';
+import { signJWT } from '../../../lib/utils/jwt';
 
 import institutionsPrisma from '../../../lib/services/prisma/institutions';
 import usersPrisma from '../../../lib/services/prisma/users';
 import usersElastic from '../../../lib/services/elastic/users';
-import UsersService from '../../../lib/entities/users.service';
 import sushiEndpointsPrisma from '../../../lib/services/prisma/sushi-endpoints';
 import sushiCredentialsPrisma from '../../../lib/services/prisma/sushi-credentials';
 import membershipsPrisma from '../../../lib/services/prisma/memberships';
 
 const adminUsername = config.get('admin.username');
-const adminPassword = config.get('admin.password');
 
 describe('[sushi]: Test delete sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
@@ -39,8 +38,6 @@ describe('[sushi]: Test delete sushi credential features', () => {
     fullName: 'User test',
     isAdmin: false,
   };
-
-  const userPassword = 'changeme';
 
   const membershipUserTest = {
     username: userTest.username,
@@ -88,7 +85,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
+    adminToken = await signJWT({ username: adminUsername });
     const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
   });
@@ -189,7 +186,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
       await usersPrisma.acceptTerms(userTest.username);
-      userToken = await (new UsersService()).generateToken(userTest.username, userPassword);
+      userToken = await signJWT({ username: userTest.username });
     });
 
     describe('Institution created by admin', () => {

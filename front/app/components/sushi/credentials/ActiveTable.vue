@@ -47,21 +47,12 @@
               {{ item.endpoint.vendor }}
             </nuxt-link>
             <span v-else>{{ item.endpoint.vendor }}</span>
+
+            <SushiEndpointStatusChip :model-value="item.endpoint" size="small" class="ml-2" />
           </div>
 
           <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" />
-
-          <v-chip
-            v-for="tag in item.endpoint.tags ?? []"
-            :key="tag"
-            :text="tag"
-            color="accent"
-            density="comfortable"
-            variant="outlined"
-            size="small"
-            label
-            class="mr-2"
-          />
+          <SushiEndpointTagsChip :model-value="item.endpoint" size="small" />
         </div>
       </template>
 
@@ -95,30 +86,19 @@
       </template>
 
       <template #[`item.active`]="{ item }">
-        <div class="d-flex align-center">
-          <v-switch
-            v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
-            :model-value="item.active"
-            :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
-            :loading="activeLoadingMap.get(item.id)"
-            :readonly="!canEdit"
-            density="compact"
-            color="primary"
-            hide-details
-            class="mt-0"
-            style="transform: scale(0.8);"
-            @update:model-value="toggleActiveStates([item])"
-          />
-
-          <v-spacer />
-
-          <v-icon
-            v-if="!item.endpoint.active"
-            v-tooltip="$t('endpoints.inactiveDescription')"
-            icon="$mdi-api-off"
-            color="warning"
-          />
-        </div>
+        <v-switch
+          v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
+          :model-value="item.active"
+          :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
+          :loading="activeLoadingMap.get(item.id)"
+          :readonly="!canEdit"
+          density="compact"
+          color="primary"
+          hide-details
+          class="mt-0"
+          style="transform: scale(0.8);"
+          @update:model-value="toggleActiveStates([item])"
+        />
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -294,7 +274,7 @@ const maxHarvestYear = new Date().getFullYear();
 
 const { user } = storeToRefs(useAuthStore());
 const { t, locale } = useI18n();
-const { public: { counterRegistryUrl } } = useRuntimeConfig();
+const { data: apiConfig } = await useApiConfig();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useConfirmStore();
 const { addToCheck } = useSushiCheckQueueStore();
@@ -404,7 +384,7 @@ const debouncedRefresh = useDebounceFn(async () => {
 /**
  * Generate COUNTER registry URL
  */
-const generateRegistryURL = (item) => new URL(`/platform/${item.endpoint.registryId}`, counterRegistryUrl);
+const generateRegistryURL = (item) => new URL(`/platform/${item.endpoint.registryId}`, apiConfig.value.counter.registryUrl);
 
 function onSushiUpdate(item) {
   const index = sushis.value.findIndex((sushi) => sushi.id === item.id);

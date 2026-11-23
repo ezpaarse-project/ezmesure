@@ -1,13 +1,13 @@
 // @ts-check
 
-const StepService = require('../../../entities/step.service');
 const HarvestJobService = require('../../../entities/harvest-job.service');
 
 const { appLogger } = require('../../logger');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('../../../.prisma/client.mjs').Step} Step
+ * @typedef {import('../../../.prisma/client.mjs').Prisma.JsonValue} JsonValue
+ * @typedef {{ label: string, status: string, runningTime: number, data: JsonValue, startedAt: Date, createdAt: Date, updatedAt: Date }} Step
  * @typedef {import('../../../entities/institutions.service').Institution} Institution
  * @typedef {import('../../../entities/sushi-endpoints.service').SushiEndpoint} SushiEndpoint
  * @typedef {import('../../../entities/sushi-credentials.service').SushiCredentials} SushiCredentials
@@ -21,6 +21,7 @@ const { appLogger } = require('../../logger');
 /* eslint-enable max-len */
 
 function prepareLogs() {
+  /** @type {{ level: string, message: string, date: Date }[]} */
   let logs = [];
 
   return {
@@ -36,7 +37,7 @@ function prepareLogs() {
      * @param {string} level The level of the log
      * @param {string} message The message of the log
      */
-    add: (level, message) => logs.push({ level, message }),
+    add: (level, message) => logs.push({ level, message, date: new Date() }),
   };
 }
 
@@ -48,38 +49,69 @@ function prepareLogs() {
  * @returns The step management
  */
 function prepareSteps(task) {
-  const stepService = new StepService();
-
   /**
    * Create a step
    *
    * @param {string} label The label of the step
    * @param {*} data The data of the step
    *
-   * @returns A promise with the created step
+   * @returns {Promise<Step>} A promise with the created step
    */
-  const create = (label, data = {}) => stepService.create({
-    data: {
+  const create = async (label, data = {}) => {
+    const step = {
       label,
       jobId: task.id,
       startedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       status: 'running',
       runningTime: 0,
       data,
-    },
-  });
+    };
+
+    await new HarvestJobService().update({
+      where: { id: task.id },
+      data: {
+        steps: { push: step },
+      },
+    });
+
+    return step;
+  };
 
   /**
    * Update a step
    *
    * @param {Step} step The step to update
    *
-   * @returns A promise with the updated step
+   * @returns {Promise<Step>} A promise with the updated step
    */
-  const update = (step) => stepService.update({
-    where: { id: step.id },
-    // @ts-ignore
-    data: step,
+  // @ts-ignore
+  const update = (step) => HarvestJobService.$transaction(async (harvestJobService) => {
+    const { steps } = await harvestJobService.findUnique({
+      where: { id: task.id },
+      select: { steps: true },
+    }) || {};
+
+    const index = steps?.findIndex((s) => s?.label === step.label);
+    if (!steps || index == null || index < 0) {
+      throw new Error(`Step [${step.label}] is not found in task [${task.id}]`);
+    }
+
+    steps[index] = {
+      ...steps[index],
+      ...step,
+      updatedAt: new Date(),
+    };
+
+    await harvestJobService.update({
+      where: { id: task.id },
+      data: {
+        steps: { set: steps },
+      },
+    });
+
+    return steps[index];
   });
 
   /**
@@ -88,7 +120,7 @@ function prepareSteps(task) {
    * @param {Step} stepData The step to update
    * @param {*} opts
    *
-   * @returns A promise with the updated step
+   * @returns {Promise<Step>} A promise with the updated step
    */
   const end = (stepData, opts = {}) => {
     const { success = true } = opts;
@@ -113,12 +145,10 @@ module.exports = async function prepareTask(job) {
     return null;
   }
 
-  const harvestJobsService = new HarvestJobService();
-
   appLogger.verbose(`[Harvest Job #${job?.id}] Fetching data of task [${taskId}]`);
   /** @type {JobTask | null} */
   // @ts-ignore
-  const task = await harvestJobsService.findUnique({
+  const task = await new HarvestJobService().findUnique({
     where: { id: taskId },
     include: {
       session: true,
@@ -144,17 +174,30 @@ module.exports = async function prepareTask(job) {
     logs.data = [];
 
     try {
-      await harvestJobsService.update({
-        where: { id: task.id },
-        // @ts-ignore
-        data: {
-          ...task,
-          updatedAt: undefined,
-          session: undefined,
-          logs: { createMany: { data: newLogs } },
-          result: task.result || undefined,
-          credentials: undefined,
-        },
+      await HarvestJobService.$transaction(async (harvestJobsService) => {
+        const { logs: previousLogs } = await harvestJobsService.findUnique({
+          where: { id: task.id },
+          select: { logs: true },
+        }) || {};
+
+        if (!previousLogs) {
+          throw new Error(`Unable to find logs for [${task.id}]`);
+        }
+
+        await harvestJobsService.update({
+          where: { id: task.id },
+          // @ts-ignore
+          data: {
+            ...task,
+            logs: { set: [...previousLogs, ...newLogs] },
+            result: task.result || undefined,
+            // Don't update the following
+            steps: undefined,
+            updatedAt: undefined,
+            session: undefined,
+            credentials: undefined,
+          },
+        });
       });
     } catch (error) {
       appLogger.error(`Failed to save sushi task ${task.id}`);
@@ -165,7 +208,7 @@ module.exports = async function prepareTask(job) {
   const finish = async (options = {}) => {
     await save();
 
-    await harvestJobsService.finish(task, options);
+    await new HarvestJobService().finish(task, options);
   };
 
   return {

@@ -94,7 +94,7 @@ const {
     url: '/api/tasks',
     query: {
       credentialsId: props.sushi.id,
-      include: ['steps', 'logs', 'session'],
+      include: ['session'],
     },
   },
   data: {

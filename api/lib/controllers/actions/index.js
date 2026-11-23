@@ -18,8 +18,8 @@ router.route({
   validate: {
     query: standardQueryParams.manyValidation.append({
       // Override validation to disallow time
-      'date:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
-      'date:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
+      'date[gte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
+      'date[lte]': Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
     }),
   },
 });

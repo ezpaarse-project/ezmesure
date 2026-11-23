@@ -1,5 +1,5 @@
 import {
-  describe, it, expect, beforeEach, afterAll,
+  describe, it, expect, beforeEach,
 } from 'vitest';
 import config from 'config';
 
@@ -9,10 +9,10 @@ import institutionsPrisma from '../../../../lib/services/prisma/institutions';
 import customFieldsPrisma from '../../../../lib/services/prisma/custom-fields';
 import usersPrisma from '../../../../lib/services/prisma/users';
 import usersElastic from '../../../../lib/services/elastic/users';
-import UsersService from '../../../../lib/entities/users.service';
 
 import { resetDatabase } from '../../../../lib/services/prisma/utils';
 import { resetElastic } from '../../../../lib/services/elastic/utils';
+import { signJWT } from '../../../../lib/utils/jwt';
 
 const adminUsername = config.get('admin.username');
 
@@ -58,7 +58,7 @@ describe('[institutions - custom-props] Add', () => {
     let adminToken;
 
     beforeEach(async () => {
-      adminToken = await (new UsersService()).generateToken(adminUsername);
+      adminToken = await signJWT({ username: adminUsername });
     });
 
     it('#01 Should be able to add a custom prop', async () => {
@@ -101,7 +101,7 @@ describe('[institutions - custom-props] Add', () => {
         },
       });
 
-      memberToken = await (new UsersService()).generateToken(userTest.username);
+      memberToken = await signJWT({ username: userTest.username });
     });
 
     it('#02 Should not be able to add a custom prop', async () => {

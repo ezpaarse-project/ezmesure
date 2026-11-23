@@ -20,6 +20,8 @@ model SushiEndpoint {
   counterVersionsAvailability Json               @default("{}")
   /// Technical provider of the endpoint (ex: Atypon)
   technicalProvider           String?
+  /// Whether the endpoint is actually fully COUNTER compliant
+  compliant                   Boolean            @default(false)
   /// Whether the endpoint is active and can be harvested
   active                      Boolean            @default(true)
   /// Date on which the active status was last modified

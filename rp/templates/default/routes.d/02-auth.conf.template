@@ -1,5 +1,0 @@
-location /auth/ {
-  # Don't rewrite as Dex expects the /auth
-
-  proxy_pass  http://auth_server;
-}

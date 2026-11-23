@@ -15,15 +15,15 @@ exports.standardQueryParams = standardQueryParams;
 
 exports.getAll = async (ctx) => {
   const {
-    'date:from': from,
-    'date:to': to,
+    'date[gte]': from,
+    'date[lte]': to,
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   prismaQuery.where = prismaQuery.where || {};
 
   // Remove date filters as handled later
-  prismaQuery.where.AND = prismaQuery.where.AND.filter((filter) => !filter.date);
+  prismaQuery.where.AND = prismaQuery.where.AND?.filter((filter) => !filter.date);
 
   if (from || to) {
     prismaQuery.where.date = {

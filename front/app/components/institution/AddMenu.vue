@@ -100,6 +100,7 @@ const {
   query: {
     q: debouncedSearch,
   },
+  lazy: true,
 });
 
 async function addInstitution(institution) {

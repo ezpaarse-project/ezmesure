@@ -42,6 +42,21 @@ function unwatchJob(taskId) {
 }
 
 /**
+ * Hard delete credentials from DB
+ *
+ * @param {string[]} ids - The ids of the credentials to delete
+ *
+ * @returns Counts of what was deleted
+ */
+async function hardDeleteCredentials(ids) {
+  const { count } = await prisma.sushiCredentials.deleteMany({
+    where: { id: { in: ids } },
+  });
+
+  return count;
+}
+
+/**
  * Update credentials deletion progression, delete credentials if completed
  *
  * @param {string} taskId The id of the deletion task
@@ -59,12 +74,20 @@ async function updateCredentialsDeletionProgression(taskId) {
 
   // If job is completed without error and not cancelled, delete task from DB
   if (body.completed && !task.status?.canceled && !body.error) {
-    const deleted = await prisma.sushiCredentialsDeletionTask.delete({
-      where: { id: taskId },
-      include: { credentials: true },
+    // Get credentials affected by task
+    const credentials = await prisma.sushiCredentials.findMany({
+      where: { deletionTaskId: taskId },
     });
-    // Credentials deletion will be handled by prisma with the OnCascade
-    appLogger.info(`[delete-sushi][${taskId}] Deletion task completed, deleted [${deleted.credentials.length}] credentials`);
+
+    // Delete credentials
+    const count = await hardDeleteCredentials(credentials.map(({ id }) => id));
+
+    // Delete task
+    await prisma.sushiCredentialsDeletionTask.delete({
+      where: { id: taskId },
+    });
+
+    appLogger.info(`[sushi-credentials][delete-job][${taskId}] Deletion task completed, deleted [${count}] credentials `);
     return;
   }
 
@@ -138,43 +161,57 @@ async function startCredentialsDataDeletion(sushiCredentials, indexPattern, oldI
  * Start credentials deletions
  */
 async function startCredentialsDeletions() {
-  // Get credentials marked for deletion but not yet started
-  const sushiCredentials = await prisma.sushiCredentials.findMany({
+  // Get credentials marked for deletion but not yet started grouped by institution
+  const institutions = await prisma.institution.findMany({
     where: {
-      deletedAt: { not: null },
-      deletionTaskId: { equals: null },
+      sushiCredentials: {
+        some: {
+          deletedAt: { not: null },
+          deletionTaskId: { equals: null },
+        },
+      },
     },
-    include: {
-      institution: { include: { repositories: true } },
+    select: {
+      id: true,
+      repositories: {
+        where: {
+          type: 'counter5',
+        },
+      },
+      sushiCredentials: {
+        where: {
+          deletedAt: { not: null },
+          deletionTaskId: { equals: null },
+        },
+      },
     },
   });
 
-  /** @type {Map<string, { credentials: SushiCredentials[], indexPattern: string }>} */
-  const credentialsByInstitution = new Map();
-  // eslint-disable-next-line no-restricted-syntax
-  for (const { institution, ...credentials } of sushiCredentials) {
-    const item = credentialsByInstitution.get(institution.id) ?? { credentials: [], indexPattern: '' };
-
-    item.credentials.push(credentials);
-    if (!item.indexPattern) {
-      // Map repositories into a index pattern compatible with elastic
-      item.indexPattern = repositoriesToIndexPattern(institution.repositories);
-    }
-
-    credentialsByInstitution.set(institution.id, item);
-  }
-
   // Start deletion
   // eslint-disable-next-line no-restricted-syntax
-  for (const [institutionId, { credentials, indexPattern }] of credentialsByInstitution) {
-    try {
-      appLogger.info(`[delete-sushi] Data of credentials for [${institutionId}] are being deleted from elastic`);
-      // Wait for deletion to be started to avoid overloading Elastic and/or Postgres
-      // eslint-disable-next-line no-await-in-loop
-      await startCredentialsDataDeletion(credentials, indexPattern);
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error(`${error}`);
-      appLogger.error(`[delete-sushi] Data of credentials for [${institutionId}] cannot be deleted from elastic: ${err.message}`);
+  for (const { id, repositories, sushiCredentials } of institutions) {
+    if (repositories.length > 0) {
+      try {
+        const indexPattern = repositoriesToIndexPattern(repositories);
+        appLogger.info(`[delete-sushi] Data of credentials for [${id}] are being deleted from elastic (using [${indexPattern}])`);
+
+        // Wait for deletion to be started to avoid overloading Elastic and/or Postgres
+        // eslint-disable-next-line no-await-in-loop
+        await startCredentialsDataDeletion(sushiCredentials, indexPattern);
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(`${error}`);
+        appLogger.error(`[delete-sushi] Data of credentials for [${id}] cannot be deleted from elastic: ${err.message}`);
+      }
+    } else {
+      try {
+        // Wait for deletion to avoid overloading Postgres
+        // eslint-disable-next-line no-await-in-loop
+        const count = await hardDeleteCredentials(sushiCredentials.map((creds) => creds.id));
+        appLogger.info(`[sushi-credentials][delete-job] Institution doesn't have any repositories, deleted [${count}] credentials`);
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(`${error}`);
+        appLogger.error(`[delete-sushi] Credentials for [${id}] cannot be deleted from DB: ${err.message}`);
+      }
     }
   }
 }
@@ -194,6 +231,7 @@ async function resumeCredentialsDeletions() {
     },
   });
 
+  const tasksEnded = [];
   const tasksToRestart = [];
 
   // eslint-disable-next-line no-restricted-syntax
@@ -203,17 +241,21 @@ async function resumeCredentialsDeletions() {
       const { body } = await getTask(task.id);
       if (body.task.status?.canceled) {
         // Task is canceled, restart it
-        throw new Error('Task is canceled');
+        throw new Error('Task is cancelled');
+      }
+      if (body.completed) {
+        // Task is completed, we'll delete credentials later
+        tasksEnded.push(task);
       }
       // Watch if task is still in elastic
-      watchJob(`${body.task}`);
+      watchJob(`${body.task.id}`);
     } catch {
       // Task is not in elastic, restart it
       tasksToRestart.push(task);
     }
   }
 
-  // Restart deletion
+  // Restart deletions
   // eslint-disable-next-line no-restricted-syntax
   for (const task of tasksToRestart) {
     try {
@@ -224,14 +266,36 @@ async function resumeCredentialsDeletions() {
       appLogger.error(`[delete-sushi][${task.id}] Data of credentials cannot be deleted from elastic: ${err.message}`);
     }
   }
+
+  // Delete credentials for tasks that ended
+  // eslint-disable-next-line no-restricted-syntax
+  for (const task of tasksEnded) {
+    try {
+      // Delete credentials
+      // eslint-disable-next-line no-await-in-loop
+      const count = await hardDeleteCredentials(task.credentials.map(({ id }) => id));
+
+      // Delete task
+      // eslint-disable-next-line no-await-in-loop
+      await prisma.sushiCredentialsDeletionTask.delete({
+        where: { id: task.id },
+      });
+
+      appLogger.info(`[sushi-credentials][delete-job][${task.id}] Deletion task completed, deleted [${count}] credentials and`);
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`${error}`);
+      appLogger.error(`[sushi-credentials][delete-job][${task.id}] Cannot delete data from DB: ${err.message}`);
+    }
+  }
 }
 
 async function deleteMarkedCredentials() {
+  const start = Date.now();
   appLogger.verbose('[delete-sushi] Starting credentials deletions');
   await startCredentialsDeletions();
 
   await resumeCredentialsDeletions();
-  appLogger.verbose('[delete-sushi] Credentials deletions ended');
+  appLogger.verbose(`[sushi-credentials][delete-job] All deletions are started | took: ${Date.now() - start}ms`);
 }
 
 async function startDeletionCron() {

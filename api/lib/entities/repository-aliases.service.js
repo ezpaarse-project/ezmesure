@@ -133,7 +133,7 @@ module.exports = class RepositoriesService extends BasePrismaService {
     }
     const { newRepositoryAlias, oldRepositoryAlias } = result;
 
-    this.triggerHooks('repository_alias:disconnected', oldRepositoryAlias, institutionId);
+    this.triggerHooks('repository_alias:disconnected', { alias: oldRepositoryAlias, institutionId });
     oldRepositoryAlias.permissions.forEach((repoPerm) => { this.triggerHooks('repository_alias_permission:delete', repoPerm); });
 
     return newRepositoryAlias;

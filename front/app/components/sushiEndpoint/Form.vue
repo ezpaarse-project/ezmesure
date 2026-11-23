@@ -114,7 +114,7 @@
                     />
                   </v-col>
 
-                  <v-col cols="12">
+                  <v-col cols="12" sm="6">
                     <v-text-field
                       v-model="endpoint.registryId"
                       :label="$t('endpoints.registryId')"
@@ -136,6 +136,22 @@
                         />
                       </template>
                     </v-text-field>
+                  </v-col>
+
+                  <v-col cols="12" sm="6">
+                    <v-checkbox
+                      v-model="endpoint.compliant"
+                      :label="$t('endpoints.compliant')"
+                      :true-icon="() => h(VIcon, { icon: '$mdi-check-decagram', size: 24, color: 'success' })"
+                      false-icon="$mdi-check-decagram-outline"
+                      density="compact"
+                      color="primary"
+                      hide-details
+                    />
+
+                    <p class="text-disabled text-body-small">
+                      {{ $t('endpoints.compliantHint') }}
+                    </p>
                   </v-col>
 
                   <v-col cols="12">
@@ -369,6 +385,8 @@
 </template>
 
 <script setup>
+import { VIcon } from 'vuetify/components';
+
 const props = defineProps({
   modelValue: {
     type: Object,

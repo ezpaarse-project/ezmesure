@@ -13,13 +13,13 @@
         {{ institution.name }}
       </div>
 
-      <template v-if="institution.validated">
+      <template v-if="!institution.validated">
         <v-spacer />
 
         <v-chip
-          :text="$t('institutions.institution.validated')"
+          :text="$t('institutions.institution.notValidated')"
           density="comfortable"
-          color="green"
+          color="red"
           label
         />
       </template>

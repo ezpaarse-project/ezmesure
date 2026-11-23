@@ -37,7 +37,7 @@ async function checkTask(taskId, jobId) {
         data: {
           status: 'failed',
           runningTime: task.startedAt ? Date.now() - task.startedAt.getTime() : 0,
-          logs: { create: { level: 'error', message: 'The task stopped unexpectedly' } },
+          logs: { push: { level: 'error', message: 'The task stopped unexpectedly' } },
         },
       },
     );
