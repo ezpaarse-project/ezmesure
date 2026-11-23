@@ -180,7 +180,7 @@ exports.getMatrix = async (ctx) => {
   const query = { sessionId: harvestId };
 
   const harvestSessionService = new HarvestSessionService();
-  if (!await harvestSessionService.findUnique({ where: { id: harvestId } })) {
+  if (!await harvestSessionService.findUnique({ where: { id: harvestId, deletedAt: null } })) {
     ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
     return;
   }
