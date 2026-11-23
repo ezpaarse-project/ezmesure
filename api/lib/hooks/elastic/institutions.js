@@ -4,6 +4,7 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 const { client: prisma } = require('../../services/prisma');
 const { syncUser } = require('../../services/sync/elastic/users');
+const { syncApiKey } = require('../../services/sync/elastic/api-keys');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').Institution} Institution
@@ -16,13 +17,23 @@ const { syncUser } = require('../../services/sync/elastic/users');
 const onInstitutionRoleUpdate = async ({ institution }) => {
   const memberships = await prisma.membership.findMany({
     where: { institutionId: institution.id },
-    include: { user: true },
+    select: { user: true },
   });
 
   try {
     await Promise.all(memberships.map((m) => syncUser(m.user)));
   } catch (error) {
     appLogger.error(`[elastic][hooks] Members of [${institution.id}] cannot be sync: ${error.message}`);
+  }
+
+  const apiKeys = await prisma.apiKey.findMany({
+    where: { institutionId: institution.id },
+  });
+
+  try {
+    await Promise.all(apiKeys.map((apiKey) => syncApiKey(apiKey)));
+  } catch (error) {
+    appLogger.error(`[elastic][hooks] API keys of [${institution.id}] cannot be sync: ${error.message}`);
   }
 };
 

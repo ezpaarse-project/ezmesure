@@ -92,22 +92,6 @@ exports.getInstitutionMember = async (ctx) => {
     { username_institutionId: { institutionId, username } },
   );
 
-  // Hide emails if not admin and institution is an onboarding one (if user is requested)
-  if (!ctx.state.user.isAdmin && prismaQuery.include?.user && ctx.state.institution.onboarding) {
-    prismaQuery.include.user = {
-      select: {
-        // Select everything by default
-        ...Object.fromEntries(
-          Object.keys(prisma.user.fields).map((key) => [key, true]),
-        ),
-        // Add requested (sub) includes
-        ...(typeof prismaQuery.include.user === 'object' ? prismaQuery.include.user.include : {}),
-        // Remove email
-        email: false,
-      },
-    };
-  }
-
   const membershipsService = new MembershipsService();
   const membership = await membershipsService.findUnique(prismaQuery);
   if (!membership) {

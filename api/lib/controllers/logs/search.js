@@ -1,19 +1,24 @@
 const elastic = require('../../services/elastic');
 
+const { getElasticUsername } = require('./utils');
+
 module.exports = async (ctx) => {
-  const { index } = ctx.request.params;
   ctx.action = 'indices/search';
-  ctx.type = 'json';
+  const { index } = ctx.request.params;
 
   const { body } = ctx.request;
 
-  const { body: result } = await elastic.search({
-    index,
-    body,
-    timeout: '30s',
-  }, {
-    headers: { 'es-security-runas-user': ctx.state.user.username },
-  });
+  const username = getElasticUsername(ctx);
 
+  const { body: result } = await elastic.search(
+    {
+      index,
+      body,
+      timeout: '30s',
+    },
+    { headers: { 'es-security-runas-user': username } },
+  );
+
+  ctx.type = 'json';
   ctx.body = result;
 };

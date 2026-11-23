@@ -1,7 +1,7 @@
 const { Joi } = require('koa-joi-router');
 const router = require('koa-joi-router')();
 
-const { requireActiveJwt, requireUser, requireAdmin } = require('../../../services/auth');
+const { requireActiveAuth, requireUser, requireAdmin } = require('../../../services/auth');
 
 const { schema } = require('../../../entities/elastic-roles.dto');
 
@@ -12,7 +12,7 @@ const {
   disconnectRole,
 } = require('./actions');
 
-router.use(requireActiveJwt, requireUser, requireAdmin);
+router.use(requireActiveAuth, requireUser, requireAdmin);
 
 router.route({
   method: 'GET',

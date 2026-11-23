@@ -39,7 +39,7 @@ describe('[roles] Assign features', () => {
     isAdmin: false,
   };
 
-  /** @type {import('@prisma/client').Prisma.InstitutionCreateInput} */
+  /** @type {import('../../.prisma/client.mjs').Prisma.InstitutionCreateInput} */
   const testInstitution = {
     id: 'test-institution',
     name: 'Test institution',

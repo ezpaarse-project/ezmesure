@@ -2,10 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireActiveJwt, requireUser } = require('../../services/auth');
-
-const oauth = require('./oauth');
-const activate = require('./activate');
+const { requireActiveAuth, requireUser } = require('../../services/auth');
 
 const {
   standardMembershipsQueryParams,
@@ -22,10 +19,21 @@ const {
   leaveInstitution,
 } = require('./actions');
 
+// Sub routes
+
+const oauth = require('./oauth');
+const activate = require('./activate');
+const apiKeys = require('./api-keys');
+
 router.use(oauth.prefix('/oauth').middleware());
 router.use(activate.prefix('/_activate').middleware());
+router.use(apiKeys.prefix('/api-keys').middleware());
 
-router.use(requireActiveJwt, requireUser);
+// Global middlewares
+
+router.use(requireActiveAuth, requireUser);
+
+// Routes
 
 router.route({
   method: 'GET',

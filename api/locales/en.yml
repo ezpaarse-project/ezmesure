@@ -9,6 +9,12 @@ errors:
   termsOfUse: You must accept the terms of use before using this service
   unauthorized: You are not authorized to access this route
 
+  upload:
+    noDir: Unable to set a location for files
+
+  apiKey:
+    notFound: API key doesn't exist
+
   harvest:
     taskExists: "COUNTER credentials [%s] already have an associated task (status: [%s])"
     sessionNotFound: The session [%s] does not exist

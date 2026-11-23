@@ -4,6 +4,7 @@ const { appLogger } = require('../logger');
 const { syncRepositories } = require('./elastic/repositories');
 const { syncRepositoryAliases } = require('./elastic/alias');
 const { syncUsers } = require('./elastic/users');
+const { syncApiKeys } = require('./elastic/api-keys');
 
 const {
   syncSpaces,
@@ -25,6 +26,7 @@ const ezr = require('./ezreeport');
  * @property {EntitySyncResult} repositories - Result of repositories synchronization
  * @property {EntitySyncResult} repositoryAliases - Result of repository aliases synchronization
  * @property {EntitySyncResult} users - Result of users synchronization
+ * @property {EntitySyncResult} apiKeys - Result of api keys synchronization
  * @property {EntitySyncResult} elasticRoles - Result of elastic roles synchronization
  * @property {EntitySyncResult} ezreeportUsers - Result of ezreeport's users synchronization
  * @property {EntitySyncResult} ezreeportNamespaces - Result of ezreeport's namespaces sync
@@ -50,6 +52,7 @@ const syncStatus = {
     repositories: { errors: 0, synchronized: 0 },
     repositoryAliases: { errors: 0, synchronized: 0 },
     users: { errors: 0, synchronized: 0 },
+    apiKeys: { errors: 0, synchronized: 0 },
     elasticRoles: { errors: 0, synchronized: 0 },
     ezreeportUsers: { errors: 0, synchronized: 0 },
     ezreeportNamespaces: { errors: 0, synchronized: 0 },
@@ -81,6 +84,7 @@ async function startSync() {
     repositories: { errors: 0, synchronized: 0 },
     repositoryAliases: { errors: 0, synchronized: 0 },
     users: { errors: 0, synchronized: 0 },
+    apiKeys: { errors: 0, synchronized: 0 },
     elasticRoles: { errors: 0, synchronized: 0 },
     ezreeportUsers: { errors: 0, synchronized: 0 },
     ezreeportNamespaces: { errors: 0, synchronized: 0 },
@@ -137,6 +141,15 @@ async function startSync() {
     setSyncResult('users', await syncUsers());
   } catch (e) {
     setSyncResult('users', { fulfilled: 0, errors: 1 });
+    appLogger.error(`[sync] An error occurred during users synchronization: ${e}`);
+  }
+
+  // Sync api keys in Elastic
+  try {
+    appLogger.info('[sync] Synchronizing api keys...');
+    setSyncResult('apiKeys', await syncApiKeys());
+  } catch (e) {
+    setSyncResult('apiKeys', { fulfilled: 0, errors: 1 });
     appLogger.error(`[sync] An error occurred during users synchronization: ${e}`);
   }
 

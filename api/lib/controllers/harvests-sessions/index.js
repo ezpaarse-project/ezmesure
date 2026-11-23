@@ -7,7 +7,7 @@ const {
 } = require('../../entities/harvest-session.dto');
 
 const {
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireAdmin,
 } = require('../../services/auth');
@@ -28,7 +28,7 @@ const { getStartStatus, startOne } = require('./start');
 const { getStopStatus, stopOne } = require('./stop');
 
 router.use(
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireAdmin,
 );

@@ -55,12 +55,6 @@
         class="text-grey-darken-3"
       />
       <v-list-item
-        :title="$t('menu.myspace.authentificationToken')"
-        to="/myspace/token"
-        prepend-icon="$mdi-key"
-        class="text-grey-darken-3"
-      />
-      <v-list-item
         :title="$t('menu.myspace.settings')"
         to="/myspace/settings"
         prepend-icon="$mdi-cog"

@@ -143,11 +143,11 @@ exports.logout = async (ctx) => {
 };
 
 exports.refresh = async (ctx) => {
-  const { user, jwtData } = ctx.state;
+  const { user, authData: { data } } = ctx.state;
 
   // Use refresh token from JWT payload
-  if (jwtData.data.refreshToken) {
-    const auth = await openid.refreshTokenGrant(jwtData.data.refreshToken);
+  if (data.refreshToken) {
+    const auth = await openid.refreshTokenGrant(data.refreshToken);
 
     const ezToken = await signJWE(
       { id: user.id, refreshToken: auth.refresh_token },
@@ -165,8 +165,8 @@ exports.refresh = async (ctx) => {
   }
 
   // Don't extend impersonating duration but don't throw error until expired
-  const expiresInMs = jwtData.data.exp - Date.now();
-  if (jwtData.data.impersonatedBy && expiresInMs >= 1000) {
+  const expiresInMs = data.exp - Date.now();
+  if (data.impersonatedBy && expiresInMs >= 1000) {
     ctx.body = {
       refresh_token: true,
       expires_in: Math.floor(expiresInMs / 1000),

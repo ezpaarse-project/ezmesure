@@ -3,13 +3,13 @@ const { Joi } = require('koa-joi-router');
 
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireActiveJwt, requireUser } = require('../../../services/auth');
+const { requireActiveJWT, requireUser } = require('../../../services/auth');
 
 const {
   activateCurrentUser,
 } = require('./actions');
 
-router.use(requireActiveJwt, requireUser);
+router.use(requireActiveJWT, requireUser);
 
 router.route({
   method: 'POST',

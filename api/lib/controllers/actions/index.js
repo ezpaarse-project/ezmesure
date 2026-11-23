@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { requireActiveJwt, requireUser, requireAdmin } = require('../../services/auth');
+const { requireActiveAuth, requireUser, requireAdmin } = require('../../services/auth');
 
 const {
   standardQueryParams,
@@ -9,7 +9,7 @@ const {
   getOne,
 } = require('./actions');
 
-router.use(requireActiveJwt, requireUser, requireAdmin);
+router.use(requireActiveAuth, requireUser, requireAdmin);
 
 router.route({
   method: 'GET',

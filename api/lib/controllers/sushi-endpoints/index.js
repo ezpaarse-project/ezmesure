@@ -7,7 +7,7 @@ const {
 } = require('../../entities/sushi-endpoints.dto');
 
 const {
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireTermsOfUse,
   fetchSushiEndpoint,
@@ -30,7 +30,7 @@ const registry = require('./_registry');
 router.use(registry.prefix('/_registry').middleware());
 
 router.use(
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireTermsOfUse,
 );

@@ -10,3 +10,4 @@ require('./elastic-roles');
 require('./elastic-role-repository-permissions');
 require('./elastic-role-repository-alias-permissions');
 require('./space-permissions');
+require('./api-keys');

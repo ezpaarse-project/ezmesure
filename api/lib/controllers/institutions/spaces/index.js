@@ -4,7 +4,7 @@ const { Joi } = require('koa-joi-router');
 const { FEATURES } = require('../../../entities/memberships.dto');
 
 const {
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   fetchInstitution,
   requireMemberPermissions,
@@ -16,14 +16,14 @@ const {
   getInstitutionSpaces,
 } = require('./actions');
 
-router.use(requireActiveJwt, requireUser);
+router.use(requireActiveAuth, requireUser);
 
 router.route({
   method: 'GET',
   path: '/',
   handler: [
     fetchInstitution(),
-    requireMemberPermissions(FEATURES.memberships.read),
+    requireMemberPermissions(FEATURES.institution.read),
     getInstitutionSpaces,
   ],
   validate: {

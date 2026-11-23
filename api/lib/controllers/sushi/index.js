@@ -8,7 +8,7 @@ const {
 } = require('../../entities/sushi-credentials.dto');
 
 const {
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireAdmin,
   requireTermsOfUse,
@@ -56,7 +56,7 @@ const blockIfLocked = (ctx, next) => {
 };
 
 router.use(
-  requireActiveJwt,
+  requireActiveAuth,
   requireUser,
   requireTermsOfUse,
   blockIfLocked,
