@@ -24,7 +24,7 @@ const schema = {
 
   kibanaVersion: Joi.string().trim(),
   name: Joi.string().trim(),
-  description: Joi.string().trim(),
+  description: Joi.string().trim().allow(''),
 
   collectionId: Joi.string().trim().min(1).allow(null),
   collection: Joi.object(),
