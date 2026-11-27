@@ -89,10 +89,10 @@ const adminUpdateSchema = withModifiers(
  * Schema to be applied when an administrator imports multiple repositories
  */
 const adminImportSchema = withModifiers(
-  adminCreateSchema,
+  schema,
+  requireFields(['id', 'name', 'type', 'institutionId']),
   {
-    id: () => schema.id,
-    permissions: () => schema.permissions,
+    imageUrl: () => Joi.string().dataUri().allow(null),
   },
 );
 
