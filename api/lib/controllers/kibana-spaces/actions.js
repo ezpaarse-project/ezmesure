@@ -16,6 +16,7 @@ const { toDataUrl } = require('../../services/images');
 /* eslint-disable max-len */
 /**
  * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceCreateInput} SpaceCreateInput
+ * @typedef {import('../../.prisma/client.mjs').Prisma.SpaceUpdateInput} SpaceUpdateInput
 */
 /* eslint-enable max-len */
 
@@ -218,44 +219,71 @@ exports.importMany = async (ctx) => {
     }
 
     /** @type {SpaceCreateInput} */
-    const data = {
+    const createData = {
       ...item,
       institutionId: undefined,
       institution: {
         connect: { id: item.institutionId },
       },
+      dashboardCollections: {
+        create: item.dashboardCollections?.map((dashboardCollection) => ({
+          ...dashboardCollection,
+          collection: {
+            connect: {
+              id: dashboardCollection.collectionId,
+            },
+          },
+          repository: dashboardCollection.repositoryPattern ? {
+            connect: {
+              pattern: dashboardCollection.repositoryPattern,
+            },
+          } : undefined,
+          repositoryAlias: dashboardCollection.aliasPattern ? {
+            connect: {
+              pattern: dashboardCollection.aliasPattern,
+            },
+          } : undefined,
+          collectionId: undefined,
+          spaceId: undefined,
+          repositoryPattern: undefined,
+          aliasPattern: undefined,
+        })),
+      },
       permissions: {
-        connectOrCreate: item.permissions?.map(
-          (permission) => ({
-            where: {
-              username_spaceId: {
+        create: item.permissions?.map((permission) => ({
+          ...permission,
+          username: undefined,
+          institutionId: undefined,
+          spaceId: undefined,
+          membership: {
+            connect: {
+              username_institutionId: {
                 username: permission.username,
-                spaceId: item.id,
+                institutionId: permission.institutionId,
               },
             },
-            create: {
-              ...permission,
-              username: undefined,
-              institutionId: undefined,
-              spaceId: undefined,
-              membership: {
-                connect: {
-                  username_institutionId: {
-                    username: permission.username,
-                    institutionId: item.institutionId,
-                  },
-                },
-              },
-            },
-          }),
-        ),
+          },
+        })),
+      },
+    };
+
+    /** @type {SpaceUpdateInput} */
+    const updateData = {
+      ...createData,
+      dashboardCollections: {
+        deleteMany: {},
+        ...createData.dashboardCollections,
+      },
+      permissions: {
+        deleteMany: {},
+        ...createData.permissions,
       },
     };
 
     const space = await spacesService.upsert({
       where: { id: item.id },
-      create: data,
-      update: data,
+      create: createData,
+      update: updateData,
     });
 
     addResponseItem(space, 'created');
