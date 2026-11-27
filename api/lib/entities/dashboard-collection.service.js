@@ -14,17 +14,11 @@ const dashboardCollectionsPrisma = require('../services/prisma/dashboard-collect
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardCollectionFindManyArgs} DashboardCollectionFindManyArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardCollectionCreateArgs} DashboardCollectionCreateArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardCollectionDeleteArgs} DashboardCollectionDeleteArgs */
-/**
- * @typedef {{
- *  collection: DashboardCollection
- *  spaceId: Space['id']
- *  repositoryPattern: SpaceDashboardCollection['repositoryPattern']
- * }} SpaceCollectionChangeHookPayload
- */
+
 /* eslint-enable max-len */
 
-module.exports = class RepositoriesService extends BasePrismaService {
-  /** @type {BasePrismaService.TransactionFnc<RepositoriesService>} */
+module.exports = class DashboardCollectionService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<DashboardCollectionService>} */
   static $transaction = super.$transaction;
 
   /**
@@ -76,44 +70,6 @@ module.exports = class RepositoriesService extends BasePrismaService {
   async update(params) {
     const collection = await dashboardCollectionsPrisma.update(params, this.prisma);
     this.triggerHooks('dashboard_collection:update', collection);
-    return collection;
-  }
-
-  /**
-   *
-   * @param {string} collectionId
-   * @param {string} spaceId
-   * @param {string} repositoryPattern
-   */
-  async addToSpace(collectionId, spaceId, repositoryPattern) {
-    const collection = await dashboardCollectionsPrisma.addToSpace(
-      collectionId,
-      spaceId,
-      repositoryPattern,
-    );
-
-    /** @type {SpaceCollectionChangeHookPayload} */
-    const hookPayload = { collection, spaceId, repositoryPattern };
-    this.triggerHooks('dashboard_collection:added_to_space', hookPayload);
-    return collection;
-  }
-
-  /**
-   *
-   * @param {string} collectionId
-   * @param {string} spaceId
-   * @param {string} repositoryPattern
-   */
-  async removeFromSpace(collectionId, spaceId, repositoryPattern) {
-    const collection = await dashboardCollectionsPrisma.removeFromSpace(
-      collectionId,
-      spaceId,
-      repositoryPattern,
-    );
-
-    /** @type {SpaceCollectionChangeHookPayload} */
-    const hookPayload = { collection, spaceId, repositoryPattern };
-    this.triggerHooks('dashboard_collection:removed_from_space', hookPayload);
     return collection;
   }
 

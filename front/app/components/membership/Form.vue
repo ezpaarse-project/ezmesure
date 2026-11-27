@@ -71,7 +71,7 @@
                   >
                     <template #prepend>
                       <v-icon
-                        :icon="role.icon ?? '$mdi-tag-outline'"
+                        :icon="role.icon ? `$${role.icon}` : '$mdi-tag-outline'"
                         :color="role.color"
                       />
                     </template>

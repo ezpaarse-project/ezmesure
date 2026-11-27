@@ -9,12 +9,14 @@ const BasePrismaService = require('./base-prisma.service');
 /**
  * @typedef {import('../.prisma/client.mts').Harvest} Harvest
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestUpdateArgs} HarvestUpdateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestUpdateManyArgs} HarvestUpdateManyArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestUpsertArgs} HarvestUpsertArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestFindUniqueArgs} HarvestFindUniqueArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestFindFirstArgs} HarvestFindFirstArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestCountArgs} HarvestCountArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestCreateArgs} HarvestCreateArgs
+ * @typedef {import('../.prisma/client.mts').Prisma.HarvestCreateManyArgs} HarvestCreateManyArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestGroupByArgs} HarvestGroupByArgs
  * @typedef {import('../.prisma/client.mts').Prisma.HarvestInclude} HarvestInclude
@@ -81,6 +83,16 @@ module.exports = class HarvestsService extends BasePrismaService {
   }
 
   /**
+   * @param {HarvestCreateManyArgs} params
+   * @returns {Promise<number>}
+   */
+  async createMany(params) {
+    const { count } = await harvestPrisma.createMany(params, this.prisma);
+
+    return count;
+  }
+
+  /**
    * @param {HarvestFindManyArgs} params
    * @returns {Promise<Harvest[]>}
    */
@@ -118,6 +130,16 @@ module.exports = class HarvestsService extends BasePrismaService {
    */
   update(params) {
     return harvestPrisma.update(params, this.prisma);
+  }
+
+  /**
+   * @param {HarvestUpdateManyArgs} params
+   * @returns {Promise<number>}
+   */
+  async updateMany(params) {
+    const { count } = await harvestPrisma.updateMany(params, this.prisma);
+
+    return count;
   }
 
   /**

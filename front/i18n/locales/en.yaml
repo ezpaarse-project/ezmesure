@@ -1188,6 +1188,7 @@ repositoryAliases:
     Manage aliases
     |Manage {count} aliases
   alias: Alias
+  aliasOf: Alias of {pattern}
   target: Target repository pattern
   template: Template
   filtered: Filtered ?

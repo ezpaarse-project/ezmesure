@@ -42,7 +42,7 @@
         :disabled="disabledItems.has(role.id)"
         :title="role.label"
         :subtitle="role.description"
-        :prepend-icon="role.icon ?? '$mdi-tag-outline'"
+        :prepend-icon="role.icon ? `$${role.icon}` : '$mdi-tag-outline'"
       >
         <template #append="{ isSelected, select }">
           <v-list-item-action start>

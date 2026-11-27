@@ -13,7 +13,7 @@ const authString = Buffer.from(`${username}:${password}`).toString('base64');
 const DEFAULT_SPACE = 'default';
 const AUTH_COOKIE = {
   name: 'sid',
-  params: { httpOnly: true, path: '/' },
+  params: { httpOnly: true, path: '/kibana' },
 };
 
 /* eslint-disable max-len */
@@ -673,6 +673,7 @@ async function logoutUser(authToken) {
         name: AUTH_COOKIE.name,
         value: authToken,
         ...AUTH_COOKIE.params,
+        path: '/',
       }),
     },
     redirect: 'manual',

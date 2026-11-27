@@ -837,6 +837,10 @@
             "description": "Pattern of the repository that should be used in the dashboards",
             "type": "string"
           },
+          "aliasPattern": {
+            "description": "Pattern of the repository alias that should be used in the dashboards",
+            "type": "string"
+          },
           "collection": {
             "description": "The collection to load into the space",
             "allOf": [
@@ -864,6 +868,17 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/Repository"
+              },
+              {
+                "readOnly": true
+              }
+            ]
+          },
+          "repositoryAlias": {
+            "description": "The repository alias that should be used in the dashboards",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RepositoryAlias"
               },
               {
                 "readOnly": true
@@ -3801,14 +3816,28 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": ["repositoryPattern"],
-                "properties": {
-                  "repositoryPattern": {
-                    "description": "Pattern of the repository that should be used for the dashboards",
-                    "type": "string"
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": ["repositoryPattern"],
+                    "properties": {
+                      "repositoryPattern": {
+                        "description": "Pattern of the repository that should be used for the dashboards. Cannot be used with aliasPattern.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": ["aliasPattern"],
+                    "properties": {
+                      "aliasPattern": {
+                        "description": "Pattern of the repository alias that should be used for the dashboards. Cannot be used with repositoryPattern.",
+                        "type": "string"
+                      }
+                    }
                   }
-                }
+                ]
               }
             }
           }

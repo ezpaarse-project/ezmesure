@@ -35,10 +35,10 @@ async function startRefreshCron() {
         const indexCreationDate = await getIndexCreationDate();
 
         if (!dateIsValid(indexCreationDate)) {
-          appLogger.info('[OpenData] Index does not exist');
+          appLogger.verbose('[OpenData] Index does not exist');
           needRefresh = true;
         } else {
-          appLogger.info('[OpenData] Looking for dataset updates');
+          appLogger.verbose('[OpenData] Looking for dataset updates');
           needRefresh = datasets.some((dataset) => {
             const updatedAt = new Date(dataset && dataset.metas && dataset.metas.modified);
             return !dateIsValid(updatedAt) || dateIsBefore(indexCreationDate, updatedAt);

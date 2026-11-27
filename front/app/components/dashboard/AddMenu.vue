@@ -126,6 +126,7 @@ const {
   query: {
     q: debouncedSearch,
   },
+  lazy: true,
 });
 
 const errorMessage = computed(() => (error.value ? getErrorMessage(error.value) : undefined));

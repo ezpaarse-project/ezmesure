@@ -15,6 +15,7 @@ const { sendMail, generateMail } = require('../mail');
 const clean = config.get('users.clean');
 
 async function deleteMarkedUsers() {
+  const start = Date.now();
   const date = startOfDay(new Date()).getTime();
 
   appLogger.verbose('[user-deletion] Checking for users to delete...');
@@ -50,7 +51,7 @@ async function deleteMarkedUsers() {
     );
   });
 
-  appLogger.verbose(`[user-deletion] Deleted ${deletedUsers.length} users`);
+  appLogger.info(`[user-deletion] Deleted ${deletedUsers.length} users | took: ${Date.now() - start}ms`);
 
   await Promise.all(
     deletedUsers.map(async (user) => {

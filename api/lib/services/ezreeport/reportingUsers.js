@@ -1,7 +1,7 @@
 // @ts-check
 const elasticUsers = require('../elastic/users');
 const { client: prisma } = require('../prisma');
-const { generateRoleNameFromRepository } = require('../../hooks/utils');
+const { generateRoleNameFromRepository, generateRoleNameFromAlias } = require('../../hooks/utils');
 
 /** @typedef {import('../../.prisma/client.mjs').Institution} Institution */
 
@@ -23,11 +23,10 @@ const getReportUserFromInstitution = (institution) => ({
  */
 async function upsertReportUserFromInstitutionId(id) {
   const institution = await prisma.institution.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
     include: {
       repositories: true,
+      repositoryAliases: true,
     },
   });
 
@@ -35,7 +34,10 @@ async function upsertReportUserFromInstitutionId(id) {
     throw new Error('Not found');
   }
 
-  const roles = institution.repositories.map((repository) => generateRoleNameFromRepository(repository, 'readonly'));
+  const roles = [
+    ...institution.repositories.map((repository) => generateRoleNameFromRepository(repository, 'readonly')),
+    ...institution.repositoryAliases.map((alias) => generateRoleNameFromAlias(alias)),
+  ];
 
   const user = {
     ...getReportUserFromInstitution(institution),

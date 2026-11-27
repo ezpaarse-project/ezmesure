@@ -3,7 +3,7 @@ const BasePrismaService = require('./base-prisma.service');
 const dashboardsPrisma = require('../services/prisma/dashboards');
 
 /* eslint-disable max-len */
-/** @typedef {import('../.prisma/client.mts').SpaceDashboardCollections} Dashboard */
+/** @typedef {import('../.prisma/client.mts').Dashboard} Dashboard */
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardUpdateArgs} DashboardUpdateArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardUpsertArgs} DashboardUpsertArgs */
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardCountArgs} DashboardCountArgs */
@@ -14,8 +14,8 @@ const dashboardsPrisma = require('../services/prisma/dashboards');
 /** @typedef {import('../.prisma/client.mts').Prisma.DashboardDeleteArgs} DashboardDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class RepositoriesService extends BasePrismaService {
-  /** @type {BasePrismaService.TransactionFnc<RepositoriesService>} */
+module.exports = class DashboardService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<DashboardService>} */
   static $transaction = super.$transaction;
 
   /**

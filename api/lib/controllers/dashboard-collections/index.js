@@ -95,9 +95,10 @@ router.route({
       id: Joi.string().trim().required(),
       spaceId: Joi.string().trim().required(),
     },
-    body: {
-      repositoryPattern: Joi.string().trim().required(),
-    },
+    body: Joi.object({
+      repositoryPattern: Joi.string().trim(),
+      aliasPattern: Joi.string().trim(),
+    }).xor('repositoryPattern', 'aliasPattern'),
   },
 });
 
@@ -106,13 +107,9 @@ router.route({
   path: '/:id/spaces/:spaceId',
   handler: removeFromSpace,
   validate: {
-    type: 'json',
     params: {
       id: Joi.string().trim().required(),
       spaceId: Joi.string().trim().required(),
-    },
-    body: {
-      repositoryPattern: Joi.string().trim().required(),
     },
   },
 });

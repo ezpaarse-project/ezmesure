@@ -69,10 +69,9 @@ async function createAdminSpace() {
 
   await client.spaceDashboardCollection.upsert({
     where: {
-      collectionId_spaceId_repositoryPattern: {
+      collectionId_spaceId: {
         spaceId: spaceData.id,
         collectionId: 'counter-base-en',
-        repositoryPattern: 'z-admin-publisher*',
       },
     },
     update: collectionData,

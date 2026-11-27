@@ -294,7 +294,7 @@ emails:
       p3: Les données sont accessibles via vos tableaux de bord habituels, à condition d'en régler la temporalité à la période voulue.
       p4:
         withoutAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement pour nous permettre de le signaler aux éditeurs.
-        withAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement à <a href="mailto:{{ REPLY_TO }}">{{ REPLY_TO }}</a> pour nous permettre de le signaler aux éditeurs.
+        withAddress: Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement à <a href="mailto:{{ replyTo }}">{{ replyTo }}</a> pour nous permettre de le signaler aux éditeurs.
       p5: 'Vous pouvez continuer à saisir de nouveaux identifiants dans <a href="{{ credentialsURL }}">le formulaire ezCOUNTER</a>. À l’issue de cette saisie, merci de cliquer à nouveau sur le bouton “VALIDER MES IDENTIFIANTS” si vous souhaitez que les rapports soient à nouveau moissonnés pour votre établissement : nous procédons à des moissonnages réguliers, au moins une fois par mois.'
       outOfDate: Ces identifiants sont périmés !
       getToYourSpace: Accéder à votre espace

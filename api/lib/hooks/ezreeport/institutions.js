@@ -12,6 +12,7 @@ const { onMembershipUpsert } = require('./memberships');
 
 /**
  * @typedef {import('../../.prisma/client.mjs').Institution} Institution
+ * @typedef {import('../../.prisma/client.mjs').ElasticRole} ElasticRole
  */
 
 /**
@@ -56,9 +57,7 @@ const onInstitutionUpsert = async (institution) => {
   // Upsert reporting user
   let username;
   try {
-    username = (
-      await ezrReportingUsers.upsertReportUserFromInstitutionId(institution?.id)
-    )?.username;
+    ({ username } = await ezrReportingUsers.upsertReportUserFromInstitutionId(institution?.id));
     appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is upserted in elastic`);
   } catch (error) {
     appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);
@@ -80,7 +79,26 @@ const onInstitutionUpsert = async (institution) => {
   }
 };
 
-registerHook('institution:create', onInstitutionUpsert);
-registerHook('institution:update', onInstitutionUpsert);
-registerHook('institution:upsert', onInstitutionUpsert);
-registerHook('institution:delete', onInstitutionDelete);
+/**
+ * @param {{ role: ElasticRole, institution: Institution }} param0
+ */
+const onInstitutionRoleUpdate = async ({ institution }) => {
+  // Upsert reporting user
+  let username;
+  try {
+    ({ username } = await ezrReportingUsers.upsertReportUserFromInstitutionId(institution.id));
+    appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is upserted in elastic`);
+  } catch (error) {
+    appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);
+  }
+};
+
+const hookOptions = { uniqueResolver: (institution) => institution.id };
+
+registerHook('institution:create', onInstitutionUpsert, hookOptions);
+registerHook('institution:update', onInstitutionUpsert, hookOptions);
+registerHook('institution:upsert', onInstitutionUpsert, hookOptions);
+registerHook('institution:delete', onInstitutionDelete, hookOptions);
+
+registerHook('institution:connect:elastic_role', onInstitutionRoleUpdate, hookOptions);
+registerHook('institution:disconnect:elastic_role', onInstitutionRoleUpdate, hookOptions);
